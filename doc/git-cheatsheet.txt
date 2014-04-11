@@ -1,15 +1,5 @@
 ############################################################################### 
 #
-# Check if base pat file was modified in release
-#
-############################################################################### 
-cd test/
-diff $CMSSW_RELEASE_BASE/src/PhysicsTools/PatAlgos/test/patTuple_addJets_cfg.py patTuple_addJets_cfg_DONOTEDIT.py
-
-
-
-############################################################################### 
-#
 # git setup&workflow
 #   - see http://cms-sw.github.io/cmssw/tutorial.html
 #
@@ -52,8 +42,20 @@ git pull tomasz MNTriggerStudies
 
 git cms-sparse-checkout CMSSW_6_2_8 HEAD
 git read-tree -mu HEAD
+scram b -j 8
 
 
+
+# Git setup recipie ends here, random git stuff follows
+
+
+############################################################################### 
+#
+# Check if base pat file was modified in release
+#
+############################################################################### 
+cd test/
+diff $CMSSW_RELEASE_BASE/src/PhysicsTools/PatAlgos/test/patTuple_addJets_cfg.py patTuple_addJets_cfg_DONOTEDIT.py
 
 
 
