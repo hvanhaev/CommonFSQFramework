@@ -5,3 +5,61 @@
 ############################################################################### 
 cd test/
 diff $CMSSW_RELEASE_BASE/src/PhysicsTools/PatAlgos/test/patTuple_addJets_cfg.py patTuple_addJets_cfg_DONOTEDIT.py
+
+
+
+############################################################################### 
+#
+# git setup&workflow
+#   - see http://cms-sw.github.io/cmssw/tutorial.html
+#
+############################################################################### 
+
+
+# 1. get git/github working
+# if you dont have e-mail account see
+# http://cms-sw.github.io/cmssw/faq.html
+# remember to export your ssh keys to github!
+
+git config --global user.name [First Name] [Last Name]
+git config --global user.email [Email Address]
+git config --global user.github [GitHub account name]
+
+
+export SCRAM_ARCH=slc5_amd64_gcc472
+cmsrel CMSSW_6_2_8
+cd CMSSW_6_2_8/src/
+cmsenv
+
+git cms-addpkg L1Trigger/RPCTrigger # we dont really need that package, this
+is just to check everything works as expected
+# anser yes to:
+#  Your reference git repository does not seem to exist, would you like to
+#  create it? [ y / N / ? ] 
+
+
+scram b -j 8
+git remote add tomasz git@github.com:fruboes/cmssw.git
+git pull tomasz MNTriggerStudies
+
+#
+# If you get 
+#   ERROR: Storage server temporarily offline
+#
+# go to
+#   https://github.com/fruboes/cmssw
+# and see if you get same error. If yes you should probably wait some while...
+
+
+
+
+
+#################3333 OLD
+ git branch
+ git checkout -b MNTriggerStudies
+ git branch
+
+ git add/commit/etc
+
+ git remote -v show 
+ git push my-cmssw MNTriggerStudies
