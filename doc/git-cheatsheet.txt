@@ -31,14 +31,13 @@ cmsrel CMSSW_6_2_8
 cd CMSSW_6_2_8/src/
 cmsenv
 
-git cms-addpkg L1Trigger/RPCTrigger # we dont really need that package, this
-is just to check everything works as expected
+#git cms-addpkg L1Trigger/RPCTrigger # we dont really need that package, this
+#is just to check everything works as expected
+git cms-init
 # anser yes to:
 #  Your reference git repository does not seem to exist, would you like to
 #  create it? [ y / N / ? ] 
 
-
-scram b -j 8
 git remote add tomasz git@github.com:fruboes/cmssw.git
 git pull tomasz MNTriggerStudies
 
@@ -51,10 +50,15 @@ git pull tomasz MNTriggerStudies
 # and see if you get same error. If yes you should probably wait some while...
 
 
+git cms-sparse-checkout CMSSW_6_2_8 HEAD
+git read-tree -mu HEAD
 
 
 
-#################3333 OLD
+
+
+
+################################## OLD stuff
  git branch
  git checkout -b MNTriggerStudies
  git branch
