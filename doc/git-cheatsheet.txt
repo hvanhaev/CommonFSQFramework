@@ -1,0 +1,7 @@
+############################################################################### 
+#
+# Check if base pat file was modified in release
+#
+############################################################################### 
+cd test/
+diff $CMSSW_RELEASE_BASE/src/PhysicsTools/PatAlgos/test/patTuple_addJets_cfg.py patTuple_addJets_cfg_DONOTEDIT.py
