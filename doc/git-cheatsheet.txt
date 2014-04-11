@@ -7,9 +7,16 @@
 
 
 # 1. get git/github working
-# if you dont have e-mail account see
+# if you dont have github account see
+#
 # http://cms-sw.github.io/cmssw/faq.html
+#
+#  on how to acquire it.
+#
+#
 # remember to export your ssh keys to github!
+
+# Setup local git variables
 
 git config --global user.name [First Name] [Last Name]
 git config --global user.email [Email Address]
@@ -21,10 +28,8 @@ cmsrel CMSSW_6_2_8
 cd CMSSW_6_2_8/src/
 cmsenv
 
-#git cms-addpkg L1Trigger/RPCTrigger # we dont really need that package, this
-#is just to check everything works as expected
 git cms-init
-# anser yes to:
+# answer yes to:
 #  Your reference git repository does not seem to exist, would you like to
 #  create it? [ y / N / ? ] 
 
