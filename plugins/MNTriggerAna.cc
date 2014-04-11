@@ -91,6 +91,7 @@ void
 MNTriggerAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
+    std::cout << "miau" << std::endl;
 
 
 
