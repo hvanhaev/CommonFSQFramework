@@ -1,9 +1,10 @@
-#!/usr/bin/env python
+#! /usr/bin/env python
 
 import os, sys
 
 import ROOT
 ROOT.gROOT.SetBatch(True)
+from ROOT import *
 
 import pprint
 
@@ -113,38 +114,11 @@ if __name__ == "__main__":
     todo = ["preamble","dsFile","anaType","rootPath","onTheFlyCustomization","fun"]
     for t in todo:
         globals()[t] = getattr(mod,t)
-
-    print dsFile
-
-    sys.exit()
+    
 
 
-    anaType = getVariant()
+    dateTT = "20140411" ## TODO fixme!
 
-    spl = anaType.split("_")
-
-    dateTT = None
-    for s in spl:
-        if s.isdigit():
-            dateTT  = s
-
-    if not dateTT:
-        print "Cannot find date in variant string"
-        sys.exit(1)
-
-
-    '''
-    if "ZMuMu" in anaType:
-        Template="Template_ZMuMu"
-    elif "DiJet" in anaType:
-        Template="Template_DiJet" # TODO: from env
-    else:
-        raise "Whhops!"
-
-    exec "from DiJetAnalysis.DiJetAna.samples."+Template+" import preamble, dsFile, anaType, " \
-         " rootPath, onTheFlyCustomization, fun"
-
-    '''
     sam = {}
     sam=main(sam)
     printSam(sam)
