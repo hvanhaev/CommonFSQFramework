@@ -84,27 +84,19 @@ switchJetCollection(
    )
 
 
-##process.Tracer = cms.Service("Tracer")
-#process.p = cms.Path(
-    #process.selectedPatCandidates
-    #*process.selectedPatJetsAK5Calo
-    #*process.selectedPatJetsAK7Calo
-    #)
-
 
 keepProds = cms.untracked.vstring() 
 keepProds.append("keep *_addPileupInfo_*_*")
 keepProds.append("keep recoVertexs_offlinePrimaryVertices__RECO")
 #keepProds.append("keep recoVertexs_offlinePrimaryVerticesWithBS__RECO") # what to keep - with or wo beamspot?
 keepProds.append("keep GenEventInfoProduct_generator__SIM")
+keepProds.append("keep edmMergeableCounter_*_*_*") # for event counters inside lumi tree
 
-process.maxEvents.input = 10
-#process.out.outputCommands = [ ... ] 
+process.maxEvents.input = 50
 process.out.outputCommands.extend(keepProds)
-print process.out.outputCommands
 
 process.out.fileName = 'mnTrgAna_PAT.root'
-process.options.wantSummary = False
+process.options.wantSummary = True
 
 process.GlobalTag.globaltag = "START62_V1::All" ## (according to https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideFrontierConditions)
 indir = '/scratch/scratch0/data/store/mc/Fall13dr/QCD_Pt-50to80_Tune4C_13TeV_pythia8/AODSIM/castor_tsg_PU1bx50_POSTLS162_V1-v1/00000/'
@@ -112,6 +104,37 @@ f = indir + '00108F5C-D873-E311-BD7F-002618943914.root'
 process.source.fileNames = [
      'file:'+f
 ]
+
+process.initialCntr = cms.EDProducer("EventCountProducer")
+process.initialSequence = cms.Sequence(process.initialCntr)
+
+
+minJetPT = 35
+minJets  = 2
+jetSel = "pt > " + str(minJetPT)
+process.selectedPFJets = cms.EDFilter("PATJetSelector",
+     src = cms.InputTag("selectedPatJets"),
+     cut = cms.string(jetSel)
+)
+
+process.countPFJets = cms.EDFilter("PATCandViewCountFilter",
+    maxNumber = cms.uint32(999999),
+    src = cms.InputTag("selectedPFJets"),
+    minNumber = cms.uint32(minJets)
+)
+
+
+process.finalCntrPFJets = cms.EDProducer("EventCountProducer")
+process.pPFJets = cms.Path(     process.initialSequence
+                          * process.selectedPFJets
+                          * process.countPFJets
+                          * process.finalCntrPFJets    )
+
+
+
+process.out.SelectEvents = cms.untracked.PSet(
+        SelectEvents = cms.vstring('pPFJets')
+)
 
 
 
