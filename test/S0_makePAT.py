@@ -1,23 +1,51 @@
 ## import skeleton process
 # based on patTuple_addJets_cfg_DONOTEDIT.py
-
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 ## switch to uncheduled mode
 process.options.allowUnscheduled = cms.untracked.bool(True)
+########################################################################
+#
+# Configure event selection here
+#
+########################################################################
+minJetPT = 35
+minJets  = 2
+# on which jets should I base my event selection?
+usePFJetsInSelection = True
+useCaloJetsInSelection = True
+usePFCHSJetsInSelection = False
+#
+# above setting means: save all events having two PF jets with pt>35
+#                        or  two  calo jets with pt>35
+# PFCHS jets are not used in selection (warning/TODO - currently they 
+#                                                  will be saved anyway)
+########################################################################
+#
+# Input file, global tag
+#
+########################################################################
+## See  https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideFrontierConditions
+process.GlobalTag.globaltag = "START62_V1::All" 
+
+process.maxEvents.input = 150
+indir = '/scratch/scratch0/data/store/mc/Fall13dr/QCD_Pt-50to80_Tune4C_13TeV_pythia8/AODSIM/castor_tsg_PU1bx50_POSTLS162_V1-v1/00000/'
+f = indir + '00108F5C-D873-E311-BD7F-002618943914.root'
+process.source.fileNames = [
+     'file:'+f
+]
+process.out.fileName = 'mnTrgAna_PAT.root'
+process.options.wantSummary = False
+process.MessageLogger.cerr.FwkReport.reportEvery = 50
+
+
 
 ## to run in un-scheduled mode uncomment the following lines
 process.load("PhysicsTools.PatAlgos.producersLayer1.patCandidates_cff")
 process.load("PhysicsTools.PatAlgos.selectionLayer1.selectedPatCandidates_cff")
 from PhysicsTools.PatAlgos.tools.metTools import addMETCollection
 
-#addMETCollection(process, labelName='patMETTC', metSource='tcMet')
-#addMETCollection(process, labelName='patMETPF', metSource='pfType1CorrectedMet')
-
-## uncomment the following line to add different jet collections
-## to the event content
 from PhysicsTools.PatAlgos.tools.jetTools import addJetCollection
 from PhysicsTools.PatAlgos.tools.jetTools import switchJetCollection
-
 
 ## uncomment the following lines to add ak5JPTJets to your PAT output
 #addJetCollection(process,cms.InputTag('JetPlusTrackZSPCorJetAntiKt5'),
@@ -92,52 +120,55 @@ keepProds.append("keep recoVertexs_offlinePrimaryVertices__RECO")
 keepProds.append("keep GenEventInfoProduct_generator__SIM")
 keepProds.append("keep edmMergeableCounter_*_*_*") # for event counters inside lumi tree
 
-process.maxEvents.input = 50
 process.out.outputCommands.extend(keepProds)
-
-process.out.fileName = 'mnTrgAna_PAT.root'
-process.options.wantSummary = True
-
-process.GlobalTag.globaltag = "START62_V1::All" ## (according to https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideFrontierConditions)
-indir = '/scratch/scratch0/data/store/mc/Fall13dr/QCD_Pt-50to80_Tune4C_13TeV_pythia8/AODSIM/castor_tsg_PU1bx50_POSTLS162_V1-v1/00000/'
-f = indir + '00108F5C-D873-E311-BD7F-002618943914.root'
-process.source.fileNames = [
-     'file:'+f
-]
 
 process.initialCntr = cms.EDProducer("EventCountProducer")
 process.initialSequence = cms.Sequence(process.initialCntr)
 
-
-minJetPT = 35
-minJets  = 2
 jetSel = "pt > " + str(minJetPT)
-process.selectedPFJets = cms.EDFilter("PATJetSelector",
-     src = cms.InputTag("selectedPatJets"),
-     cut = cms.string(jetSel)
-)
 
-process.countPFJets = cms.EDFilter("PATCandViewCountFilter",
-    maxNumber = cms.uint32(999999),
-    src = cms.InputTag("selectedPFJets"),
-    minNumber = cms.uint32(minJets)
-)
+interestingJetsCollections = {}
+if usePFJetsInSelection:
+    interestingJetsCollections["PF"] = "selectedPatJets"
+if useCaloJetsInSelection:
+    interestingJetsCollections["Calo"] = "selectedPatJetsAK5CaloCopy"
+if usePFCHSJetsInSelection:
+    interestingJetsCollections["PFCHS"] = "selectedPatJetsAK5PFCHS"
 
 
-process.finalCntrPFJets = cms.EDProducer("EventCountProducer")
-process.pPFJets = cms.Path(     process.initialSequence
-                          * process.selectedPFJets
-                          * process.countPFJets
-                          * process.finalCntrPFJets    )
+selectorPaths = cms.vstring()
+for jc in interestingJetsCollections:
+    selector = cms.EDFilter("PATJetSelector",
+        src = cms.InputTag(interestingJetsCollections[jc]),
+        cut = cms.string(jetSel)
+    )
+    selectorLabel = "selectedTFJets"+jc
 
+    filter = cms.EDFilter("PATCandViewCountFilter",
+        maxNumber = cms.uint32(999999),
+        src = cms.InputTag(selectorLabel),
+        minNumber = cms.uint32(minJets)
+    )
+    filterLabel = "filterTFJets"+jc
+
+    counter = cms.EDProducer("EventCountProducer")
+    counterLabel = "countTFJets"+jc
+
+    setattr(process, selectorLabel, selector)
+    setattr(process, filterLabel, filter)
+    setattr(process, counterLabel, counter)
+
+    pathTF = cms.Path( process.initialSequence
+                      *getattr(process,selectorLabel)
+                      *getattr(process,filterLabel) 
+                      *getattr(process,counterLabel) 
+                     )
+    pathTFlabel="p"+jc
+    setattr(process, pathTFlabel, pathTF)
+    selectorPaths.append(pathTFlabel)
 
 
 process.out.SelectEvents = cms.untracked.PSet(
-        SelectEvents = cms.vstring('pPFJets')
+        SelectEvents = selectorPaths
 )
-
-
-
-
-
 
