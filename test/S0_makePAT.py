@@ -38,7 +38,7 @@ process.options.wantSummary = False
 process.MessageLogger.cerr.FwkReport.reportEvery = 50
 
 
-
+process.TFileService = cms.Service("TFileService", fileName = cms.string("trees.root") )
 ## to run in un-scheduled mode uncomment the following lines
 process.load("PhysicsTools.PatAlgos.producersLayer1.patCandidates_cff")
 process.load("PhysicsTools.PatAlgos.selectionLayer1.selectedPatCandidates_cff")
@@ -137,6 +137,7 @@ if usePFCHSJetsInSelection:
 
 
 selectorPaths = cms.vstring()
+process.schedule = cms.Schedule()
 for jc in interestingJetsCollections:
     selector = cms.EDFilter("PATJetSelector",
         src = cms.InputTag(interestingJetsCollections[jc]),
@@ -166,6 +167,15 @@ for jc in interestingJetsCollections:
     pathTFlabel="p"+jc
     setattr(process, pathTFlabel, pathTF)
     selectorPaths.append(pathTFlabel)
+    process.schedule.append(getattr(process, pathTFlabel))
+
+
+process.treeProd1 = cms.EDAnalyzer("ExampleTreeProducer")
+process.p = cms.Path(process.treeProd1)
+process.schedule.append(process.p) # TODO tree producer will run through all events, not depending on the filtering results
+
+
+
 
 
 process.out.SelectEvents = cms.untracked.PSet(
