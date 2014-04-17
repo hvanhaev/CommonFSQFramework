@@ -46,11 +46,14 @@ class ExampleTreeProducer : public edm::EDAnalyzer {
 
 
    private:
+      void resetTrees();
       virtual void beginJob() override;
       virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
       virtual void endJob() override;
 
       TTree *m_tree;
+      std::map<std::string, int> m_integerBranches;
+
 
       //virtual void beginRun(edm::Run const&, edm::EventSetup const&) override;
       //virtual void endRun(edm::Run const&, edm::EventSetup const&) override;
@@ -78,10 +81,31 @@ ExampleTreeProducer::ExampleTreeProducer(const edm::ParameterSet& iConfig)
     edm::Service<TFileService> tFileService;
     m_tree = tFileService->make<TTree>("data", "data");
 
+    // define your branches. Registration will be made automagically
+    m_integerBranches["run"] = 0;
+    m_integerBranches["lumi"] = 0;
+    m_integerBranches["event"] = 0;
+
+
+    std::map<std::string, int>::iterator it =  m_integerBranches.begin();
+    std::map<std::string, int>::iterator itE =  m_integerBranches.end();
+    for (;it != itE;++it){
+        m_tree->Branch(it->first.c_str(), &it->second, (it->first+"/I").c_str());
+    }
+
    //now do what ever initialization is needed
 
 }
+void ExampleTreeProducer::resetTrees(){
+    std::map<std::string, int>::iterator it =  m_integerBranches.begin();
+    std::map<std::string, int>::iterator itE =  m_integerBranches.end();
+    for (;it != itE;++it){
+            m_integerBranches[it->first]=0;
+    }
 
+
+
+}
 
 ExampleTreeProducer::~ExampleTreeProducer()
 {
@@ -100,7 +124,14 @@ ExampleTreeProducer::~ExampleTreeProducer()
 void
 ExampleTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-   using namespace edm;
+    using namespace edm;
+    resetTrees();
+
+    //std::cout << "Moin Agatko!" << std::endl;
+    m_integerBranches["run"] = iEvent.eventAuxiliary().run();
+    m_integerBranches["lumi"] = iEvent.eventAuxiliary().luminosityBlock();
+    m_integerBranches["event"] = iEvent.eventAuxiliary().event();
+
 
 
 
@@ -113,6 +144,9 @@ ExampleTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
    ESHandle<SetupData> pSetup;
    iSetup.get<SetupRecord>().get(pSetup);
 #endif
+
+    m_tree->Fill();
+
 }
 
 
