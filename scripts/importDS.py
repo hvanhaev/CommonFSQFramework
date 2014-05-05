@@ -7,6 +7,8 @@ ROOT.gROOT.SetBatch(True)
 from ROOT import *
 
 import pprint
+from elementtree import ElementTree
+#from elementtree.ElementTree import ElementTree
 
 #from DiJetAnalysis.Common.Util import *
 
@@ -36,6 +38,8 @@ def main(sam):
 
         # todo: set path also via "fun"
         #path discrovery
+
+        '''
         pathList = set()
         for r,d,f in os.walk(rootPath(dateTT)):
             for files in f:
@@ -49,6 +53,54 @@ def main(sam):
             print "Problem with paths:", name, pathList
         else:
             sam[name]["path"] = pathList.pop() + "/"
+        '''
+
+
+        # SEDir for copying
+        #DiJet_20140214_METFwd-Run2010B-Apr21ReReco-v1
+        crabDirName = "DiJet_20140214_METFwd-Run2010B-Apr21ReReco-v1"
+        print "Warning - devel name of crab dir"
+        # crabDirName = name
+        crabResDir = crabDirName + "/res/"
+
+        SEDirs = set()
+        for  r,d,f in os.walk(crabResDir):
+            for file in f:
+                if not file.endswith(".xml"): continue
+                if not file.startswith("crab_fjr_"): continue
+                if "Submission_" in r: continue
+                crabFjr = r+"/"+file
+                fp = open(crabFjr,"r")
+                mydoc = ElementTree.parse(fp)
+                pfnDir=None
+                for e in mydoc.findall('./File/PFN'):
+                    if pfnDir != None:
+                        print "Allready have a pfn in", crabFjr
+                    else:
+                        pfnDir = e.text.strip()
+                    
+                    #print pfnDir
+                    fileName = pfnDir.split("/")[-1]
+                    pfnDir = pfnDir.replace(fileName,"")
+                    SEDirs.add(pfnDir)
+
+                if len(SEDirs) > 0: # makes consistency checks above useless, but it;s to long to parse all xml files
+                    break
+
+        SEDir = None
+        if len(SEDirs)!=1: 
+            print "Problem determining SE dir for", name, "- candidates are: ", SEDirs
+        else:
+            SEDir = SEDirs.pop()
+
+        sam[name]["SEDir"] = SEDir
+
+
+
+
+
+
+
 
     return sam
 
