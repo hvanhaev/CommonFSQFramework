@@ -129,9 +129,9 @@ for s in sampleListTodo:
 
 
 
-  print command
-  sys.exit()
-  #os.system(command)
+  #print command
+  #sys.exit()
+  os.system(command)
 
   cfgName = None
   with open("crab.cfg", "r") as cfg:
