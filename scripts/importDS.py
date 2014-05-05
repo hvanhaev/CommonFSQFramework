@@ -145,8 +145,10 @@ def printSam(sam):
         localBasePathTrees = mod.TTreeBasePATH
 
         for s in sam:
-            sam[s]["pathPAT"] = sam[s]["pathPAT"].replace("XXXTMFPAT", localBasePathPAT)
-            sam[s]["pathTrees"] = sam[s]["pathTrees"].replace("XXXTMFTTree", localBasePathTrees)
+            if "pathPAT" in sam[s]:
+                sam[s]["pathPAT"] = sam[s]["pathPAT"].replace("XXXTMFPAT", localBasePathPAT)
+            if "pathTrees" in sam[s]:
+                sam[s]["pathTrees"] = sam[s]["pathTrees"].replace("XXXTMFTTree", localBasePathTrees)
             #print sam[s]["pathPAT"]
             #print sam[s]["pathTrees"]
         return sam
