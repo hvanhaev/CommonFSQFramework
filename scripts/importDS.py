@@ -8,9 +8,6 @@ from ROOT import *
 
 import pprint
 from elementtree import ElementTree
-#from elementtree.ElementTree import ElementTree
-
-#from DiJetAnalysis.Common.Util import *
 
 
 def main(sam):
@@ -36,31 +33,9 @@ def main(sam):
             if value != None:
                 sam[name][f] = value
 
-        # todo: set path also via "fun"
-        #path discrovery
-
-        '''
-        pathList = set()
-        for r,d,f in os.walk(rootPath(dateTT)):
-            for files in f:
-                if files.endswith(".root"):
-                     if name in r:
-                        pathList.add( r )
-                        #print  name, r
-                     #fullname = os.path.join(r,files)
-
-        if len(pathList) != 1:
-            print "Problem with paths:", name, pathList
-        else:
-            sam[name]["path"] = pathList.pop() + "/"
-        '''
-
-
-        # SEDir for copying
-        #DiJet_20140214_METFwd-Run2010B-Apr21ReReco-v1
-        crabDirName = "DiJet_20140214_METFwd-Run2010B-Apr21ReReco-v1"
-        print "Warning - devel name of crab dir"
-        # crabDirName = name
+        #crabDirName = "DiJet_20140214_METFwd-Run2010B-Apr21ReReco-v1"
+        #print "Warning - devel name of crab dir"
+        crabDirName = name
         crabResDir = crabDirName + "/res/"
 
         SEDirs = set()
@@ -90,11 +65,38 @@ def main(sam):
         SEDir = None
         if len(SEDirs)!=1: 
             print "Problem determining SE dir for", name, "- candidates are: ", SEDirs
+            print "   Note: this is perfectly normal if you are before running crab or none of your jobs produced usable output "
+            print ""
         else:
             SEDir = SEDirs.pop()
+            # put also local paths together
 
-        sam[name]["SEDir"] = SEDir
+            sam[name]["pathSE"] = SEDir
+            tagBasePathPAT = "XXXTMFPAT"  # note this tag in customization function below
+            tagBasePathTrees = "XXXTMFTTree" # note this tag in customization function below
+            basePathName = ""
+            startRecording = False
+            for x in SEDir.split("/"):
+                if x == "store":
+                    startRecording = True
 
+                if startRecording:
+                    basePathName += "/" + x
+                    
+            basePathName += "/"
+
+            sam[name]["pathPAT"] = "/" + tagBasePathPAT + basePathName
+            sam[name]["pathTrees"] = "/" + tagBasePathTrees + basePathName
+            todo = [sam[name]["pathPAT"], sam[name]["pathTrees"]]
+            for t in todo:
+                cnt = 0
+                for r,d,f in os.walk(t):
+                    for files in f:
+                        if not files.endswith(".root"): continue
+                        cnt += 1
+
+                if cnt == 0:
+                    print "Warning - empty path", t
 
 
 
@@ -125,6 +127,34 @@ def printSam(sam):
 
     epilogue = onTheFlyCustomization()
     toFile.append(epilogue)
+
+    toFile.append('''def fixLocalPaths(sam):
+        import os,imp
+        if "SmallXAnaDefFile" not in os.environ:
+            print "Please set SmallXAnaDefFile environment variable:"
+            print "export SmallXAnaDefFile=FullPathToFile"
+            raise Exception("Whooops! SmallXAnaDefFile env var not defined")
+
+        anaDefFile = os.environ["SmallXAnaDefFile"]
+        mod_dir, filename = os.path.split(anaDefFile)
+        mod, ext = os.path.splitext(filename)
+        f, filename, desc = imp.find_module(mod, [mod_dir])
+        mod = imp.load_module(mod, f, filename, desc)
+
+        localBasePathPAT = mod.PATbasePATH
+        localBasePathTrees = mod.TTreeBasePATH
+
+        for s in sam:
+            sam[s]["pathPAT"] = sam[s]["pathPAT"].replace("XXXTMFPAT", localBasePathPAT)
+            sam[s]["pathTrees"] = sam[s]["pathTrees"].replace("XXXTMFTTree", localBasePathTrees)
+            #print sam[s]["pathPAT"]
+            #print sam[s]["pathTrees"]
+        return sam
+sam = fixLocalPaths(sam)
+''' )
+
+
+
 
     ofile = "Samples_"+anaVersion+".py"
     if os.path.isfile(ofile):
