@@ -8,7 +8,7 @@ process.options.allowUnscheduled = cms.untracked.bool(True)
 # Configure event selection here
 #
 ########################################################################
-minJetPT = 35
+minJetPT = 28
 minJets  = 2
 # on which jets should I base my event selection?
 usePFJetsInSelection = True
@@ -119,6 +119,19 @@ keepProds.append("keep recoVertexs_offlinePrimaryVertices__RECO")
 #keepProds.append("keep recoVertexs_offlinePrimaryVerticesWithBS__RECO") # what to keep - with or wo beamspot?
 keepProds.append("keep GenEventInfoProduct_generator__SIM")
 keepProds.append("keep edmMergeableCounter_*_*_*") # for event counters inside lumi tree
+# TODO - generator weight
+
+keepProds.extend(['keep edmTriggerResults_*_*_HLT',
+                  'keep triggerTriggerEvent_*_*_*',
+                  'keep *_hltL1extraParticlesCentral_*_*',
+                  'keep *_hltL1extraParticlesNonIsolated_*_*',
+                  'keep *_hltL1extraParticlesTau_*_*',
+                  'keep l1extra*_*_*_*']
+)
+
+
+
+
 
 process.out.outputCommands.extend(keepProds)
 
@@ -173,6 +186,8 @@ for jc in interestingJetsCollections:
 process.treeProd1 = cms.EDAnalyzer("ExampleTreeProducer")
 process.p = cms.Path(process.treeProd1)
 process.schedule.append(process.p) # TODO tree producer will run through all events, not depending on the filtering results
+process.schedule.append(process.outpath)
+
 
 
 
