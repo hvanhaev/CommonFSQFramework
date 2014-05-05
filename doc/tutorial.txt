@@ -1,0 +1,26 @@
+1. Follow git-cheatsheet to get the code. Build it
+
+
+2. Create a file containing definition of data directories (for PAT tuples and trees):
+
+-----------------
+PATbasePATH="/scratch/scratch0/tfruboes/DJNewFW/PATFiles/"
+TTreeBasePATH="/scratch/scratch0/tfruboes/DJNewFW/TreeFiles/"
+-----------------
+
+in yours you should give correct paths. Tell the framework where this file is 
+by setting shell env variable:
+
+export SmallXAnaDefFile=~/MyAnalisys.py
+
+
+3. Another shell environment variable (SmallXAnaVersion) contains path to a
+file with samples definition. You can set this variable by sourcing selected
+file from 
+
+MNTriggerStudies/MNTriggerAna/env/
+
+directory
+
+
+
