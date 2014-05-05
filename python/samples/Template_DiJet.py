@@ -11,12 +11,12 @@ cbWMS="https://wmscms.cern.ch:7443/glite_wms_wmproxy_server"
 #skimEfficiencyMethod="getSkimEffFromME"
 skimEfficiencyMethod="getSkimEff"
 
-from DiJetAnalysis.DiJetAna.ana.DiJetBalanceSelector import DiJetBalanceSelector
-MySelector  = DiJetBalanceSelector()
-from DiJetAnalysis.DiJetAna.ana.DiJetBalanceVariables import DiJetBalanceVariables
-MyVariables = DiJetBalanceVariables()
-MyVariables.doBalanceAnalisys()
-MySelector.doBalanceAnalysis()
+#from DiJetAnalysis.DiJetAna.ana.DiJetBalanceSelector import DiJetBalanceSelector
+#MySelector  = DiJetBalanceSelector()
+#from DiJetAnalysis.DiJetAna.ana.DiJetBalanceVariables import DiJetBalanceVariables
+#MyVariables = DiJetBalanceVariables()
+#MyVariables.doBalanceAnalisys()
+#MySelector.doBalanceAnalysis()
 
 #MyVariables.doDiJetAnalysis()
 #MySelector.doDiJetAnalysis()
@@ -110,96 +110,45 @@ def XS(ds):
         return -1
 
     s = {}
-    #                                                              654130000
     s["QCD_Pt_15to30_TuneZ2star_HFshowerLibrary_7TeV_pythia6"]   = 8.1591283E8
-    #                                                              42464000
-    s["QCD_Pt_30to50_TuneZ2star_HFshowerLibrary_7TeV_pythia6"]   = 53122368.0
-    #                                                               5113600
-    s["QCD_Pt_50to80_TuneZ2star_HFshowerLibrary_7TeV_pythia6"]   =  6359119.0
-    #                                                                636160
-    s["QCD_Pt_80to120_TuneZ2star_HFshowerLibrary_7TeV_pythia6"]  =   784265.2
-    #                                                                 93495
-    s["QCD_Pt_120to170_TuneZ2star_HFshowerLibrary_7TeV_pythia6"] =   115133.5
-    s["QCD_Pt_170to300_TuneZ2star_HFshowerLibrary_7TeV_pythia6"] =    24262.83
-    s["QCD_Pt_300to470_TuneZ2star_HFshowerLibrary_7TeV_pythia6"] =     1168.494
 
 
-    # it looks, like the fwd xs from prep page allready include filter efficiency
-    factor = 1e9    
-    s["QCD_Pt_10to25_fwdJet_TuneZ2star_HFshowerLibrary_7TeV_pythia6"] =  3.651* factor *  0.06727
-    s["QCD_Pt_25to40_fwdJet_TuneZ2star_HFshowerLibrary_7TeV_pythia6"] =  0.1059* factor *   0.27707
-    s["QCD_Pt_40to80_fwdJet_TuneZ2star_HFshowerLibrary_7TeV_pythia6"] =  0.01771* factor *   0.25234
-    s["QCD_Pt_80to150_fwdJet_TuneZ2star_HFshowerLibrary_7TeV_pythia6"] =  8.756E-4*factor *   0.19052
-    s["QCD_Pt_150toInf_fwdJet_TuneZ2star_HFshowerLibrary_7TeV_pythia6"] =  4.76E-5*factor *   0.14464
+    #print "TODO: not sure if xs values from pdmv are fetched correctly"
+    s["QCD_Pt-15to30_Tune4C_13TeV_pythia8"] = 1644000000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00041
+    s["QCD_Pt-30to50_Tune4C_13TeV_pythia8"] = 164400000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00042
+    s["QCD_Pt-50to80_Tune4C_13TeV_pythia8"] = 21930000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00043
+    s["QCD_Pt-80to120_Tune4C_13TeV_pythia8"] = 3000000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00044
+    s["QCD_Pt-120to170_Tune4C_13TeV_pythia8"] = 493200.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00045
+    s["QCD_Pt-170to300_Tune4C_13TeV_pythia8"] = 12030.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00046
+    s["QCD_Pt-300to470_Tune4C_13TeV_pythia8"] = 7475.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00047
+    s["QCD_Pt-470to600_Tune4C_13TeV_pythia8"] = 587.1 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00048
+    s["QCD_Pt-600to800_Tune4C_13TeV_pythia8"] = 167.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00049
+    s["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"] = 28.25 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00050
+    s["QCD_Pt-1000to1400_Tune4C_13TeV_pythia8"] = 8.975 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00051
+    s["QCD_Pt-1400to1800_Tune4C_13TeV_pythia8"] = 0.8975 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00052
+    s["QCD_Pt-1800_Tune4C_13TeV_pythia8"] = 0.737844 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00053
 
+    s["QCD_Pt-5to10_Tune4C_13TeV_pythia8"] = 80710000000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00001
+    s["QCD_Pt-10to15_Tune4C_13TeV_pythia8"] = 7528000000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00002
 
-    #'''
-    #                                                           654 130 000
-    s["QCD_Pt-15to30_Tune23_HFshowerLibrary_7TeV_herwigpp"] = 1.25100006E9
-
-    #                                                        42 464 000
-    s["QCD_Pt-30to50_Tune23_HFshowerLibrary_7TeV_herwigpp"] = 8.31E7
-    
-    #                                                         5113600
-    s["QCD_Pt-50to80_Tune23_HFshowerLibrary_7TeV_herwigpp"] = 1.001E7
-    #                                                           636160  
-    s["QCD_Pt-80to120_Tune23_HFshowerLibrary_7TeV_herwigpp"] = 1221000.0
-
-    #
-    # 179200.0/36040.0=4.972253052164262 # best cand pair
-    #                                                            93495   
-    s["QCD_Pt-120to170_Tune23_HFshowerLibrary_7TeV_herwigpp"] = 179200.0
-
-    s["QCD_Pt-170to300_Tune23_HFshowerLibrary_7TeV_herwigpp"] =  36040.0
-
-    s["QCD_Pt-300to470_Tune23_HFshowerLibrary_7TeV_herwigpp"] =  1702.0
-
-
-    # https://twiki.cern.ch/twiki/bin/view/CMS/ProductionSummer2011#HERWIG
-    # weighted samples, so the pt spectrum is flat
-
-    # 0.0430588744076 * herwigXS = 9.5E8
-    s["QCD_Pt-15to3000_Tune23_Flat_HFshowerLibrary_7TeV_herwigpp"] =    2.21268193E10
-    # '''
-    s["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"] = 2.213E10 
-
-
-
-    # xs from Tom - https://twiki.cern.ch/twiki/bin/viewauth/CMS/FSQxsec
-    '''
-    s["QCD_Pt-15to3000_Tune23_Flat_HFshowerLibrary_7TeV_herwigpp"] = 2.3841e+10 # err 1.15937e+8
-    s["QCD_Pt-15to30_Tune23_HFshowerLibrary_7TeV_herwigpp"] = 8.41666e+8 # err 4.03076e+6
-    s["QCD_Pt-30to50_Tune23_HFshowerLibrary_7TeV_herwigpp"] = 5.57944e+7 # err 3.0054e+5
-    s["QCD_Pt-50to80_Tune23_HFshowerLibrary_7TeV_herwigpp"] = 6.83871e+6 # err 2.7796e+4
-    s["QCD_Pt-80to120_Tune23_HFshowerLibrary_7TeV_herwigpp"] = 8.67734e+5 # err 3.60005e+3
-    s["QCD_Pt-120to170_Tune23_HFshowerLibrary_7TeV_herwigpp"] = 1.29717e+5 # err 5.41466e+2
-    s["QCD_Pt-170to300_Tune23_HFshowerLibrary_7TeV_herwigpp"] = 2.84432e+4 # err 1.58357e+2
-    s["QCD_Pt-300to470_Tune23_HFshowerLibrary_7TeV_herwigpp"] = 1.40208e+3 # err 7.93158
-    s["QCD_Pt-470to600_Tune23_HFshowerLibrary_7TeV_herwigpp"] = 87.1996 # err 0.523422
-    s["QCD_Pt-600to800_Tune23_HFshowerLibrary_7TeV_herwigpp"] = 19.9533 # err 0.115348 
-    '''
-
-
-
-
-
-
-    '''
-    todo = { "pythia6" : s["DiJet_20131008_QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"],
-             "herwigpp": s["DiJet_20131008_QCD_Pt-15to3000_Tune23_Flat_HFshowerLibrary_7TeV_herwigpp"]
-           }
-    for t in todo:
-        sum = 0.
-        for sam in s:
-            if not t in sam: continue
-            if "15to3000" in sam: continue
-            sum += s[sam]
-        print t, sum/todo[t]
-    '''
+    s["MinBias_TuneA2MB_13TeV_pythia8"] = 78420000000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00015
+    s["EWKWplus_mqq120_mnl50_13TeV_madgraph-pythia8"] = 14.246 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00016
+    s["EWKWmin_mqq120_mnl50_13TeV_madgraph-pythia8"] = 9.4569 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00017
+    s["GammaGammaToMuMu_Elastic_Pt3_13TeV_lpair"] = 1.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00018
+    s["GammaGammaToTauTau_Elastic_Pt3_13TeV_lpair"] = 1.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00019
+    s["EWKZjj_mqq120_mll50_13TeV_madgraph-pythia8"] = 1.949 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00020
+    s["CEPGammaGamma_Pt2p5_13TeV_SuperCHIC"] = 1.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00021
+    s["Upsilon1SToMuMu_13TeV_starlight"] = 1.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00022
+    s["MinBias_TuneZ2star_13TeV_pythia6"] = 78260000000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00023
+    s["DYToMuMu_M-50_Tune4C_13TeV-pythia8"] = 1785.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00024
+    s["DYToEE_M-50_Tune4C_13TeV-pythia8"] = 1728.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00025
 
     dsName = name(ds)
     if dsName in s:
         return s[dsName]
+    else:
+        print "FIXME - XS missing for", dsName
+        print '    s["'+dsName+'"] = '
     return -1
 
 # not needed?
