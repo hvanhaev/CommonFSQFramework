@@ -69,9 +69,15 @@ for s in sampleList:
         #print srcFile, targetFile
         cnt += 1
 
-        print "Copying", typeString, " #"+str(cnt), "from", s
         cpCommand = ['lcg-cp', srcFile, targetFile]
         #cpCommand = ['lcg-ls', srcFile]
+        if os.path.isfile(targetFile):
+            print "Allready present", typeString, " #"+str(cnt), "from", s
+            continue
+
+        print "Copying", typeString, " #"+str(cnt), "from", s
+
+
         result = subprocess.call(cpCommand)
         if result != 0:
             print "Problem within sample", s, "file", srcFile
