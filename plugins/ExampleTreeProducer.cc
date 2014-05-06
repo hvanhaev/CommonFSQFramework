@@ -58,6 +58,7 @@ class ExampleTreeProducer : public edm::EDAnalyzer {
       TTree *m_tree;
       std::map<std::string, int> m_integerBranches;
       std::map<std::string, float> m_floatBranches;
+      std::map<std::string, std::vector<reco::Candidate::LorentzVector> > m_vectorBranches;
 
 
       //virtual void beginRun(edm::Run const&, edm::EventSetup const&) override;
@@ -105,6 +106,10 @@ ExampleTreeProducer::ExampleTreeProducer(const edm::ParameterSet& iConfig)
     m_floatBranches["subleadJetPt"] = 0;
     m_floatBranches["subleadJetEta"] = 0;
 
+
+    // 
+    m_vectorBranches["pfJets"] = std::vector<reco::Candidate::LorentzVector>();
+
     // integer branches auto registration
     {
         std::map<std::string, int>::iterator it =  m_integerBranches.begin();
@@ -123,6 +128,17 @@ ExampleTreeProducer::ExampleTreeProducer(const edm::ParameterSet& iConfig)
         }
 
     }
+
+
+    // vector branches autoreg
+    {   
+        std::map<std::string, std::vector<reco::Candidate::LorentzVector> >::iterator it =  m_vectorBranches.begin();
+        std::map<std::string, std::vector<reco::Candidate::LorentzVector> >::iterator itE =  m_vectorBranches.end();
+        for (;it != itE;++it){
+            m_tree->Branch(it->first.c_str(), &it->second);//#;, (it->first+"/I").c_str());
+        }
+    }
+
 
 
 }
@@ -145,6 +161,17 @@ void ExampleTreeProducer::resetTrees(){
                 m_floatBranches[it->first]=0;
         }
     }
+
+
+    //
+    {
+        std::map<std::string, std::vector<reco::Candidate::LorentzVector> >::iterator it =  m_vectorBranches.begin();
+        std::map<std::string, std::vector<reco::Candidate::LorentzVector> >::iterator itE =  m_vectorBranches.end();
+        for (;it != itE;++it){
+            m_vectorBranches[it->first].clear();
+        }
+    }
+
 
 
 
@@ -176,15 +203,18 @@ ExampleTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     m_integerBranches["event"] = iEvent.eventAuxiliary().event();
 
     edm::Handle<pat::JetCollection> hJets;
-    iEvent.getByLabel(edm::InputTag("patJets"), hJets);  // TODO/Fixme - inputTag from python cfg
+    //iEvent.getByLabel(edm::InputTag("patJets"), hJets);  // TODO/Fixme - inputTag from python cfg
+    iEvent.getByLabel(edm::InputTag("selectedPatJets"), hJets);  // TODO/Fixme - inputTag from python cfg
 
-    /*
     for (unsigned int i = 0; i<hJets->size(); ++i){
+        m_vectorBranches["pfJets"].push_back(hJets->at(i).p4());
+        /*
         std::cout   << "Jet:"  
                     << " " <<  hJets->at(i).pt()  // by default gives you pt with JEC applied
                     << " " <<  hJets->at(i).eta() // 
                     << std::endl;
-    }*/
+        // */
+    }
 
     // jets are pt ordered by default
     // TODO: CHECKME - this was in 4_2, shouldnt change, but who knows...
