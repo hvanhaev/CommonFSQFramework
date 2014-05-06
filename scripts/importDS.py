@@ -35,7 +35,8 @@ def main(sam):
 
         #crabDirName = "DiJet_20140214_METFwd-Run2010B-Apr21ReReco-v1"
         #print "Warning - devel name of crab dir"
-        crabDirName = name
+        #  name=anaVersion+"_"+s
+        crabDirName = anaVersion+"_"+name # crab dir naming from runCrabJobs.py
         crabResDir = crabDirName + "/res/"
 
         SEDirs = set()
@@ -87,6 +88,9 @@ def main(sam):
 
             sam[name]["pathPAT"] = "/" + tagBasePathPAT + basePathName
             sam[name]["pathTrees"] = "/" + tagBasePathTrees + basePathName
+
+            '''
+            # TODO or place elsewhere
             todo = [sam[name]["pathPAT"], sam[name]["pathTrees"]]
             for t in todo:
                 cnt = 0
@@ -97,6 +101,7 @@ def main(sam):
 
                 if cnt == 0:
                     print "Warning - empty path", t
+            '''
 
 
 
@@ -110,7 +115,6 @@ def printSam(sam):
     pp = pprint.PrettyPrinter()
     toFile = []
 
-    anaVersion = anaType + "_" + dateTT
 
     toFile.append('anaVersion="' + anaVersion + '"\n')
     toFile.append('anaType="'    + anaType + '"\n')
@@ -200,8 +204,10 @@ if __name__ == "__main__":
         globals()[t] = getattr(mod,t)
     
 
-
     dateTT = "20140411" ## TODO fixme!
+    anaVersion = anaType + "_" + dateTT
+    #globals()["anaVersion"] = anaVersion
+
 
     sam = {}
     sam=main(sam)
