@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import sys,os,re,shutil
+from optparse import OptionParser
 
 import ROOT
 ROOT.gROOT.SetBatch(True)
@@ -11,7 +12,6 @@ AutoLibraryLoader.enable()
 
 import MNTriggerStudies.MNTriggerAna.Util
 
-from optparse import OptionParser
 sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
 anaVersion=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("anaVersion")
 blacklist=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("cbSmartBlackList")

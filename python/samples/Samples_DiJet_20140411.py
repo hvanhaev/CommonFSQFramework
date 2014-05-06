@@ -111,7 +111,10 @@ sam["QCD_Pt-80to120_Tune4C_13TeV_pythia8"]["lumiJet15"]='crashMeMC'
 sam["QCD_Pt-80to120_Tune4C_13TeV_pythia8"]["weightNoPu"]='RooFormulaVar("weight","weight", "xsOverEvents", RooArgList())'
 sam["QCD_Pt-80to120_Tune4C_13TeV_pythia8"]["json"]=''
 sam["QCD_Pt-80to120_Tune4C_13TeV_pythia8"]["lumiDiJet15FB"]='crashMeMC'
+sam["QCD_Pt-80to120_Tune4C_13TeV_pythia8"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/QCD_Pt-80to120_Tune4C_13TeV_pythia8/DiJet_20140411_QCD_Pt-80to120_Tune4C_13TeV_pythia8/2b7f6fbfa4bcda451fe51ee9c9d04565//'
 sam["QCD_Pt-80to120_Tune4C_13TeV_pythia8"]["XS"]=3000000.0
+sam["QCD_Pt-80to120_Tune4C_13TeV_pythia8"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/QCD_Pt-80to120_Tune4C_13TeV_pythia8/DiJet_20140411_QCD_Pt-80to120_Tune4C_13TeV_pythia8/2b7f6fbfa4bcda451fe51ee9c9d04565//'
+sam["QCD_Pt-80to120_Tune4C_13TeV_pythia8"]["pathSE"]='srm://polgrid4.in2p3.fr:8446/srm/managerv2?SFN=/dpm/in2p3.fr/home/cms/trivcat/store/user/fruboes/QCD_Pt-80to120_Tune4C_13TeV_pythia8/DiJet_20140411_QCD_Pt-80to120_Tune4C_13TeV_pythia8/2b7f6fbfa4bcda451fe51ee9c9d04565/'
 sam["QCD_Pt-80to120_Tune4C_13TeV_pythia8"]["DS"]='/QCD_Pt-80to120_Tune4C_13TeV_pythia8/Fall13dr-castor_tsg_PU1bx50_POSTLS162_V1-v1/AODSIM'
 
 def icm(sam):
