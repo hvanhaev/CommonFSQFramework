@@ -9,40 +9,12 @@ from ROOT import *
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 AutoLibraryLoader.enable()
 
-########################
-#
-# TODO - where should we put those two?
-#
-########################
-def getVariant():
-    if  "SmallXAnaVersion" not in  os.environ:
-        m = " Cannot get ana variant from env. Set SmallXAnaVersion"
-        m += "to desired value (e.g. by sourcing one of files from MNTriggerStudies/MNTriggerAna/env/ directory) "
-        raise Exception(m)
+import MNTriggerStudies.MNTriggerAna.Util
 
-    variant = os.environ["SmallXAnaVersion"]
-    return variant
-
-
-def getAnaDefinition(varname, toGlobal=False):
-    variant = getVariant()
-    command = "from "+variant+" import "+varname
-    if toGlobal:
-        exec(command, globals(), globals())
-    else:
-        exec(command)
-
-    obj = eval(varname)
-
-    return obj
-
-
-
-#from DiJetAnalysis.Common.Util import *
 from optparse import OptionParser
-sampleList=getAnaDefinition("sam")
-anaVersion=getAnaDefinition("anaVersion")
-blacklist=getAnaDefinition("cbSmartBlackList")
+sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
+anaVersion=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("anaVersion")
+blacklist=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("cbSmartBlackList")
 
 def dumpEnvVariable(var):
     ret = "# "+var+"="
@@ -117,6 +89,7 @@ for s in sampleListTodo:
   os.environ["TFSampleName"]=s
   ''' 
 
+  '''
   if int(sampleList[s]["crabJobs"]) >= 500:
     i=1
     step = 400
@@ -124,14 +97,15 @@ for s in sampleListTodo:
         range=str(i)+","+str(i+step)
         command+="crab -submit " + range + " -c " + name
         i+=step
+  '''
   
   #sys.exit()
 
 
 
-  #print command
-  #sys.exit()
-  os.system(command)
+  print command
+  sys.exit()
+  #os.system(command)
 
   cfgName = None
   with open("crab.cfg", "r") as cfg:
