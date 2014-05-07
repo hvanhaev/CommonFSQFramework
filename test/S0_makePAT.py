@@ -207,8 +207,9 @@ for jc in interestingJetsCollections:
     process.schedule.append(getattr(process, pathTFlabel))
 
 
-process.treeProd1 = cms.EDAnalyzer("ExampleTreeProducer")
-process.p = cms.Path(process.treeProd1)
+process.exampleTree = cms.EDAnalyzer("ExampleTreeProducer")
+process.infoHisto = cms.EDAnalyzer("SaveCountHistoInTreeFile")
+process.p = cms.Path(process.infoHisto*process.exampleTree)
 process.schedule.append(process.p) # TODO tree producer will run through all events, not depending on the filtering results
 
 # Note: despite we are putting this value into every event waste of space is neglible thanks to root branch compression.
