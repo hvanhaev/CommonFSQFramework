@@ -128,7 +128,7 @@ if __name__ == "__main__":
     cwd = os.getcwd()+"/"
 
 
-    dataset = TDSet( 'TTree', 'data', 'treeProd1') # the last name is the directory name inside the root file
+    dataset = TDSet( 'TTree', 'data', 'exampleTree') # the last name is the directory name inside the root file
     # TODO automatic file picking from ds
     dataset.Add( 'root://'+os.getcwd()+'/trees.root')
         
