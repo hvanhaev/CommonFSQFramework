@@ -64,8 +64,8 @@ for s in sampleListTodo:
   command+=" -CMSSW.number_of_jobs="+str(sampleList[s]["crabJobs"])
   command+=" -GRID.ce_black_list="+blacklist
 
-  if int(sampleList[s]["crabJobs"]) < 500:
-      command+=" -submit "
+  #if int(sampleList[s]["crabJobs"]) < 500:
+  #    command+=" -submit "
 
   if isData:
     print isData, sampleList[s]["json"]
@@ -76,20 +76,12 @@ for s in sampleListTodo:
   else:
     command+=" -CMSSW.total_number_of_events="+str(sampleList[s]["numEvents"])
 
-  '''
-  if isData:
-    os.environ["isData"]="True"
-  else:
-    os.environ["isData"]="False"
+  # TODO save old value and set it at exit   
+  os.environ["TMFSampleName"]=s
 
-
-  os.environ["TFGlobalTag"]=""
-  gt = sampleList[s]["GT"]
-  os.environ["TFGlobalTag"]=gt
-  os.environ["TFSampleName"]=s
-  ''' 
-
-  '''
+  # crab is not able to submit more than 500 jobs at once
+  # note, there was a limit of ~2000 jobs per task (one could
+  # submit more than 2000, but job status check resulted in crash
   if int(sampleList[s]["crabJobs"]) >= 500:
     i=1
     step = 400
@@ -97,15 +89,10 @@ for s in sampleListTodo:
         range=str(i)+","+str(i+step)
         command+="crab -submit " + range + " -c " + name
         i+=step
-  '''
-  
-  #sys.exit()
-
-
-
-  print command
-  sys.exit()
-  #os.system(command)
+  else:
+      #print command
+      #sys.exit()
+      os.system(command)
 
   cfgName = None
   with open("crab.cfg", "r") as cfg:
@@ -115,25 +102,8 @@ for s in sampleListTodo:
         cfgName = line.split("=")[-1]
 
 
-  '''
   if not cfgName:
     print "Unable to determine cfg name from crab.cfg!"
   else:
     fOut = name + "/" + cfgName
     shutil.copy(cfgName, fOut)
-    with open(fOut,"a") as cfgFileCopy:
-        strout = "Shell env dump:\n"
-        strout += dumpEnvVariable("TFGlobalTag")
-        strout += dumpEnvVariable("TFSampleName")
-        strout += dumpEnvVariable("isData")
-        cfgFileCopy.write(strout)
-    
-  # clean settings  
-  os.environ["TFGlobalTag"]=""
-  os.environ["TFSampleName"]=""
-  os.environ["isData"]="" 
-  '''
-
-
-
-
