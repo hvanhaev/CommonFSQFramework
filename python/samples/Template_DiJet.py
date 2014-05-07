@@ -114,11 +114,11 @@ def XS(ds):
 
 
     #print "TODO: not sure if xs values from pdmv are fetched correctly"
-    s["QCD_Pt-15to30_Tune4C_13TeV_pythia8"] = 1644000000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00041
-    s["QCD_Pt-30to50_Tune4C_13TeV_pythia8"] = 164400000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00042
-    s["QCD_Pt-50to80_Tune4C_13TeV_pythia8"] = 21930000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00043
-    s["QCD_Pt-80to120_Tune4C_13TeV_pythia8"] = 3000000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00044
-    s["QCD_Pt-120to170_Tune4C_13TeV_pythia8"] = 493200.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00045
+    s["QCD_Pt-15to30_Tune4C_13TeV_pythia8"] = 2237000000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00041
+    s["QCD_Pt-30to50_Tune4C_13TeV_pythia8"] = 161500000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00042
+    s["QCD_Pt-50to80_Tune4C_13TeV_pythia8"] = 22110000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00043
+    s["QCD_Pt-80to120_Tune4C_13TeV_pythia8"] = 3116000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00044
+    s["QCD_Pt-120to170_Tune4C_13TeV_pythia8"] = 486200.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00045
     s["QCD_Pt-170to300_Tune4C_13TeV_pythia8"] = 12030.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00046
     s["QCD_Pt-300to470_Tune4C_13TeV_pythia8"] = 7475.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00047
     s["QCD_Pt-470to600_Tune4C_13TeV_pythia8"] = 587.1 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00048
@@ -126,7 +126,10 @@ def XS(ds):
     s["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"] = 28.25 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00050
     s["QCD_Pt-1000to1400_Tune4C_13TeV_pythia8"] = 8.975 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00051
     s["QCD_Pt-1400to1800_Tune4C_13TeV_pythia8"] = 0.8975 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00052
-    s["QCD_Pt-1800_Tune4C_13TeV_pythia8"] = 0.737844 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00053
+    s["QCD_Pt-5to10_Tune4C_13TeV_pythia8"] = 80710000000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00001
+    s["QCD_Pt-10to15_Tune4C_13TeV_pythia8"] = 7528000000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00002
+
+
 
     s["QCD_Pt-5to10_Tune4C_13TeV_pythia8"] = 80710000000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00001
     s["QCD_Pt-10to15_Tune4C_13TeV_pythia8"] = 7528000000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00002
