@@ -43,7 +43,7 @@ def fetchData(linkBase, minI, maxI):
 
 
 if __name__ == "__main__":
-    #fetchData("https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-", 29, 53)
+    fetchData("https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-", 29, 53)
     fetchData("https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-", 1, 26)
 
 
