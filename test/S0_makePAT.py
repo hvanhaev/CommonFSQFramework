@@ -1,6 +1,9 @@
 ## import skeleton process
 # based on patTuple_addJets_cfg_DONOTEDIT.py
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
+
+
+
 ## switch to uncheduled mode
 process.options.allowUnscheduled = cms.untracked.bool(True)
 ########################################################################
@@ -27,7 +30,7 @@ usePFCHSJetsInSelection = False
 ## See  https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideFrontierConditions
 process.GlobalTag.globaltag = "START62_V1::All" 
 
-process.maxEvents.input = 150
+process.maxEvents.input = 100
 indir = '/scratch/scratch0/data/store/mc/Fall13dr/QCD_Pt-50to80_Tune4C_13TeV_pythia8/AODSIM/castor_tsg_PU1bx50_POSTLS162_V1-v1/00000/'
 f = indir + '00108F5C-D873-E311-BD7F-002618943914.root'
 process.source.fileNames = [
@@ -112,9 +115,27 @@ switchJetCollection(
    )
 
 
+from PhysicsTools.PatAlgos.tools.trigTools import *
+triggerProcess='HLT'
+switchOnTrigger(process)
+
+
+#from CMS.PhysicsTools.PatAlgos.triggerLayer1.triggerMatcher_cfi import cleanJetTriggerMatchHLTJet240
+
+#triggerMatch1 = cleanJetTriggerMatchHLTJet240.clone( matchedCuts = triggerObjectSelection, src = "" )
+
+#process.somePatJetTriggerMatchHLTMu8DiJet30 = cms.EDProducer("PATTriggerMatcherDRDPtLessByR",
+#    matchedCuts = cms.string('type( "TriggerJet" ) 
+
+#switchOnTriggerMatching(process)
+#switchOnTriggerMatchEmbedding(process)
+
+#switchOnTrigger(process, 'patTrigger', 'patTriggerEvent', 'patDefaultSequence', triggerProcess, 'out')
+
 
 keepProds = cms.untracked.vstring() 
 keepProds.append("keep *_addPileupInfo_*_*")
+keepProds.append("keep *_XS_*_*")
 keepProds.append("keep recoVertexs_offlinePrimaryVertices__RECO")
 #keepProds.append("keep recoVertexs_offlinePrimaryVerticesWithBS__RECO") # what to keep - with or wo beamspot?
 keepProds.append("keep GenEventInfoProduct_generator__SIM")
@@ -130,6 +151,9 @@ keepProds.extend(['keep edmTriggerResults_*_*_HLT',
 )
 
 
+"selectedPatJets"
+"selectedPatJetsAK5CaloCopy"
+"selectedPatJetsAK5PFCHS"
 
 
 
@@ -186,8 +210,50 @@ for jc in interestingJetsCollections:
 process.treeProd1 = cms.EDAnalyzer("ExampleTreeProducer")
 process.p = cms.Path(process.treeProd1)
 process.schedule.append(process.p) # TODO tree producer will run through all events, not depending on the filtering results
+
+# Note: despite we are putting this value into every event waste of space is neglible thanks to root branch compression.
+process.XS =  cms.EDProducer("DoubleProducer",
+    value = cms.double(-1),
+)
+
+process.pUtil = cms.Path(process.XS)
+process.schedule.append(process.pUtil)
 process.schedule.append(process.outpath)
 
+import os
+if "TMFSampleName" not in os.environ:
+    print "#"*80
+    print "#"
+    print "#    Note: 'TMFSampleName' variable not found in environment."
+    print "#             Will embed default values (XS wont be set)"
+    print "#"
+    print "#"*80
+else:
+    s = os.environ["TMFSampleName"]
+    print "Customizing to: ", s
+    import MNTriggerStudies.MNTriggerAna.Util
+    sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
+    anaVersion=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("anaVersion")
+    XS = sampleList[s]["XS"]
+    isData =  sampleList[s]["isData"]
+    
+    stringForProv = "\n"+"#"*80+"\n"
+    stringForProv += "Ana version: " + anaVersion + "\n"
+    stringForProv += "XS = " + str(XS) + "\n"
+    process.XS.value = XS
+    stringForProv += "isData = " + str(isData) + "\n" # not used...yet
+    stringForProv += "#"*80+"\n"
+
+    print stringForProv
+    # attach the string to one of the modules, so it will show in the prov data
+    # (use edmProvDump on the PAT file to see it)
+    process.XS.provHack = cms.string(stringForProv)
+
+
+
+    process.TMFDataForProv = cms.PSet(notes = cms.string("test"))
+
+    # also - GT 
 
 
 
