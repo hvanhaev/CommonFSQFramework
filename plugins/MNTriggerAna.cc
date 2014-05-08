@@ -111,6 +111,8 @@ MNTriggerAna::MNTriggerAna(const edm::ParameterSet& iConfig)
 
     // 
     m_vectorBranches["pfJets"] = std::vector<reco::Candidate::LorentzVector>();
+    m_vectorBranches["hltJets"] = std::vector<reco::Candidate::LorentzVector>();
+    m_vectorBranches["hltJetsFromTriggerEvent"] = std::vector<reco::Candidate::LorentzVector>();
 
     // integer branches auto registration
     {
@@ -199,22 +201,43 @@ MNTriggerAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     resetTrees();
     using namespace edm;
 
-    //std::cout << "Moin Agatko!" << std::endl;
     m_integerBranches["run"] = iEvent.eventAuxiliary().run();
     m_integerBranches["lumi"] = iEvent.eventAuxiliary().luminosityBlock();
     m_integerBranches["event"] = iEvent.eventAuxiliary().event();
 
+    float minPT = 10; // TODO!
+
+
     edm::Handle<edm::View<pat::Jet> > hJets;
-    //iEvent.getByLabel(edm::InputTag("patJets"), hJets);  // TODO/Fixme - inputTag from python cfg
     iEvent.getByLabel(edm::InputTag("selectedPatJets"), hJets);  // TODO/Fixme - inputTag from python cfg
 
+    edm::Handle<std::vector<reco::PFJet> > hHLTJets;
+    iEvent.getByLabel(edm::InputTag("hltAK5PFJetL1FastL2L3Corrected"), hHLTJets);// TODO...
+
+
     edm::Handle< pat::TriggerEvent > hTrEvent;
-    iEvent.getByLabel(edm::InputTag("patTriggerEvent"), hTrEvent);
-    const pat::TriggerObjectMatch * trMatches = hTrEvent->triggerObjectMatchResult("triggerMatchPF"); 
+    iEvent.getByLabel(edm::InputTag("patTriggerEvent"), hTrEvent); // TODO
 
+    for (unsigned int i = 0; i<hHLTJets->size(); ++i) {
+        if (hHLTJets->at(i).pt() <  minPT) continue;
+        m_vectorBranches["hltJets"].push_back(hHLTJets->at(i).p4());
+    }
 
-    for (unsigned int i = 0; i<hJets->size(); ++i){
+    // dump data from trigger event for xcheck purposes (are we producing HLTjets properly?)
+    pat::TriggerObjectRefVector jetObjects = hTrEvent->objects(trigger::TriggerJet );
+    for ( pat::TriggerObjectRefVector::const_iterator iRef = jetObjects.begin(); iRef != jetObjects.end(); ++iRef ) {
+        //std::cout << ( *iRef )->collection() << std::endl;
+        if (( *iRef )->collection() != "hltAK5PFJetL1FastL2L3Corrected::HLT") continue; // TODO
+        if (( *iRef )->pt() <  minPT) continue;
+        m_vectorBranches["hltJetsFromTriggerEvent"].push_back(( *iRef )->p4());
+    }
+
+    //const pat::TriggerObjectMatch * trMatches = hTrEvent->triggerObjectMatchResult("triggerMatchPF"); 
+    for (unsigned int i = 0; i<hJets->size(); ++i) {
+        if (hJets->at(i).pt() <  minPT) continue;
         m_vectorBranches["pfJets"].push_back(hJets->at(i).p4());
+
+        /*
         edm::RefToBase<pat::Jet> jetRef = hJets->refAt(i);
         edm::Ref<pat::TriggerObjectCollection > hltRefVec = (*trMatches)[jetRef];
 
@@ -226,7 +249,7 @@ MNTriggerAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         }
 
         std::cout << "J: " <<  hJets->at(i).pt() << " " << hltp4.pt() << std::endl;
-
+        */
 
 
         /*
@@ -251,20 +274,6 @@ MNTriggerAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
 
     
-
-
-
-
-#ifdef THIS_IS_AN_EVENT_EXAMPLE
-   Handle<ExampleData> pIn;
-   iEvent.getByLabel("example",pIn);
-#endif
-   
-#ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
-   ESHandle<SetupData> pSetup;
-   iSetup.get<SetupRecord>().get(pSetup);
-#endif
-
     m_tree->Fill();
 
 }
