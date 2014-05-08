@@ -1,8 +1,10 @@
 ## import skeleton process
 # based on patTuple_addJets_cfg_DONOTEDIT.py
-from PhysicsTools.PatAlgos.patTemplate_cfg import *
+#from PhysicsTools.PatAlgos.patTemplate_cfg import *
+from patTemplate_cfg_mod import *
 
 
+doHLTPFJets = True
 
 ## switch to uncheduled mode
 process.options.allowUnscheduled = cms.untracked.bool(True)
@@ -11,7 +13,7 @@ process.options.allowUnscheduled = cms.untracked.bool(True)
 # Configure event selection here
 #
 ########################################################################
-minJetPT = 20
+minJetPT = 10
 minJets  = 2
 # on which jets should I base my event selection?
 usePFJetsInSelection = True
@@ -28,7 +30,8 @@ usePFCHSJetsInSelection = False
 #
 ########################################################################
 ## See  https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideFrontierConditions
-process.GlobalTag.globaltag = "START62_V1::All" 
+#process.GlobalTag.globaltag = "START62_V1::All" 
+process.GlobalTag.globaltag = "POSTLS162_V2::All" 
 
 process.maxEvents.input = 100
 #indir = '/scratch/scratch0/data/store/mc/Fall13dr/QCD_Pt-50to80_Tune4C_13TeV_pythia8/AODSIM/castor_tsg_PU1bx50_POSTLS162_V1-v1/00000/'
@@ -36,10 +39,13 @@ process.maxEvents.input = 100
 
 indir = '/scratch/scratch0/data/store/mc/Fall13dr/QCD_Pt-15to30_Tune4C_13TeV_pythia8/AODSIM/castor_tsg_PU1bx50_POSTLS162_V1-v1/00000/'
 f = indir + '1EB67544-9074-E311-B8F7-0025905A6132.root'
-
 process.source.fileNames = [
      'file:'+f
 ]
+
+
+
+
 process.out.fileName = 'mnTrgAna_PAT.root'
 process.options.wantSummary = False
 process.MessageLogger.cerr.FwkReport.reportEvery = 50
@@ -253,18 +259,79 @@ else:
     # attach the string to one of the modules, so it will show in the prov data
     # (use edmProvDump on the PAT file to see it)
     process.XS.provHack = cms.string(stringForProv)
-
-
-
     process.TMFDataForProv = cms.PSet(notes = cms.string("test"))
 
     # also - GT 
 
-
-
-
-
 process.out.SelectEvents = cms.untracked.PSet(
         SelectEvents = selectorPaths
 )
+
+
+
+if doHLTPFJets:
+    process.load('Configuration.StandardSequences.Services_cff')
+    process.load('HLTrigger.Configuration.HLT_GRun_cff')
+
+    # remove all paths that were imported. Unscheduled execution may try running it all otherwise
+    import FWCore.ParameterSet.SequenceTypes as st
+    for a in dir(process):
+        attr = getattr(process, a)
+        if type(attr) == st.Path:
+            if not a.startswith("HLT_"): continue
+            #print "Removing", a
+            del attr
+
+    
+
+
+    #from HLTrigger.Configuration.HLT_GRun_cff import hltPrePFJet40, HLTBeginSequence, HLTPFL1FastL2L3ReconstructionSequence
+
+    #process.hltL1sL1SingleJet8 =  process.hltL1sL1SingleJet16.clone( L1SeedsLogicalExpression = cms.string( "L1_SingleJet8" ) )
+    process.hltPrePFJet15  = process.hltPrePFJet40.clone()
+    process.hlt1PFJet15 = process.hlt1PFJet40.clone( MinPt = cms.double(15.0), inputTag = cms.InputTag("hltAK5PFJetL1FastL2L3Corrected"))
+
+    # note L1 seeding is disabled, since low enough L1 seed is not present in L1 menu
+    process.HLT_PFJet15_v1 = cms.Path( process.HLTBeginSequence+
+                                       #process.hltL1sL1SingleJet8 +  # TODO
+                                       process.hltPrePFJet15 +  # TODO
+                                       process.HLTPFL1FastL2L3ReconstructionSequence +
+                                       ##process.hltPFJetsL1Matched + 
+                                       process.hlt1PFJet15 + #  TODO
+                                       process.HLTEndSequence )
+
+    placeAt = len(process.schedule)-2
+    process.schedule.insert(placeAt, process.HLT_PFJet15_v1)
+
+    keepProds = cms.untracked.vstring()
+    keepProds.append("keep *_hltAK5PFJetL1FastL2L3Corrected_*_*")
+    keepProds.append("keep *_hltAK5PFJetL1FastL2L3CorrectedNoPU_*_*")
+    process.out.outputCommands.extend(keepProds)
+
+    fAOD = "/scratch/scratch0/data/store/mc/Fall13dr/QCD_Pt-15to30_Tune4C_13TeV_pythia8/AODSIM/castor_tsg_PU1bx50_POSTLS162_V1-v1/00000/C2DF7978-8A74-E311-BFCC-00304867920C.root"
+
+    #fRAW = "/scratch/scratch0/data/store/mc/Fall13dr/QCD_Pt-15to30_Tune4C_13TeV_pythia8/GEN-SIM-RAW/castor_tsg_PU1bx50_POSTLS162_V1-v1/00000/00352658-5774-E311-AD39-0025905A60B6.root"
+    fRAW = "/scratch/scratch0/data/store/mc/Fall13dr/QCD_Pt-15to30_Tune4C_13TeV_pythia8/GEN-SIM-RAW/castor_tsg_PU1bx50_POSTLS162_V1-v1/00000/D0D5CE25-5774-E311-8FB2-0025905A605E.root"
+    process.source = cms.Source("PoolSource",
+        secondaryFileNames = cms.untracked.vstring('file:'+fRAW),
+        fileNames = cms.untracked.vstring('file:'+fAOD)
+    )
+
+    # customisation of the process.
+    # Automatic addition of the customisation function from HLTrigger.Configuration.customizeHLTforMC
+    from HLTrigger.Configuration.customizeHLTforMC import customizeHLTforMC
+    #call to customisation function customizeHLTforMC imported from HLTrigger.Configuration.customizeHLTforMC
+    process = customizeHLTforMC(process)
+    # Automatic addition of the customisation function from SLHCUpgradeSimulations.Configuration.postLS1Customs
+    from SLHCUpgradeSimulations.Configuration.postLS1Customs import customisePostLS1
+    #call to customisation function customisePostLS1 imported from SLHCUpgradeSimulations.Configuration.postLS1Customs
+    process = customisePostLS1(process)
+
+
+
+
+
+            
+           
+
 
