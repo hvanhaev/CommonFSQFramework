@@ -73,7 +73,7 @@ def crabJobs(ds):
     if "QCD_Pt-15to3000" in dsName and "_V17B-v2" in ds:
         return 1950 
 
-    return 100
+    return 470
 
 def numEvents(ds):
     return -1

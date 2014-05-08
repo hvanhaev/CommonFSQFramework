@@ -189,7 +189,12 @@ if __name__ == "__main__":
                             version="%prog 1.0")
                             
     #parser.add_option("-p", "--plotDefFile",   action="store", type="string", dest="plotDefFile", help="plot using definitions from plot def file" )
+    parser.add_option("-d", "--date",   action="store", type="string", dest="date", help="skim date" )
     (options, args) = parser.parse_args()
+
+    if not options.date:
+        print "Date missing"
+        sys.exit()
 
     if len(args) == 0:
         print "You should give the template file name"
@@ -204,7 +209,7 @@ if __name__ == "__main__":
         globals()[t] = getattr(mod,t)
     
 
-    dateTT = "20140411" ## TODO fixme!
+    dateTT = options.date#"20140411" ## TODO fixme!
     anaVersion = anaType + "_" + dateTT
     #globals()["anaVersion"] = anaVersion
 
