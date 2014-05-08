@@ -113,24 +113,27 @@ def XS(ds):
     s["QCD_Pt_15to30_TuneZ2star_HFshowerLibrary_7TeV_pythia6"]   = 8.1591283E8
 
 
-    #print "TODO: not sure if xs values from pdmv are fetched correctly"
     s["QCD_Pt-15to30_Tune4C_13TeV_pythia8"] = 2237000000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00041
     s["QCD_Pt-30to50_Tune4C_13TeV_pythia8"] = 161500000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00042
     s["QCD_Pt-50to80_Tune4C_13TeV_pythia8"] = 22110000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00043
-    s["QCD_Pt-80to120_Tune4C_13TeV_pythia8"] = 3116000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00044
-    s["QCD_Pt-120to170_Tune4C_13TeV_pythia8"] = 486200.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00045
-    s["QCD_Pt-170to300_Tune4C_13TeV_pythia8"] = 12030.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00046
+    # Note: multiple entries  avaliable. Will use last entry:
+    # Date: 2013-10-30-17-35 3116000.0 1.0 1.0
+    # Date: 2014-05-07-15-30 3000114.3 1.0 1.0
+    s["QCD_Pt-80to120_Tune4C_13TeV_pythia8"] = 3000114.3 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00044
+    # Note: multiple entries  avaliable. Will use last entry:
+    # Date: 2013-10-30-17-35 486200.0 1.0 1.0
+    # Date: 2014-05-07-15-28 493200.0 1.0 1.0
+    s["QCD_Pt-120to170_Tune4C_13TeV_pythia8"] = 493200.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00045
+    # Note: multiple entries  avaliable. Will use last entry:
+    # Date: 2013-10-30-17-35 12030.0 1.0 1.0
+    # Date: 2014-05-07-14-47 120300.0 1.0 1.0
+    s["QCD_Pt-170to300_Tune4C_13TeV_pythia8"] = 120300.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00046
     s["QCD_Pt-300to470_Tune4C_13TeV_pythia8"] = 7475.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00047
     s["QCD_Pt-470to600_Tune4C_13TeV_pythia8"] = 587.1 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00048
     s["QCD_Pt-600to800_Tune4C_13TeV_pythia8"] = 167.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00049
     s["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"] = 28.25 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00050
-    s["QCD_Pt-1000to1400_Tune4C_13TeV_pythia8"] = 8.975 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00051
-    s["QCD_Pt-1400to1800_Tune4C_13TeV_pythia8"] = 0.8975 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00052
-    s["QCD_Pt-5to10_Tune4C_13TeV_pythia8"] = 80710000000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00001
-    s["QCD_Pt-10to15_Tune4C_13TeV_pythia8"] = 7528000000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00002
-
-
-
+    s["QCD_Pt-1000to1400_Tune4C_13TeV_pythia8"] = 8.195 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00051
+    s["QCD_Pt-1400to1800_Tune4C_13TeV_pythia8"] = 0.7346 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00052
     s["QCD_Pt-5to10_Tune4C_13TeV_pythia8"] = 80710000000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00001
     s["QCD_Pt-10to15_Tune4C_13TeV_pythia8"] = 7528000000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00002
 
@@ -143,8 +146,15 @@ def XS(ds):
     s["CEPGammaGamma_Pt2p5_13TeV_SuperCHIC"] = 1.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00021
     s["Upsilon1SToMuMu_13TeV_starlight"] = 1.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00022
     s["MinBias_TuneZ2star_13TeV_pythia6"] = 78260000000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00023
-    s["DYToMuMu_M-50_Tune4C_13TeV-pythia8"] = 1785.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00024
-    s["DYToEE_M-50_Tune4C_13TeV-pythia8"] = 1728.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00025
+    # Note: multiple entries  avaliable. Will use last entry:
+    # Date: 2014-03-06-17-47 1785.0 1.0 1.0
+    # Date: 2014-05-07-13-50 1592.0 1.0 1.0
+    s["DYToMuMu_M-50_Tune4C_13TeV-pythia8"] = 1592.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00024
+    # Note: multiple entries  avaliable. Will use last entry:
+    # Date: 2014-03-06-17-55 1728.0 1.0 1.0
+    # Date: 2014-05-07-13-53 1604.0 1.0 1.0
+    s["DYToEE_M-50_Tune4C_13TeV-pythia8"] = 1604.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00025
+
 
     dsName = name(ds)
     if dsName in s:
