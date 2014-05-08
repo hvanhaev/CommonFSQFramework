@@ -18,12 +18,26 @@ def fetchData(linkBase, minI, maxI):
             myJson = json.load(f)
 
             dsName = myJson[u'results'][u'dataset_name']
-            if len(myJson[u'results'][u'generator_parameters']) != 1:
-                print "Problem with", dsName
+            if len(myJson[u'results'][u'generator_parameters']) == 0:
+                print "Problem with", dsName, link
                 continue
-            xs = float(myJson[u'results'][u'generator_parameters'][0][u'cross_section'])
-            matchE = float(myJson[u'results'][u'generator_parameters'][0][u'match_efficiency'])
-            filterE = float(myJson[u'results'][u'generator_parameters'][0][u'filter_efficiency'])
+            useEntry = len(myJson[u'results'][u'generator_parameters'])-1
+            if len(myJson[u'results'][u'generator_parameters']) > 1:
+                print "    # Note: multiple entries  avaliable. Will use last entry:"
+                for i in xrange(0, useEntry+1):
+                    xs = float(myJson[u'results'][u'generator_parameters'][i][u'cross_section'])
+                    matchE = float(myJson[u'results'][u'generator_parameters'][i][u'match_efficiency'])
+                    filterE = float(myJson[u'results'][u'generator_parameters'][i][u'filter_efficiency'])
+                    print "    # Date:", myJson[u'results'][u'generator_parameters'][i][u"submission_details"][u'submission_date'],\
+                            xs, matchE, filterE
+
+
+            xs = float(myJson[u'results'][u'generator_parameters'][useEntry][u'cross_section'])
+            matchE = float(myJson[u'results'][u'generator_parameters'][useEntry][u'match_efficiency'])
+            filterE = float(myJson[u'results'][u'generator_parameters'][useEntry][u'filter_efficiency'])
+
+
+
 
             #print dsName, xs, matchE, filterE
             r1 = matchE/1.
