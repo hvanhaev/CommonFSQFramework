@@ -109,6 +109,7 @@ ExampleTreeProducer::ExampleTreeProducer(const edm::ParameterSet& iConfig)
 
     // 
     m_vectorBranches["pfJets"] = std::vector<reco::Candidate::LorentzVector>();
+    m_vectorBranches["genJets"] = std::vector<reco::Candidate::LorentzVector>();
 
     // integer branches auto registration
     {
@@ -194,6 +195,8 @@ ExampleTreeProducer::~ExampleTreeProducer()
 void
 ExampleTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+
+        
     resetTrees();
     using namespace edm;
 
@@ -203,11 +206,19 @@ ExampleTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     m_integerBranches["event"] = iEvent.eventAuxiliary().event();
 
     edm::Handle<pat::JetCollection> hJets;
-    //iEvent.getByLabel(edm::InputTag("patJets"), hJets);  // TODO/Fixme - inputTag from python cfg
     iEvent.getByLabel(edm::InputTag("selectedPatJets"), hJets);  // TODO/Fixme - inputTag from python cfg
 
+    float ptMin = 15;
+
     for (unsigned int i = 0; i<hJets->size(); ++i){
+        if (hJets->at(i).pt() < ptMin) continue;
         m_vectorBranches["pfJets"].push_back(hJets->at(i).p4());
+        reco::Candidate::LorentzVector genP4;
+        if (hJets->at(i).genJet()){
+            genP4 = hJets->at(i).genJet()->p4();
+        }
+        m_vectorBranches["genJets"].push_back(genP4);
+
         /*
         std::cout   << "Jet:"  
                     << " " <<  hJets->at(i).pt()  // by default gives you pt with JEC applied
