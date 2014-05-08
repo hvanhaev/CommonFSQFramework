@@ -11,7 +11,7 @@ process.options.allowUnscheduled = cms.untracked.bool(True)
 # Configure event selection here
 #
 ########################################################################
-minJetPT = 28
+minJetPT = 20
 minJets  = 2
 # on which jets should I base my event selection?
 usePFJetsInSelection = True
@@ -31,8 +31,12 @@ usePFCHSJetsInSelection = False
 process.GlobalTag.globaltag = "START62_V1::All" 
 
 process.maxEvents.input = 100
-indir = '/scratch/scratch0/data/store/mc/Fall13dr/QCD_Pt-50to80_Tune4C_13TeV_pythia8/AODSIM/castor_tsg_PU1bx50_POSTLS162_V1-v1/00000/'
-f = indir + '00108F5C-D873-E311-BD7F-002618943914.root'
+#indir = '/scratch/scratch0/data/store/mc/Fall13dr/QCD_Pt-50to80_Tune4C_13TeV_pythia8/AODSIM/castor_tsg_PU1bx50_POSTLS162_V1-v1/00000/'
+#f = indir + '00108F5C-D873-E311-BD7F-002618943914.root'
+
+indir = '/scratch/scratch0/data/store/mc/Fall13dr/QCD_Pt-15to30_Tune4C_13TeV_pythia8/AODSIM/castor_tsg_PU1bx50_POSTLS162_V1-v1/00000/'
+f = indir + '1EB67544-9074-E311-B8F7-0025905A6132.root'
+
 process.source.fileNames = [
      'file:'+f
 ]
@@ -119,15 +123,14 @@ from PhysicsTools.PatAlgos.tools.trigTools import *
 triggerProcess='HLT'
 switchOnTrigger(process)
 
+from PhysicsTools.PatAlgos.triggerLayer1.triggerMatcherExamples_cfi import somePatJetTriggerMatchHLTPFJet40
+process.triggerMatchPF = somePatJetTriggerMatchHLTPFJet40.clone(matchedCuts='type("TriggerJet" )', src="selectedPatJets")
+process.triggerMatchPFCHS = somePatJetTriggerMatchHLTPFJet40.clone(matchedCuts='type("TriggerJet" )', src="selectedPatJetsAK5PFCHS")
+process.triggerMatchCalo = somePatJetTriggerMatchHLTPFJet40.clone(matchedCuts='type("TriggerJet" )', src="selectedPatJetsAK5CaloCopy")
 
-#from CMS.PhysicsTools.PatAlgos.triggerLayer1.triggerMatcher_cfi import cleanJetTriggerMatchHLTJet240
-
-#triggerMatch1 = cleanJetTriggerMatchHLTJet240.clone( matchedCuts = triggerObjectSelection, src = "" )
-
-#process.somePatJetTriggerMatchHLTMu8DiJet30 = cms.EDProducer("PATTriggerMatcherDRDPtLessByR",
-#    matchedCuts = cms.string('type( "TriggerJet" ) 
-
-#switchOnTriggerMatching(process)
+switchOnTriggerMatching(process, ["triggerMatchPF", "triggerMatchPFCHS", "triggerMatchCalo"] )
+# seems not to change anything:
+#switchOnTriggerMatchEmbedding(process, ["triggerMatchPF", "triggerMatchPFCHS", "triggerMatchCalo"] )
 #switchOnTriggerMatchEmbedding(process)
 
 #switchOnTrigger(process, 'patTrigger', 'patTriggerEvent', 'patDefaultSequence', triggerProcess, 'out')
@@ -209,8 +212,7 @@ for jc in interestingJetsCollections:
 
 process.exampleTree = cms.EDAnalyzer("ExampleTreeProducer")
 process.infoHisto = cms.EDAnalyzer("SaveCountHistoInTreeFile")
-process.p = cms.Path(process.infoHisto*process.exampleTree)
-process.schedule.append(process.p) # TODO tree producer will run through all events, not depending on the filtering results
+process.pTreeProducers = cms.Path(process.infoHisto*process.exampleTree)
 
 # Note: despite we are putting this value into every event waste of space is neglible thanks to root branch compression.
 process.XS =  cms.EDProducer("DoubleProducer",
@@ -218,7 +220,9 @@ process.XS =  cms.EDProducer("DoubleProducer",
 )
 
 process.pUtil = cms.Path(process.XS)
+
 process.schedule.append(process.pUtil)
+process.schedule.append(process.pTreeProducers) # TODO tree producer will run through all events, not depending on the filtering results
 process.schedule.append(process.outpath)
 
 import os

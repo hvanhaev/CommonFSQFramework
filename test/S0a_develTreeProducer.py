@@ -23,7 +23,8 @@ process.TFileService = cms.Service("TFileService", fileName = cms.string("trees.
 
 process.exampleTree = cms.EDAnalyzer("ExampleTreeProducer")
 process.infoHisto = cms.EDAnalyzer("SaveCountHistoInTreeFile")
+process.mnTriggerAna = cms.EDAnalyzer("MNTriggerAna")
 
 
-process.p = cms.Path(process.treeProd1*process.infoHisto)
+process.p = cms.Path(process.exampleTree*process.infoHisto*process.mnTriggerAna)
 
