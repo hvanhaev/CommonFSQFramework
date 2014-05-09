@@ -111,6 +111,7 @@ MNTriggerAna::MNTriggerAna(const edm::ParameterSet& iConfig)
 
     // 
     m_vectorBranches["pfJets"] = std::vector<reco::Candidate::LorentzVector>();
+    m_vectorBranches["l1Jets"] = std::vector<reco::Candidate::LorentzVector>();
     m_vectorBranches["hltJets"] = std::vector<reco::Candidate::LorentzVector>();
     m_vectorBranches["hltJetsFromTriggerEvent"] = std::vector<reco::Candidate::LorentzVector>();
 
@@ -260,9 +261,29 @@ MNTriggerAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         // */
     }
 
+
+    //* L1extra part
+    std::vector<edm::InputTag> todo;
+    todo.push_back(edm::InputTag("l1extraParticles", "Central", "RECO"));
+    todo.push_back(edm::InputTag("l1extraParticles", "Forward", "RECO"));
+    todo.push_back(edm::InputTag("l1extraParticles", "Tau", "RECO"));
+    for (unsigned int i = 0; i < todo.size();++i){
+        edm::Handle<std::vector<l1extra::L1JetParticle> > hL1;
+        iEvent.getByLabel(todo.at(i), hL1);
+        for (unsigned iL1 = 0; iL1< hL1->size();++iL1){
+            //std::cout << "L1 cand: " << hL1->at(iL1).pt() << " " << hL1->at(iL1).bx() << std::endl;
+            if (hL1->at(iL1).bx()!=0){
+                std::cout << "Warningn!  L1 cand with bx!=0: " << hL1->at(iL1).pt() << " " << hL1->at(iL1).bx() << std::endl;
+            } else {
+                m_vectorBranches["l1Jets"].push_back(hL1->at(iL1).p4());
+            }
+        }
+    }
+
+
+
     // jets are pt ordered by default
     // TODO: CHECKME - this was in 4_2, shouldnt change, but who knows...
-
     int nJets =  hJets->size();
     if (nJets>0){
         m_floatBranches["leadJetPt"] = hJets->at(0).pt();
