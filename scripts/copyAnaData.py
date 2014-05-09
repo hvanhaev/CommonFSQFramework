@@ -19,20 +19,21 @@ sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
 parser = OptionParser(usage="usage: %prog [options] filename",
                         version="%prog 1.0")
 
-parser.add_option("-p", "--patOnly", action="store_true", dest="patOnly")
-parser.add_option("-t", "--treesOnly", action="store_true",  dest="treesOnly")
+parser.add_option("-p", "--doPat", action="store_true", dest="pat")
+parser.add_option("-t", "--doTrees", action="store_true",  dest="trees")
 (options, args) = parser.parse_args()
 
+doPAT = False
+doTrees = False
 
-if options.patOnly :
+if options.pat :
     doPAT = True
-    doTrees = False
-elif options.treesOnly:
-    doPAT = False
+elif options.trees:
     doTrees = True
-else:
-    doTrees = True
-    doPAT = True
+
+if not doPAT and not doTrees:
+    print "Nothing to do. Run me with '-t' option to copy trees from current skim"
+    sys.exit()
 
 for s in sampleList:
     if "pathSE" not in sampleList[s]:
