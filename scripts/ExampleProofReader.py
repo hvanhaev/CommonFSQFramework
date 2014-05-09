@@ -1,7 +1,13 @@
 #!/usr/bin/env python
 
 from MNTriggerStudies.MNTriggerAna.GetDatasetInfo import getTreeFilesAndNormalizations
-
+###############################################################################
+#
+#  TODO: 
+#   1. Select output root file when calling runAll
+#   2. Same for datasets
+#
+#
 ###############################################################################
 #
 # Example proof reader of trees produced with framework. This script reads
