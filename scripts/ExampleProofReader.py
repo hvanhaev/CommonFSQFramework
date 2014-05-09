@@ -125,68 +125,74 @@ class ExampleProofReader( TPySelector ):
         for o in olist:
             o.Write()
 
+
+    #@staticmethod
+    @classmethod
+    def runAll(cls):
+        cwd = os.getcwd()+"/"
+        treeFilesAndNormalizations = getTreeFilesAndNormalizations()
+
+        #todo = ["QCD_Pt-30to50_Tune4C_13TeV_pythia8"] # devel on one ds
+        #todo.append("QCD_Pt-10to15_Tune4C_13TeV_pythia8")
+        todo = treeFilesAndNormalizations.keys() # run them all
+
+        # ret[s]["files"] = fileList
+        # ret[s]["normFactor"] = normFactor
+
+        outFile = "~/tmp/plots.root" # note: duplicated defintion above...
+        of = ROOT.TFile(outFile,"RECREATE")
+        if not of:
+            print "Cannot create outfile:", outFile
+            sys.exit()
+        of.Close() # so we dont mess with file opens during proof ana
+        
+
+        skipped = []
+        for t in todo:
+            if len(treeFilesAndNormalizations[t]["files"])==0:
+                print "Skipping, empty filelist for",t
+                skipped.append(t)
+                continue
+
+            dataset = TDSet( 'TTree', 'data', 'exampleTree') # the last name is the directory name inside the root file
+            for file in treeFilesAndNormalizations[t]["files"]:
+                dataset.Add( 'root://'+file)
+            
+
+            TProof.AddEnvVar("PATH2",ROOT.gSystem.Getenv("PYTHONPATH")+":"+os.getcwd())
+
+            ROOT.gSystem.Setenv("TMFDatasetName", t)
+
+            proof = TProof.Open('')
+            #proof = TProof.Open('workers=1')
+            proof.Exec( 'gSystem->Setenv("PYTHONPATH",gSystem->Getenv("PATH2"));') # for some reason cannot use method below for python path
+            proof.Exec( 'gSystem->Setenv("PATH", "'+ROOT.gSystem.Getenv("PATH") + '");')
+            #print dataset.Process( 'TPySelector', 'ExampleProofReader')
+            print "Running:", cls.__name__
+            print dataset.Process( 'TPySelector', cls.__name__)
+
+
+        if len(skipped)>0:
+            print "Note: following samples were skipped:"
+            for sk in skipped:
+                print "  ",sk
+
+        print "Writing normalization constants: "
+        of = ROOT.TFile(outFile,"UPDATE")
+        for t in set(todo)-set(skipped):
+            saveDir = of.Get(t)
+            if not saveDir:
+                print "Cannot get directory from plot file"
+                continue
+            saveDir.cd()
+            norm = treeFilesAndNormalizations[t]["normFactor"]
+            print "  ",t, norm
+            hist = ROOT.TH1D("norm", "norm", 1,0,1)
+            hist.SetBinContent(1, norm)
+            hist.Write()
+
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     AutoLibraryLoader.enable()
-
-    cwd = os.getcwd()+"/"
-    treeFilesAndNormalizations = getTreeFilesAndNormalizations()
-
-    #todo = ["QCD_Pt-30to50_Tune4C_13TeV_pythia8"] # devel on one ds
-    #todo.append("QCD_Pt-10to15_Tune4C_13TeV_pythia8")
-    todo = treeFilesAndNormalizations.keys() # run them all
-
-    # ret[s]["files"] = fileList
-    # ret[s]["normFactor"] = normFactor
-
-    outFile = "~/tmp/plots.root" # note: duplicated defintion above...
-    of = ROOT.TFile(outFile,"RECREATE")
-    if not of:
-        print "Cannot create outfile:", outFile
-        sys.exit()
-    of.Close() # so we dont mess with file opens during proof ana
-    
-
-    skipped = []
-    for t in todo:
-        if len(treeFilesAndNormalizations[t]["files"])==0:
-            print "Skipping, empty filelist for",t
-            skipped.append(t)
-            continue
-
-        dataset = TDSet( 'TTree', 'data', 'exampleTree') # the last name is the directory name inside the root file
-        for file in treeFilesAndNormalizations[t]["files"]:
-            dataset.Add( 'root://'+file)
-        
-
-        TProof.AddEnvVar("PATH2",ROOT.gSystem.Getenv("PYTHONPATH")+":"+os.getcwd())
-
-        ROOT.gSystem.Setenv("TMFDatasetName", t)
-
-        proof = TProof.Open('')
-        #proof = TProof.Open('workers=1')
-        proof.Exec( 'gSystem->Setenv("PYTHONPATH",gSystem->Getenv("PATH2"));') # for some reason cannot use method below for python path
-        proof.Exec( 'gSystem->Setenv("PATH", "'+ROOT.gSystem.Getenv("PATH") + '");')
-        print dataset.Process( 'TPySelector', 'ExampleProofReader')
-
-
-    if len(skipped)>0:
-        print "Note: following samples were skipped:"
-        for sk in skipped:
-            print "  ",sk
-
-    print "Writing normalization constants: "
-    of = ROOT.TFile(outFile,"UPDATE")
-    for t in set(todo)-set(skipped):
-        saveDir = of.Get(t)
-        if not saveDir:
-            print "Cannot get directory from plot file"
-            continue
-        saveDir.cd()
-        norm = treeFilesAndNormalizations[t]["normFactor"]
-        print "  ",t, norm
-        hist = ROOT.TH1D("norm", "norm", 1,0,1)
-        hist.SetBinContent(1, norm)
-        hist.Write()
-
+    ExampleProofReader.runAll()
