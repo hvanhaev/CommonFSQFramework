@@ -15,7 +15,7 @@ sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
 anaVersion=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("anaVersion")
 
 # TODO: control verbosity
-def getDatasetInfo():
+def getTreeFilesAndNormalizations():
     print "Printing info for: ",  anaVersion
 
     ret = {}
@@ -66,6 +66,6 @@ def getDatasetInfo():
     return ret
 
 if __name__ == "__main__":
-    getDatasetInfo()
+    getTreeFilesAndNormalizations()
 
 
