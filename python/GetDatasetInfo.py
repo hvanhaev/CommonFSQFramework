@@ -14,12 +14,14 @@ import MNTriggerStudies.MNTriggerAna.Util
 sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
 anaVersion=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("anaVersion")
 
-def getInfo():
+# TODO: control verbosity
+def getDatasetInfo():
     print "Printing info for: ",  anaVersion
 
     ret = {}
     tab = "     "
     for s in sampleList:
+        ret[s] = {}
         print "#"*120
         print "Found sample:", s
         print tab,"dataset:",sampleList[s]["DS"]
@@ -53,12 +55,17 @@ def getInfo():
         print tab, "events processed in skim:", evCnt # in agreement with crab xml output
         print tab, "list of files for this ds saved in 'fileList' variable "
         if evCnt == 0:
+            normFactor = -1
             print "Event count equals zero. Cowardly refusing to calculate normalization factor"
         else:
             normFactor = sampleList[s]["XS"]/evCnt
             print tab, "Normalization factor is ", normFactor
+        ret[s]["files"] = fileList
+        ret[s]["normFactor"] = normFactor
+
+    return ret
 
 if __name__ == "__main__":
-    getInfo()
+    getDatasetInfo()
 
 
