@@ -1,26 +1,48 @@
-1. Follow git-cheatsheet to get the code. Build it
+1. Follow info in git-cheatsheet.txt to get the code. Build it
 
+2. Create a file containing definition of data directories:
 
-2. Create a file containing definition of data directories (for PAT tuples and trees):
-
------------------
+vi MyAnalisys.py
+########### MyAnalisys.py: #########################################
 PATbasePATH="/scratch/scratch0/tfruboes/DJNewFW/PATFiles/"
 TTreeBasePATH="/scratch/scratch0/tfruboes/DJNewFW/TreeFiles/"
------------------
+####################################################################
 
-in yours you should give correct paths. Tell the framework where this file is 
-by setting shell env variable:
+(obiously you need to use different paths). Above file defines, where
+the framework will copy trees (and PATfiles) from the (centrall) skim.
+
+
+3. Tell the framework where the above file is: 
 
 export SmallXAnaDefFile=~/MyAnalisys.py
 
+ you can put this in your .bashrc
 
 3. Another shell environment variable (SmallXAnaVersion) contains path to a
-file with samples definition. You can set this variable by sourcing selected
-file from 
+file with skim definition. You can set this variable by sourcing selected
+file from MNTriggerStudies/MNTriggerAna/env/ directory:
 
-MNTriggerStudies/MNTriggerAna/env/
+cd MNTriggerStudies/MNTriggerAna/env/
+source do_DiJet_20140508.sh
 
-directory
+4. (xcheck) See your framework env related variables
+
+env | grep Small
+    SmallXAnaDefFile=/home/8/tfruboes/MyAnalisys.py
+    SmallXAnaVersion=MNTriggerStudies.MNTriggerAna.samples.Samples_DiJet_20140508
+
+5. Copy data:
+
+../scripts/copyAnaData.py -t
+
+Above command uses lcg-cp to get the tree files. They will land in subdirectories
+of the directory defined by TTreeBasePATH variable from MyAnalisys.py
+
+6. You can see example how to automatically get file list for every dataset
+and corresponding normalization factors inside
+
+../scripts/ExampleGetDatasetInfo.py
+
 
 
 
