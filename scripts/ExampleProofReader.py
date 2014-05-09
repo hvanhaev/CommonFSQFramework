@@ -7,7 +7,7 @@ from MNTriggerStudies.MNTriggerAna.GetDatasetInfo import getTreeFilesAndNormaliz
 #   1. Select output root file when calling runAll
 #   2. Same for datasets
 #   3. Same for directory with tree!
-#
+#   4. Fetch generator weight, create histos with sumw
 #
 ###############################################################################
 #
