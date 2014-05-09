@@ -217,8 +217,9 @@ for jc in interestingJetsCollections:
 
 
 process.exampleTree = cms.EDAnalyzer("ExampleTreeProducer")
+process.mnTriggerAna = cms.EDAnalyzer("MNTriggerAna")
 process.infoHisto = cms.EDAnalyzer("SaveCountHistoInTreeFile")
-process.pTreeProducers = cms.Path(process.infoHisto*process.exampleTree)
+process.pTreeProducers = cms.Path(process.infoHisto*process.exampleTree*process.mnTriggerAna)
 
 # Note: despite we are putting this value into every event waste of space is neglible thanks to root branch compression.
 process.XS =  cms.EDProducer("DoubleProducer",
