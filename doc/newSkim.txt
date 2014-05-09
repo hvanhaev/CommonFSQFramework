@@ -1,0 +1,52 @@
+0. If needed modify the template and dsList
+
+1. Use current date and run:
+
+    ../scripts/importDS.py ../python/samples/Template_DiJet.py -d 20140508
+
+
+2. Move resulting file to python/samples/:
+
+    mv  Samples_DiJet_20140508.py ../python/samples/Samples_DiJet_20140508.py
+
+
+3. Prepare new file in env with 'SmallXAnaVersion' env variable pointing to the new
+file.
+
+    vi ../env/do_DiJet_20140508.sh
+
+4. Add both new files to git:
+
+    git add ../python/samples/Samples_DiJet_20140508.py ../env/do_DiJet_20140508.sh
+    git commit -m "new skim" ../python/samples/Samples_DiJet_20140508.py ../env/do_DiJet_20140508.sh
+
+
+4. Source the new file from env:
+
+    source ../env/do_DiJet_20140508.sh
+
+
+5. Start crab jobs (from test directory)
+
+    ../scripts/runCrabJobs.py
+
+6. Use cb.sh helper script to manage the jobs. Examples:
+
+    ../scripts/cb.sh DiJet_20140508_ status
+    ../scripts/cb.sh DiJet_20140508_ get
+    ../scripts/cb.sh DiJet_20140508_ "resubmit bad"
+    ../scripts/cb.sh DiJet_20140508_ "kill all"
+
+7. As soon as at least one job for each dataset completes rerun importDS
+
+    ../scripts/importDS.py ../python/samples/Template_DiJet.py -d 20140508
+
+  this will add correct grid and local paths (pointing to trees and PATfiles) 
+   to your samples file
+
+
+8. Update the samples file:
+
+    mv  Samples_DiJet_20140508.py ../python/samples/Samples_DiJet_20140508.py
+    git commit -m "Inc paths" ../python/samples/Samples_DiJet_20140508.py
+
