@@ -53,4 +53,4 @@ if __name__ == "__main__":
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     AutoLibraryLoader.enable()
 
-    DerivedProofReader.runAll()
+    DerivedProofReader.runAll(treeName="exampleTree")

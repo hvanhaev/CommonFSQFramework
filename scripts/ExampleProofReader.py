@@ -6,7 +6,6 @@ from MNTriggerStudies.MNTriggerAna.GetDatasetInfo import getTreeFilesAndNormaliz
 #  TODO: 
 #   1. Select output root file when calling runAll
 #   2. Same for datasets
-#   3. Same for directory with tree!
 #   4. Fetch generator weight, create histos with sumw
 #
 ###############################################################################
@@ -135,7 +134,7 @@ class ExampleProofReader( TPySelector ):
 
     #@staticmethod
     @classmethod
-    def runAll(cls):
+    def runAll(cls, treeName):
         cwd = os.getcwd()+"/"
         treeFilesAndNormalizations = getTreeFilesAndNormalizations()
 
@@ -161,7 +160,7 @@ class ExampleProofReader( TPySelector ):
                 skipped.append(t)
                 continue
 
-            dataset = TDSet( 'TTree', 'data', 'exampleTree') # the last name is the directory name inside the root file
+            dataset = TDSet( 'TTree', 'data', treeName) # the last name is the directory name inside the root file
             for file in treeFilesAndNormalizations[t]["files"]:
                 dataset.Add( 'root://'+file)
             
@@ -202,4 +201,4 @@ if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     AutoLibraryLoader.enable()
-    ExampleProofReader.runAll()
+    ExampleProofReader.runAll(treeName="exampleTree")
