@@ -53,4 +53,5 @@ if __name__ == "__main__":
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     AutoLibraryLoader.enable()
 
+    # same as the label of EDProducer that was used to produce the trees
     DerivedProofReader.runAll(treeName="exampleTree")
