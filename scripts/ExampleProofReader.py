@@ -7,6 +7,7 @@ from MNTriggerStudies.MNTriggerAna.GetDatasetInfo import getTreeFilesAndNormaliz
 #   1. Select output root file when calling runAll
 #   2. Same for datasets
 #   4. Fetch generator weight, create histos with sumw
+#   5. Add protection agains returning anything different than 1/0 from process
 #
 ###############################################################################
 #
@@ -134,13 +135,14 @@ class ExampleProofReader( TPySelector ):
 
     #@staticmethod
     @classmethod
-    def runAll(cls, treeName):
+    def runAll(cls, treeName, sampleList = None):
         cwd = os.getcwd()+"/"
         treeFilesAndNormalizations = getTreeFilesAndNormalizations()
 
-        #todo = ["QCD_Pt-30to50_Tune4C_13TeV_pythia8"] # devel on one ds
-        #todo.append("QCD_Pt-10to15_Tune4C_13TeV_pythia8")
-        todo = treeFilesAndNormalizations.keys() # run them all
+        if sampleList == None:
+            todo = treeFilesAndNormalizations.keys() # run them all
+        else:
+            todo = sampleList
 
         # ret[s]["files"] = fileList
         # ret[s]["normFactor"] = normFactor
