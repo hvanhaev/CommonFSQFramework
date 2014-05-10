@@ -24,8 +24,15 @@ class MNTrgAnaProofReader(ExampleProofReader):
         self.getVariables()
         self.signalEffVsHLTThreshold_NOM = ROOT.TH1F("signalEffVsHLTThreshold_NOM",   "signalEffVsHLTThreshold_NOM",  50, -0.5, 49.5)
         self.signalEffVsHLTThreshold_DENOM = ROOT.TH1F("signalEffVsHLTThreshold_DENOM",   "signalEffVsHLTThreshold_DENOM",  50, -0.5, 49.5)
+        self.signalEffVsL1Threshold_NOM = ROOT.TH1F("signalEffVsL1Threshold_NOM",   "signalEffVsL1Threshold_NOM",  50, -0.5, 49.5)
+        self.signalEffVsL1Threshold_DENOM = ROOT.TH1F("signalEffVsL1Threshold_DENOM",   "signalEffVsL1Threshold_DENOM",  50, -0.5, 49.5)
+
         self.GetOutputList().Add(self.signalEffVsHLTThreshold_NOM)
         self.GetOutputList().Add(self.signalEffVsHLTThreshold_DENOM)
+        self.GetOutputList().Add(self.signalEffVsL1Threshold_NOM)
+        self.GetOutputList().Add(self.signalEffVsL1Threshold_DENOM)
+
+
         sys.stdout.flush()
 
     def Process( self, entry ):
@@ -57,37 +64,56 @@ class MNTrgAnaProofReader(ExampleProofReader):
         if bestPair[1] == None or bestPair[0] == None:
             return 1
 
+        self.doThresholdAna(2,2) # HLT, threshold ana - requiering two jets
+        self.doThresholdAna(1,1) # L1, threshold ana - one L1 jet required
+
+        return 1
+
+    def doThresholdAna(self, level, minObjects):
+        ''' level=1 - L1, level=2 - HLT '''
         # at this point we got a signal event. Go through avaliable HLT jets
         # and find two with the highest PT
         # TODO  : recoJet2HLTjet matching
         # TODO2 : hltJet2l1Jet matching
         HLTpts = []
-        hltJets = self.fChain.hltJets
+
+        if level == 2:
+            hltJets = self.fChain.hltJets
+        elif level == 1:
+            hltJets = self.fChain.l1Jets
+        else:
+            raise Exception("level should be equal to 1 or 2")
+
+
         for i in xrange(hltJets.size()):
             pt = hltJets.at(i).pt()
             HLTpts.append(pt)
 
         lowestPTNeededForAcceptForThisEvent = 0 # if it stays 0 - less than two HLT jets present in the event
-        if len(HLTpts)>1:
-            lowestPTNeededForAcceptForThisEvent = sorted(HLTpts, reverse=True)[1]
+        if len(HLTpts)>= minObjects:
+            lowestPTNeededForAcceptForThisEvent = sorted(HLTpts, reverse=True)[minObjects-1]
 
 
-        #print "XXX", lowestPTNeededForAcceptForThisEvent
         # We found two HLT jets with pt at least equall to lowestPTNeededForAcceptForThisEvent
         # any double jet HLT path requireing pt higher than lowestPTNeededForAcceptForThisEvent
         # would not fire
 
-        nbins = self.signalEffVsHLTThreshold_DENOM.GetNbinsX()
-        getBinCenter = self.signalEffVsHLTThreshold_DENOM.GetXaxis().GetBinCenter
+        if level == 2:
+            nom = self.signalEffVsHLTThreshold_NOM
+            denom = self.signalEffVsHLTThreshold_DENOM
+        elif level == 1:
+            nom = self.signalEffVsL1Threshold_NOM
+            denom = self.signalEffVsL1Threshold_DENOM
+
+
+        nbins = denom.GetNbinsX()
+        getBinCenter = denom.GetXaxis().GetBinCenter
         for i in xrange(1,nbins+1):
-            self.signalEffVsHLTThreshold_DENOM.Fill(i)
-            #if histAxis.GetBinCenter(i) < lowestPTNeededForAcceptForThisEvent:
+            denom.Fill(i)
             if getBinCenter(i) < lowestPTNeededForAcceptForThisEvent:
-                self.signalEffVsHLTThreshold_NOM.Fill(i)
+                nom.Fill(i)
         del getBinCenter
 
-        #l1Jets = self.fChain.l1Jets
-        return 1
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
