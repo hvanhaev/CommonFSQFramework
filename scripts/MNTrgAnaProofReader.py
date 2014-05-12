@@ -22,16 +22,16 @@ class MNTrgAnaProofReader(ExampleProofReader):
     def SlaveBegin( self, tree ):
         print 'py: slave beginning: MNTrgAnaProofReader'
         self.getVariables()
-        self.signalEffVsHLTThreshold_NOM = ROOT.TH1F("signalEffVsHLTThreshold_NOM",   "signalEffVsHLTThreshold_NOM",  50, -0.5, 49.5)
-        self.signalEffVsHLTThreshold_DENOM = ROOT.TH1F("signalEffVsHLTThreshold_DENOM",   "signalEffVsHLTThreshold_DENOM",  50, -0.5, 49.5)
-        self.signalEffVsL1Threshold_NOM = ROOT.TH1F("signalEffVsL1Threshold_NOM",   "signalEffVsL1Threshold_NOM",  50, -0.5, 49.5)
-        self.signalEffVsL1Threshold_DENOM = ROOT.TH1F("signalEffVsL1Threshold_DENOM",   "signalEffVsL1Threshold_DENOM",  50, -0.5, 49.5)
+        self.hist = {}
 
-        self.GetOutputList().Add(self.signalEffVsHLTThreshold_NOM)
-        self.GetOutputList().Add(self.signalEffVsHLTThreshold_DENOM)
-        self.GetOutputList().Add(self.signalEffVsL1Threshold_NOM)
-        self.GetOutputList().Add(self.signalEffVsL1Threshold_DENOM)
+        self.hist["signalEffVsHLTThreshold_NOM"] = ROOT.TH1F("signalEffVsHLTThreshold_NOM",   "signalEffVsHLTThreshold_NOM",  50, -0.5, 49.5)
+        self.hist["signalEffVsHLTThreshold_DENOM"] = ROOT.TH1F("signalEffVsHLTThreshold_DENOM",   "signalEffVsHLTThreshold_DENOM",  50, -0.5, 49.5)
+        self.hist["signalEffVsL1Threshold_NOM"] = ROOT.TH1F("signalEffVsL1Threshold_NOM",   "signalEffVsL1Threshold_NOM",  50, -0.5, 49.5)
+        self.hist["signalEffVsL1Threshold_DENOM"] = ROOT.TH1F("signalEffVsL1Threshold_DENOM",   "signalEffVsL1Threshold_DENOM",  50, -0.5, 49.5)
 
+        for h in self.hist:
+            self.hist[h].Sumw2()
+            self.GetOutputList().Add(self.hist[h])
 
         sys.stdout.flush()
 
@@ -99,11 +99,11 @@ class MNTrgAnaProofReader(ExampleProofReader):
         # would not fire
 
         if level == 2:
-            nom = self.signalEffVsHLTThreshold_NOM
-            denom = self.signalEffVsHLTThreshold_DENOM
+            nom = self.hist["signalEffVsHLTThreshold_NOM"]
+            denom = self.hist["signalEffVsHLTThreshold_DENOM"]
         elif level == 1:
-            nom = self.signalEffVsL1Threshold_NOM
-            denom = self.signalEffVsL1Threshold_DENOM
+            nom = self.hist["signalEffVsL1Threshold_NOM"]
+            denom = self.hist["signalEffVsL1Threshold_DENOM"]
 
 
         nbins = denom.GetNbinsX()
