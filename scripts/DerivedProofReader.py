@@ -19,16 +19,21 @@ from array import *
 from ExampleProofReader import ExampleProofReader
 
 class DerivedProofReader(ExampleProofReader):
-    def SlaveBegin( self, tree ):
-        print 'py: slave beginning: DerivedProofReader'
-        self.getVariables()
-        self.ptLeadHisto = ROOT.TH1F("ptLead",   "ptLead",  100, 0, 100)
-        self.GetOutputList().Add(self.ptLeadHisto)
+    def configureAnalyzer( self):
+        print "configureAnalyzer - DerivedProofReader"
+        self.hist = {}
+
+        self.hist["ptLeadHisto"] =  ROOT.TH1F("ptLead",   "ptLead",  100, 0, 100)
+        # 2d histograms also supported
+        self.hist["dummy2d"] =  ROOT.TH2F("dummy2d",   "dummy2d",  100, 0, 100, 100, 0, 100)
+
+        for h in self.hist:
+            self.hist[h].Sumw2()
+            self.GetOutputList().Add(self.hist[h])
+
         sys.stdout.flush()
 
-    def Process( self, entry ):
-        if self.fChain.GetEntry( entry ) <= 0:
-           return 0
+    def analyze(self):
         #event = self.fChain.event
         #run = self.fChain.run
         #lumi = self.fChain.lumi
@@ -43,7 +48,7 @@ class DerivedProofReader(ExampleProofReader):
             leadJetPtFromVectorBranch = pfJetsMomenta.at(0).pt()
 
         if leadJetPtFromVectorBranch > 30:
-           self.ptLeadHisto.Fill( leadJetPtFromVectorBranch, weight)
+           self.hist["ptLeadHisto"].Fill( leadJetPtFromVectorBranch, weight)
 
         return 1
 
@@ -54,4 +59,4 @@ if __name__ == "__main__":
     AutoLibraryLoader.enable()
 
     # same as the label of EDProducer that was used to produce the trees
-    DerivedProofReader.runAll(treeName="exampleTree")
+    DerivedProofReader.runAll(treeName="exampleTree", outFile = "~/tmp/plots2.root", maxFiles = 10)

@@ -19,9 +19,9 @@ from array import *
 from ExampleProofReader import ExampleProofReader
 
 class MNTrgAnaProofReader(ExampleProofReader):
-    def SlaveBegin( self, tree ):
-        print 'py: slave beginning: MNTrgAnaProofReader'
-        self.getVariables()
+    #def SlaveBegin( self, tree ):
+    def configureAnalyzer(self):
+        print 'configure: MNTrgAnaProofReader'
         self.hist = {}
 
         self.hist["signalEffVsHLTThreshold_NOM"] = ROOT.TH1F("signalEffVsHLTThreshold_NOM",   "signalEffVsHLTThreshold_NOM",  50, -0.5, 49.5)
@@ -35,9 +35,7 @@ class MNTrgAnaProofReader(ExampleProofReader):
 
         sys.stdout.flush()
 
-    def Process( self, entry ):
-        if self.fChain.GetEntry( entry ) <= 0:
-           return 0
+    def analyze(self):
 
         recoJetPtThreshold = 35
         #event = self.fChain.event
@@ -122,4 +120,5 @@ if __name__ == "__main__":
 
     sampleList = None # run through all
     #sampleList = ["QCD_Pt-30to50_Tune4C_13TeV_pythia8",]
-    MNTrgAnaProofReader.runAll(treeName="mnTriggerAna", sampleList=sampleList)
+    #MNTrgAnaProofReader.runAll(treeName="mnTriggerAna", sampleList=sampleList)
+    MNTrgAnaProofReader.runAll(treeName="mnTriggerAna", outFile = "~/tmp/plotsHLT.root", maxFiles = 10)
