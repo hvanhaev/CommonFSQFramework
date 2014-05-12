@@ -1,15 +1,15 @@
 1. Follow info in git-cheatsheet.txt to get the code. Build it
 
-2. Create a file containing definition of data directories:
+2. Create a file in your home directory (~/MyAnalisys.py) containing 
+definition of data directories for local storage:
 
-vi MyAnalisys.py
 ########### MyAnalisys.py: #########################################
 PATbasePATH="/scratch/scratch0/tfruboes/DJNewFW/PATFiles/"
 TTreeBasePATH="/scratch/scratch0/tfruboes/DJNewFW/TreeFiles/"
 ####################################################################
 
 (obiously you need to use different paths). Above file defines, where
-the framework will copy trees (and PATfiles) from the (centrall) skim.
+the framework will copy trees (and PATfiles) from the (central) skim.
 
 
 3. Tell the framework where the above file is: 
@@ -23,25 +23,31 @@ file with skim definition. You can set this variable by sourcing selected
 file from MNTriggerStudies/MNTriggerAna/env/ directory:
 
 cd MNTriggerStudies/MNTriggerAna/env/
-source do_DiJet_20140508.sh
+source do_DiJet_20140509.sh
 
 4. (xcheck) See your framework env related variables
 
 env | grep Small
     SmallXAnaDefFile=/home/8/tfruboes/MyAnalisys.py
-    SmallXAnaVersion=MNTriggerStudies.MNTriggerAna.samples.Samples_DiJet_20140508
+    SmallXAnaVersion=MNTriggerStudies.MNTriggerAna.samples.Samples_DiJet_20140509
 
 5. Copy data:
 
 ../scripts/copyAnaData.py -t
 
-Above command uses lcg-cp to get the tree files. They will land in subdirectories
-of the directory defined by TTreeBasePATH variable from MyAnalisys.py
+Above command uses lcg-cp to get the tree files and relies on valid grid proxy. 
+If it fails complaining about it, you can get one by running grid-proxy-init
+
+The files will land in subdirectories the directory defined by TTreeBasePATH 
+variable from MyAnalisys.py
 
 6. You can see example how to automatically get file list for every dataset
 and corresponding normalization factors inside
 
-../scripts/ExampleGetDatasetInfo.py
+MNTriggerStudies/MNTriggerAna/python/GetDatasetInfo.py
+
+above module is runable, it will show info on datasets defined by file from
+SmallXAnaVersion variable (in the example above - Samples_DiJet_20140509)
 
 
 
