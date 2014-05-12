@@ -15,7 +15,7 @@ sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
 anaVersion=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("anaVersion")
 
 # TODO: control verbosity
-def getTreeFilesAndNormalizations():
+def getTreeFilesAndNormalizations(maxFiles = None):
     print "Printing info for: ",  anaVersion
 
     ret = {}
@@ -34,8 +34,12 @@ def getTreeFilesAndNormalizations():
             #print tab, "path to trees:",sampleList[s]["pathTrees"]
             print tab, "path to trees taken from 'sampleList[s][\"pathTrees\"]' variable"
 
+            fileCnt = 0
             for dirpath, dirnames, filenames in os.walk(sampleList[s]["pathTrees"]):
                 for f in filenames:
+                    if maxFiles != None and fileCnt >= maxFiles:
+                        break # we dont need more
+
                     if not f.startswith("trees_"): continue
                     if not f.endswith(".root"): continue
                     fname = dirpath.replace("//","/") + f   # somehow root doesnt like // at the begining
@@ -45,12 +49,14 @@ def getTreeFilesAndNormalizations():
                         print "Problem reading info histo from", fname
                         continue
 
+
                     if infoHisto.GetXaxis().GetBinLabel(3)!="evCnt":
                         print "Problem - evCnt bin expected at position 3. Got",  infoHisto.getBinLabel(3)
                         continue
-                    else:
-                        fileList.append(fname)
-                        evCnt += int(infoHisto.GetBinContent(3))
+
+                    fileCnt += 1
+                    fileList.append(fname)
+                    evCnt += int(infoHisto.GetBinContent(3))
         print tab, "number of tree files:", len(fileList)
         print tab, "events processed in skim:", evCnt # in agreement with crab xml output
         print tab, "list of files for this ds saved in 'fileList' variable "

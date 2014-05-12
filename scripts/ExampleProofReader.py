@@ -60,6 +60,11 @@ from ROOT import TPySelector
 class ExampleProofReader( TPySelector ):
     def getVariables(self):
         self.dsName = ROOT.gSystem.Getenv("TMFDatasetName")
+        variablesToFetch = ROOT.gSystem.Getenv("TMFVariables")
+
+
+
+
 
     def Begin( self ):
         print 'py: beginning'
@@ -117,8 +122,8 @@ class ExampleProofReader( TPySelector ):
     def Terminate( self ): # executed once on client
 
         print 'py: terminating'
-        c1 = ROOT.TCanvas("ccc")
-        h1 = self.GetOutputList().FindObject("test")
+        #c1 = ROOT.TCanvas("ccc")
+        #h1 = self.GetOutputList().FindObject("test")
         #h1.Draw()
         #c1.Print("~/tmp/ddd.png")
         olist =  self.GetOutputList()
@@ -135,9 +140,15 @@ class ExampleProofReader( TPySelector ):
 
     #@staticmethod
     @classmethod
-    def runAll(cls, treeName, sampleList = None):
+    def runAll(cls, treeName, sampleList = None, maxFiles=None, normalize=True):
+        # TODO - maxFiles
+        # normalize
+        # change method names
+        #    protect against  bad method returns
+        # parameterSetting 
+    
         cwd = os.getcwd()+"/"
-        treeFilesAndNormalizations = getTreeFilesAndNormalizations()
+        treeFilesAndNormalizations = getTreeFilesAndNormalizations(maxFiles=maxFiles)
 
         if sampleList == None:
             todo = treeFilesAndNormalizations.keys() # run them all
@@ -204,3 +215,4 @@ if __name__ == "__main__":
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     AutoLibraryLoader.enable()
     ExampleProofReader.runAll(treeName="exampleTree")
+    #ExampleProofReader.runAll(treeName="exampleTree", maxFiles = 10)
