@@ -92,10 +92,12 @@ class ExampleProofReader( TPySelector ):
                 setattr(self, s, float(attr))
             elif attrType == "str":
                 setattr(self, s, attr)
+            elif attrType == "bool":
+                setattr(self, s, bool(attr))
             else:
                 print "Dont know what to do with", s, attrType
             
-        print "XXX1", self.YODA, self.LUKE, self.VADER
+        print "XXX1", self.YODA, self.LUKE, self.VADER, self.LEIA
 
 
 
@@ -150,38 +152,38 @@ class ExampleProofReader( TPySelector ):
         return 1
 
     def SlaveTerminate( self ):
-       print 'py: slave terminating'
+        print 'py: slave terminating'
 
     def Terminate( self ): # executed once on client
-
-        print 'py: terminating'
-        #c1 = ROOT.TCanvas("ccc")
-        #h1 = self.GetOutputList().FindObject("test")
-        #h1.Draw()
-        #c1.Print("~/tmp/ddd.png")
+        print 'py: terminating' 
         olist =  self.GetOutputList()
 
-        outFile = ROOT.TFile("~/tmp/plots.root", "UPDATE") # TODO - take dir name from Central file
+        of = ROOT.TFile(self.outFile, "UPDATE") # TODO - take dir name from Central file
 
-        outDir = outFile.mkdir(self.datasetName)
+        outDir = of.mkdir(self.datasetName)
         outDir.cd()
 
-        # TODO save in a directory mathcing the hlt collection name
+        if self.doNormalization:
+            print "Will try to apply scale:", self.normalizationFactor
+
         for o in olist:
+            if self.doNormalization:
+                if not o.InheritsFrom("TH1"):
+                    print "Dont know how to scale object:", o.GetName(), o.ClassName()
+                else:
+                    o.Scale(self.normalizationFactor)
             o.Write()
 
 
-    #@staticmethod
+    #    change method names
+    #    protect against  bad method returns
+    #    select nWorkers
     @classmethod
-    def runAll(cls, treeName, sampleList = None, maxFiles=None, normalize=True, slaveParameters = None):
-        if slaveParameters == None: # Othwerwise is kept till next call
+    def runAll(cls, treeName, outFile, sampleList = None, maxFiles=None, \
+               normalize=True, slaveParameters = None):
+        if slaveParameters == None: # When default param is used reset contents on every call to runAll
             slaveParameters = {}
 
-
-        # normalize
-        # change method names
-        #    protect against  bad method returns
-    
         cwd = os.getcwd()+"/"
         treeFilesAndNormalizations = getTreeFilesAndNormalizations(maxFiles=maxFiles)
 
@@ -190,16 +192,15 @@ class ExampleProofReader( TPySelector ):
         else:
             todo = sampleList
 
-        # ret[s]["files"] = fileList
-        # ret[s]["normFactor"] = normFactor
 
-        outFile = "~/tmp/plots.root" # note: duplicated defintion above...
         of = ROOT.TFile(outFile,"RECREATE")
         if not of:
             print "Cannot create outfile:", outFile
             sys.exit()
         of.Close() # so we dont mess with file opens during proof ana
         
+        slaveParameters["doNormalization"] = normalize # normalization factor set in event loop
+        slaveParameters["outFile"] = outFile
 
         skipped = []
         for t in todo:
@@ -212,13 +213,14 @@ class ExampleProofReader( TPySelector ):
             for file in treeFilesAndNormalizations[t]["files"]:
                 dataset.Add( 'root://'+file)
             
+            slaveParameters["datasetName"] = t
+            slaveParameters["normalizationFactor"] =  treeFilesAndNormalizations[t]["normFactor"]
 
             TProof.AddEnvVar("PATH2",ROOT.gSystem.Getenv("PYTHONPATH")+":"+os.getcwd())
 
             #ROOT.gSystem.Setenv("TMFDatasetName", t)
 
-            supportedTypes = set(["int", "str", "float"])
-            slaveParameters["datasetName"] = t
+            supportedTypes = set(["int", "str", "float", "bool"])
             variablesToFetch = ""
             coma = ""
             for p in slaveParameters:
@@ -273,11 +275,13 @@ if __name__ == "__main__":
 
     slaveParams = {}
 
-    ExampleProofReader.runAll(treeName="exampleTree")
+    #ExampleProofReader.runAll(treeName="exampleTree", outFile = "~/tmp/plots.root")
 
-    '''
+    #'''
     slaveParams["YODA"] = 1234
     slaveParams["LUKE"] = "theForce"
     slaveParams["VADER"] = 3.14
-    ExampleProofReader.runAll(treeName="exampleTree", maxFiles = 10, slaveParameters=slaveParams)
+    slaveParams["LEIA"] = True
+
+    ExampleProofReader.runAll(treeName="exampleTree", maxFiles = 10, slaveParameters=slaveParams, outFile = "~/tmp/plots.root")
     # '''
