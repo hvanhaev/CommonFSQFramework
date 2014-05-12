@@ -83,6 +83,7 @@ class ExampleProofReader( TPySelector ):
             attrRaw = ROOT.gSystem.Getenv(self.encodeEnvString(s))
             #print s, attr
             attrSpl = attrRaw.split(";;;")
+            print s, attrSpl
             attr = attrSpl[0]
             attrType = attrSpl[1]
 
@@ -93,11 +94,16 @@ class ExampleProofReader( TPySelector ):
             elif attrType == "str":
                 setattr(self, s, attr)
             elif attrType == "bool":
-                setattr(self, s, bool(attr))
+                if attr == "True":
+                    setattr(self, s, True)
+                elif attr == "False":
+                    setattr(self, s, False)
+                else:
+                    print "Cannot set bool attribute", s, "from", attr
             else:
                 print "Dont know what to do with", s, attrType
             
-        print "XXX1", self.YODA, self.LUKE, self.VADER, self.LEIA
+        print "XXX1", self.YODA, self.LUKE, self.VADER, self.LEIA, self.LEIA2
 
 
 
@@ -108,10 +114,10 @@ class ExampleProofReader( TPySelector ):
     def SlaveBegin( self, tree ):
         print 'py: slave beginning'
         self.getVariables()
+        self.configureAnalyzer() 
 
-        self.coarseBinning = False
-        self.fbTrigger = False
-
+    # this method will be overridden in derived class
+    def configureAnalyzer(self):
         self.histograms = {}
         self.ptLeadHisto = ROOT.TH1F("ptLead",   "ptLead",  100, 0, 100)      
         self.ptRatioHisto = ROOT.TH1F("ptRatio", "ptRatio", 100, -0.0001, 10)      
@@ -119,9 +125,18 @@ class ExampleProofReader( TPySelector ):
         self.GetOutputList().Add(self.ptRatioHisto)
         sys.stdout.flush()
     
+    # protect from returning None or other nonsense by 
+    # putting analysis stuff in separate function
     def Process( self, entry ):
         if self.fChain.GetEntry( entry ) <= 0:
            return 0
+
+        self.analyze()
+        return 1
+
+    # this method will be overridden in derived class
+    def analyze(self):
+    
         #event = self.fChain.event
         #run = self.fChain.run
         #lumi = self.fChain.lumi
@@ -174,13 +189,9 @@ class ExampleProofReader( TPySelector ):
                     o.Scale(self.normalizationFactor)
             o.Write()
 
-
-    #    change method names
-    #    protect against  bad method returns
-    #    select nWorkers
     @classmethod
     def runAll(cls, treeName, outFile, sampleList = None, maxFiles=None, \
-               normalize=True, slaveParameters = None):
+               normalize=True, slaveParameters = None, nWorkers=None):
         if slaveParameters == None: # When default param is used reset contents on every call to runAll
             slaveParameters = {}
 
@@ -201,6 +212,9 @@ class ExampleProofReader( TPySelector ):
         
         slaveParameters["doNormalization"] = normalize # normalization factor set in event loop
         slaveParameters["outFile"] = outFile
+
+
+        print "XXX", normalize, slaveParameters["doNormalization"]
 
         skipped = []
         for t in todo:
@@ -240,8 +254,10 @@ class ExampleProofReader( TPySelector ):
 
 
 
-            proof = TProof.Open('')
-            #proof = TProof.Open('workers=1')
+            if nWorkers == None:
+                proof = TProof.Open('')
+            else:
+                proof = TProof.Open('workers='+str(nWorkers))
             proof.Exec( 'gSystem->Setenv("PYTHONPATH",gSystem->Getenv("PATH2"));') # for some reason cannot use method below for python path
             proof.Exec( 'gSystem->Setenv("PATH", "'+ROOT.gSystem.Getenv("PATH") + '");')
             #print dataset.Process( 'TPySelector', 'ExampleProofReader')
@@ -282,6 +298,10 @@ if __name__ == "__main__":
     slaveParams["LUKE"] = "theForce"
     slaveParams["VADER"] = 3.14
     slaveParams["LEIA"] = True
+    slaveParams["LEIA2"] = False
 
-    ExampleProofReader.runAll(treeName="exampleTree", maxFiles = 10, slaveParameters=slaveParams, outFile = "~/tmp/plots.root")
+    ExampleProofReader.runAll(treeName="exampleTree", maxFiles = 10, \
+                              slaveParameters=slaveParams, \
+                              outFile = "~/tmp/plots.root", \
+                              normalize = True)
     # '''
