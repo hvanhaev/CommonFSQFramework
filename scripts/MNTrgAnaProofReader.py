@@ -13,10 +13,9 @@ from array import *
 # please note that python selector class name (here: MNTrgAnaProofReader) 
 # should be consistent with this file name (MNTrgAnaProofReader.py)
 
-# note2: current limitation is that the derived class (MNTrgAnaProofReader) must 
-#        be run from the same dir as ExampleProofReader
+# you have to run this file from directory where it is saved
 
-from ExampleProofReader import ExampleProofReader
+from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader
 
 class MNTrgAnaProofReader(ExampleProofReader):
     #def SlaveBegin( self, tree ):

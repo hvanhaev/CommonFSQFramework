@@ -13,10 +13,10 @@ from array import *
 # please note that python selector class name (here: DerivedProofReader) 
 # should be consistent with this file name (DerivedProofReader.py)
 
-# note2: current limitation is that the derived class (DerivedProofReader) must 
-#        be run from the same dir as ExampleProofReader
+# you have to run this file from directory where it is saved
 
-from ExampleProofReader import ExampleProofReader
+
+from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader
 
 class DerivedProofReader(ExampleProofReader):
     def configureAnalyzer( self):
