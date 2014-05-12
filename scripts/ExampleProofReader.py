@@ -58,11 +58,44 @@ from array import *
 # should be consistent with this file name (ExampleProofReader.py)
 from ROOT import TPySelector
 class ExampleProofReader( TPySelector ):
+    uniqueEnvString = "TMFTMFqWeRtY_"
+
+    @classmethod
+    def encodeEnvString(cls, s):
+        return s+cls.uniqueEnvString
+
+    @classmethod
+    def decodeEnvString(cls, s):
+        spl = s.split(cls.uniqueEnvString)
+        if len(spl)!=1:
+            err = "Cannot env decode:", s
+            print err
+            sys.stdout.flush()
+            raise Exception(err)
+        return spl[0]
+
     def getVariables(self):
-        self.dsName = ROOT.gSystem.Getenv("TMFDatasetName")
-        variablesToFetch = ROOT.gSystem.Getenv("TMFVariables")
+        #self.dsName = ROOT.gSystem.Getenv("TMFDatasetName")
+        variablesToFetch = ROOT.gSystem.Getenv(self.encodeEnvString("VariablesToFetch") )
+        print variablesToFetch
+        split = variablesToFetch.split(",")
+        for s in split:
+            attrRaw = ROOT.gSystem.Getenv(self.encodeEnvString(s))
+            #print s, attr
+            attrSpl = attrRaw.split(";;;")
+            attr = attrSpl[0]
+            attrType = attrSpl[1]
 
-
+            if attrType == "int":
+                setattr(self, s, int(attr))
+            elif attrType == "float":
+                setattr(self, s, float(attr))
+            elif attrType == "str":
+                setattr(self, s, attr)
+            else:
+                print "Dont know what to do with", s, attrType
+            
+        print "XXX1", self.YODA, self.LUKE, self.VADER
 
 
 
@@ -130,7 +163,7 @@ class ExampleProofReader( TPySelector ):
 
         outFile = ROOT.TFile("~/tmp/plots.root", "UPDATE") # TODO - take dir name from Central file
 
-        outDir = outFile.mkdir(self.dsName)
+        outDir = outFile.mkdir(self.datasetName)
         outDir.cd()
 
         # TODO save in a directory mathcing the hlt collection name
@@ -140,12 +173,14 @@ class ExampleProofReader( TPySelector ):
 
     #@staticmethod
     @classmethod
-    def runAll(cls, treeName, sampleList = None, maxFiles=None, normalize=True):
-        # TODO - maxFiles
+    def runAll(cls, treeName, sampleList = None, maxFiles=None, normalize=True, slaveParameters = None):
+        if slaveParameters == None: # Othwerwise is kept till next call
+            slaveParameters = {}
+
+
         # normalize
         # change method names
         #    protect against  bad method returns
-        # parameterSetting 
     
         cwd = os.getcwd()+"/"
         treeFilesAndNormalizations = getTreeFilesAndNormalizations(maxFiles=maxFiles)
@@ -180,7 +215,28 @@ class ExampleProofReader( TPySelector ):
 
             TProof.AddEnvVar("PATH2",ROOT.gSystem.Getenv("PYTHONPATH")+":"+os.getcwd())
 
-            ROOT.gSystem.Setenv("TMFDatasetName", t)
+            #ROOT.gSystem.Setenv("TMFDatasetName", t)
+
+            supportedTypes = set(["int", "str", "float"])
+            slaveParameters["datasetName"] = t
+            variablesToFetch = ""
+            coma = ""
+            for p in slaveParameters:
+                encodedName = cls.encodeEnvString(p)
+
+                # Check if parameter is supported. Adding another type is easy - see
+                #       getVariables method
+                paramType = slaveParameters[p].__class__.__name__
+                if paramType not in supportedTypes:
+                    raise Exception("Parameter of type "+paramType \
+                          + " is not of currently supported types: " + ", ".join(supportedTypes) )
+                ROOT.gSystem.Setenv(encodedName, str(slaveParameters[p])+";;;"+paramType)
+
+                variablesToFetch += coma + p
+                coma = ","
+            ROOT.gSystem.Setenv(cls.encodeEnvString("VariablesToFetch"), variablesToFetch)
+
+
 
             proof = TProof.Open('')
             #proof = TProof.Open('workers=1')
@@ -214,5 +270,14 @@ if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     AutoLibraryLoader.enable()
+
+    slaveParams = {}
+
     ExampleProofReader.runAll(treeName="exampleTree")
-    #ExampleProofReader.runAll(treeName="exampleTree", maxFiles = 10)
+
+    '''
+    slaveParams["YODA"] = 1234
+    slaveParams["LUKE"] = "theForce"
+    slaveParams["VADER"] = 3.14
+    ExampleProofReader.runAll(treeName="exampleTree", maxFiles = 10, slaveParameters=slaveParams)
+    # '''
