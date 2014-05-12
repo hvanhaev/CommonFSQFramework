@@ -8,7 +8,7 @@ PATbasePATH="/scratch/scratch0/tfruboes/DJNewFW/PATFiles/"
 TTreeBasePATH="/scratch/scratch0/tfruboes/DJNewFW/TreeFiles/"
 ####################################################################
 
-(obiously you need to use different paths). Above file defines, where
+(obviously you need to use different paths). Above file defines, where
 the framework will copy trees (and PATfiles) from the (central) skim.
 
 
