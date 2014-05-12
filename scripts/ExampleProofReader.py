@@ -103,7 +103,7 @@ class ExampleProofReader( TPySelector ):
             else:
                 print "Dont know what to do with", s, attrType
             
-        print "XXX1", self.YODA, self.LUKE, self.VADER, self.LEIA, self.LEIA2
+        #print "XXX1", self.YODA, self.LUKE, self.VADER, self.LEIA, self.LEIA2
 
 
 
@@ -293,12 +293,13 @@ if __name__ == "__main__":
 
     #ExampleProofReader.runAll(treeName="exampleTree", outFile = "~/tmp/plots.root")
 
-    #'''
+    '''
     slaveParams["YODA"] = 1234
     slaveParams["LUKE"] = "theForce"
     slaveParams["VADER"] = 3.14
     slaveParams["LEIA"] = True
     slaveParams["LEIA2"] = False
+    #'''
 
     ExampleProofReader.runAll(treeName="exampleTree", maxFiles = 10, \
                               slaveParameters=slaveParams, \
