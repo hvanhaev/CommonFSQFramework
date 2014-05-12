@@ -263,26 +263,37 @@ class ExampleProofReader( TPySelector ):
             #print dataset.Process( 'TPySelector', 'ExampleProofReader')
             print "Running:", cls.__name__
             print dataset.Process( 'TPySelector', cls.__name__)
+            of = ROOT.TFile(outFile,"UPDATE")
 
+            # Write norm value and other info
+            saveDir = of.Get(t)
+            if not saveDir:
+                print "Cannot get directory from plot file"
+                continue
+            #saveDir.cd()
+            norm = treeFilesAndNormalizations[t]["normFactor"]
+            print "  ",t, norm
+            hist = ROOT.TH1D("norm", "norm", 1,0,1)
+            hist.SetBinContent(1, norm)
+            saveDir.WriteObject(hist, hist.GetName())
+
+            hist = ROOT.TH1D("isNormalized", "isNormalized", 1,0,1)
+            value = 0
+            if normalize:
+                value = 1
+            hist.SetBinContent(1, value)
+            saveDir.WriteObject(hist, hist.GetName())
+            of.Close()
 
         if len(skipped)>0:
             print "Note: following samples were skipped:"
             for sk in skipped:
                 print "  ",sk
 
-        print "Writing normalization constants: "
-        of = ROOT.TFile(outFile,"UPDATE")
+        print "Analyzed:"
+
         for t in set(todo)-set(skipped):
-            saveDir = of.Get(t)
-            if not saveDir:
-                print "Cannot get directory from plot file"
-                continue
-            saveDir.cd()
-            norm = treeFilesAndNormalizations[t]["normFactor"]
-            print "  ",t, norm
-            hist = ROOT.TH1D("norm", "norm", 1,0,1)
-            hist.SetBinContent(1, norm)
-            hist.Write()
+            print t
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
