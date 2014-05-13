@@ -120,4 +120,4 @@ if __name__ == "__main__":
     sampleList = None # run through all
     #sampleList = ["QCD_Pt-30to50_Tune4C_13TeV_pythia8",]
     #MNTrgAnaProofReader.runAll(treeName="mnTriggerAna", sampleList=sampleList)
-    MNTrgAnaProofReader.runAll(treeName="mnTriggerAna", outFile = "~/tmp/plotsHLT.root", maxFiles = 10)
+    MNTrgAnaProofReader.runAll(treeName="mnTriggerAna", outFile = "~/plotsHLT.root", maxFiles = 10)
