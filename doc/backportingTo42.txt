@@ -1,10 +1,22 @@
+#####################################################################
+#
+# Get the code
+#
+#####################################################################
 git cms-init
 git remote add tomasz git@github.com:fruboes/cmssw.git
 git fetch tomasz
+git config core.sparseCheckout true
 echo MNTriggerStudies/MNTriggerAna >> .git/info/sparse-checkout
 git checkout -b MNTriggerStudies_42BPort tomasz/MNTriggerStudies
 
-#git push my-cmssw MNTriggerStudies_42BPort
+# <Optional part for working within cmssw_4_2>
+export CVSROOT=":ext:fruboes@lxplus5.cern.ch:/afs/cern.ch/user/c/cvscmssw/public/CMSSW"
+export CVS_RSH=ssh
+kinit fruboes@CERN.CH
+
+# make sure you have krb based ssh authentication for lxplus5. If yes
+# do checkout:
 
 addpkg DataFormats/PatCandidates  V06-04-19-05
 addpkg PhysicsTools/PatAlgos      V08-06-58
@@ -13,4 +25,45 @@ addpkg CommonTools/ParticleFlow   B4_2_X_V00-03-05
 addpkg PhysicsTools/SelectorUtils V00-03-24
 addpkg PhysicsTools/UtilAlgos     V08-02-14
 addpkg PhysicsTools/Utilities     V08-03-17
+
+# <end of optional part>
+
+# compile
+scramv1 b -j 8
+
+#####################################################################
+#
+# Work with the code
+#
+#####################################################################
+# add file to repository:  
+git add filename # note: you need also commit it!
+
+# commit file to (local) repo after doing changes
+git commit filename 
+
+# Export your work to server so its safe 
+git push my-cmssw MNTriggerStudies_42BPort 
+
+
+#####################################################################
+#
+# Get the latest code
+#
+#####################################################################
+
+
+#   Update info on the remote repo. Note that we have defined repository
+#    "tomasz" in "get the code" section above (git remote add..). Other
+#    repositories may be defined and handled in same way 
+#   
+git fetch tomasz 
+
+#   Compare changes
+git diff MNTriggerStudies_42BPort..tomasz/MNTriggerStudies | less
+
+#   Merge changes
+git merge tomasz/MNTriggerStudies
+scramv1 b -j 8
+
 
