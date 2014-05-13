@@ -35,8 +35,6 @@ class MNTrgAnaProofReader(ExampleProofReader):
         sys.stdout.flush()
 
     def analyze(self):
-
-        recoJetPtThreshold = 35
         #event = self.fChain.event
         #run = self.fChain.run
         #lumi = self.fChain.lumi
@@ -50,7 +48,7 @@ class MNTrgAnaProofReader(ExampleProofReader):
         bestPair = [None,None]
 
         for i in xrange(pfJetsMomenta.size()):
-            if pfJetsMomenta.at(i).pt() < recoJetPtThreshold: continue
+            if pfJetsMomenta.at(i).pt() < self.recoJetPtThreshold: continue
 
             eta = pfJetsMomenta.at(i).eta()
             if bestPair[0] == None or bestPair[0].eta() > eta:
@@ -120,4 +118,12 @@ if __name__ == "__main__":
     sampleList = None # run through all
     #sampleList = ["QCD_Pt-30to50_Tune4C_13TeV_pythia8",]
     #MNTrgAnaProofReader.runAll(treeName="mnTriggerAna", sampleList=sampleList)
-    MNTrgAnaProofReader.runAll(treeName="mnTriggerAna", outFile = "~/plotsHLT.root", maxFiles = 10)
+
+
+    slaveParams = {}
+    slaveParams["recoJetPtThreshold"] = 35
+        
+
+    MNTrgAnaProofReader.runAll(treeName="mnTriggerAna", outFile = "~/plotsHLT.root", 
+                                slaveParameters=slaveParams,
+                                maxFiles = 10)
