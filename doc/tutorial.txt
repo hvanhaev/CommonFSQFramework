@@ -49,6 +49,109 @@ MNTriggerStudies/MNTriggerAna/python/GetDatasetInfo.py
 above module is runable, it will show info on datasets defined by file from
 SmallXAnaVersion variable (in the example above - Samples_DiJet_20140509)
 
+----------------------------------------------------------------
+----------------------------------------------------------------
+----------------------------------------------------------------
+- Running analysis
+
+Currently the only fully working analysis chain is for MN trigger studies.
+
+0. Make sure you have all env variables defined :
+
+    env | grep Small
+    SmallXAnaDefFile=/home/8/tfruboes/MyAnalisys.py
+    SmallXAnaVersion=MNTriggerStudies.MNTriggerAna.samples.Samples_DiJet_20140509
+
+1. Go to MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/ directory. Run
+
+     ./MNTrgAnaProofReader.py
+    
+2 run 
+
+    ./drawMNTrgEfficiencyPlots.py
+
+    efficiency histograms (L1.png, HLT.png) will appear in your home
+directory.
+
+
+3. Go through notes below to get a glimpse what is happening (or that is
+wrong):
+
+
+ Notes:
+  - Running tha analyzer from a different directory will fail. Ie you should not try:
+
+        cd MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/
+        ./mnTrgAnalyzer/MNTrgAnaProofReader.py # wont work
+
+    the correct way is: 
+
+        cd MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/mnTrgAnalyzer/
+        ./MNTrgAnaProofReader.py # YAY!
+
+  - by default it will run only on 10 treefiles from each dataset. You can run
+    through all of the files by removing maxFiles parameter from runAll() call
+  -- this is meant to speed development (final plots should be obtained on all
+     files). Running through all currently used  datesets takes ~5 minutes on 
+     a 4 core machine (for 35 GeV reco jet threshold)
+
+  - This analyzer uses proof (part of the root framework) to use all cores for
+    analysis. In case you are using some public login service (like lxplus)
+    for development you may want to disable multithreading by adding
+
+          nWorkers=1
+
+    to the runAll() parameters. Otherwise your worker most likely will get
+    killed.
+
+  - Resulting plots will be saved in your home directory, plotsHLT.root file
+  -- Note, that the histograms get correct normalization not depending on
+     the value of maxFiles parameters
+
+  - comunication with the analyzer is performed in a special way. First a
+    dictionary is created and passed via slaveParameters parameter (of
+    the runAll() function). Values from this dictionary will appear as data
+    attributes of the analyzing class
+
+
+  - note, that proof by default uses a directory named .proof placed in your home
+    directory. Since there are some file operations done there it may be wise
+    to move it (and use a symbolic link) into a different place for faster file 
+    operations. My setup utilizes local scratch space exported via NFS:
+
+        ls -la ~ | grep proof
+        lrwxrwxrwx   1 tfruboes xxxxx       39 Jul 12  2011 .proof -> /scratch/scratch0/tfruboes/ProofWorkDir
+
+    this was achieved by running
+
+        cd ~
+        mkdir /scratch/scratch0/tfruboes/ProofWorkDir/
+        ln -s /scratch/scratch0/tfruboes/ProofWorkDir/ .proof
+
+  -- Note, that proof analyzer can be also ran across multiple computers (see
+     http://pod.gsi.de/). Your proof dir must be then seen from every of them
+     (ie you must use some network shared directory, so sticking with home
+     directory may not be bad idea)
+
+  - Typically you wont see error messages if something goes wrong. Logs for
+    last run are saved inside the .proof directory, see 
+
+     ~/.proof/<veryLongNameCorrespondingToRunningDirectory>/last-lite-session/worker-0.0.log
+
+    where <veryLongNameCorrespondingToRunningDirectory> in my case is
+
+      scratch-scratch0-tfruboes-2014.04.HLT-CMSSW_6_2_8-src-MNTriggerStudies-MNTriggerAna-test-mnTrgAnalyzer
+
+  -  Sometimes your analyzer will crash, the output file will stay empty, and
+     no reason will be visible in proof log files. The only way than is to
+     partially comment/uncomment parts of your analyzer code in order to
+     identify the problematic part.
+
+     There is also a possibility, that you are looking at wrong log file (from
+     wrong directory under .proof) as I tend to do.
+
+
+
 
 
 
