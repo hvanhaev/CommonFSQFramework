@@ -1,3 +1,11 @@
+0. <general tip> Usage of the "screen" utility usually makes work much 
+    easier. You can find a tutorial under
+
+   http://www.rackaid.com/blog/linux-screen-tutorial-and-how-to/
+
+   screen is included in most (all?) recent linux distros, but often is not
+   installed by default. Ask your administrator for it.
+
 1. Follow info in git-cheatsheet.txt to get the code. Build it
 
 2. Create a file in your home directory (~/MyAnalisys.py) containing 
