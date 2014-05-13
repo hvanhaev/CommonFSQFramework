@@ -1,0 +1,16 @@
+git cms-init
+git remote add tomasz git@github.com:fruboes/cmssw.git
+git fetch tomasz
+echo MNTriggerStudies/MNTriggerAna >> .git/info/sparse-checkout
+git checkout -b MNTriggerStudies_42BPort tomasz/MNTriggerStudies
+
+#git push my-cmssw MNTriggerStudies_42BPort
+
+addpkg DataFormats/PatCandidates  V06-04-19-05
+addpkg PhysicsTools/PatAlgos      V08-06-58
+addpkg PhysicsTools/PatUtils      V03-09-18
+addpkg CommonTools/ParticleFlow   B4_2_X_V00-03-05
+addpkg PhysicsTools/SelectorUtils V00-03-24
+addpkg PhysicsTools/UtilAlgos     V08-02-14
+addpkg PhysicsTools/Utilities     V08-03-17
+
