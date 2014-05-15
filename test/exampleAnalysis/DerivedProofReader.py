@@ -24,6 +24,7 @@ class DerivedProofReader(ExampleProofReader):
         self.hist = {}
 
         self.hist["ptLeadHisto"] =  ROOT.TH1F("ptLead",   "ptLead",  100, 0, 100)
+    
         # 2d histograms also supported
         self.hist["dummy2d"] =  ROOT.TH2F("dummy2d",   "dummy2d",  100, 0, 100, 100, 0, 100)
 
@@ -53,10 +54,27 @@ class DerivedProofReader(ExampleProofReader):
         return 1
 
 
+
+    @classmethod
+    def testAll(cls):
+        # same as the label of EDProducer that was used to produce the trees
+        #todo = [400, 100, 25, 8, 2]
+        todo =[1,6,25,100,400]
+        #todo = [8]
+        for t in todo:
+            oname = "~/tmp/plots_"+str(t)+".root"
+            onameMerged = "~/tmp/plotsMerged_"+str(t)+".root"
+            #pr = DerivedProofReader()
+            #pr.runAll(treeName="exampleTree", outFile = oname, maxFiles = t)
+            #DerivedProofReader.DerivedProofReader().runAll(treeName="exampleTree", outFile = oname, maxFiles = t)
+            cls.runAll(treeName="exampleTree", outFile = oname, maxFiles = t)
+            os.system("../../scripts/normalizeAndAddHistograms.py -i "+oname + " -o " + onameMerged)
+
+
+
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     AutoLibraryLoader.enable()
+    DerivedProofReader.testAll()
 
-    # same as the label of EDProducer that was used to produce the trees
-    DerivedProofReader.runAll(treeName="exampleTree", outFile = "~/tmp/plots2.root", maxFiles = 10)
