@@ -1,3 +1,22 @@
+Register at github
+(http://cms-sw.github.io/cmssw/faq.html#how_do_i_subscribe_to_github)
+
+It is crucial that you register your ssh key and set those values 
+
+git config --global user.name <First Name> <Last Name>
+git config --global user.email <Your-Email-Address>
+git config --global user.github <Your-Just-Created-GitHub-Account>
+
+
+login to github, go to https://github.com/cms-sw/cmssw and click "Fork". 
+
+Go to https://github.com/<yourGitHubUserName>/cmssw . If you see cmssw
+packages directory structure then you can go to next step. If you see message
+like "This repository is temporarily unavailable." you need to wait till it's
+ok (usually couple of minutes).
+
+
+
 git cms-init
 git remote add tomasz git@github.com:fruboes/cmssw.git
 git fetch tomasz
@@ -13,4 +32,15 @@ addpkg CommonTools/ParticleFlow   B4_2_X_V00-03-05
 addpkg PhysicsTools/SelectorUtils V00-03-24
 addpkg PhysicsTools/UtilAlgos     V08-02-14
 addpkg PhysicsTools/Utilities     V08-03-17
+
+
+# sample def creation
+../../scripts/importDS.py  -d 20140514_MN2010 Template_DiJet_42.py
+source do_DiJet_20140514_MN2010.sh
+export SmallXAnaDefFile=~/MyAnalisys.py
+
+# development
+export TMFSampleName=JetMETTau-Run2010A-Apr21ReReco-v1
+# or
+export TMFSampleName=QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6
 
