@@ -598,3 +598,30 @@ process.patDefaultSequence.replace(process.patJets, process.patJetsORG*process.p
 
 if anaType == "JetTriggerEff":
     del process.out
+
+
+
+process.load("CondCore.DBCommon.CondDBCommon_cfi")
+from CondCore.DBCommon.CondDBSetup_cfi import *
+process.jec = cms.ESSource("PoolDBESSource",
+      DBParameters = cms.PSet(
+        messageLevel = cms.untracked.int32(0)
+        ),
+      timetype = cms.string('runnumber'),
+      toGet = cms.VPSet(
+      cms.PSet(
+            record = cms.string('JetCorrectionsRecord'),
+            tag    = cms.string('JetCorrectorParametersCollection_START42_V16A_AK5PF'),
+            label  = cms.untracked.string('AK5PF')
+            ),
+      cms.PSet(
+            record = cms.string('JetCorrectionsRecord'),
+            tag    = cms.string('JetCorrectorParametersCollection_START42_V16A_AK5Calo'),
+            label  = cms.untracked.string('AK5Calo')
+            ),
+      ), 
+      connect = cms.string('sqlite:START42_V16A.db')
+)
+## add an es_prefer statement to resolve a possible conflict from simultaneous connection to a global tag
+process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
+
