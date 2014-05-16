@@ -78,13 +78,8 @@ elif anaType == "JetTriggerEff":
     minJetPT =  25
     minJets =    0
     minDiMuons = 0
-    process.TFileService = cms.Service("TFileService", 
-       fileName = cms.string("jets.root"),
-       closeFileFast = cms.untracked.bool(True)
-    )
 
-
-
+process.TFileService = cms.Service("TFileService", fileName = cms.string("trees.root") )
 
 if is2011Balance:
     minJetPT = 30
@@ -129,7 +124,7 @@ if enableTur:
 #f = "/scratch/scratch0/data/store/data/Run2010B/METFwd/AOD/Apr21ReReco-v1/0005/9CC263B4-1974-E011-A817-0024E876839D.root"
 
 if currentSampleName=="QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6":
-    f = "/scratch/scratch0/data/store/data/Run2010A/JetMETTau/AOD/Apr21ReReco-v1/0000/0440B04B-9B6F-E011-88A2-0018F3D096C2.root"
+    f = "/scratch/scratch0/data/store/mc/Summer12/QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/AODSIM/LowPU2010_DR42_PU_S0_START42_V17B-v1/00000/7CFD2C30-ED2F-E211-9866-00215E2221AE.root"
 elif currentSampleName=="JetMETTau-Run2010A-Apr21ReReco-v1":
     # most of the file takes good part of run 139407 - first 26897 events of it are safe to run
     f = "/scratch/scratch0/data/store/data/Run2010A/JetMETTau/AOD/Apr21ReReco-v1/0000/001144C0-DB6D-E011-9850-002618943911.root"
@@ -154,7 +149,7 @@ process.source.fileNames = [
 ]
 
 
-process.out.fileName = "ana_DiJetPAT.root"
+process.out.fileName = 'mnTrgAna_PAT.root'
 process.options.wantSummary = False
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 ####################################################################
@@ -600,7 +595,7 @@ if anaType == "JetTriggerEff":
     del process.out
 
 
-
+# '''
 process.load("CondCore.DBCommon.CondDBCommon_cfi")
 from CondCore.DBCommon.CondDBSetup_cfi import *
 process.jec = cms.ESSource("PoolDBESSource",
@@ -624,4 +619,9 @@ process.jec = cms.ESSource("PoolDBESSource",
 )
 ## add an es_prefer statement to resolve a possible conflict from simultaneous connection to a global tag
 process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
+# '''
+
+
+
+
 

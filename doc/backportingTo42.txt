@@ -38,6 +38,9 @@ addpkg PhysicsTools/SelectorUtils V00-03-24
 addpkg PhysicsTools/UtilAlgos     V08-02-14
 addpkg PhysicsTools/Utilities     V08-03-17
 
+# preparation of jec sql file:
+addpkg JetMETCorrections/Modules
+addpkg CondFormats/JetMETObjects
 
 # <end of optional part>
 
@@ -97,6 +100,12 @@ git diff MNTriggerStudies_42BPort..tomasz/MNTriggerStudies
 #   Merge changes
 git merge tomasz/MNTriggerStudies
 scramv1 b -j 8
+####################################################################
+#
+# Fix problems related to sparse-checkout
+#
+#####################################################################
+git read-tree -mu HEAD
 
 
 ####################################################################
