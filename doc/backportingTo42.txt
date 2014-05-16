@@ -42,6 +42,15 @@ addpkg PhysicsTools/SelectorUtils V00-03-24
 addpkg PhysicsTools/UtilAlgos     V08-02-14
 addpkg PhysicsTools/Utilities     V08-03-17
 
+cvs co -r  V06-04-19-05 DataFormats/PatCandidates  
+cvs co -r  V08-06-58 PhysicsTools/PatAlgos      
+cvs co -r  V03-09-18 PhysicsTools/PatUtils      
+cvs co -r  B4_2_X_V00-03-05 CommonTools/ParticleFlow   
+cvs co -r  V00-03-24 PhysicsTools/SelectorUtils 
+cvs co -r  V08-02-14 PhysicsTools/UtilAlgos     
+cvs co -r  V08-03-17 PhysicsTools/Utilities     
+
+
 # preparation of jec sql file:
 addpkg JetMETCorrections/Modules
 addpkg CondFormats/JetMETObjects
