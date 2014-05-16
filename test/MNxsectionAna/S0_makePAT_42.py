@@ -131,6 +131,7 @@ elif currentSampleName=="JetMETTau-Run2010A-Apr21ReReco-v1":
     f = "/scratch/scratch0/data/store/data/Run2010A/JetMETTau/AOD/Apr21ReReco-v1/0000/001144C0-DB6D-E011-9850-002618943911.root"
 else:
     print ""
+    f= "IdontCare.root"
     print "Warning: input file not set (fine if you are running with crab)"
     print ""
 

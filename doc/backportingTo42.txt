@@ -49,7 +49,8 @@ cvs co -r  B4_2_X_V00-03-05 CommonTools/ParticleFlow
 cvs co -r  V00-03-24 PhysicsTools/SelectorUtils 
 cvs co -r  V08-02-14 PhysicsTools/UtilAlgos     
 cvs co -r  V08-03-17 PhysicsTools/Utilities     
-
+export PYTHONPATH=${PYTHONPATH}:/cvmfs/cms.cern.ch/slc5_amd64_gcc434/external/py2-pycurl/7.19.0-cms2/lib/python2.6/site-packages/
+export PYTHONPATH=${PYTHONPATH}:/cvmfs/cms.cern.ch/slc5_amd64_gcc434/external/py2-cjson/1.0.5/lib/python2.6/site-packages/
 
 # preparation of jec sql file:
 addpkg JetMETCorrections/Modules
