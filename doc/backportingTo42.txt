@@ -15,6 +15,10 @@ packages directory structure then you can go to next step. If you see message
 like "This repository is temporarily unavailable." you need to wait till it's
 ok (usually couple of minutes).
 
+export SCRAM_ARCH=slc5_amd64_gcc434 # only for 4_2
+cmsrel CMSSW_4_2_10
+cd CMSSW_4_2_10/src
+
 git cms-init
 git remote add tomasz git@github.com:fruboes/cmssw.git
 git fetch tomasz
