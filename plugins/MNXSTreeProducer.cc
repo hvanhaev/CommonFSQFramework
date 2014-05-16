@@ -132,10 +132,6 @@ MNXSTreeProducer::MNXSTreeProducer(const edm::ParameterSet& iConfig)
 
 
     // use m_floatBranches for float values
-    m_floatBranches["leadJetPt"] = 0;
-    m_floatBranches["leadJetEta"] = 0;
-    m_floatBranches["subleadJetPt"] = 0;
-    m_floatBranches["subleadJetEta"] = 0;
     m_floatBranches["genWeight"] = 0;
     m_floatBranches["puTrueNumInteractions"] = 0; 
 
@@ -278,11 +274,16 @@ MNXSTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
                 genP4 = hJets->at(i).genJet()->p4();
             }
             if (genP4.pt() > ptMin) isGood = true;
+            reco::Candidate::LorentzVector smearedP4 = this->smear(hJets->at(i));
+            if (smearedP4.pt() > ptMin) isGood = true;
+
+
+
             if (!isGood) continue;
 
             m_vectorBranches[it->first].push_back(hJets->at(i).p4());
             m_vectorBranches[it->first+"2Gen"].push_back(genP4);
-            m_vectorBranches[it->first+"Smear"].push_back(this->smear(hJets->at(i)));
+            m_vectorBranches[it->first+"Smear"].push_back(smearedP4);
             m_vectorBranches[it->first+"Uncorrected"].push_back(hJets->at(i).correctedJet("Uncorrected").p4());
         }
     }
@@ -304,36 +305,36 @@ MNXSTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
                 }
                 
             } // end paths iter
-            if (!pathFound) m_integerBranches[it->first] = -1;  // no path was found. Probably somehting wrong in config.
+            if (!pathFound) m_integerBranches[itTrg->first] = -1;  // no path was found. Probably somehting wrong in config.
         } // end trigger class iter
-    }
+    } // data only part end
 
 
 
-    if (!isMC) return;
+    if (isMC) { // MC only part
+        edm::Handle< std::vector<reco::GenJet> > hGJ;
+        iEvent.getByLabel(edm::InputTag("ak5GenJets","","SIM"), hGJ);
+        for (unsigned int i =0; i< hGJ->size();++i){
+            if (hGJ->at(i).pt() < ptMin) continue;
+            m_vectorBranches["genJets"].push_back(hGJ->at(i).p4());
 
-    edm::Handle< std::vector<reco::GenJet> > hGJ;
-    iEvent.getByLabel(edm::InputTag("ak5GenJets","","SIM"), hGJ);
-    for (unsigned int i =0; i< hGJ->size();++i){
-        if (hGJ->at(i).pt() < ptMin) continue;
-        m_vectorBranches["genJets"].push_back(hGJ->at(i).p4());
+        }
 
-    }
-
-    edm::Handle<GenEventInfoProduct> hGW; 
-    iEvent.getByLabel(edm::InputTag("generator"), hGW);
-    m_floatBranches["genWeight"] = hGW->weight();
+        edm::Handle<GenEventInfoProduct> hGW; 
+        iEvent.getByLabel(edm::InputTag("generator"), hGW);
+        m_floatBranches["genWeight"] = hGW->weight();
 
 
-    edm::Handle< std::vector<PileupSummaryInfo> > hPU;
-    iEvent.getByLabel(edm::InputTag("addPileupInfo"), hPU);
-    for (unsigned int i = 0; i< hPU->size();++i){
-        if (hPU->at(i).getBunchCrossing() == 0) {
-            m_floatBranches["puTrueNumInteractions"] = hPU->at(i).getTrueNumInteractions();
-            break;
+        edm::Handle< std::vector<PileupSummaryInfo> > hPU;
+        iEvent.getByLabel(edm::InputTag("addPileupInfo"), hPU);
+        for (unsigned int i = 0; i< hPU->size();++i){
+            if (hPU->at(i).getBunchCrossing() == 0) {
+                m_floatBranches["puTrueNumInteractions"] = hPU->at(i).getTrueNumInteractions();
+                break;
+            }
         }
     }
-    
+        
 
 
     
