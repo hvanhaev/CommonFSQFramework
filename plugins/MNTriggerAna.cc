@@ -62,6 +62,8 @@ class MNTriggerAna : public edm::EDAnalyzer {
       std::map<std::string, float> m_floatBranches;
       std::map<std::string, std::vector<reco::Candidate::LorentzVector> > m_vectorBranches;
 
+        
+
 
       //virtual void beginRun(edm::Run const&, edm::EventSetup const&) override;
       //virtual void endRun(edm::Run const&, edm::EventSetup const&) override;
@@ -353,6 +355,9 @@ MNTriggerAna::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   desc.setUnknown();
   descriptions.addDefault(desc);
 }
+
+
+
 
 //define this as a plug-in
 DEFINE_FWK_MODULE(MNTriggerAna);
