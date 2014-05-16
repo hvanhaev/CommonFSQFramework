@@ -7,6 +7,9 @@ from PhysicsTools.PatAlgos.tools.coreTools import *
 #
 ####################################3#####################################3
 
+process.XS =  cms.EDProducer("DoubleProducer",
+    value = cms.double(-1),
+)
 import os
 if "TMFSampleName" not in os.environ:
     print "#"*80
@@ -38,8 +41,8 @@ else:
 
     stringForProv = "\n"+"#"*80+"\n"
     stringForProv += "Ana version: " + anaVersion + "\n"
-    #stringForProv += "XS = " + str(XS) + "\n"
-    #process.XS.value = XS
+    stringForProv += "XS = " + str(XS) + "\n"
+    process.XS.value = XS
     stringForProv += "isData = " + str(isData) + "\n" # not used...yet
     stringForProv += "GT = " + str(process.GlobalTag.globaltag) + "\n" # not used...yet
     stringForProv += "#"*80+"\n"
@@ -47,9 +50,7 @@ else:
     print stringForProv
     # attach the string to one of the modules, so it will show in the prov data
     # (use edmProvDump on the PAT file to see it)
-    process.dummyMod = cms.EDProducer("DummyModule", provHack = cms.string(stringForProv))
-    #process.XS.provHack = cms.string(stringForProv)
-    #process.TMFDataForProv = cms.PSet(notes = cms.string("test"))
+    process.XS.provHack = cms.string(stringForProv)
 
 #print "Whoaaa! Run on MC overriden!\n"*10
 
@@ -390,8 +391,6 @@ process.pCalo = cms.Path (   process.initialSequence
                            * process.countTFCaloJets
                            * process.finalCntrCalo )
 
-process.dummyPath = cms.Path(process.dummyMod)
-
 
 
 process.schedule = cms.Schedule()
@@ -450,10 +449,18 @@ if anaType == "JetTriggerEff":
 
 
 
-process.schedule.extend([process.dummyPath])
 process.schedule.extend([process.pPF, process.pCalo])
 #process.schedule = cms.Schedule(process.pCalo, process.outpath)
 process.schedule.extend([process.tfMuonsP,])
+
+process.exampleTree = cms.EDAnalyzer("ExampleTreeProducer")
+process.mnXS = cms.EDAnalyzer("MNXSTreeProducer")
+process.infoHisto = cms.EDAnalyzer("SaveCountHistoInTreeFile")
+process.pTreeProducers = cms.Path(process.infoHisto*process.exampleTree*process.mnXS)
+process.pUtil = cms.Path(process.XS)
+process.schedule.append(process.pUtil)
+process.schedule.append(process.pTreeProducers)
+
 if anaType != "JetTriggerEff":
     process.schedule.extend([process.outpath,]) #xxx
 else:
