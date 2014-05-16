@@ -53,9 +53,9 @@ class MNTriggerAna : public edm::EDAnalyzer {
 
    private:
       void resetTrees();
-      virtual void beginJob() override;
-      virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
-      virtual void endJob() override;
+      virtual void beginJob();
+      virtual void analyze(const edm::Event&, const edm::EventSetup&);
+      virtual void endJob();
 
       TTree *m_tree;
       std::map<std::string, int> m_integerBranches;

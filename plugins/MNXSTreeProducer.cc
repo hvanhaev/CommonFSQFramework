@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
-// Package:    ExampleTreeProducer
-// Class:      ExampleTreeProducer
+// Package:    MNXSTreeProducer
+// Class:      MNXSTreeProducer
 // 
-/**\class ExampleTreeProducer ExampleTreeProducer.cc MNTriggerStudies/ExampleTreeProducer/plugins/ExampleTreeProducer.cc
+/**\class MNXSTreeProducer MNXSTreeProducer.cc MNTriggerStudies/MNXSTreeProducer/plugins/MNXSTreeProducer.cc
 
  Description: [one line class summary]
 
@@ -41,10 +41,10 @@
 // class declaration
 //
 
-class ExampleTreeProducer : public edm::EDAnalyzer {
+class MNXSTreeProducer : public edm::EDAnalyzer {
    public:
-      explicit ExampleTreeProducer(const edm::ParameterSet&);
-      ~ExampleTreeProducer();
+      explicit MNXSTreeProducer(const edm::ParameterSet&);
+      ~MNXSTreeProducer();
 
       static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
@@ -80,7 +80,7 @@ class ExampleTreeProducer : public edm::EDAnalyzer {
 //
 // constructors and destructor
 //
-ExampleTreeProducer::ExampleTreeProducer(const edm::ParameterSet& iConfig)
+MNXSTreeProducer::MNXSTreeProducer(const edm::ParameterSet& iConfig)
 
 {
 
@@ -143,7 +143,7 @@ ExampleTreeProducer::ExampleTreeProducer(const edm::ParameterSet& iConfig)
 
 
 }
-void ExampleTreeProducer::resetTrees(){
+void MNXSTreeProducer::resetTrees(){
 
     // int branches
     {
@@ -177,8 +177,8 @@ void ExampleTreeProducer::resetTrees(){
 
 
 }
-
-ExampleTreeProducer::~ExampleTreeProducer()
+//%
+MNXSTreeProducer::~MNXSTreeProducer()
 {
  
    // do anything here that needs to be done at desctruction time
@@ -193,89 +193,68 @@ ExampleTreeProducer::~ExampleTreeProducer()
 
 // ------------ method called for each event  ------------
 void
-ExampleTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+MNXSTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
 
         
     resetTrees();
     using namespace edm;
 
-    //std::cout << "Moin Agatko!" << std::endl;
     m_integerBranches["run"] = iEvent.eventAuxiliary().run();
     m_integerBranches["lumi"] = iEvent.eventAuxiliary().luminosityBlock();
     m_integerBranches["event"] = iEvent.eventAuxiliary().event();
 
-    edm::Handle<pat::JetCollection> hJets;
-    iEvent.getByLabel(edm::InputTag("selectedPatJets"), hJets);  // TODO/Fixme - inputTag from python cfg
+    std::map<std::string, edm::InputTag> todo;
+    todo["pf"] = edm::InputTag("selectedPatJets");
+    todo["calo"] = edm::InputTag("selectedPatJetsAK5Calo");
 
-    float ptMin = 15;
-
-    for (unsigned int i = 0; i<hJets->size(); ++i){
-        if (hJets->at(i).pt() < ptMin) continue;
-        m_vectorBranches["pfJets"].push_back(hJets->at(i).p4());
-        reco::Candidate::LorentzVector genP4;
-        if (hJets->at(i).genJet()){
-            genP4 = hJets->at(i).genJet()->p4();
-        }
-        m_vectorBranches["genJets"].push_back(genP4);
-
-        /*
-        std::cout   << "Jet:"  
-                    << " " <<  hJets->at(i).pt()  // by default gives you pt with JEC applied
-                    << " " <<  hJets->at(i).eta() // 
-                    << std::endl;
-        // */
-    }
-
-    // jets are pt ordered by default
-    // TODO: CHECKME - this was in 4_2, shouldnt change, but who knows...
-
-    int nJets =  hJets->size();
-    if (nJets>0){
-        m_floatBranches["leadJetPt"] = hJets->at(0).pt();
-        m_floatBranches["leadJetEta"] = hJets->at(0).eta();
-    }
-    if (nJets>1){
-        m_floatBranches["subleadJetPt"] = hJets->at(1).pt();
-        m_floatBranches["subleadJetEta"] = hJets->at(1).eta();
-    }
+    std::map<std::string, edm::InputTag>::iterator itBegin = todo.begin(), itEnd = todo.end() ;
 
     
+    for (;itBegin != itEnd; ++itBegin){
+        edm::Handle<pat::JetCollection> hJets;
+        iEvent.getByLabel(edm::InputTag("selectedPatJets"), hJets);  // TODO/Fixme - inputTag from python cfg
 
+        float ptMin = 15;
 
+        for (unsigned int i = 0; i<hJets->size(); ++i){
+            if (hJets->at(i).pt() < ptMin) continue;
+            m_vectorBranches["pfJets"].push_back(hJets->at(i).p4());
+            reco::Candidate::LorentzVector genP4;
+            if (hJets->at(i).genJet()){
+                genP4 = hJets->at(i).genJet()->p4();
+            }
+            m_vectorBranches["genJets"].push_back(genP4);
 
-
-#ifdef THIS_IS_AN_EVENT_EXAMPLE
-   Handle<ExampleData> pIn;
-   iEvent.getByLabel("example",pIn);
-#endif
-   
-#ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
-   ESHandle<SetupData> pSetup;
-   iSetup.get<SetupRecord>().get(pSetup);
-#endif
+            /*
+            std::cout   << "Jet:"  
+                        << " " <<  hJets->at(i).pt()  // by default gives you pt with JEC applied
+                        << " " <<  hJets->at(i).eta() // 
+                        << std::endl;
+            // */
+        }
+    }
 
     m_tree->Fill();
-
 }
 
 
 // ------------ method called once each job just before starting event loop  ------------
 void 
-ExampleTreeProducer::beginJob()
+MNXSTreeProducer::beginJob()
 {
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
 void 
-ExampleTreeProducer::endJob() 
+MNXSTreeProducer::endJob() 
 {
 }
 
 // ------------ method called when starting to processes a run  ------------
 /*
 void 
-ExampleTreeProducer::beginRun(edm::Run const&, edm::EventSetup const&)
+MNXSTreeProducer::beginRun(edm::Run const&, edm::EventSetup const&)
 {
 }
 */
@@ -283,7 +262,7 @@ ExampleTreeProducer::beginRun(edm::Run const&, edm::EventSetup const&)
 // ------------ method called when ending the processing of a run  ------------
 /*
 void 
-ExampleTreeProducer::endRun(edm::Run const&, edm::EventSetup const&)
+MNXSTreeProducer::endRun(edm::Run const&, edm::EventSetup const&)
 {
 }
 */
@@ -291,7 +270,7 @@ ExampleTreeProducer::endRun(edm::Run const&, edm::EventSetup const&)
 // ------------ method called when starting to processes a luminosity block  ------------
 /*
 void 
-ExampleTreeProducer::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
+MNXSTreeProducer::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
 {
 }
 */
@@ -299,14 +278,14 @@ ExampleTreeProducer::beginLuminosityBlock(edm::LuminosityBlock const&, edm::Even
 // ------------ method called when ending the processing of a luminosity block  ------------
 /*
 void 
-ExampleTreeProducer::endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
+MNXSTreeProducer::endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
 {
 }
 */
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void
-ExampleTreeProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+MNXSTreeProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   edm::ParameterSetDescription desc;
@@ -315,4 +294,4 @@ ExampleTreeProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptio
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(ExampleTreeProducer);
+DEFINE_FWK_MODULE(MNXSTreeProducer);
