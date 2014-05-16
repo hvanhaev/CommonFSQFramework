@@ -72,7 +72,7 @@ elif anaType == "DiJetBalance":
     minJets =  2
     minDiMuons = 0
 elif anaType == "DiJet":
-    minJetPT =  27
+    minJetPT =  30
     minJets =    1
     minDiMuons = 0
 elif anaType == "JetTriggerEff":
@@ -95,7 +95,7 @@ else:
     from PhysicsTools.PatAlgos.tools.trigTools import *
     switchOnTrigger(process, 'patTrigger', 'patTriggerEvent', 'patDefaultSequence', triggerProcess, 'out')
 
-process.maxEvents.input = 10
+process.maxEvents.input = 200
 process.source.skipEvents = cms.untracked.uint32(0)
 
 
@@ -456,7 +456,8 @@ process.schedule.extend([process.tfMuonsP,])
 process.exampleTree = cms.EDAnalyzer("ExampleTreeProducer")
 process.mnXS = cms.EDAnalyzer("MNXSTreeProducer")
 process.infoHisto = cms.EDAnalyzer("SaveCountHistoInTreeFile")
-process.pTreeProducers = cms.Path(process.infoHisto*process.exampleTree*process.mnXS)
+#process.initialSequence.remove(process.hltJet)
+process.pTreeProducers = cms.Path(process.initialSequence*process.infoHisto*process.exampleTree*process.mnXS)
 process.pUtil = cms.Path(process.XS)
 process.schedule.append(process.pUtil)
 process.schedule.append(process.pTreeProducers)
