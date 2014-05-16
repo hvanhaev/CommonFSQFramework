@@ -37,9 +37,16 @@
 #include "TTree.h"
 
 #include "DataFormats/PatCandidates/interface/Jet.h"
+
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 //
 // class declaration
 //
+#include "DataFormats/PatCandidates/interface/TriggerEvent.h"
+
+
 
 class MNXSTreeProducer : public edm::EDAnalyzer {
    public:
@@ -59,6 +66,9 @@ class MNXSTreeProducer : public edm::EDAnalyzer {
       std::map<std::string, int> m_integerBranches;
       std::map<std::string, float> m_floatBranches;
       std::map<std::string, std::vector<reco::Candidate::LorentzVector> > m_vectorBranches;
+
+      std::map<std::string, edm::InputTag> m_todo;
+      std::map<std::string, std::vector<std::string> > m_todoTriggers;
 
 
       //virtual void beginRun(edm::Run const&, edm::EventSetup const&) override;
@@ -87,6 +97,20 @@ MNXSTreeProducer::MNXSTreeProducer(const edm::ParameterSet& iConfig)
     edm::Service<TFileService> tFileService;
     m_tree = tFileService->make<TTree>("data", "data");
 
+    m_todo["pfJets"] = edm::InputTag("selectedPatJets");
+    m_todo["caloJets"] = edm::InputTag("selectedPatJetsAK5Calo");
+
+    m_todoTriggers["doubleJ15FB"] = std::vector<std::string>();
+    m_todoTriggers["doubleJ15FB"].push_back("HLT_DoubleJet15U_ForwardBackward");
+    m_todoTriggers["doubleJ15FB"].push_back("HLT_DoubleJet15U_ForwardBackward_v3");
+    m_todoTriggers["jet15"] = std::vector<std::string>();
+    m_todoTriggers["jet15"].push_back("HLT_Jet15U");
+    m_todoTriggers["jet15"].push_back("HLT_Jet15U_v3");
+
+    m_todoTriggers["ttjet15"] = std::vector<std::string>();
+    m_todoTriggers["ttjet15"].push_back("HLT_Jet15Utt");
+
+
     // define your branches. Registration will be made automagically
     //
     //  note: verify, that your data is filled in the tree. If you will
@@ -100,16 +124,30 @@ MNXSTreeProducer::MNXSTreeProducer(const edm::ParameterSet& iConfig)
     m_integerBranches["lumi"] = 0;
     m_integerBranches["event"] = 0;
 
+    std::map<std::string, std::vector<std::string> >::iterator itTrg = m_todoTriggers.begin();
+    for (;itTrg != m_todoTriggers.end(); ++itTrg){
+            m_integerBranches[itTrg->first] = 0;
+    }
+
+
     // use m_floatBranches for float values
     m_floatBranches["leadJetPt"] = 0;
     m_floatBranches["leadJetEta"] = 0;
     m_floatBranches["subleadJetPt"] = 0;
     m_floatBranches["subleadJetEta"] = 0;
+    m_floatBranches["genWeight"] = 0;
+    m_floatBranches["puTrueNumInteractions"] = 0; 
 
+
+    std::map<std::string, edm::InputTag>::iterator it = m_todo.begin(), itEnd = m_todo.end() ;
+    for (; it != itEnd; ++it){
+        m_vectorBranches[it->first] = std::vector<reco::Candidate::LorentzVector>();
+        m_vectorBranches[it->first+"2Gen"] = std::vector<reco::Candidate::LorentzVector>();
+    }
+
+    m_vectorBranches["genJets"] = std::vector<reco::Candidate::LorentzVector>();
 
     // 
-    m_vectorBranches["pfJets"] = std::vector<reco::Candidate::LorentzVector>();
-    m_vectorBranches["genJets"] = std::vector<reco::Candidate::LorentzVector>();
 
     // integer branches auto registration
     {
@@ -204,36 +242,85 @@ MNXSTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     m_integerBranches["lumi"] = iEvent.eventAuxiliary().luminosityBlock();
     m_integerBranches["event"] = iEvent.eventAuxiliary().event();
 
-    std::map<std::string, edm::InputTag> todo;
-    todo["pf"] = edm::InputTag("selectedPatJets");
-    todo["calo"] = edm::InputTag("selectedPatJetsAK5Calo");
+    bool isMC = iEvent.eventAuxiliary().run() < 100;
 
-    std::map<std::string, edm::InputTag>::iterator itBegin = todo.begin(), itEnd = todo.end() ;
 
-    
-    for (;itBegin != itEnd; ++itBegin){
+    std::map<std::string, edm::InputTag>::iterator it = m_todo.begin(), itEnd = m_todo.end() ;
+    float ptMin = 30;
+
+    for (;it != itEnd; ++it){
         edm::Handle<pat::JetCollection> hJets;
-        iEvent.getByLabel(edm::InputTag("selectedPatJets"), hJets);  // TODO/Fixme - inputTag from python cfg
-
-        float ptMin = 15;
+        iEvent.getByLabel(it->second, hJets);
 
         for (unsigned int i = 0; i<hJets->size(); ++i){
-            if (hJets->at(i).pt() < ptMin) continue;
-            m_vectorBranches["pfJets"].push_back(hJets->at(i).p4());
+            // Check if reconstructed jet or his matched genJet are above thr
+            bool isGood = false;
+            if (hJets->at(i).pt() > ptMin) isGood = true;
             reco::Candidate::LorentzVector genP4;
             if (hJets->at(i).genJet()){
                 genP4 = hJets->at(i).genJet()->p4();
             }
-            m_vectorBranches["genJets"].push_back(genP4);
+            if (genP4.pt() > ptMin) isGood = true;
+            if (!isGood) continue;
 
-            /*
-            std::cout   << "Jet:"  
-                        << " " <<  hJets->at(i).pt()  // by default gives you pt with JEC applied
-                        << " " <<  hJets->at(i).eta() // 
-                        << std::endl;
-            // */
+            m_vectorBranches[it->first].push_back(hJets->at(i).p4());
+            m_vectorBranches[it->first+"2Gen"].push_back(genP4);
         }
     }
+
+    if (!isMC){ // check triggers. No trigger simulation in MC
+        edm::Handle< pat::TriggerEvent > hTrgEvent;
+        iEvent.getByLabel(edm::InputTag("patTriggerEvent"), hTrgEvent);
+
+        std::map<std::string, std::vector<std::string> >::iterator itTrg = m_todoTriggers.begin();
+        for (;itTrg != m_todoTriggers.end(); ++itTrg){
+            bool pathFound = false;
+            for (unsigned int i = 0; i < itTrg->second.size();++i){
+                const pat::TriggerPath * pth = hTrgEvent->path(itTrg->second.at(i));
+                if (pth){
+                    pathFound = true;
+                    if (pth->wasAccept()){
+                        m_integerBranches[itTrg->first] = 1;
+                    }
+                }
+                
+            } // end paths iter
+            if (!pathFound) m_integerBranches[it->first] = -1;  // no path was found. Probably somehting wrong in config.
+        } // end trigger class iter
+    }
+
+
+
+    if (!isMC) return;
+
+    edm::Handle< std::vector<reco::GenJet> > hGJ;
+    iEvent.getByLabel(edm::InputTag("ak5GenJets","","SIM"), hGJ);
+    for (unsigned int i =0; i< hGJ->size();++i){
+        if (hGJ->at(i).pt() < ptMin) continue;
+        m_vectorBranches["genJets"].push_back(hGJ->at(i).p4());
+
+    }
+
+    edm::Handle<GenEventInfoProduct> hGW; 
+    iEvent.getByLabel(edm::InputTag("generator"), hGW);
+    m_floatBranches["genWeight"] = hGW->weight();
+
+
+    edm::Handle< std::vector<PileupSummaryInfo> > hPU;
+    iEvent.getByLabel(edm::InputTag("addPileupInfo"), hPU);
+    for (unsigned int i = 0; i< hPU->size();++i){
+        if (hPU->at(i).getBunchCrossing() == 0) {
+            m_floatBranches["puTrueNumInteractions"] = hPU->at(i).getTrueNumInteractions();
+            break;
+        }
+    }
+    
+
+
+    
+    
+
+
 
     m_tree->Fill();
 }
