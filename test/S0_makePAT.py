@@ -13,7 +13,7 @@ process.options.allowUnscheduled = cms.untracked.bool(True)
 # Configure event selection here
 #
 ########################################################################
-minJetPT = 25
+minJetPT = 30
 minJets  = 2
 # on which jets should I base my event selection?
 usePFJetsInSelection = True
