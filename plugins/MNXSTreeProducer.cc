@@ -37,14 +37,13 @@
 #include "TTree.h"
 
 #include "DataFormats/PatCandidates/interface/Jet.h"
-
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
-
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
+#include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 //
 // class declaration
 //
-#include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 
 
 
@@ -61,6 +60,7 @@ class MNXSTreeProducer : public edm::EDAnalyzer {
       virtual void beginJob();
       virtual void analyze(const edm::Event&, const edm::EventSetup&);
       virtual void endJob();
+      reco::Candidate::LorentzVector smear(const pat::Jet & jet);
 
       TTree *m_tree;
       std::map<std::string, int> m_integerBranches;
@@ -123,6 +123,7 @@ MNXSTreeProducer::MNXSTreeProducer(const edm::ParameterSet& iConfig)
     m_integerBranches["run"] = 0;
     m_integerBranches["lumi"] = 0;
     m_integerBranches["event"] = 0;
+    m_integerBranches["ngoodVTX"] = 0;
 
     std::map<std::string, std::vector<std::string> >::iterator itTrg = m_todoTriggers.begin();
     for (;itTrg != m_todoTriggers.end(); ++itTrg){
@@ -143,6 +144,8 @@ MNXSTreeProducer::MNXSTreeProducer(const edm::ParameterSet& iConfig)
     for (; it != itEnd; ++it){
         m_vectorBranches[it->first] = std::vector<reco::Candidate::LorentzVector>();
         m_vectorBranches[it->first+"2Gen"] = std::vector<reco::Candidate::LorentzVector>();
+        m_vectorBranches[it->first+"Smear"] = std::vector<reco::Candidate::LorentzVector>();
+        m_vectorBranches[it->first+"Uncorrected"] = std::vector<reco::Candidate::LorentzVector>();
     }
 
     m_vectorBranches["genJets"] = std::vector<reco::Candidate::LorentzVector>();
@@ -242,6 +245,20 @@ MNXSTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     m_integerBranches["lumi"] = iEvent.eventAuxiliary().luminosityBlock();
     m_integerBranches["event"] = iEvent.eventAuxiliary().event();
 
+    edm::Handle< std::vector<reco::Vertex> > hVTX;
+    iEvent.getByLabel(edm::InputTag("offlinePrimaryVertices"), hVTX);
+    int vtxCnt = 0;
+    for (unsigned int i = 0; i < hVTX->size(); ++i){
+        if (!hVTX->at(i).isValid() ) continue;
+        if (hVTX->at(i).isFake() ) continue;
+        if (hVTX->at(i).ndof()<5 ) continue;
+        if (std::abs(hVTX->at(i).z())>24. ) continue;
+        if (std::abs(hVTX->at(i).position().rho())>2. ) continue;
+        vtxCnt += 1;
+    }
+    m_integerBranches["ngoodVTX"] = vtxCnt;
+
+
     bool isMC = iEvent.eventAuxiliary().run() < 100;
 
 
@@ -265,6 +282,8 @@ MNXSTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
             m_vectorBranches[it->first].push_back(hJets->at(i).p4());
             m_vectorBranches[it->first+"2Gen"].push_back(genP4);
+            m_vectorBranches[it->first+"Smear"].push_back(this->smear(hJets->at(i)));
+            m_vectorBranches[it->first+"Uncorrected"].push_back(hJets->at(i).correctedJet("Uncorrected").p4());
         }
     }
 
@@ -379,6 +398,53 @@ MNXSTreeProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions)
   desc.setUnknown();
   descriptions.addDefault(desc);
 }
+
+reco::Candidate::LorentzVector MNXSTreeProducer::smear(const pat::Jet & jet) {
+    if (!jet.genJet()){
+        return jet.p4();
+    }
+    static float V_PF[] = {1.066, 1.191, 1.096, 1.166};
+    static float E_PF[] = {1.1,  1.7, 2.3, 5.};
+
+    static float V_calo[] = {1.088, 1.139, 1.082, 1.065};
+    static float E_calo[] = {1.1,  1.7, 2.3, 5.};
+
+
+    static std::vector<float> smearV_pf(V_PF, V_PF+sizeof(V_PF)/sizeof(float));
+    static std::vector<float> smearE_pf(E_PF, E_PF+sizeof(E_PF)/sizeof(float));
+
+    static std::vector<float> smearV_calo(V_calo, V_calo+sizeof(V_calo)/sizeof(float));
+    static std::vector<float> smearE_calo(E_calo, E_calo+sizeof(E_calo)/sizeof(float));
+
+    float eta = std::abs(jet.eta());
+    float factor = -1;
+    std::vector<float> *smearV, *smearE;
+    if (jet.isCaloJet()) {
+        smearV = &smearV_calo;
+        smearE = &smearE_calo;
+
+    } else if (jet.isPFJet()) {
+        smearV = &smearV_pf;
+        smearE = &smearE_pf;
+    }
+    else {
+        throw "Jet type not known";
+    }
+
+    for (unsigned int i = 0; i < smearV->size(); ++i){
+        if (eta < smearE->at(i)){
+            factor = smearV->at(i);
+            break;
+        }
+    }
+
+    if (factor < 0) throw "Cannot calculate factor!";
+    float ptGen = jet.genJet()->pt(); // not: we check for genJet presence earlier
+    float ptScaled = std::max(0., ptGen + factor*(ptGen - jet.pt()));
+    float scale = ptScaled/jet.pt();
+    return jet.p4()*scale;
+}
+
 
 //define this as a plug-in
 DEFINE_FWK_MODULE(MNXSTreeProducer);
