@@ -297,6 +297,7 @@ if doHLTPFJets:
                                        #process.hltL1sL1SingleJet8 +  # TODO
                                        process.hltPrePFJet15 +  # TODO
                                        process.HLTPFL1FastL2L3ReconstructionSequence +
+                                       process.HLTPFnoPUL1FastL2L3ReconstructionSequence + 
                                        ##process.hltPFJetsL1Matched + 
                                        process.hlt1PFJet15 + #  TODO
                                        process.HLTEndSequence )
