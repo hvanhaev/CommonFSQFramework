@@ -418,7 +418,7 @@ reco::Candidate::LorentzVector MNXSTreeProducer::smear(const pat::Jet & jet) {
     static std::vector<float> smearE_calo(E_calo, E_calo+sizeof(E_calo)/sizeof(float));
 
     float eta = std::abs(jet.eta());
-    float factor = -1;
+    float factor = 1;
     std::vector<float> *smearV, *smearE;
     if (jet.isCaloJet()) {
         smearV = &smearV_calo;
@@ -439,7 +439,15 @@ reco::Candidate::LorentzVector MNXSTreeProducer::smear(const pat::Jet & jet) {
         }
     }
 
-    if (factor < 0) throw "Cannot calculate factor!";
+
+    /*
+    if (factor < 0) {
+            std::cout << "Cannot calculate factor!" 
+                <<  " " << eta
+                << std::endl;
+            std::cout.flush();
+            throw "Cannot calculate factor!";
+    }*/ 
     float ptGen = jet.genJet()->pt(); // not: we check for genJet presence earlier
     float ptScaled = std::max(0., ptGen + factor*(ptGen - jet.pt()));
     float scale = ptScaled/jet.pt();
