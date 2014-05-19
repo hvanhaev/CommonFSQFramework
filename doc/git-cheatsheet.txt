@@ -96,6 +96,8 @@ git fetch tomasz # see how "tomasz" repo was defined above
 # display changes from remote branch. Note "..." (means do not display changes
 # in the local branch)
 git diff ...tomasz/MNTriggerStudies_42BPort
+
+# if you dont see anything worrying  perform a merge
 git merge tomasz/MNTriggerStudies_42BPort
 
 
