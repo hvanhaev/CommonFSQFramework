@@ -73,7 +73,7 @@ class MNTrgAnaProofReader(ExampleProofReader):
         HLTpts = []
 
         if level == 2:
-            hltJets = self.fChain.hltJets
+            hltJets = getattr(self.fChain, self.hltCollection)
         elif level == 1:
             hltJets = self.fChain.l1Jets
         else:
@@ -122,8 +122,13 @@ if __name__ == "__main__":
 
     slaveParams = {}
     slaveParams["recoJetPtThreshold"] = 35
-        
 
-    MNTrgAnaProofReader.runAll(treeName="mnTriggerAna", outFile = "~/plotsHLT.root", 
-                                slaveParameters=slaveParams,
-                                maxFiles = 10)
+    # select hltCollection here (see plugins/MNTriggerAna.cc to learn whats avaliable):
+    slaveParams["hltCollection"] = "hltAK5PFJetL1FastL2L3Corrected"
+
+    # note - remove maxFiles parameter in order to run on all files
+    MNTrgAnaProofReader.runAll(treeName="mnTriggerAna", 
+                               slaveParameters=slaveParams,
+                               maxFiles = 10,
+                               outFile = "~/plotsHLT.root" )
+                                
