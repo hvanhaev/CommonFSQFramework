@@ -43,7 +43,10 @@ sam["QCD_Pt-10to15_Tune4C_13TeV_pythia8"]["lumiJet15"]='crashMeMC'
 sam["QCD_Pt-10to15_Tune4C_13TeV_pythia8"]["weightNoPu"]='RooFormulaVar("weight","weight", "xsOverEvents", RooArgList())'
 sam["QCD_Pt-10to15_Tune4C_13TeV_pythia8"]["json"]=''
 sam["QCD_Pt-10to15_Tune4C_13TeV_pythia8"]["lumiDiJet15FB"]='crashMeMC'
+sam["QCD_Pt-10to15_Tune4C_13TeV_pythia8"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/QCD_Pt-10to15_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-10to15_Tune4C_13TeV_pythia8/e69320067b8f0ba24d244d9ad12dec6d//'
 sam["QCD_Pt-10to15_Tune4C_13TeV_pythia8"]["XS"]=7528000000.0
+sam["QCD_Pt-10to15_Tune4C_13TeV_pythia8"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/QCD_Pt-10to15_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-10to15_Tune4C_13TeV_pythia8/e69320067b8f0ba24d244d9ad12dec6d//'
+sam["QCD_Pt-10to15_Tune4C_13TeV_pythia8"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-10to15_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-10to15_Tune4C_13TeV_pythia8/e69320067b8f0ba24d244d9ad12dec6d/'
 sam["QCD_Pt-10to15_Tune4C_13TeV_pythia8"]["DS"]='/QCD_Pt-10to15_Tune4C_13TeV_pythia8/Fall13dr-castor_tsg_PU1bx50_POSTLS162_V1-v3/AODSIM'
 
 sam["QCD_Pt-15to30_Tune4C_13TeV_pythia8"]={}
@@ -60,7 +63,10 @@ sam["QCD_Pt-15to30_Tune4C_13TeV_pythia8"]["lumiJet15"]='crashMeMC'
 sam["QCD_Pt-15to30_Tune4C_13TeV_pythia8"]["weightNoPu"]='RooFormulaVar("weight","weight", "xsOverEvents", RooArgList())'
 sam["QCD_Pt-15to30_Tune4C_13TeV_pythia8"]["json"]=''
 sam["QCD_Pt-15to30_Tune4C_13TeV_pythia8"]["lumiDiJet15FB"]='crashMeMC'
+sam["QCD_Pt-15to30_Tune4C_13TeV_pythia8"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/QCD_Pt-15to30_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-15to30_Tune4C_13TeV_pythia8/99e092f084ca597ce9e4db2331fd8768//'
 sam["QCD_Pt-15to30_Tune4C_13TeV_pythia8"]["XS"]=2237000000.0
+sam["QCD_Pt-15to30_Tune4C_13TeV_pythia8"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/QCD_Pt-15to30_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-15to30_Tune4C_13TeV_pythia8/99e092f084ca597ce9e4db2331fd8768//'
+sam["QCD_Pt-15to30_Tune4C_13TeV_pythia8"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to30_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-15to30_Tune4C_13TeV_pythia8/99e092f084ca597ce9e4db2331fd8768/'
 sam["QCD_Pt-15to30_Tune4C_13TeV_pythia8"]["DS"]='/QCD_Pt-15to30_Tune4C_13TeV_pythia8/Fall13dr-castor_tsg_PU1bx50_POSTLS162_V1-v1/AODSIM'
 
 sam["QCD_Pt-30to50_Tune4C_13TeV_pythia8"]={}
@@ -77,7 +83,10 @@ sam["QCD_Pt-30to50_Tune4C_13TeV_pythia8"]["lumiJet15"]='crashMeMC'
 sam["QCD_Pt-30to50_Tune4C_13TeV_pythia8"]["weightNoPu"]='RooFormulaVar("weight","weight", "xsOverEvents", RooArgList())'
 sam["QCD_Pt-30to50_Tune4C_13TeV_pythia8"]["json"]=''
 sam["QCD_Pt-30to50_Tune4C_13TeV_pythia8"]["lumiDiJet15FB"]='crashMeMC'
+sam["QCD_Pt-30to50_Tune4C_13TeV_pythia8"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/QCD_Pt-30to50_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-30to50_Tune4C_13TeV_pythia8/c558ad3a18d04628a4b38f7254e4a057//'
 sam["QCD_Pt-30to50_Tune4C_13TeV_pythia8"]["XS"]=161500000.0
+sam["QCD_Pt-30to50_Tune4C_13TeV_pythia8"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/QCD_Pt-30to50_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-30to50_Tune4C_13TeV_pythia8/c558ad3a18d04628a4b38f7254e4a057//'
+sam["QCD_Pt-30to50_Tune4C_13TeV_pythia8"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-30to50_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-30to50_Tune4C_13TeV_pythia8/c558ad3a18d04628a4b38f7254e4a057/'
 sam["QCD_Pt-30to50_Tune4C_13TeV_pythia8"]["DS"]='/QCD_Pt-30to50_Tune4C_13TeV_pythia8/Fall13dr-castor_tsg_PU1bx50_POSTLS162_V1-v1/AODSIM'
 
 sam["QCD_Pt-50to80_Tune4C_13TeV_pythia8"]={}
@@ -94,7 +103,10 @@ sam["QCD_Pt-50to80_Tune4C_13TeV_pythia8"]["lumiJet15"]='crashMeMC'
 sam["QCD_Pt-50to80_Tune4C_13TeV_pythia8"]["weightNoPu"]='RooFormulaVar("weight","weight", "xsOverEvents", RooArgList())'
 sam["QCD_Pt-50to80_Tune4C_13TeV_pythia8"]["json"]=''
 sam["QCD_Pt-50to80_Tune4C_13TeV_pythia8"]["lumiDiJet15FB"]='crashMeMC'
+sam["QCD_Pt-50to80_Tune4C_13TeV_pythia8"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/QCD_Pt-50to80_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-50to80_Tune4C_13TeV_pythia8/93709b35c6f80c65b1bc5e47664cf12b//'
 sam["QCD_Pt-50to80_Tune4C_13TeV_pythia8"]["XS"]=22110000.0
+sam["QCD_Pt-50to80_Tune4C_13TeV_pythia8"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/QCD_Pt-50to80_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-50to80_Tune4C_13TeV_pythia8/93709b35c6f80c65b1bc5e47664cf12b//'
+sam["QCD_Pt-50to80_Tune4C_13TeV_pythia8"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-50to80_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-50to80_Tune4C_13TeV_pythia8/93709b35c6f80c65b1bc5e47664cf12b/'
 sam["QCD_Pt-50to80_Tune4C_13TeV_pythia8"]["DS"]='/QCD_Pt-50to80_Tune4C_13TeV_pythia8/Fall13dr-castor_tsg_PU1bx50_POSTLS162_V1-v1/AODSIM'
 
 sam["QCD_Pt-80to120_Tune4C_13TeV_pythia8"]={}
@@ -111,7 +123,10 @@ sam["QCD_Pt-80to120_Tune4C_13TeV_pythia8"]["lumiJet15"]='crashMeMC'
 sam["QCD_Pt-80to120_Tune4C_13TeV_pythia8"]["weightNoPu"]='RooFormulaVar("weight","weight", "xsOverEvents", RooArgList())'
 sam["QCD_Pt-80to120_Tune4C_13TeV_pythia8"]["json"]=''
 sam["QCD_Pt-80to120_Tune4C_13TeV_pythia8"]["lumiDiJet15FB"]='crashMeMC'
+sam["QCD_Pt-80to120_Tune4C_13TeV_pythia8"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/QCD_Pt-80to120_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-80to120_Tune4C_13TeV_pythia8/ed4583f263f96aee4a382259882e5333//'
 sam["QCD_Pt-80to120_Tune4C_13TeV_pythia8"]["XS"]=3000114.3
+sam["QCD_Pt-80to120_Tune4C_13TeV_pythia8"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/QCD_Pt-80to120_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-80to120_Tune4C_13TeV_pythia8/ed4583f263f96aee4a382259882e5333//'
+sam["QCD_Pt-80to120_Tune4C_13TeV_pythia8"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-80to120_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-80to120_Tune4C_13TeV_pythia8/ed4583f263f96aee4a382259882e5333/'
 sam["QCD_Pt-80to120_Tune4C_13TeV_pythia8"]["DS"]='/QCD_Pt-80to120_Tune4C_13TeV_pythia8/Fall13dr-castor_tsg_PU1bx50_POSTLS162_V1-v1/AODSIM'
 
 def icm(sam):
