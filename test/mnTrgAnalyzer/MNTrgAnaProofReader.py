@@ -122,17 +122,17 @@ class MNTrgAnaProofReader(ExampleProofReader):
             raise Exception("level should be equal to 1 or 2")
 
         self.getTriggers() # cache best L1 and HLT objects
-        lowestPTNeededForAcceptForThisEvent = 0 # if it stays 0 - less than two HLT jets present in the event
+        highestHLTThresholdPossibleForThisEvent = 0 # if it stays 0 - less than two HLT jets present in the event
         if level == 1:
             if len(self.allL1)>= minObjects:
-                lowestPTNeededForAcceptForThisEvent = sorted(self.allL1, reverse=True)[minObjects-1]
+                highestHLTThresholdPossibleForThisEvent = sorted(self.allL1, reverse=True)[minObjects-1]
         elif level == 2:
             if len(self.allHLT)>= minObjects:
-                lowestPTNeededForAcceptForThisEvent = sorted(self.allHLT, reverse=True)[minObjects-1]
+                highestHLTThresholdPossibleForThisEvent = sorted(self.allHLT, reverse=True)[minObjects-1]
 
 
-        # We found two HLT jets with pt at least equall to lowestPTNeededForAcceptForThisEvent
-        # any double jet HLT path requireing pt higher than lowestPTNeededForAcceptForThisEvent
+        # We found two HLT jets with pt at least equall to highestHLTThresholdPossibleForThisEvent
+        # any double jet HLT path requireing pt higher than highestHLTThresholdPossibleForThisEvent
         # would not fire
 
         if level == 2:
@@ -147,7 +147,7 @@ class MNTrgAnaProofReader(ExampleProofReader):
         getBinCenter = denom.GetXaxis().GetBinCenter
         for i in xrange(1,nbins+1):
             denom.Fill(i)
-            if getBinCenter(i) < lowestPTNeededForAcceptForThisEvent:
+            if getBinCenter(i) < highestHLTThresholdPossibleForThisEvent:
                 nom.Fill(i)
         del getBinCenter
 
