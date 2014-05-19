@@ -26,15 +26,22 @@ class MNTrgAnaProofReader(ExampleProofReader):
 
         self.hist = {}
 
-        todo = ["signalEffVsHLTThreshold_NOM",
-                "signalEffVsHLTThreshold_DENOM",
-                "signalEffVsL1Threshold_NOM",
-                "signalEffVsL1Threshold_DENOM"]
+        todo = ["signalEffVsHLTThreshold",
+                "signalEffVsL1Threshold",
+                "signalEffVsL1Threshold_bothForward",
+                "signalEffVsHLTThreshold_bothForward",
+                "signalEffVsHLTThreshold_atLeastOneNonForward",
+                "signalEffVsL1Threshold_atLeastOneNonForward"
+                ]
 
-        for t in todo:
-            self.hist[t] = ROOT.TH1F(t, t, 50, -0.5, 49.5)
-            self.hist[t].Sumw2()
-            self.GetOutputList().Add(self.hist[t])
+        todo2= ["_NOM", "_DENOM"]
+
+        for t1 in todo:
+            for t2 in todo2:
+                t = t1+t2
+                self.hist[t] = ROOT.TH1F(t, t, 50, -0.5, 49.5)
+                self.hist[t].Sumw2()
+                self.GetOutputList().Add(self.hist[t])
 
         sys.stdout.flush()
 
@@ -74,14 +81,24 @@ class MNTrgAnaProofReader(ExampleProofReader):
                 else:
                     curCen = sorted(curCen, reverse = True)
                     curFwd = sorted(curFwd, reverse = True)
-                    all = sorted(curCen + curFwd, reverse = True)
-                    self.allHLT = all
-                    self.bestCAny = sorted([all[0], all[1]], reverse = True)
+                    self.allHLT  = sorted(curCen + curFwd, reverse = True)
+                    if len(curCen) > 0 and len(curCen) + len(curFwd) > 1:
+                        pt1 = curCen[0]
+                        pt2Cand = []
+                        if len(curFwd) > 0:
+                            pt2Cand.append(curFwd[0])
+                        if len(curCen) > 1:
+                            pt2Cand.append(curCen[1])
+
+                        if len(pt2Cand) == 0:   # not possible...
+                            raise Exception("Totally lost.")
+
+                        pt2 = max(pt2Cand)
+                        self.bestCAny = sorted([pt1, pt2], reverse = True)
+
                     if len(curFwd) > 1:
                         self.bestFF = sorted([curFwd[0], curFwd[1]], reverse = True)
                             
-            
-
     def analyze(self):
         #event = self.fChain.event
         #run = self.fChain.run
@@ -113,14 +130,24 @@ class MNTrgAnaProofReader(ExampleProofReader):
         if eta1 > 3 and eta2 > 3:
             bothForward = True
 
+        #if not bothForward: return
+
 
         self.doThresholdAna(level=2, minObjects=2) # HLT, threshold ana - requiering two jets
         self.doThresholdAna(level=1, minObjects=1) # L1, threshold ana - one L1 jet required
 
+        self.doThresholdAna(level=1, minObjects = 1, bothForwardTrigger=bothForward)
+        self.doThresholdAna(level=2, minObjects = 2, bothForwardTrigger=bothForward)
+
+
         return 1
 
-    def doThresholdAna(self, level, minObjects):
-        ''' level=1 - L1, level=2 - HLT '''
+    def doThresholdAna(self, level, minObjects, bothForwardTrigger=None):
+        ''' level=1 - L1, level=2 - HLT
+        bothForwardTrigger=None - do not use split trigger
+        bothForwardTrigger=True - use split trigger for bothForward category
+        bothForwardTrigger=False - use split trigger for atLeastOneNonForward category
+        '''
         # at this point we got a signal event. Go through avaliable HLT jets
         # and find two with the highest PT
         # TODO  : recoJet2HLTjet matching
@@ -131,24 +158,40 @@ class MNTrgAnaProofReader(ExampleProofReader):
 
         self.getTriggers() # cache best L1 and HLT objects
         highestHLTThresholdPossibleForThisEvent = 0 # if it stays 0 - less than two HLT jets present in the event
-        if level == 1:
-            if len(self.allL1)>= minObjects:
-                highestHLTThresholdPossibleForThisEvent = sorted(self.allL1, reverse=True)[minObjects-1]
-        elif level == 2:
-            if len(self.allHLT)>= minObjects:
-                highestHLTThresholdPossibleForThisEvent = sorted(self.allHLT, reverse=True)[minObjects-1]
 
+        if bothForwardTrigger == None:
+            if level == 1:
+                base = "signalEffVsL1Threshold"
+                if len(self.allL1)>= minObjects:
+                    highestHLTThresholdPossibleForThisEvent = sorted(self.allL1, reverse=True)[minObjects-1]
+            elif level == 2:
+                base = "signalEffVsHLTThreshold"
+                if len(self.allHLT)>= minObjects:
+                    highestHLTThresholdPossibleForThisEvent = sorted(self.allHLT, reverse=True)[minObjects-1]
+        elif bothForwardTrigger == True:
+            if level == 1:
+                base = "signalEffVsL1Threshold_bothForward"
+                if len(self.allL1)>= minObjects:
+                    highestHLTThresholdPossibleForThisEvent = sorted(self.allL1, reverse=True)[minObjects-1]
+            elif level == 2:
+                base = "signalEffVsHLTThreshold_bothForward"
+                if len(self.bestFF) > 1:
+                    highestHLTThresholdPossibleForThisEvent = min(self.bestFF[0], self.bestFF[1])
 
-        # We found two HLT jets with pt at least equall to highestHLTThresholdPossibleForThisEvent
-        # any double jet HLT path requireing pt higher than highestHLTThresholdPossibleForThisEvent
-        # would not fire
-
-        if level == 2:
-            nom = self.hist["signalEffVsHLTThreshold_NOM"]
-            denom = self.hist["signalEffVsHLTThreshold_DENOM"]
-        elif level == 1:
-            nom = self.hist["signalEffVsL1Threshold_NOM"]
-            denom = self.hist["signalEffVsL1Threshold_DENOM"]
+        elif bothForwardTrigger == False: 
+            if level == 1:
+                base = "signalEffVsL1Threshold_atLeastOneNonForward"
+                if len(self.allL1)>= minObjects:
+                    highestHLTThresholdPossibleForThisEvent = sorted(self.allL1, reverse=True)[minObjects-1]
+            elif level == 2:
+                base = "signalEffVsHLTThreshold_atLeastOneNonForward"
+                if len(self.bestCAny) > 1:
+                    highestHLTThresholdPossibleForThisEvent = min(self.bestCAny[0], self.bestCAny[1])
+        else:
+            raise Exception("Got confused by bothForwardTrigger variable")
+    
+        nom = self.hist[base + "_NOM"]
+        denom = self.hist[base + "_DENOM"]
 
 
         nbins = denom.GetNbinsX()
