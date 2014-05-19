@@ -53,15 +53,17 @@ class MNTriggerAna : public edm::EDAnalyzer {
 
    private:
       void resetTrees();
-      virtual void beginJob() override;
-      virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
-      virtual void endJob() override;
+      virtual void beginJob();
+      virtual void analyze(const edm::Event&, const edm::EventSetup&);
+      virtual void endJob();
 
       TTree *m_tree;
       std::map<std::string, int> m_integerBranches;
       std::map<std::string, float> m_floatBranches;
       std::map<std::string, std::vector<reco::Candidate::LorentzVector> > m_vectorBranches;
       std::map<std::string, edm::InputTag> m_todoHltCollections;
+
+        
 
 
       //virtual void beginRun(edm::Run const&, edm::EventSetup const&) override;
@@ -383,6 +385,9 @@ MNTriggerAna::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   desc.setUnknown();
   descriptions.addDefault(desc);
 }
+
+
+
 
 //define this as a plug-in
 DEFINE_FWK_MODULE(MNTriggerAna);

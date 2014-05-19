@@ -2,7 +2,7 @@ import os
 
 def getVariant():
     if  "SmallXAnaVersion" not in  os.environ:
-        m = " Cannot get ana variant from env. Set SmallXAnaVersion"
+        m = " Cannot get ana variant from env. Set SmallXAnaVersion "
         m += "to desired value (e.g. by sourcing one of files from MNTriggerStudies/MNTriggerAna/env/ directory) "
         raise Exception(m)
 
