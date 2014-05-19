@@ -26,14 +26,15 @@ class MNTrgAnaProofReader(ExampleProofReader):
 
         self.hist = {}
 
-        self.hist["signalEffVsHLTThreshold_NOM"] = ROOT.TH1F("signalEffVsHLTThreshold_NOM",   "signalEffVsHLTThreshold_NOM",  50, -0.5, 49.5)
-        self.hist["signalEffVsHLTThreshold_DENOM"] = ROOT.TH1F("signalEffVsHLTThreshold_DENOM",   "signalEffVsHLTThreshold_DENOM",  50, -0.5, 49.5)
-        self.hist["signalEffVsL1Threshold_NOM"] = ROOT.TH1F("signalEffVsL1Threshold_NOM",   "signalEffVsL1Threshold_NOM",  50, -0.5, 49.5)
-        self.hist["signalEffVsL1Threshold_DENOM"] = ROOT.TH1F("signalEffVsL1Threshold_DENOM",   "signalEffVsL1Threshold_DENOM",  50, -0.5, 49.5)
+        todo = ["signalEffVsHLTThreshold_NOM",
+                "signalEffVsHLTThreshold_DENOM",
+                "signalEffVsL1Threshold_NOM",
+                "signalEffVsL1Threshold_DENOM"]
 
-        for h in self.hist:
-            self.hist[h].Sumw2()
-            self.GetOutputList().Add(self.hist[h])
+        for t in todo:
+            self.hist[t] = ROOT.TH1F(t, t, 50, -0.5, 49.5)
+            self.hist[t].Sumw2()
+            self.GetOutputList().Add(self.hist[t])
 
         sys.stdout.flush()
 
@@ -106,8 +107,15 @@ class MNTrgAnaProofReader(ExampleProofReader):
         if bestPair[1] == None or bestPair[0] == None:
             return 1
 
-        self.doThresholdAna(2,2) # HLT, threshold ana - requiering two jets
-        self.doThresholdAna(1,1) # L1, threshold ana - one L1 jet required
+        eta1 = abs(bestPair[0].eta())
+        eta2 = abs(bestPair[1].eta())
+        bothForward = False
+        if eta1 > 3 and eta2 > 3:
+            bothForward = True
+
+
+        self.doThresholdAna(level=2, minObjects=2) # HLT, threshold ana - requiering two jets
+        self.doThresholdAna(level=1, minObjects=1) # L1, threshold ana - one L1 jet required
 
         return 1
 
