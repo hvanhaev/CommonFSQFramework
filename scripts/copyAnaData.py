@@ -51,7 +51,7 @@ for s in sampleList:
     # needed for srm access to dirs with >1000 files.
     #command = ["lcg-ls", sampleList[s]["pathSE"]]
     
-    maxResults = 200
+    maxResults = 500
     offset = 0
     while True: # handle 100 results at a time
         command = ["srmls", "-2", "--offset", str(offset), "--count", str(maxResults),  sampleList[s]["pathSE"]]
