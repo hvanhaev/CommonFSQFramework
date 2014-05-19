@@ -41,6 +41,7 @@
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
+
 //
 // class declaration
 //
@@ -449,7 +450,7 @@ reco::Candidate::LorentzVector MNXSTreeProducer::smear(const pat::Jet & jet) {
             throw "Cannot calculate factor!";
     }*/ 
     float ptGen = jet.genJet()->pt(); // not: we check for genJet presence earlier
-    float ptScaled = std::max(0., ptGen + factor*(ptGen - jet.pt()));
+    float ptScaled = std::max(float(0.), ptGen + factor*(ptGen - jet.pt()));
     float scale = ptScaled/jet.pt();
     return jet.p4()*scale;
 }
