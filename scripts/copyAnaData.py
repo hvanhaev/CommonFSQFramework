@@ -54,7 +54,7 @@ for s in sampleList:
     maxResults = 200
     offset = 0
     while True: # handle 100 results at a time
-        command = ["srmls", "--offset", str(offset), "--count", str(maxResults),  sampleList[s]["pathSE"]]
+        command = ["srmls", "-2", "--offset", str(offset), "--count", str(maxResults),  sampleList[s]["pathSE"]]
         retryCnt = 1
         goodRootFiles = 0
         # for current offset value obtain list of files.
@@ -115,7 +115,7 @@ for s in sampleList:
                     print "Problem within sample", s, "file", srcFile
 
             if lineCnt <= 1:
-                if retryCnt == 4:
+                if retryCnt == 8:
                     err = "Cannot get filelist for sample "+s+"\n"
                     err += " - if  some files were copied allready this probably means some server related problems."
                     err += " Please retry in couple of minutes. \n"  
