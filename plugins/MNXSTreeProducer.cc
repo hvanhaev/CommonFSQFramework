@@ -450,7 +450,7 @@ reco::Candidate::LorentzVector MNXSTreeProducer::smear(const pat::Jet & jet) {
             throw "Cannot calculate factor!";
     }*/ 
     float ptGen = jet.genJet()->pt(); // not: we check for genJet presence earlier
-    float ptScaled = std::max(float(0.), ptGen + factor*(ptGen - jet.pt()));
+    float ptScaled = std::max(double(0.), double(ptGen + factor*(ptGen - jet.pt())));
     float scale = ptScaled/jet.pt();
     return jet.p4()*scale;
 }
