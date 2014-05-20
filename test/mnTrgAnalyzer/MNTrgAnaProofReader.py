@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-import sys, os, time
+import sys, os, time, math
 sys.path.append(os.path.dirname(__file__))
 
 import ROOT
@@ -34,7 +34,7 @@ class MNTrgAnaProofReader(ExampleProofReader):
                 "signalEffVsL1Threshold_atLeastOneNonForward"
                 ]
 
-        todo2= ["_NOM", "_DENOM"]
+        todo2= ["_NOM", "_DENOM", "_rate"]
 
         for t1 in todo:
             for t2 in todo2:
@@ -42,6 +42,20 @@ class MNTrgAnaProofReader(ExampleProofReader):
                 self.hist[t] = ROOT.TH1F(t, t, 50, -0.5, 49.5)
                 self.hist[t].Sumw2()
                 self.GetOutputList().Add(self.hist[t])
+
+
+        todoXCheck = [  "signalEffVsHLTThreshold_SinglePFJet",]
+        for t1 in todoXCheck:
+            for t2 in todo2:
+                t = t1+t2
+                #self.hist[t] = ROOT.TH1F(t, t, 100, 309.5, 409.5)
+                self.hist[t] = ROOT.TH1F(t, t, 100, 9.5, 109.5)
+                self.hist[t].Sumw2()
+                self.GetOutputList().Add(self.hist[t])
+
+
+
+
 
         sys.stdout.flush()
 
@@ -98,6 +112,11 @@ class MNTrgAnaProofReader(ExampleProofReader):
 
                     if len(curFwd) > 1:
                         self.bestFF = sorted([curFwd[0], curFwd[1]], reverse = True)
+
+                    #print "Best: CFff", self.bestCAny
+                    #if len(self.bestCAny) > 1:
+                    ##    for j in todo["hlt"]:
+                    #        print j.pt(), j.eta()
                             
     def analyze(self):
         #event = self.fChain.event
@@ -106,6 +125,23 @@ class MNTrgAnaProofReader(ExampleProofReader):
         #print event
 
         weight = 1. # calculate your event weight here
+
+        # for xcheck purposes 
+        self.getTriggers()
+        if len(self.allHLT) > 0:
+            hardest = self.allHLT[0]
+            rateVsPtThreshold = self.hist["signalEffVsHLTThreshold_SinglePFJet_rate"]
+            nbins = rateVsPtThreshold.GetNbinsX()
+            getBinCenter = rateVsPtThreshold.GetXaxis().GetBinCenter
+            fill = rateVsPtThreshold.Fill
+            for i in xrange(1,nbins+1):
+                binCenter = getBinCenter(i)
+                if binCenter <= hardest:
+                    print "  fl!", i, rateVsPtThreshold.GetXaxis().GetBinCenter(i)
+                    fill(binCenter)
+                else:
+                    break
+
 
         pfJetsMomenta = self.fChain.pfJets
 
@@ -121,17 +157,23 @@ class MNTrgAnaProofReader(ExampleProofReader):
             elif bestPair[1] == None or bestPair[1].eta() < eta:
                 bestPair[1] = pfJetsMomenta.at(i)
 
+
+
+        self.doThresholdAna(level=2, minObjects=2, isRatePlot = True) # HLT, threshold ana - requiering two jets
+        self.doThresholdAna(level=1, minObjects=1, isRatePlot = True) # L1, threshold ana - one L1 jet required
+                    
+        self.doThresholdAna(level=1, minObjects = 1, bothForwardTrigger=True, isRatePlot = True)
+        self.doThresholdAna(level=1, minObjects = 1, bothForwardTrigger=False, isRatePlot = True)
+        self.doThresholdAna(level=2, minObjects = 2, bothForwardTrigger=True, isRatePlot = True)
+        self.doThresholdAna(level=2, minObjects = 2, bothForwardTrigger=False, isRatePlot = True)
+
         if bestPair[1] == None or bestPair[0] == None:
             return 1
-
         eta1 = abs(bestPair[0].eta())
         eta2 = abs(bestPair[1].eta())
         bothForward = False
         if eta1 > 3 and eta2 > 3:
             bothForward = True
-
-        #if not bothForward: return
-
 
         self.doThresholdAna(level=2, minObjects=2) # HLT, threshold ana - requiering two jets
         self.doThresholdAna(level=1, minObjects=1) # L1, threshold ana - one L1 jet required
@@ -142,7 +184,7 @@ class MNTrgAnaProofReader(ExampleProofReader):
 
         return 1
 
-    def doThresholdAna(self, level, minObjects, bothForwardTrigger=None):
+    def doThresholdAna(self, level, minObjects, bothForwardTrigger=None, isRatePlot = False):
         ''' level=1 - L1, level=2 - HLT
         bothForwardTrigger=None - do not use split trigger
         bothForwardTrigger=True - use split trigger for bothForward category
@@ -187,20 +229,48 @@ class MNTrgAnaProofReader(ExampleProofReader):
                 base = "signalEffVsHLTThreshold_atLeastOneNonForward"
                 if len(self.bestCAny) > 1:
                     highestHLTThresholdPossibleForThisEvent = min(self.bestCAny[0], self.bestCAny[1])
+                    #print "  -->", highestHLTThresholdPossibleForThisEvent
         else:
             raise Exception("Got confused by bothForwardTrigger variable")
     
+
+        #print base, highestHLTThresholdPossibleForThisEvent, math.ceil(highestHLTThresholdPossibleForThisEvent)
         nom = self.hist[base + "_NOM"]
         denom = self.hist[base + "_DENOM"]
 
 
-        nbins = denom.GetNbinsX()
-        getBinCenter = denom.GetXaxis().GetBinCenter
-        for i in xrange(1,nbins+1):
-            denom.Fill(i)
-            if getBinCenter(i) < highestHLTThresholdPossibleForThisEvent:
-                nom.Fill(i)
-        del getBinCenter
+        if not isRatePlot:
+            fillNom = nom.Fill
+            fillDenom = denom.Fill
+            nbins = denom.GetNbinsX()
+            getBinCenter = denom.GetXaxis().GetBinCenter
+            for i in xrange(1,nbins+1):
+                binCenter = getBinCenter(i)
+                fillDenom(binCenter)
+                if binCenter <= highestHLTThresholdPossibleForThisEvent:
+                    #print "->Fill"
+                    fillNom(binCenter)
+            del getBinCenter
+
+    
+        if isRatePlot:
+            rateVsPtThreshold = self.hist[base+"_rate"]
+            nbins = rateVsPtThreshold.GetNbinsX()
+            getBinCenter = rateVsPtThreshold.GetXaxis().GetBinCenter
+            #binMax = rateVsPtThreshold.GetXaxis().FindBin(highestHLTThresholdPossibleForThisEvent)
+            #addBinContent = rateVsPtThreshold.AddBinContent
+            fill = rateVsPtThreshold.Fill
+            for i in xrange(1,nbins+1):
+
+                binCenter = getBinCenter(i)
+                if binCenter <= highestHLTThresholdPossibleForThisEvent:
+                    #print "  fl", i, rateVsPtThreshold.GetXaxis().GetBinCenter(i)
+                    fill(binCenter)
+                else:
+                    break
+                #addBinContent(i)
+
+            del getBinCenter
 
 
 if __name__ == "__main__":
@@ -210,7 +280,7 @@ if __name__ == "__main__":
 
     sampleList = None # run through all
     #sampleList = ["QCD_Pt-30to50_Tune4C_13TeV_pythia8",]
-    #MNTrgAnaProofReader.runAll(treeName="mnTriggerAna", sampleList=sampleList)
+    #sampleList = ["QCD_Pt-10to15_Tune4C_13TeV_pythia8",]
 
 
     slaveParams = {}
@@ -222,6 +292,7 @@ if __name__ == "__main__":
     # note - remove maxFiles parameter in order to run on all files
     MNTrgAnaProofReader.runAll(treeName="mnTriggerAna", 
                                slaveParameters=slaveParams,
+                               sampleList=sampleList,
                                maxFiles = 10,
                                outFile = "~/plotsHLT.root" )
                                 
