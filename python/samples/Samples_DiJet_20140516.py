@@ -49,6 +49,23 @@ sam["QCD_Pt-10to15_Tune4C_13TeV_pythia8"]["pathPAT"]='/XXXTMFPAT/store/user/frub
 sam["QCD_Pt-10to15_Tune4C_13TeV_pythia8"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-10to15_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-10to15_Tune4C_13TeV_pythia8/e69320067b8f0ba24d244d9ad12dec6d/'
 sam["QCD_Pt-10to15_Tune4C_13TeV_pythia8"]["DS"]='/QCD_Pt-10to15_Tune4C_13TeV_pythia8/Fall13dr-castor_tsg_PU1bx50_POSTLS162_V1-v3/AODSIM'
 
+sam["QCD_Pt-120to170_Tune4C_13TeV_pythia8"]={}
+sam["QCD_Pt-120to170_Tune4C_13TeV_pythia8"]["sgeJobs"]=80
+sam["QCD_Pt-120to170_Tune4C_13TeV_pythia8"]["crabJobs"]=470
+sam["QCD_Pt-120to170_Tune4C_13TeV_pythia8"]["GT"]='START42_V16::All'
+sam["QCD_Pt-120to170_Tune4C_13TeV_pythia8"]["weightJet15"]='RooFormulaVar("weight","weight", "xsOverEvents*puWeightJet15V4*trgWeightJet15RawTF2*trgWeightJet15L1RawTF2", RooArgList(v["puWeightJet15V4"]["RooVar"],v["trgWeightJet15RawTF2"]["RooVar"],v["trgWeightJet15L1RawTF2"]["RooVar"]))'
+sam["QCD_Pt-120to170_Tune4C_13TeV_pythia8"]["name"]='QCD_Pt-120to170_Tune4C_13TeV_pythia8'
+sam["QCD_Pt-120to170_Tune4C_13TeV_pythia8"]["isData"]=False
+sam["QCD_Pt-120to170_Tune4C_13TeV_pythia8"]["weightPuOnly"]='RooFormulaVar("weight","weight", "xsOverEvents*puWeightJet15V4", RooArgList(v["puWeightJet15V4"]["RooVar"]))'
+sam["QCD_Pt-120to170_Tune4C_13TeV_pythia8"]["weightJet15Inverse"]='RooFormulaVar("weight","weight", "xsOverEvents*puWeightJet15V4", RooArgList(v["puWeightJet15V4"]["RooVar"]))'
+sam["QCD_Pt-120to170_Tune4C_13TeV_pythia8"]["numEvents"]=-1
+sam["QCD_Pt-120to170_Tune4C_13TeV_pythia8"]["lumiJet15"]='crashMeMC'
+sam["QCD_Pt-120to170_Tune4C_13TeV_pythia8"]["weightNoPu"]='RooFormulaVar("weight","weight", "xsOverEvents", RooArgList())'
+sam["QCD_Pt-120to170_Tune4C_13TeV_pythia8"]["json"]=''
+sam["QCD_Pt-120to170_Tune4C_13TeV_pythia8"]["lumiDiJet15FB"]='crashMeMC'
+sam["QCD_Pt-120to170_Tune4C_13TeV_pythia8"]["XS"]=493200.0
+sam["QCD_Pt-120to170_Tune4C_13TeV_pythia8"]["DS"]='/QCD_Pt-120to170_Tune4C_13TeV_pythia8/Fall13dr-castor_tsg_PU1bx50_POSTLS162_V1-v1/AODSIM'
+
 sam["QCD_Pt-15to30_Tune4C_13TeV_pythia8"]={}
 sam["QCD_Pt-15to30_Tune4C_13TeV_pythia8"]["sgeJobs"]=80
 sam["QCD_Pt-15to30_Tune4C_13TeV_pythia8"]["crabJobs"]=470
@@ -68,6 +85,40 @@ sam["QCD_Pt-15to30_Tune4C_13TeV_pythia8"]["XS"]=2237000000.0
 sam["QCD_Pt-15to30_Tune4C_13TeV_pythia8"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/QCD_Pt-15to30_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-15to30_Tune4C_13TeV_pythia8/99e092f084ca597ce9e4db2331fd8768//'
 sam["QCD_Pt-15to30_Tune4C_13TeV_pythia8"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to30_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-15to30_Tune4C_13TeV_pythia8/99e092f084ca597ce9e4db2331fd8768/'
 sam["QCD_Pt-15to30_Tune4C_13TeV_pythia8"]["DS"]='/QCD_Pt-15to30_Tune4C_13TeV_pythia8/Fall13dr-castor_tsg_PU1bx50_POSTLS162_V1-v1/AODSIM'
+
+sam["QCD_Pt-170to300_Tune4C_13TeV_pythia8"]={}
+sam["QCD_Pt-170to300_Tune4C_13TeV_pythia8"]["sgeJobs"]=80
+sam["QCD_Pt-170to300_Tune4C_13TeV_pythia8"]["crabJobs"]=470
+sam["QCD_Pt-170to300_Tune4C_13TeV_pythia8"]["GT"]='START42_V16::All'
+sam["QCD_Pt-170to300_Tune4C_13TeV_pythia8"]["weightJet15"]='RooFormulaVar("weight","weight", "xsOverEvents*puWeightJet15V4*trgWeightJet15RawTF2*trgWeightJet15L1RawTF2", RooArgList(v["puWeightJet15V4"]["RooVar"],v["trgWeightJet15RawTF2"]["RooVar"],v["trgWeightJet15L1RawTF2"]["RooVar"]))'
+sam["QCD_Pt-170to300_Tune4C_13TeV_pythia8"]["name"]='QCD_Pt-170to300_Tune4C_13TeV_pythia8'
+sam["QCD_Pt-170to300_Tune4C_13TeV_pythia8"]["isData"]=False
+sam["QCD_Pt-170to300_Tune4C_13TeV_pythia8"]["weightPuOnly"]='RooFormulaVar("weight","weight", "xsOverEvents*puWeightJet15V4", RooArgList(v["puWeightJet15V4"]["RooVar"]))'
+sam["QCD_Pt-170to300_Tune4C_13TeV_pythia8"]["weightJet15Inverse"]='RooFormulaVar("weight","weight", "xsOverEvents*puWeightJet15V4", RooArgList(v["puWeightJet15V4"]["RooVar"]))'
+sam["QCD_Pt-170to300_Tune4C_13TeV_pythia8"]["numEvents"]=-1
+sam["QCD_Pt-170to300_Tune4C_13TeV_pythia8"]["lumiJet15"]='crashMeMC'
+sam["QCD_Pt-170to300_Tune4C_13TeV_pythia8"]["weightNoPu"]='RooFormulaVar("weight","weight", "xsOverEvents", RooArgList())'
+sam["QCD_Pt-170to300_Tune4C_13TeV_pythia8"]["json"]=''
+sam["QCD_Pt-170to300_Tune4C_13TeV_pythia8"]["lumiDiJet15FB"]='crashMeMC'
+sam["QCD_Pt-170to300_Tune4C_13TeV_pythia8"]["XS"]=120300.0
+sam["QCD_Pt-170to300_Tune4C_13TeV_pythia8"]["DS"]='/QCD_Pt-170to300_Tune4C_13TeV_pythia8/Fall13dr-castor_tsg_PU1bx50_POSTLS162_V2-v1/AODSIM'
+
+sam["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]={}
+sam["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]["sgeJobs"]=80
+sam["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]["crabJobs"]=470
+sam["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]["GT"]='START42_V16::All'
+sam["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]["weightJet15"]='RooFormulaVar("weight","weight", "xsOverEvents*puWeightJet15V4*trgWeightJet15RawTF2*trgWeightJet15L1RawTF2", RooArgList(v["puWeightJet15V4"]["RooVar"],v["trgWeightJet15RawTF2"]["RooVar"],v["trgWeightJet15L1RawTF2"]["RooVar"]))'
+sam["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]["name"]='QCD_Pt-300to470_Tune4C_13TeV_pythia8'
+sam["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]["isData"]=False
+sam["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]["weightPuOnly"]='RooFormulaVar("weight","weight", "xsOverEvents*puWeightJet15V4", RooArgList(v["puWeightJet15V4"]["RooVar"]))'
+sam["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]["weightJet15Inverse"]='RooFormulaVar("weight","weight", "xsOverEvents*puWeightJet15V4", RooArgList(v["puWeightJet15V4"]["RooVar"]))'
+sam["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]["numEvents"]=-1
+sam["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]["lumiJet15"]='crashMeMC'
+sam["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]["weightNoPu"]='RooFormulaVar("weight","weight", "xsOverEvents", RooArgList())'
+sam["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]["json"]=''
+sam["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]["lumiDiJet15FB"]='crashMeMC'
+sam["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]["XS"]=7475.0
+sam["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]["DS"]='/QCD_Pt-300to470_Tune4C_13TeV_pythia8/Fall13dr-castor_tsg_PU1bx50_POSTLS162_V1-v2/AODSIM'
 
 sam["QCD_Pt-30to50_Tune4C_13TeV_pythia8"]={}
 sam["QCD_Pt-30to50_Tune4C_13TeV_pythia8"]["sgeJobs"]=80
@@ -89,6 +140,23 @@ sam["QCD_Pt-30to50_Tune4C_13TeV_pythia8"]["pathPAT"]='/XXXTMFPAT/store/user/frub
 sam["QCD_Pt-30to50_Tune4C_13TeV_pythia8"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-30to50_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-30to50_Tune4C_13TeV_pythia8/c558ad3a18d04628a4b38f7254e4a057/'
 sam["QCD_Pt-30to50_Tune4C_13TeV_pythia8"]["DS"]='/QCD_Pt-30to50_Tune4C_13TeV_pythia8/Fall13dr-castor_tsg_PU1bx50_POSTLS162_V1-v1/AODSIM'
 
+sam["QCD_Pt-470to600_Tune4C_13TeV_pythia8"]={}
+sam["QCD_Pt-470to600_Tune4C_13TeV_pythia8"]["sgeJobs"]=80
+sam["QCD_Pt-470to600_Tune4C_13TeV_pythia8"]["crabJobs"]=470
+sam["QCD_Pt-470to600_Tune4C_13TeV_pythia8"]["GT"]='START42_V16::All'
+sam["QCD_Pt-470to600_Tune4C_13TeV_pythia8"]["weightJet15"]='RooFormulaVar("weight","weight", "xsOverEvents*puWeightJet15V4*trgWeightJet15RawTF2*trgWeightJet15L1RawTF2", RooArgList(v["puWeightJet15V4"]["RooVar"],v["trgWeightJet15RawTF2"]["RooVar"],v["trgWeightJet15L1RawTF2"]["RooVar"]))'
+sam["QCD_Pt-470to600_Tune4C_13TeV_pythia8"]["name"]='QCD_Pt-470to600_Tune4C_13TeV_pythia8'
+sam["QCD_Pt-470to600_Tune4C_13TeV_pythia8"]["isData"]=False
+sam["QCD_Pt-470to600_Tune4C_13TeV_pythia8"]["weightPuOnly"]='RooFormulaVar("weight","weight", "xsOverEvents*puWeightJet15V4", RooArgList(v["puWeightJet15V4"]["RooVar"]))'
+sam["QCD_Pt-470to600_Tune4C_13TeV_pythia8"]["weightJet15Inverse"]='RooFormulaVar("weight","weight", "xsOverEvents*puWeightJet15V4", RooArgList(v["puWeightJet15V4"]["RooVar"]))'
+sam["QCD_Pt-470to600_Tune4C_13TeV_pythia8"]["numEvents"]=-1
+sam["QCD_Pt-470to600_Tune4C_13TeV_pythia8"]["lumiJet15"]='crashMeMC'
+sam["QCD_Pt-470to600_Tune4C_13TeV_pythia8"]["weightNoPu"]='RooFormulaVar("weight","weight", "xsOverEvents", RooArgList())'
+sam["QCD_Pt-470to600_Tune4C_13TeV_pythia8"]["json"]=''
+sam["QCD_Pt-470to600_Tune4C_13TeV_pythia8"]["lumiDiJet15FB"]='crashMeMC'
+sam["QCD_Pt-470to600_Tune4C_13TeV_pythia8"]["XS"]=587.1
+sam["QCD_Pt-470to600_Tune4C_13TeV_pythia8"]["DS"]='/QCD_Pt-470to600_Tune4C_13TeV_pythia8/Fall13dr-castor_tsg_PU1bx50_POSTLS162_V1-v1/AODSIM'
+
 sam["QCD_Pt-50to80_Tune4C_13TeV_pythia8"]={}
 sam["QCD_Pt-50to80_Tune4C_13TeV_pythia8"]["sgeJobs"]=80
 sam["QCD_Pt-50to80_Tune4C_13TeV_pythia8"]["crabJobs"]=470
@@ -108,6 +176,40 @@ sam["QCD_Pt-50to80_Tune4C_13TeV_pythia8"]["XS"]=22110000.0
 sam["QCD_Pt-50to80_Tune4C_13TeV_pythia8"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/QCD_Pt-50to80_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-50to80_Tune4C_13TeV_pythia8/93709b35c6f80c65b1bc5e47664cf12b//'
 sam["QCD_Pt-50to80_Tune4C_13TeV_pythia8"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-50to80_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-50to80_Tune4C_13TeV_pythia8/93709b35c6f80c65b1bc5e47664cf12b/'
 sam["QCD_Pt-50to80_Tune4C_13TeV_pythia8"]["DS"]='/QCD_Pt-50to80_Tune4C_13TeV_pythia8/Fall13dr-castor_tsg_PU1bx50_POSTLS162_V1-v1/AODSIM'
+
+sam["QCD_Pt-600to800_Tune4C_13TeV_pythia8"]={}
+sam["QCD_Pt-600to800_Tune4C_13TeV_pythia8"]["sgeJobs"]=80
+sam["QCD_Pt-600to800_Tune4C_13TeV_pythia8"]["crabJobs"]=470
+sam["QCD_Pt-600to800_Tune4C_13TeV_pythia8"]["GT"]='START42_V16::All'
+sam["QCD_Pt-600to800_Tune4C_13TeV_pythia8"]["weightJet15"]='RooFormulaVar("weight","weight", "xsOverEvents*puWeightJet15V4*trgWeightJet15RawTF2*trgWeightJet15L1RawTF2", RooArgList(v["puWeightJet15V4"]["RooVar"],v["trgWeightJet15RawTF2"]["RooVar"],v["trgWeightJet15L1RawTF2"]["RooVar"]))'
+sam["QCD_Pt-600to800_Tune4C_13TeV_pythia8"]["name"]='QCD_Pt-600to800_Tune4C_13TeV_pythia8'
+sam["QCD_Pt-600to800_Tune4C_13TeV_pythia8"]["isData"]=False
+sam["QCD_Pt-600to800_Tune4C_13TeV_pythia8"]["weightPuOnly"]='RooFormulaVar("weight","weight", "xsOverEvents*puWeightJet15V4", RooArgList(v["puWeightJet15V4"]["RooVar"]))'
+sam["QCD_Pt-600to800_Tune4C_13TeV_pythia8"]["weightJet15Inverse"]='RooFormulaVar("weight","weight", "xsOverEvents*puWeightJet15V4", RooArgList(v["puWeightJet15V4"]["RooVar"]))'
+sam["QCD_Pt-600to800_Tune4C_13TeV_pythia8"]["numEvents"]=-1
+sam["QCD_Pt-600to800_Tune4C_13TeV_pythia8"]["lumiJet15"]='crashMeMC'
+sam["QCD_Pt-600to800_Tune4C_13TeV_pythia8"]["weightNoPu"]='RooFormulaVar("weight","weight", "xsOverEvents", RooArgList())'
+sam["QCD_Pt-600to800_Tune4C_13TeV_pythia8"]["json"]=''
+sam["QCD_Pt-600to800_Tune4C_13TeV_pythia8"]["lumiDiJet15FB"]='crashMeMC'
+sam["QCD_Pt-600to800_Tune4C_13TeV_pythia8"]["XS"]=167.0
+sam["QCD_Pt-600to800_Tune4C_13TeV_pythia8"]["DS"]='/QCD_Pt-600to800_Tune4C_13TeV_pythia8/Fall13dr-castor_tsg_PU1bx50_POSTLS162_V1-v1/AODSIM'
+
+sam["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"]={}
+sam["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"]["sgeJobs"]=80
+sam["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"]["crabJobs"]=470
+sam["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"]["GT"]='START42_V16::All'
+sam["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"]["weightJet15"]='RooFormulaVar("weight","weight", "xsOverEvents*puWeightJet15V4*trgWeightJet15RawTF2*trgWeightJet15L1RawTF2", RooArgList(v["puWeightJet15V4"]["RooVar"],v["trgWeightJet15RawTF2"]["RooVar"],v["trgWeightJet15L1RawTF2"]["RooVar"]))'
+sam["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"]["name"]='QCD_Pt-800to1000_Tune4C_13TeV_pythia8'
+sam["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"]["isData"]=False
+sam["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"]["weightPuOnly"]='RooFormulaVar("weight","weight", "xsOverEvents*puWeightJet15V4", RooArgList(v["puWeightJet15V4"]["RooVar"]))'
+sam["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"]["weightJet15Inverse"]='RooFormulaVar("weight","weight", "xsOverEvents*puWeightJet15V4", RooArgList(v["puWeightJet15V4"]["RooVar"]))'
+sam["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"]["numEvents"]=-1
+sam["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"]["lumiJet15"]='crashMeMC'
+sam["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"]["weightNoPu"]='RooFormulaVar("weight","weight", "xsOverEvents", RooArgList())'
+sam["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"]["json"]=''
+sam["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"]["lumiDiJet15FB"]='crashMeMC'
+sam["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"]["XS"]=28.25
+sam["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"]["DS"]='/QCD_Pt-800to1000_Tune4C_13TeV_pythia8/Fall13dr-castor_tsg_PU1bx50_POSTLS162_V1-v1/AODSIM'
 
 sam["QCD_Pt-80to120_Tune4C_13TeV_pythia8"]={}
 sam["QCD_Pt-80to120_Tune4C_13TeV_pythia8"]["sgeJobs"]=80
