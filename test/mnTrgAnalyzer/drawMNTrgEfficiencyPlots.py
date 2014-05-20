@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-from ROOT import *
 import ROOT
 ROOT.gROOT.SetBatch(True)
+from ROOT import *
 
 import os,re,sys,math
 
@@ -57,21 +57,58 @@ def main():
 
 
 
+    todoEff  = { "HLT": "signalEffVsHLTThreshold",
+                  "L1": "signalEffVsL1Threshold",
+                 "L1_bothForward":   "signalEffVsL1Threshold_bothForward",
+                 "HLT_bothForward":   "signalEffVsHLTThreshold_bothForward",
+                 "HLT_atLeastOneNonForward":"signalEffVsHLTThreshold_atLeastOneNonForward",
+                 "L1_atLeastOneNonForward": "signalEffVsL1Threshold_atLeastOneNonForward",
+                 "HLTrateSinglePF": "signalEffVsHLTThreshold_SinglePFJet"
+
+                }
 
 
-    todo = {}
-    todo["L1"] = ["signalEffVsL1Threshold_NOM","signalEffVsL1Threshold_DENOM"]
-    todo["HLT"] = ["signalEffVsHLTThreshold_NOM","signalEffVsHLTThreshold_DENOM"]
+    totalBunches = 3564
+    collidingBunches = 2*1380 # take the highest value from 2012, mul x2 (50ns - > 25 ns)
+    avgPU = 25
+    #minBiasXS = 78.42 * 1E9 # pb
+    #minBiasXS = 69.3 * 1E9 # pb // 8 TeV
+    minBiasXS = 68. * 1E9 # pb // 7 TeV
+
+    perBunchXSLumi = avgPU/minBiasXS # in pb-1
+    print "per bunch lumi", perBunchXSLumi, "(pb^-1)"
+    LHCFrequency = 40. * 1E6 # 40 MHz
+
+    rateScaleFactor = perBunchXSLumi*LHCFrequency*float(collidingBunches)/float(totalBunches)
+
+
+    print "Inst lumi", rateScaleFactor, "(pb^-1 * s^-1)"
+
+
     c1 = ROOT.TCanvas()
-    for t in todo:
+    for t in todoEff:
         fname = "~/"+t+".png"
         #nom = f.Get(todo[t][0])
         #denom = f.Get(todo[t][1])
-        nom = finalMap[todo[t][0]]
-        denom = finalMap[todo[t][1]]
+        nom = finalMap[todoEff[t] + "_NOM"]
+        denom = finalMap[todoEff[t] + "_DENOM"]
 
         nom.Divide(denom)
+        nom.GetXaxis().SetTitle("trigger threshold [GeV]")
+        nom.GetYaxis().SetTitle("signal efficiency")
         nom.Draw()
+        c1.Print(fname)
+
+        rate = finalMap[todoEff[t] + "_rate"]
+        fname = "~/"+t+"_rate.png"
+        rate.Scale(rateScaleFactor)
+
+        rate.Draw()
+        #rate.GetXaxis().SetRange(15, 50)
+        rate.GetXaxis().SetTitle("trigger threshold [GeV]")
+        rate.GetYaxis().SetTitle("rate  [Hz]")
+        
+
         c1.Print(fname)
 
 
