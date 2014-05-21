@@ -188,7 +188,10 @@ class ExampleProofReader( TPySelector ):
                 if not o.InheritsFrom("TH1"):
                     print "Dont know how to scale object:", o.GetName(), o.ClassName()
                 else:
-                    o.Scale(self.normalizationFactor)
+                    if self.isData:
+                        print "Cowardly refusing to apply normalization constant to data sample", self.datasetName
+                    else:
+                        o.Scale(self.normalizationFactor)
             o.Write()
 
     @classmethod
