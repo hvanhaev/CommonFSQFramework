@@ -83,7 +83,7 @@ if __name__ == "__main__":
     #slaveParams["hltCollection"] = "hltAK5PFJetL1FastL2L3Corrected"
 
     # note - remove maxFiles parameter in order to run on all files
-    MNTrgAnaProofReader.runAll(treeName="mnXS",
+    MNxsAnalyzer.runAll(treeName="mnXS",
                                #slaveParameters=slaveParams,
                                #sampleList=sampleList,
                                maxFiles = 1,
