@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 from MNTriggerStudies.MNTriggerAna.GetDatasetInfo import getTreeFilesAndNormalizations
+import MNTriggerStudies.MNTriggerAna.Util
+
 ###############################################################################
 #
 #  TODO: 
@@ -217,6 +219,8 @@ class ExampleProofReader( TPySelector ):
         print "XXX", normalize, slaveParameters["doNormalization"]
 
         skipped = []
+
+        sampleListFullInfo = MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
         for t in todo:
             if len(treeFilesAndNormalizations[t]["files"])==0:
                 print "Skipping, empty filelist for",t
@@ -228,6 +232,7 @@ class ExampleProofReader( TPySelector ):
                 dataset.Add( 'root://'+file)
             
             slaveParameters["datasetName"] = t
+            slaveParameters["isData"] = sampleListFullInfo[t]["isData"]
             slaveParameters["normalizationFactor"] =  treeFilesAndNormalizations[t]["normFactor"]
 
             TProof.AddEnvVar("PATH2",ROOT.gSystem.Getenv("PYTHONPATH")+":"+os.getcwd())
@@ -263,6 +268,7 @@ class ExampleProofReader( TPySelector ):
             #print dataset.Process( 'TPySelector', 'ExampleProofReader')
             print "Running:", cls.__name__
             print dataset.Process( 'TPySelector', cls.__name__)
+            curPath = ROOT.gDirectory.GetPath()
             of = ROOT.TFile(outFile,"UPDATE")
 
             # Write norm value and other info
@@ -270,20 +276,27 @@ class ExampleProofReader( TPySelector ):
             if not saveDir:
                 print "Cannot get directory from plot file"
                 continue
-            #saveDir.cd()
+            saveDir.cd()
+
             norm = treeFilesAndNormalizations[t]["normFactor"]
             print "  ",t, norm
             hist = ROOT.TH1D("norm", "norm", 1,0,1)
             hist.SetBinContent(1, norm)
-            saveDir.WriteObject(hist, hist.GetName())
+            #saveDir.WriteObject(hist, hist.GetName())
+            hist.Write(hist.GetName())
+
+
 
             hist = ROOT.TH1D("isNormalized", "isNormalized", 1,0,1)
             value = 0
             if normalize:
                 value = 1
             hist.SetBinContent(1, value)
-            saveDir.WriteObject(hist, hist.GetName())
+            #saveDir.WriteObject(hist, hist.GetName())
+            hist.Write(hist.GetName())
             of.Close()
+            ROOT.gDirectory.cd(curPath)
+
 
         if len(skipped)>0:
             print "Note: following samples were skipped:"
