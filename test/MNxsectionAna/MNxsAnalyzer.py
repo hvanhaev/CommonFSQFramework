@@ -131,7 +131,7 @@ if __name__ == "__main__":
     AutoLibraryLoader.enable()
 
     #sampleList = None
-    sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
+    #sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
     #sampleList= ["JetMETTau-Run2010A-Apr21ReReco-v1"]
     #slaveParams = {}
     #slaveParams["recoJetPtThreshold"] = 35
@@ -147,8 +147,8 @@ if __name__ == "__main__":
 
     MNxsAnalyzer.runAll(treeName="mnXS",
                                slaveParameters=slaveParams,
-                               sampleList=sampleList,
-                               maxFiles = 1,
+                               #sampleList=sampleList,
+                               #maxFiles = 1,
                                #nWorkers=1,
                                outFile = "~/plotsMNxs.root" )
 
