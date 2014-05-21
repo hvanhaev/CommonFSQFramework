@@ -1,10 +1,9 @@
 ############################################################################### 
 #
-# git setup&workflow
+# 1. git setup&workflow
 #   - see http://cms-sw.github.io/cmssw/tutorial.html
 #
 ############################################################################### 
-
 
 # 1. get git/github working
 # if you dont have github account see
@@ -16,6 +15,7 @@
 #
 # remember to export your ssh keys to github!
 
+
 # Setup local git variables
 
 git config --global user.name [First Name] [Last Name]
@@ -23,6 +23,14 @@ git config --global user.email [Email Address]
 git config --global user.github [GitHub account name]
 
 
+# login to github, go to https://github.com/cms-sw/cmssw and click "Fork".
+
+# Go to https://github.com/<yourGitHubUserName>/cmssw . If you see cmssw
+# packages directory structure then you can go to next step. If you see
+# message like "This repository is temporarily unavailable." you need to
+# wait till it's ok (usually couple of minutes).
+
+# it you see your repo properly created create dev area:
 export SCRAM_ARCH=slc5_amd64_gcc472
 cmsrel CMSSW_6_2_8
 cd CMSSW_6_2_8/src/
@@ -33,26 +41,104 @@ git cms-init
 #  Your reference git repository does not seem to exist, would you like to
 #  create it? [ y / N / ? ] 
 
+git cms-init
 git remote add tomasz git@github.com:fruboes/cmssw.git
-git pull tomasz MNTriggerStudies
+git fetch tomasz
+git config core.sparseCheckout true
+echo MNTriggerStudies/MNTriggerAna >> .git/info/sparse-checkout
 
-#
-# If you get 
-#   ERROR: Storage server temporarily offline
-#
-# go to
-#   https://github.com/fruboes/cmssw
-# and see if you get same error. If yes you should probably wait some while...
+# Following command will create a new branch (here named MyMNTriggerStudiesBranch,
+# you can use other name) in your repo - basing on MNTriggerStudies from repository 
+# "tomasz" we have defined above:
+git checkout -b MyMNTriggerStudiesBranch tomasz/MNTriggerStudies
 
-
-git cms-sparse-checkout CMSSW_6_2_8 HEAD
-git read-tree -mu HEAD
+# If you see that code has appeared compile it
 scram b -j 8
 
 
+#####################################################################
+#
+# 2. Work with the code
+#
+#####################################################################
 
-# Git setup recipie ends here, random git stuff follows
+# you can modify your repo (and make your changes visible to others)
+# using following commands
 
+# add file to repository:
+git add filename # note: you need also commit it!
+
+# commit file to (local) repo after doing changes
+git commit filename -m "Put your commit message here"
+
+# redo above command everytime you want to commit changes
+
+
+# Export your work to server so its safe
+git push my-cmssw MyMNTriggerStudiesBranch
+
+############################################################################### 
+#
+# 3. Fetch latest developments (including new samples files) from others
+#
+############################################################################### 
+
+# make sure you have all your changes commited
+git status -uno # show status of yout files, omits info about untracked files
+git commit -m "my commit message" filenames 
+# alternatively you may commit all the changes at once
+git commit -a -m "my commit message"
+
+
+# fetch remote repo repo
+git fetch tomasz # see how "tomasz" repo was defined above
+
+# display changes from remote branch. Note "..." (means do not display changes
+# in the local branch)
+git diff ...tomasz/MNTriggerStudies_42BPort
+
+# if you dont see anything worrying  perform a merge
+git merge tomasz/MNTriggerStudies_42BPort
+
+
+####################################################################
+#
+# 4. Resolve conflicts during merge
+#
+#####################################################################
+
+# A conflict between your changes and done by others may occur during merge:
+git merge tomasz/MNTriggerStudies
+  Auto-merging MNTriggerStudies/MNTriggerAna/doc/backportingTo42.txt
+  CONFLICT (content): Merge conflict in
+  MNTriggerStudies/MNTriggerAna/doc/backportingTo42.txt
+  Automatic merge failed; fix conflicts and then commit the result.
+
+
+# To see what files caused the conflict run
+
+git status -uno  # -uno so the output is not spamed with untracked files
+
+#Than edit the file containing conflict. Note that conflicting sections can
+#occur in couple of places, marked by
+
+ <<<<<<< / ======= / >>>>>>>
+
+#strings. When you finish editing conflicting files run
+
+git add <conflictingFileName>
+
+# you need to perform above for all conflicting files ()
+git commit
+
+############################################################################### 
+#
+# Another package in release area
+#
+############################################################################### 
+# if you need to add another packages from cmssw to your development area add
+# them into .git/info/sparse-checkout and execute
+git read-tree -mu HEAD
 
 ############################################################################### 
 #
@@ -63,14 +149,3 @@ cd test/
 diff $CMSSW_RELEASE_BASE/src/PhysicsTools/PatAlgos/test/patTuple_addJets_cfg.py patTuple_addJets_cfg_DONOTEDIT.py
 
 
-
-
-################################## OLD stuff
- git branch
- git checkout -b MNTriggerStudies
- git branch
-
- git add/commit/etc
-
- git remote -v show 
- git push my-cmssw MNTriggerStudies

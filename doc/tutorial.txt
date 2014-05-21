@@ -150,7 +150,14 @@ wrong):
 
       scratch-scratch0-tfruboes-2014.04.HLT-CMSSW_6_2_8-src-MNTriggerStudies-MNTriggerAna-test-mnTrgAnalyzer
 
-  -  Sometimes your analyzer will crash, the output file will stay empty, and
+    error messages may be hard to identify. Here you can find one example:
+
+        15:53:29  1220 Wrk-0.0 | Info in <TPySelector::AbortProcess>: 'list' object has no attribute 'push_back'
+
+     (I've tried to use c++ method "push_back" on a python list object, which
+        lead to a crash) 
+
+  -  Sometimes your analyzer will crash, the output rootfile will stay empty, and
      no reason will be visible in proof log files. The only way than is to
      partially comment/uncomment parts of your analyzer code in order to
      identify the problematic part.
