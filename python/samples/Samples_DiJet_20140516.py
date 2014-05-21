@@ -63,7 +63,10 @@ sam["QCD_Pt-120to170_Tune4C_13TeV_pythia8"]["lumiJet15"]='crashMeMC'
 sam["QCD_Pt-120to170_Tune4C_13TeV_pythia8"]["weightNoPu"]='RooFormulaVar("weight","weight", "xsOverEvents", RooArgList())'
 sam["QCD_Pt-120to170_Tune4C_13TeV_pythia8"]["json"]=''
 sam["QCD_Pt-120to170_Tune4C_13TeV_pythia8"]["lumiDiJet15FB"]='crashMeMC'
+sam["QCD_Pt-120to170_Tune4C_13TeV_pythia8"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/QCD_Pt-120to170_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-120to170_Tune4C_13TeV_pythia8/f7355bc900d15e86df80b2b0a76f95b0//'
 sam["QCD_Pt-120to170_Tune4C_13TeV_pythia8"]["XS"]=493200.0
+sam["QCD_Pt-120to170_Tune4C_13TeV_pythia8"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/QCD_Pt-120to170_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-120to170_Tune4C_13TeV_pythia8/f7355bc900d15e86df80b2b0a76f95b0//'
+sam["QCD_Pt-120to170_Tune4C_13TeV_pythia8"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-120to170_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-120to170_Tune4C_13TeV_pythia8/f7355bc900d15e86df80b2b0a76f95b0/'
 sam["QCD_Pt-120to170_Tune4C_13TeV_pythia8"]["DS"]='/QCD_Pt-120to170_Tune4C_13TeV_pythia8/Fall13dr-castor_tsg_PU1bx50_POSTLS162_V1-v1/AODSIM'
 
 sam["QCD_Pt-15to30_Tune4C_13TeV_pythia8"]={}
@@ -100,7 +103,10 @@ sam["QCD_Pt-170to300_Tune4C_13TeV_pythia8"]["lumiJet15"]='crashMeMC'
 sam["QCD_Pt-170to300_Tune4C_13TeV_pythia8"]["weightNoPu"]='RooFormulaVar("weight","weight", "xsOverEvents", RooArgList())'
 sam["QCD_Pt-170to300_Tune4C_13TeV_pythia8"]["json"]=''
 sam["QCD_Pt-170to300_Tune4C_13TeV_pythia8"]["lumiDiJet15FB"]='crashMeMC'
+sam["QCD_Pt-170to300_Tune4C_13TeV_pythia8"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/QCD_Pt-170to300_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-170to300_Tune4C_13TeV_pythia8/45c40c0164dc217ea95f49523d90b883//'
 sam["QCD_Pt-170to300_Tune4C_13TeV_pythia8"]["XS"]=120300.0
+sam["QCD_Pt-170to300_Tune4C_13TeV_pythia8"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/QCD_Pt-170to300_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-170to300_Tune4C_13TeV_pythia8/45c40c0164dc217ea95f49523d90b883//'
+sam["QCD_Pt-170to300_Tune4C_13TeV_pythia8"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-170to300_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-170to300_Tune4C_13TeV_pythia8/45c40c0164dc217ea95f49523d90b883/'
 sam["QCD_Pt-170to300_Tune4C_13TeV_pythia8"]["DS"]='/QCD_Pt-170to300_Tune4C_13TeV_pythia8/Fall13dr-castor_tsg_PU1bx50_POSTLS162_V2-v1/AODSIM'
 
 sam["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]={}
@@ -117,7 +123,10 @@ sam["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]["lumiJet15"]='crashMeMC'
 sam["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]["weightNoPu"]='RooFormulaVar("weight","weight", "xsOverEvents", RooArgList())'
 sam["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]["json"]=''
 sam["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]["lumiDiJet15FB"]='crashMeMC'
+sam["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/QCD_Pt-300to470_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-300to470_Tune4C_13TeV_pythia8/ca240519628083f3306afaf28fb39c0d//'
 sam["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]["XS"]=7475.0
+sam["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/QCD_Pt-300to470_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-300to470_Tune4C_13TeV_pythia8/ca240519628083f3306afaf28fb39c0d//'
+sam["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-300to470_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-300to470_Tune4C_13TeV_pythia8/ca240519628083f3306afaf28fb39c0d/'
 sam["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]["DS"]='/QCD_Pt-300to470_Tune4C_13TeV_pythia8/Fall13dr-castor_tsg_PU1bx50_POSTLS162_V1-v2/AODSIM'
 
 sam["QCD_Pt-30to50_Tune4C_13TeV_pythia8"]={}
@@ -154,7 +163,10 @@ sam["QCD_Pt-470to600_Tune4C_13TeV_pythia8"]["lumiJet15"]='crashMeMC'
 sam["QCD_Pt-470to600_Tune4C_13TeV_pythia8"]["weightNoPu"]='RooFormulaVar("weight","weight", "xsOverEvents", RooArgList())'
 sam["QCD_Pt-470to600_Tune4C_13TeV_pythia8"]["json"]=''
 sam["QCD_Pt-470to600_Tune4C_13TeV_pythia8"]["lumiDiJet15FB"]='crashMeMC'
+sam["QCD_Pt-470to600_Tune4C_13TeV_pythia8"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/QCD_Pt-470to600_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-470to600_Tune4C_13TeV_pythia8/00951ef0f7eaaba4bde52a152a0aed8f//'
 sam["QCD_Pt-470to600_Tune4C_13TeV_pythia8"]["XS"]=587.1
+sam["QCD_Pt-470to600_Tune4C_13TeV_pythia8"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/QCD_Pt-470to600_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-470to600_Tune4C_13TeV_pythia8/00951ef0f7eaaba4bde52a152a0aed8f//'
+sam["QCD_Pt-470to600_Tune4C_13TeV_pythia8"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-470to600_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-470to600_Tune4C_13TeV_pythia8/00951ef0f7eaaba4bde52a152a0aed8f/'
 sam["QCD_Pt-470to600_Tune4C_13TeV_pythia8"]["DS"]='/QCD_Pt-470to600_Tune4C_13TeV_pythia8/Fall13dr-castor_tsg_PU1bx50_POSTLS162_V1-v1/AODSIM'
 
 sam["QCD_Pt-50to80_Tune4C_13TeV_pythia8"]={}
@@ -191,7 +203,10 @@ sam["QCD_Pt-600to800_Tune4C_13TeV_pythia8"]["lumiJet15"]='crashMeMC'
 sam["QCD_Pt-600to800_Tune4C_13TeV_pythia8"]["weightNoPu"]='RooFormulaVar("weight","weight", "xsOverEvents", RooArgList())'
 sam["QCD_Pt-600to800_Tune4C_13TeV_pythia8"]["json"]=''
 sam["QCD_Pt-600to800_Tune4C_13TeV_pythia8"]["lumiDiJet15FB"]='crashMeMC'
+sam["QCD_Pt-600to800_Tune4C_13TeV_pythia8"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/QCD_Pt-600to800_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-600to800_Tune4C_13TeV_pythia8/480d69d0a2051b62040655d33c9013da//'
 sam["QCD_Pt-600to800_Tune4C_13TeV_pythia8"]["XS"]=167.0
+sam["QCD_Pt-600to800_Tune4C_13TeV_pythia8"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/QCD_Pt-600to800_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-600to800_Tune4C_13TeV_pythia8/480d69d0a2051b62040655d33c9013da//'
+sam["QCD_Pt-600to800_Tune4C_13TeV_pythia8"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-600to800_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-600to800_Tune4C_13TeV_pythia8/480d69d0a2051b62040655d33c9013da/'
 sam["QCD_Pt-600to800_Tune4C_13TeV_pythia8"]["DS"]='/QCD_Pt-600to800_Tune4C_13TeV_pythia8/Fall13dr-castor_tsg_PU1bx50_POSTLS162_V1-v1/AODSIM'
 
 sam["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"]={}
@@ -208,7 +223,10 @@ sam["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"]["lumiJet15"]='crashMeMC'
 sam["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"]["weightNoPu"]='RooFormulaVar("weight","weight", "xsOverEvents", RooArgList())'
 sam["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"]["json"]=''
 sam["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"]["lumiDiJet15FB"]='crashMeMC'
+sam["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/QCD_Pt-800to1000_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-800to1000_Tune4C_13TeV_pythia8/3785454fec0cb5af907bd4395d5415ea//'
 sam["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"]["XS"]=28.25
+sam["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/QCD_Pt-800to1000_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-800to1000_Tune4C_13TeV_pythia8/3785454fec0cb5af907bd4395d5415ea//'
+sam["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-800to1000_Tune4C_13TeV_pythia8/DiJet_20140516_QCD_Pt-800to1000_Tune4C_13TeV_pythia8/3785454fec0cb5af907bd4395d5415ea/'
 sam["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"]["DS"]='/QCD_Pt-800to1000_Tune4C_13TeV_pythia8/Fall13dr-castor_tsg_PU1bx50_POSTLS162_V1-v1/AODSIM'
 
 sam["QCD_Pt-80to120_Tune4C_13TeV_pythia8"]={}
