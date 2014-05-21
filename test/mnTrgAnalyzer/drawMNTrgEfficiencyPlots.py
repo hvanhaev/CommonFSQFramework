@@ -68,12 +68,26 @@ def main():
                 }
 
 
+    # verification - single jet trigger for PU=25
+    #   https://twiki.cern.ch/twiki/bin/view/CMS/TriggerMenuDevelopment#Rate_Studies
+    #
+    #  -> rate scale factor (equal to instantaneous luminosity) correctly calculated 
+    #       (you need to set avgPU to 25)
+    #       
+    #  -> single jet rates (click JetHT) @ 13 TeV
+    #
+    #     HLT_PFJet320  97.77 pm 1.71 
+    #     HLT_PFJet400  29.27 pm 0.07 
+    #
+
+
+
     totalBunches = 3564
     collidingBunches = 2*1380 # take the highest value from 2012, mul x2 (50ns - > 25 ns)
-    avgPU = 25
-    #minBiasXS = 78.42 * 1E9 # pb
+    avgPU = 1
+    minBiasXS = 78.42 * 1E9 # pb
     #minBiasXS = 69.3 * 1E9 # pb // 8 TeV
-    minBiasXS = 68. * 1E9 # pb // 7 TeV
+    #minBiasXS = 68. * 1E9 # pb // 7 TeV
 
     perBunchXSLumi = avgPU/minBiasXS # in pb-1
     print "per bunch lumi", perBunchXSLumi, "(pb^-1)"
@@ -104,7 +118,7 @@ def main():
         rate.Scale(rateScaleFactor)
 
         rate.Draw()
-        #rate.GetXaxis().SetRange(15, 50)
+        rate.GetXaxis().SetRange(15, 50)
         rate.GetXaxis().SetTitle("trigger threshold [GeV]")
         rate.GetYaxis().SetTitle("rate  [Hz]")
         

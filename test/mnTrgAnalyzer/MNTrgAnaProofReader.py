@@ -48,8 +48,8 @@ class MNTrgAnaProofReader(ExampleProofReader):
         for t1 in todoXCheck:
             for t2 in todo2:
                 t = t1+t2
-                #self.hist[t] = ROOT.TH1F(t, t, 100, 309.5, 409.5)
-                self.hist[t] = ROOT.TH1F(t, t, 100, 9.5, 109.5)
+                self.hist[t] = ROOT.TH1F(t, t, 100, 309.5, 409.5)
+                #self.hist[t] = ROOT.TH1F(t, t, 100, 9.5, 109.5)
                 self.hist[t].Sumw2()
                 self.GetOutputList().Add(self.hist[t])
 

@@ -156,7 +156,7 @@ def main():
                 print "Allready present", typeString, fname, " #"+str(cnt), "from", s
                 continue
 
-            print "Copying", typeString, " #"+str(cnt), "from", s
+            print "Copying", typeString, fname, " #"+str(cnt), "from", s
 
 
             result = subprocess.call(cpCommand)
