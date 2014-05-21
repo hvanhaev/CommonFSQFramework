@@ -40,7 +40,8 @@ class MNxsAnalyzer(ExampleProofReader):
         #lumi = self.fChain.lumi
         #print event
 
-        weight = 1. # calculate your event weight here
+        print "XXDS", self.datasetName, self.isData
+        weight = 1. 
 
         pfJetsMomenta = self.fChain.pfJets
         leadJetPtFromVectorBranch = 0
@@ -76,5 +77,19 @@ if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     AutoLibraryLoader.enable()
+
+    #slaveParams = {}
+    #slaveParams["recoJetPtThreshold"] = 35
+    #slaveParams["hltCollection"] = "hltAK5PFJetL1FastL2L3Corrected"
+
+    # note - remove maxFiles parameter in order to run on all files
+    MNTrgAnaProofReader.runAll(treeName="mnXS",
+                               #slaveParameters=slaveParams,
+                               #sampleList=sampleList,
+                               maxFiles = 1,
+                               outFile = "~/plotsMNxs.root" )
+
+
+
     MNxsAnalyzer.testAll()
 
