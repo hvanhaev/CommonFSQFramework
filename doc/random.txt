@@ -1,0 +1,5 @@
+# take all slots on a given machine at sge cluster
+
+qsub -q all.q@compute-0-0 -b yes -pe mpich 12 /bin/sleep 8h
+ssh -X compute-0-0
+
