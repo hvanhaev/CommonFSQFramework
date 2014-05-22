@@ -130,14 +130,17 @@ if __name__ == "__main__":
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     AutoLibraryLoader.enable()
 
-    #sampleList = None
+    sampleList = None
+    maxFiles = None
+    nWorkers = None # Use all
+
+    # debug config:
     #sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
     #sampleList= ["JetMETTau-Run2010A-Apr21ReReco-v1"]
-    #slaveParams = {}
-    #slaveParams["recoJetPtThreshold"] = 35
-    #slaveParams["hltCollection"] = "hltAK5PFJetL1FastL2L3Corrected"
+    #maxFiles = 1
+    #nWorkers = 1
 
-    # note - remove maxFiles parameter in order to run on all files
+
     slaveParams = {}
     slaveParams["threshold"] = 35.
     #slaveParams["recoJetCollection"] = "pfJets"
@@ -147,12 +150,10 @@ if __name__ == "__main__":
 
     MNxsAnalyzer.runAll(treeName="mnXS",
                                slaveParameters=slaveParams,
-                               #sampleList=sampleList,
-                               #maxFiles = 1,
-                               #nWorkers=1,
+                               sampleList=sampleList,
+                               maxFiles = maxFiles,
+                               nWorkers=nWorkers,
                                outFile = "~/plotsMNxs.root" )
 
 
-
-    #MNxsAnalyzer.testAll()
 
