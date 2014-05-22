@@ -79,7 +79,7 @@ class ExampleProofReader( TPySelector ):
     def getVariables(self):
         #self.dsName = ROOT.gSystem.Getenv("TMFDatasetName")
         variablesToFetch = ROOT.gSystem.Getenv(self.encodeEnvString("VariablesToFetch") )
-        print variablesToFetch
+        #print variablesToFetch
         split = variablesToFetch.split(",")
         for s in split:
             attrRaw = ROOT.gSystem.Getenv(self.encodeEnvString(s))
@@ -110,13 +110,14 @@ class ExampleProofReader( TPySelector ):
 
 
     def Begin( self ):
-        print 'py: beginning'
+        #print 'py: beginning'
         self.getVariables()
 
     def SlaveBegin( self, tree ):
-        print 'py: slave beginning'
+        #print 'py: slave beginning'
         self.getVariables()
         self.configureAnalyzer() 
+
 
     # this method will be overridden in derived class
     def configureAnalyzer(self):
@@ -172,7 +173,7 @@ class ExampleProofReader( TPySelector ):
         print 'py: slave terminating'
 
     def Terminate( self ): # executed once on client
-        print 'py: terminating' 
+        #print 'py: terminating' 
         olist =  self.GetOutputList()
 
         of = ROOT.TFile(self.outFile, "UPDATE") # TODO - take dir name from Central file
@@ -183,6 +184,7 @@ class ExampleProofReader( TPySelector ):
         if self.doNormalization:
             print "Will try to apply scale:", self.normalizationFactor
 
+        #print "XXXX", ROOT.gDirectory.GetPath()
         for o in olist:
             if self.doNormalization:
                 if not o.InheritsFrom("TH1"):
@@ -191,8 +193,12 @@ class ExampleProofReader( TPySelector ):
                     if self.isData:
                         print "Cowardly refusing to apply normalization constant to data sample", self.datasetName
                     else:
+                        print " Applying  normalization constant", self.normalizationFactor, \
+                              "to data sample", self.datasetName, "histo", o.GetName()
                         o.Scale(self.normalizationFactor)
             o.Write()
+
+        of.Close()
 
     @classmethod
     def runAll(cls, treeName, outFile, sampleList = None, maxFiles=None, \
@@ -219,7 +225,7 @@ class ExampleProofReader( TPySelector ):
         slaveParameters["outFile"] = outFile
 
 
-        print "XXX", normalize, slaveParameters["doNormalization"]
+        #print "XXX", normalize, slaveParameters["doNormalization"]
 
         skipped = []
 
@@ -245,6 +251,8 @@ class ExampleProofReader( TPySelector ):
             supportedTypes = set(["int", "str", "float", "bool"])
             variablesToFetch = ""
             coma = ""
+
+            variablesToSetInProof = {}
             for p in slaveParameters:
                 encodedName = cls.encodeEnvString(p)
 
@@ -255,23 +263,29 @@ class ExampleProofReader( TPySelector ):
                     raise Exception("Parameter of type "+paramType \
                           + " is not of currently supported types: " + ", ".join(supportedTypes) )
                 ROOT.gSystem.Setenv(encodedName, str(slaveParameters[p])+";;;"+paramType)
-
+                variablesToSetInProof[encodedName] =  str(slaveParameters[p])+";;;"+paramType
                 variablesToFetch += coma + p
                 coma = ","
             ROOT.gSystem.Setenv(cls.encodeEnvString("VariablesToFetch"), variablesToFetch)
-
-
+            variablesToSetInProof[cls.encodeEnvString("VariablesToFetch")] = variablesToFetch
 
             if nWorkers == None:
                 proof = TProof.Open('')
             else:
                 proof = TProof.Open('workers='+str(nWorkers))
+
+            
             proof.Exec( 'gSystem->Setenv("PYTHONPATH",gSystem->Getenv("PATH2"));') # for some reason cannot use method below for python path
             proof.Exec( 'gSystem->Setenv("PATH", "'+ROOT.gSystem.Getenv("PATH") + '");')
+            for v in variablesToSetInProof:  
+                # if you get better implemenation (GetParameter?) mail me
+                proof.Exec('gSystem->Setenv("'+v+'","'+variablesToSetInProof[v]+'");')
             #print dataset.Process( 'TPySelector', 'ExampleProofReader')
             print "Running:", cls.__name__
             print dataset.Process( 'TPySelector', cls.__name__)
             curPath = ROOT.gDirectory.GetPath()
+
+
             of = ROOT.TFile(outFile,"UPDATE")
 
             # Write norm value and other info
@@ -282,7 +296,6 @@ class ExampleProofReader( TPySelector ):
             saveDir.cd()
 
             norm = treeFilesAndNormalizations[t]["normFactor"]
-            print "  ",t, norm
             hist = ROOT.TH1D("norm", "norm", 1,0,1)
             hist.SetBinContent(1, norm)
             #saveDir.WriteObject(hist, hist.GetName())
@@ -299,6 +312,15 @@ class ExampleProofReader( TPySelector ):
             hist.Write(hist.GetName())
             of.Close()
             ROOT.gDirectory.cd(curPath)
+
+            # clean environment
+            for v in variablesToSetInProof:  
+                #command = 'gSystem->Unsetenv("'+v+'");'
+                #print command
+                proof.Exec('gSystem->Unsetenv("'+v+'");')
+
+            
+
 
 
         if len(skipped)>0:
