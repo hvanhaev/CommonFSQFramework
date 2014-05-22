@@ -1,5 +1,8 @@
 # take all slots on a given machine at sge cluster
 
 qsub -q all.q@compute-0-0 -b yes -pe mpich 12 /bin/sleep 8h
-ssh -X compute-0-0
+qstat # wait till it actually starts running
+qstat -u "*" # displays jobs from all users /ie have I choose correct host?/
+
+ssh -x compute-0-0
 

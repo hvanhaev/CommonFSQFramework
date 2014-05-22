@@ -20,7 +20,7 @@ from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader
 
 class MNxsAnalyzer(ExampleProofReader):
     def configureAnalyzer( self):
-        print "configureAnalyzer - MNxsAnalyzer"
+        print "XXX configureAnalyzer - MNxsAnalyzer", self.datasetName, self.isData
         self.hist = {}
 
         todo = ["_jet15", "_dj15fb"]
@@ -40,6 +40,8 @@ class MNxsAnalyzer(ExampleProofReader):
         sys.stdout.flush()
 
     def analyze(self):
+        #print "testXX", self.datasetName, self.isData
+        #sys.stdout.flush()
         #event = self.fChain.event
         #run = self.fChain.run
         #lumi = self.fChain.lumi
@@ -87,7 +89,7 @@ class MNxsAnalyzer(ExampleProofReader):
                 else:
                     raise Exception("Trigger not known??? "+triggerToUse)
 
-            #print triggerToUse, eta1, eta2, gotTrigger
+            #print triggerToUse, eta1, eta2, gotTrigger, self.datasetName, self.isData
             # TODO: vertex reweighting depending on trigger
             if gotTrigger:
                 leadJet = mostBkgJet
@@ -96,6 +98,7 @@ class MNxsAnalyzer(ExampleProofReader):
                     subleadJet = mostBkgJet
                     leadJet = mostFwdJet
 
+                #print recoJets.at(leadJet).pt(), weight
                 self.hist["ptLead"+triggerToUse].Fill(recoJets.at(leadJet).pt(), weight)
                 self.hist["ptSublead"+triggerToUse].Fill(recoJets.at(subleadJet).pt(), weight)
                 self.hist["etaLead"+triggerToUse].Fill(recoJets.at(leadJet).eta(), weight)
@@ -137,7 +140,7 @@ if __name__ == "__main__":
     # debug config:
     #sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
     #sampleList= ["JetMETTau-Run2010A-Apr21ReReco-v1"]
-    #maxFiles = 1
+    #maxFiles = 2
     #nWorkers = 1
 
 
