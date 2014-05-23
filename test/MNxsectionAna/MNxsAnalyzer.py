@@ -45,6 +45,7 @@ class MNxsAnalyzer(ExampleProofReader):
                 self.hist["etaLead"+t] =  ROOT.TH1F("etaLead"+t,   "etaLead"+t,  100, -5, 5)
                 self.hist["etaSublead"+t] =  ROOT.TH1F("etaSublead"+t,   "etaSublead"+t,  100, -5, 5)
                 self.hist["xsVsDeltaEta"+t] =  ROOT.TH1F("xs"+t,   "xs"+t,  100, 0, 9.4)
+                self.hist["vtx"+t] =  ROOT.TH1F("vtx"+t,   "vtx"+t,  10, -0.5, 9.5)
 
         for h in self.hist:
             self.hist[h].Sumw2()
@@ -52,23 +53,24 @@ class MNxsAnalyzer(ExampleProofReader):
 
 
         puFiles = {}
-        jet15FileV2 = edm.FileInPath("MNTriggerStudies/MNTriggerAna/lumi/PUJet15V2.root").fullPath()   # MC gen distribution
+        # MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/
+        jet15FileV2 = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/PUJet15V2.root").fullPath()   # MC gen distribution
 
-        puFiles["dj15_1"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/lumi/pu_dj15_1_0.root").fullPath()
-        puFiles["dj15_1_05"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/lumi/pu_dj15_1_05.root").fullPath()
-        puFiles["dj15_0_95"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/lumi/pu_dj15_0_95.root").fullPath()
-        puFiles["j15_1"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/lumi/pu_j15_1_0.root").fullPath()
-        puFiles["j15_1_05"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/lumi/pu_j15_1_05.root").fullPath()
-        puFiles["j15_0_95"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/lumi/pu_j15_0_95.root").fullPath()
+        puFiles["dj15_1"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_dj15_1_0.root").fullPath()
+        puFiles["dj15_1_05"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_dj15_1_05.root").fullPath()
+        puFiles["dj15_0_95"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_dj15_0_95.root").fullPath()
+        puFiles["j15_1"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_j15_1_0.root").fullPath()
+        puFiles["j15_1_05"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_j15_1_05.root").fullPath()
+        puFiles["j15_0_95"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_j15_0_95.root").fullPath()
 
         self.lumiWeighters = {}
-        self.lumiWeighters["lumiWeighterJet15"] = edm.LumiReWeighting(jet15FileV2, puFiles["j15_1"], "MC", "pileup")
-        self.lumiWeighters["lumiWeighterJet15_up"] = edm.LumiReWeighting(jet15FileV2, puFiles["j15_1_05"], "MC", "pileup")
-        self.lumiWeighters["lumiWeighterJet15_down"] = edm.LumiReWeighting(jet15FileV2, puFiles["j15_0_95"], "MC", "pileup")
+        self.lumiWeighters["_jet15_central"] = edm.LumiReWeighting(jet15FileV2, puFiles["j15_1"], "MC", "pileup")
+        self.lumiWeighters["_jet15_puUp"] = edm.LumiReWeighting(jet15FileV2, puFiles["j15_1_05"], "MC", "pileup")
+        self.lumiWeighters["_jet15_puDown"] = edm.LumiReWeighting(jet15FileV2, puFiles["j15_0_95"], "MC", "pileup")
 
-        self.lumiWeighters["lumiWeighterDJ15"] = edm.LumiReWeighting(jet15FileV2, puFiles["dj15_1"], "MC", "pileup")
-        self.lumiWeighters["lumiWeighterDJ15_up"] = edm.LumiReWeighting(jet15FileV2, puFiles["dj15_1_05"], "MC", "pileup")
-        self.lumiWeighters["lumiWeighterDJ15_down"] = edm.LumiReWeighting(jet15FileV2, puFiles["dj15_0_95"], "MC", "pileup")
+        self.lumiWeighters["_dj15fb_central"] = edm.LumiReWeighting(jet15FileV2, puFiles["dj15_1"], "MC", "pileup")
+        self.lumiWeighters["_dj15fb_puUp"] = edm.LumiReWeighting(jet15FileV2, puFiles["dj15_1_05"], "MC", "pileup")
+        self.lumiWeighters["_dj15fb_puDown"] = edm.LumiReWeighting(jet15FileV2, puFiles["dj15_0_95"], "MC", "pileup")
 
 
     def ptShifted(self, jet, shift):
@@ -123,9 +125,9 @@ class MNxsAnalyzer(ExampleProofReader):
         recoJets = getattr(self.fChain, self.recoJetCollection)
 
         for shift in self.todoShifts:
-            weight = 1. 
+            weightBase = 1. 
             if not self.isData:
-                weight *= self.fChain.genWeight # keep inside shift iter
+                weightBase *= self.fChain.genWeight # keep inside shift iter
 
             # find best jet
             mostFwdJet = None
@@ -184,6 +186,17 @@ class MNxsAnalyzer(ExampleProofReader):
                     #print recoJets.at(leadJet).pt(), weight
                     histoName = shift +triggerToUse
 
+
+                    #
+                    weight = weightBase
+                    # puTrueNumInteractions
+                    # _jet15_central
+                    if not self.isData:
+                        truePU = self.fChain.puTrueNumInteractions
+                        puWeight =  self.lumiWeighters[triggerToUse+"_central"].weight(truePU)
+                        weight *= puWeight
+
+
                     # why calling a fill method is so costly ?!?
                     #  -- cost is not comming from python
                     self.hist["ptLead"+histoName].Fill(ptLead, weight)
@@ -192,6 +205,7 @@ class MNxsAnalyzer(ExampleProofReader):
                     self.hist["etaSublead"+histoName].Fill(recoJets.at(subleadJet).eta(), weight)
                     #print "DETA", deta, weight, 
                     self.hist["xsVsDeltaEta"+histoName].Fill(deta, weight)
+                    self.hist["vtx"+histoName].Fill(self.fChain.ngoodVTX, weight)
 
 
         return 1
