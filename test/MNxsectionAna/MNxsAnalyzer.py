@@ -9,6 +9,7 @@ ROOT.gROOT.SetBatch(True)
 from ROOT import *
 
 from array import *
+#import cProfile
 
 # please note that python selector class name (here: MNxsAnalyzer) 
 # should be consistent with this file name (MNxsAnalyzer.py)
@@ -20,31 +21,96 @@ from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader
 
 class MNxsAnalyzer(ExampleProofReader):
     def configureAnalyzer( self):
-        print "XXX configureAnalyzer - MNxsAnalyzer", self.datasetName, self.isData
+        #sys.stdout = sys.stderr
+        #self.pr = cProfile.Profile()
 
-        ptShiftTodo = [0]
-        if hasattr(self, "jetUncFile"):
-            print "Trying ptShifter"
-            sys.stdout.flush()
-            ptShiftTodo.extend([-1,1])
+        print "XXX configureAnalyzer - MNxsAnalyzer", self.datasetName, self.isData
+        print  os.getcwd()
+
+        self.todoShifts = ["_central"]
+        if hasattr(self, "jetUncFile") and not self.isData and self.doPtShifts:
+            self.todoShifts.append("_ptUp")
+            self.todoShifts.append("_ptDown")
             self.jetUnc = JetCorrectionUncertainty(self.jetUncFile)
 
         self.hist = {}
 
-        todo = ["_jet15", "_dj15fb"]
-        for t in todo:
-            self.hist["ptLead"+t] =  ROOT.TH1F("ptLead"+t,   "ptLead"+t,  100, 0, 100)
-            self.hist["ptSublead"+t] =  ROOT.TH1F("ptSublead"+t,   "ptSublead"+t,  100, 0, 100)
-            self.hist["etaLead"+t] =  ROOT.TH1F("etaLead"+t,   "etaLead"+t,  100, -5, 5)
-            self.hist["etaSublead"+t] =  ROOT.TH1F("etaSublead"+t,   "etaSublead"+t,  100, -5, 5)
-            self.hist["xsVsDeltaEta"+t] =  ROOT.TH1F("xs"+t,   "xs"+t,  100, 0, 9.4)
+        todoTrg = ["_jet15", "_dj15fb"]
+
+        for shift in self.todoShifts:
+            for trg in todoTrg:
+                t = shift+trg
+                self.hist["ptLead"+t] =  ROOT.TH1F("ptLead"+t,   "ptLead"+t,  100, 0, 100)
+                self.hist["ptSublead"+t] =  ROOT.TH1F("ptSublead"+t,   "ptSublead"+t,  100, 0, 100)
+                self.hist["etaLead"+t] =  ROOT.TH1F("etaLead"+t,   "etaLead"+t,  100, -5, 5)
+                self.hist["etaSublead"+t] =  ROOT.TH1F("etaSublead"+t,   "etaSublead"+t,  100, -5, 5)
+                self.hist["xsVsDeltaEta"+t] =  ROOT.TH1F("xs"+t,   "xs"+t,  100, 0, 9.4)
 
         for h in self.hist:
             self.hist[h].Sumw2()
             self.GetOutputList().Add(self.hist[h])
 
-        sys.stdout.flush()
 
+        '''
+        puFiles = {}
+        jet15FileV2 = edm.FileInPath("MNTriggerStudies/DiJetAna/lumi/PUJet15V2.root").fullPath()   # MC gen distribution
+
+        puFiles["dj15_1"] = edm.FileInPath("MNTriggerStudies/DiJetAna/lumi/pu_dj15_1_0.root").fullPath()
+        puFiles["dj15_1_05"] = edm.FileInPath("MNTriggerStudies/DiJetAna/lumi/pu_dj15_1_05.root").fullPath()
+        puFiles["dj15_0_95"] = edm.FileInPath("MNTriggerStudies/DiJetAna/lumi/pu_dj15_0_95.root").fullPath()
+        puFiles["j15_1"] = edm.FileInPath("MNTriggerStudies/DiJetAna/lumi/pu_j15_1_0.root").fullPath()
+        puFiles["j15_1_05"] = edm.FileInPath("MNTriggerStudies/DiJetAna/lumi/pu_j15_1_05.root").fullPath()
+        puFiles["j15_0_95"] = edm.FileInPath("MNTriggerStudies/DiJetAna/lumi/pu_j15_0_95.root").fullPath()
+
+        self.lumiWeighters = {}
+        self.lumiWeighters["lumiWeighterJet15"] = edm.LumiReWeighting(jet15FileV2, puFiles["j15_1"], "MC", "pileup")
+        self.lumiWeighters["lumiWeighterJet15_up"] = edm.LumiReWeighting(jet15FileV2, puFiles["j15_1_05"], "MC", "pileup")
+        self.lumiWeighters["lumiWeighterJet15_down"] = edm.LumiReWeighting(jet15FileV2, puFiles["j15_0_95"], "MC", "pileup")
+
+        self.lumiWeighters["lumiWeighterDJ15"] = edm.LumiReWeighting(jet15FileV2, puFiles["dj15_1"], "MC", "pileup")
+        self.lumiWeighters["lumiWeighterDJ15_up"] = edm.LumiReWeighting(jet15FileV2, puFiles["dj15_1_05"], "MC", "pileup")
+        self.lumiWeighters["lumiWeighterDJ15_down"] = edm.LumiReWeighting(jet15FileV2, puFiles["dj15_0_95"], "MC", "pileup")
+        '''
+
+
+    def ptShifted(self, jet, shift):
+        if not shift.startswith("_pt"): return jet.pt()
+        if self.isData:
+            raise Exception("pt shift for data called")
+
+
+        pt = jet.pt()
+        self.jetUnc.setJetEta(jet.eta())
+        self.jetUnc.setJetPt(pt) # corrected pt
+        unc = self.jetUnc.getUncertainty(true)
+        if "_ptUp" == shift:
+            ptFactor = 1.
+        elif "_ptDown" == shift:
+            ptFactor = -1.
+        pt *= (1. + ptFactor*unc)
+
+        if pt < 0: return 0
+        return pt 
+
+
+    '''
+    # stuff for code profiling
+    def analyze(self):
+        self.pr.enable()
+        self.analyzeTT()
+        self.pr.disable()
+
+
+    def SlaveTerminate( self ):
+        print 'py: slave terminating AAZAZ'
+        dname = "/scratch/scratch0/tfruboes/2014.05.NewFWAnd4_2/CMSSW_4_2_8_patch7/src/MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/stats/"
+        profName = dname + "stats"
+        self.pr.dump_stats(profName)
+    '''
+        
+
+
+    #def analyzeTT(self):
     def analyze(self):
         #print "testXX", self.datasetName, self.isData
         #sys.stdout.flush()
@@ -56,66 +122,78 @@ class MNxsAnalyzer(ExampleProofReader):
         #print "XXDS", self.datasetName, self.isData
         if self.fChain.ngoodVTX == 0: return
 
-
-        weight = 1. 
-        if not self.isData:
-            weight *= self.fChain.genWeight
-
         recoJets = getattr(self.fChain, self.recoJetCollection)
 
-        mostFwdJet = None
-        mostBkgJet = None
-        for i in xrange(0, recoJets.size()):
-            jet = recoJets.at(i)
-            if jet.pt() < self.threshold: continue
-            #print jet.pt()
-            eta = jet.eta()
-            #if abs(eta) > 4.7: continue
-            if abs(eta) > 3: continue
-            if  mostFwdJet == None or recoJets.at(mostFwdJet).eta() < eta:
-                mostFwdJet = i
-            if  mostBkgJet == None or recoJets.at(mostBkgJet).eta() > eta:
-                mostBkgJet = i
+        for shift in self.todoShifts:
+            weight = 1. 
+            if not self.isData:
+                weight *= self.fChain.genWeight # keep inside shift iter
 
-        #if mostFwdJet != None:
-        #    print "Pair: F/B",  recoJets.at(mostFwdJet).eta(), recoJets.at(mostBkgJet).eta()
-        pairFound = False
-        if mostFwdJet != None and mostBkgJet != mostFwdJet:
-            pairFound = True
+            # find best jet
+            mostFwdJet = None
+            mostBkgJet = None
+            mostFwdJetEta = None
+            mostBkgJetEta = None
+            for i in xrange(0, recoJets.size()):
+                jet = recoJets.at(i)
 
-        if pairFound:
-            deta = abs(recoJets.at(mostFwdJet).eta() - recoJets.at(mostBkgJet).eta())
-            triggerToUse = "_jet15"
-            eta1 =  recoJets.at(mostFwdJet).eta()
-            eta2 =  recoJets.at(mostBkgJet).eta()
-            if abs(eta1) > 3 and abs(eta2) > 3 and eta1*eta2<0:
-                triggerToUse = "_dj15fb"
 
-            gotTrigger = True
-            if self.isData: # check trigger
-                if triggerToUse == "_jet15":
-                    gotTrigger = self.fChain.jet15 > 0.5
-                elif triggerToUse == "_dj15fb":
-                    gotTrigger = self.fChain.doubleJ15FB > 0.5
-                else:
-                    raise Exception("Trigger not known??? "+triggerToUse)
 
-            #print triggerToUse, eta1, eta2, gotTrigger, self.datasetName, self.isData
-            # TODO: vertex reweighting depending on trigger
-            if gotTrigger:
-                leadJet = mostBkgJet
-                subleadJet = mostFwdJet
-                if recoJets.at(subleadJet).pt() > recoJets.at(leadJet).pt():
-                    subleadJet = mostBkgJet
-                    leadJet = mostFwdJet
+                if self.ptShifted(jet, shift) < self.threshold: continue
+                eta = jet.eta()
+                if abs(eta) > 4.7: continue
+                #if abs(eta) > 3: continue
+                if  mostFwdJet == None or mostFwdJetEta < eta:
+                    mostFwdJet = i
+                    mostFwdJetEta = eta
+                if  mostBkgJet == None or mostBkgJetEta > eta:
+                    mostBkgJet = i
+                    mostBkgJetEta = eta
 
-                #print recoJets.at(leadJet).pt(), weight
-                self.hist["ptLead"+triggerToUse].Fill(recoJets.at(leadJet).pt(), weight)
-                self.hist["ptSublead"+triggerToUse].Fill(recoJets.at(subleadJet).pt(), weight)
-                self.hist["etaLead"+triggerToUse].Fill(recoJets.at(leadJet).eta(), weight)
-                self.hist["etaSublead"+triggerToUse].Fill(recoJets.at(subleadJet).eta(), weight)
-                #print "DETA", deta, weight, triggerToUse
-                self.hist["xsVsDeltaEta"+triggerToUse].Fill(deta, weight)
+            #if mostFwdJet != None:
+            #    print "Pair: F/B",  recoJets.at(mostFwdJet).eta(), recoJets.at(mostBkgJet).eta()
+            pairFound = False
+            if mostFwdJet != None and mostBkgJet != mostFwdJet:
+                pairFound = True
+
+            if pairFound:
+                deta = abs(mostFwdJetEta - mostBkgJetEta)
+                triggerToUse = "_jet15"
+                if abs(mostFwdJetEta) > 3 and abs(mostBkgJetEta) > 3 and mostFwdJetEta*mostBkgJetEta<0:
+                    triggerToUse = "_dj15fb"
+
+                gotTrigger = True
+                if self.isData: # check trigger
+                    if triggerToUse == "_jet15":
+                        gotTrigger = self.fChain.jet15 > 0.5
+                    elif triggerToUse == "_dj15fb":
+                        gotTrigger = self.fChain.doubleJ15FB > 0.5
+                    else:
+                        raise Exception("Trigger not known??? "+triggerToUse)
+
+                # TODO: vertex reweighting depending on trigger
+                if gotTrigger:
+                    leadJet = mostBkgJet
+                    subleadJet = mostFwdJet
+                    # self.ptShifted(jet.pt(), shift)
+                    ptLead =  self.ptShifted( recoJets.at(leadJet), shift)
+                    ptSublead =  self.ptShifted( recoJets.at(subleadJet), shift)
+
+                    if ptSublead > ptLead:
+                        ptLead, ptSublead = ptSublead, ptLead
+                        leadJet, subleadJet = subleadJet, leadJet
+
+                    #print recoJets.at(leadJet).pt(), weight
+                    histoName = shift +triggerToUse
+
+                    # why calling a fill method is so costly ?!?
+                    #  -- cost is not comming from python
+                    self.hist["ptLead"+histoName].Fill(ptLead, weight)
+                    self.hist["ptSublead"+histoName].Fill(ptSublead, weight)
+                    self.hist["etaLead"+histoName].Fill(recoJets.at(leadJet).eta(), weight)
+                    self.hist["etaSublead"+histoName].Fill(recoJets.at(subleadJet).eta(), weight)
+                    #print "DETA", deta, weight, 
+                    self.hist["xsVsDeltaEta"+histoName].Fill(deta, weight)
 
 
         return 1
@@ -152,19 +230,21 @@ if __name__ == "__main__":
     #sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
     #sampleList= ["JetMETTau-Run2010A-Apr21ReReco-v1"]
     #maxFiles = 2
+    #maxFiles = 1
     #nWorkers = 1
 
 
     slaveParams = {}
     slaveParams["threshold"] = 35.
-    #slaveParams["recoJetCollection"] = "pfJets"
-    slaveParams["recoJetCollection"] = "pfJetsSmear"
+    slaveParams["doPtShifts"] = False
+    slaveParams["recoJetCollection"] = "pfJets"
+    #slaveParams["recoJetCollection"] = "pfJetsSmear"
     #slaveParams["recoJetCollection"] = "caloJets"
     #slaveParams["recoJetCollection"] = "caloJetsSmear"
 
     jetUncFile = "START42_V11_AK5PF_Uncertainty.txt"
 
-    slaveParams["jetUncFile"] =  edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/"+jetUncFile).fullPath()
+    slaveParams["jetUncFile"] =  edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"+jetUncFile).fullPath()
 
 
     MNxsAnalyzer.runAll(treeName="mnXS",
