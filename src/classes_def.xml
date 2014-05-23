@@ -1,4 +1,6 @@
 <lcgdict>
     <class name="edm::FileInPath"/>
+    <class name="edm::LumiReWeighting"/>
+
 </lcgdict>
 
