@@ -19,13 +19,13 @@ from array import *
 
 from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader
 
+#import DiJetBalancePlugin
+
 class MNxsAnalyzer(ExampleProofReader):
     def configureAnalyzer( self):
         #sys.stdout = sys.stderr
         #self.pr = cProfile.Profile()
-
         print "XXX configureAnalyzer - MNxsAnalyzer", self.datasetName, self.isData
-        print  os.getcwd()
 
         self.todoShifts = ["_central"]
         if hasattr(self, "jetUncFile") and not self.isData and self.doPtShifts:
@@ -33,8 +33,10 @@ class MNxsAnalyzer(ExampleProofReader):
             self.todoShifts.append("_ptDown")
             self.jetUnc = JetCorrectionUncertainty(self.jetUncFile)
 
-        self.hist = {}
 
+        #self.djBalance = DiJetBalancePlugin.DiJetBalancePlugin(self.recoJetCollection)
+
+        self.hist = {}
         todoTrg = ["_jet15", "_dj15fb"]
 
         for shift in self.todoShifts:
@@ -112,6 +114,9 @@ class MNxsAnalyzer(ExampleProofReader):
 
     #def analyzeTT(self):
     def analyze(self):
+        #if self.fChain.jet15 > 0.5:
+        #    print "XXX", self.fChain.run, self.fChain.lumi
+        #    sys.stdout.flush()
         #print "testXX", self.datasetName, self.isData
         #sys.stdout.flush()
         #event = self.fChain.event
@@ -207,7 +212,7 @@ class MNxsAnalyzer(ExampleProofReader):
                     self.hist["xsVsDeltaEta"+histoName].Fill(deta, weight)
                     self.hist["vtx"+histoName].Fill(self.fChain.ngoodVTX, weight)
 
-
+        #self.djBalance.analyze(self.fChain)
         return 1
 
 
@@ -240,7 +245,9 @@ if __name__ == "__main__":
 
     # debug config:
     #sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
-    #sampleList= ["JetMETTau-Run2010A-Apr21ReReco-v1"]
+    #sampleList=  ["JetMETTau-Run2010A-Apr21ReReco-v1"]
+    #sampleList=  ["Jet-Run2010B-Apr21ReReco-v1"] 
+    #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
     #maxFiles = 2
     #maxFiles = 1
     #nWorkers = 1
@@ -248,9 +255,10 @@ if __name__ == "__main__":
 
     slaveParams = {}
     slaveParams["threshold"] = 35.
-    slaveParams["doPtShifts"] = False
-    slaveParams["recoJetCollection"] = "pfJets"
-    #slaveParams["recoJetCollection"] = "pfJetsSmear"
+    #slaveParams["doPtShifts"] = False
+    slaveParams["doPtShifts"] = True
+    #slaveParams["recoJetCollection"] = "pfJets"
+    slaveParams["recoJetCollection"] = "pfJetsSmear"
     #slaveParams["recoJetCollection"] = "caloJets"
     #slaveParams["recoJetCollection"] = "caloJetsSmear"
 
