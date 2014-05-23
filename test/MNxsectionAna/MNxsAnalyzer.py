@@ -21,6 +21,14 @@ from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader
 class MNxsAnalyzer(ExampleProofReader):
     def configureAnalyzer( self):
         print "XXX configureAnalyzer - MNxsAnalyzer", self.datasetName, self.isData
+
+        ptShiftTodo = [0]
+        if hasattr(self, "jetUncFile"):
+            print "Trying ptShifter"
+            sys.stdout.flush()
+            ptShiftTodo.extend([-1,1])
+            self.jetUnc = JetCorrectionUncertainty(self.jetUncFile)
+
         self.hist = {}
 
         todo = ["_jet15", "_dj15fb"]
@@ -30,8 +38,6 @@ class MNxsAnalyzer(ExampleProofReader):
             self.hist["etaLead"+t] =  ROOT.TH1F("etaLead"+t,   "etaLead"+t,  100, -5, 5)
             self.hist["etaSublead"+t] =  ROOT.TH1F("etaSublead"+t,   "etaSublead"+t,  100, -5, 5)
             self.hist["xsVsDeltaEta"+t] =  ROOT.TH1F("xs"+t,   "xs"+t,  100, 0, 9.4)
-
-    
 
         for h in self.hist:
             self.hist[h].Sumw2()
@@ -155,6 +161,11 @@ if __name__ == "__main__":
     slaveParams["recoJetCollection"] = "pfJetsSmear"
     #slaveParams["recoJetCollection"] = "caloJets"
     #slaveParams["recoJetCollection"] = "caloJetsSmear"
+
+    jetUncFile = "START42_V11_AK5PF_Uncertainty.txt"
+
+    slaveParams["jetUncFile"] =  edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/"+jetUncFile).fullPath()
+
 
     MNxsAnalyzer.runAll(treeName="mnXS",
                                slaveParameters=slaveParams,
