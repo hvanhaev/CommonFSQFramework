@@ -51,16 +51,15 @@ class MNxsAnalyzer(ExampleProofReader):
             self.GetOutputList().Add(self.hist[h])
 
 
-        '''
         puFiles = {}
-        jet15FileV2 = edm.FileInPath("MNTriggerStudies/DiJetAna/lumi/PUJet15V2.root").fullPath()   # MC gen distribution
+        jet15FileV2 = edm.FileInPath("MNTriggerStudies/MNTriggerAna/lumi/PUJet15V2.root").fullPath()   # MC gen distribution
 
-        puFiles["dj15_1"] = edm.FileInPath("MNTriggerStudies/DiJetAna/lumi/pu_dj15_1_0.root").fullPath()
-        puFiles["dj15_1_05"] = edm.FileInPath("MNTriggerStudies/DiJetAna/lumi/pu_dj15_1_05.root").fullPath()
-        puFiles["dj15_0_95"] = edm.FileInPath("MNTriggerStudies/DiJetAna/lumi/pu_dj15_0_95.root").fullPath()
-        puFiles["j15_1"] = edm.FileInPath("MNTriggerStudies/DiJetAna/lumi/pu_j15_1_0.root").fullPath()
-        puFiles["j15_1_05"] = edm.FileInPath("MNTriggerStudies/DiJetAna/lumi/pu_j15_1_05.root").fullPath()
-        puFiles["j15_0_95"] = edm.FileInPath("MNTriggerStudies/DiJetAna/lumi/pu_j15_0_95.root").fullPath()
+        puFiles["dj15_1"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/lumi/pu_dj15_1_0.root").fullPath()
+        puFiles["dj15_1_05"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/lumi/pu_dj15_1_05.root").fullPath()
+        puFiles["dj15_0_95"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/lumi/pu_dj15_0_95.root").fullPath()
+        puFiles["j15_1"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/lumi/pu_j15_1_0.root").fullPath()
+        puFiles["j15_1_05"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/lumi/pu_j15_1_05.root").fullPath()
+        puFiles["j15_0_95"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/lumi/pu_j15_0_95.root").fullPath()
 
         self.lumiWeighters = {}
         self.lumiWeighters["lumiWeighterJet15"] = edm.LumiReWeighting(jet15FileV2, puFiles["j15_1"], "MC", "pileup")
@@ -70,7 +69,6 @@ class MNxsAnalyzer(ExampleProofReader):
         self.lumiWeighters["lumiWeighterDJ15"] = edm.LumiReWeighting(jet15FileV2, puFiles["dj15_1"], "MC", "pileup")
         self.lumiWeighters["lumiWeighterDJ15_up"] = edm.LumiReWeighting(jet15FileV2, puFiles["dj15_1_05"], "MC", "pileup")
         self.lumiWeighters["lumiWeighterDJ15_down"] = edm.LumiReWeighting(jet15FileV2, puFiles["dj15_0_95"], "MC", "pileup")
-        '''
 
 
     def ptShifted(self, jet, shift):
