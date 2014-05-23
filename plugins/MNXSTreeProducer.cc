@@ -440,6 +440,14 @@ reco::Candidate::LorentzVector MNXSTreeProducer::smear(const pat::Jet & jet) {
         }
     }
 
+    /*
+    std::cout << "Jet: "<< jet.isPFJet() 
+            << " " << jet.pt()
+            << " " << jet.eta() 
+            << " " << factor
+            << std::endl;
+
+   */
 
     /*
     if (factor < 0) {
@@ -452,6 +460,8 @@ reco::Candidate::LorentzVector MNXSTreeProducer::smear(const pat::Jet & jet) {
     float ptGen = jet.genJet()->pt(); // not: we check for genJet presence earlier
     float ptScaled = std::max(double(0.), double(ptGen + factor*(ptGen - jet.pt())));
     float scale = ptScaled/jet.pt();
+
+    //std::cout << scale << " " << jet.p4().pt() << " " << (jet.p4()*scale).pt() << std::endl;
     return jet.p4()*scale;
 }
 

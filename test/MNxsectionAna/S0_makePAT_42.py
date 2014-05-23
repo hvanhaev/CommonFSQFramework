@@ -95,7 +95,7 @@ else:
     from PhysicsTools.PatAlgos.tools.trigTools import *
     switchOnTrigger(process, 'patTrigger', 'patTriggerEvent', 'patDefaultSequence', triggerProcess, 'out')
 
-process.maxEvents.input = 200
+process.maxEvents.input = 10
 process.source.skipEvents = cms.untracked.uint32(0)
 
 

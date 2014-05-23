@@ -3,6 +3,7 @@
 namespace {
   struct dictionary {
     edm::FileInPath v1;
+
   };
 }
 

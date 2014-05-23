@@ -26,6 +26,8 @@ def main():
     lumiMap["dj15fb"]  = 0.
 
     triggersToSamples = {}
+    #triggersToSamples["jet15"] = ["JetMETTau-Run2010A-Apr21ReReco-v1"]
+    #triggersToSamples["jet15"]=     [ "JetMET-Run2010A-Apr21ReReco-v1"]
     triggersToSamples["jet15"] = ["Jet-Run2010B-Apr21ReReco-v1", "JetMETTau-Run2010A-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1"]
     triggersToSamples["dj15fb"] = ["METFwd-Run2010B-Apr21ReReco-v1", "JetMETTau-Run2010A-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1"]
     #  QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6
