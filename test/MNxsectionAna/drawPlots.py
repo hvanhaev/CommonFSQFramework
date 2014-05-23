@@ -110,6 +110,8 @@ def main():
     oName = "~/plotsMNxs_norm.root"
     fOut = ROOT.TFile(oName, "RECREATE")
 
+    print lumiMap
+
     for histoType in finalMap: # data/MC
         for histoName in finalMap[histoType]:
             if histoType == "data": # divide by lumi

@@ -48,6 +48,9 @@ class MNxsAnalyzer(ExampleProofReader):
         #print event
 
         #print "XXDS", self.datasetName, self.isData
+        if self.fChain.ngoodVTX == 0: return
+
+
         weight = 1. 
         if not self.isData:
             weight *= self.fChain.genWeight
@@ -61,6 +64,8 @@ class MNxsAnalyzer(ExampleProofReader):
             if jet.pt() < self.threshold: continue
             #print jet.pt()
             eta = jet.eta()
+            #if abs(eta) > 4.7: continue
+            if abs(eta) > 3: continue
             if  mostFwdJet == None or recoJets.at(mostFwdJet).eta() < eta:
                 mostFwdJet = i
             if  mostBkgJet == None or recoJets.at(mostBkgJet).eta() > eta:
