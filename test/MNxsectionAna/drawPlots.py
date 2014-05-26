@@ -8,6 +8,55 @@ import os,re,sys,math
 
 import MNTriggerStudies.MNTriggerAna.Util
 
+from array import array
+
+
+
+def getUncertaintyBand(histos, hCentral):
+    if len(histos) == 0:
+        raise Exception("Empty histogram list")
+    nbins = hCentral.GetNbinsX()
+    for h in histos:
+        if h.GetNbinsX() != nbins:
+            raise Exception("Different number of bins - "+ h.GetName())
+
+    x = array('d')
+    xZeros = array('d')
+
+    y =  array('d')
+    yUp = array('d')
+    yDown = array('d')
+    for i in xrange(1, nbins+1):
+        x.append(histos[0].GetBinCenter(i))
+
+        centralValue = hCentral.GetBinContent(i)
+        yUpLocal  = 0.
+        yDownLocal  = 0.
+        for h in histos:
+            valLocal = h.GetBinContent(i)
+            delta = centralValue - valLocal
+            if delta > 0:
+                yUpLocal += delta*delta
+            else:
+                yDownLocal += delta*delta
+
+
+        xZeros.append(0)
+
+        y.append(centralValue)
+        yUp.append(sqrt(yUpLocal))
+        yDown.append(sqrt(yDownLocal))
+
+
+    ret = ROOT.TGraphAsymmErrors(len(x), x, y, xZeros, xZeros, yDown, yUp)
+    ret.SetFillStyle(3001);
+    #    graphBand.Draw("3") 
+
+    return ret
+
+
+
+
 def main():
 
     sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
@@ -125,6 +174,67 @@ def main():
                 scale = 1./lumi
                 finalMap[histoType][histoName].Scale(scale)
             finalMap[histoType][histoName].Write(histoType+"_"+histoName)
+
+    #for d in finalMap["data"]: 
+    variations = set()
+    triggers = set()
+    histos = set()
+    for d in finalMap["MC"]: 
+        spl = d.split("_")
+        if len(spl)!=3:
+            print "Skipping: ", d
+
+        trg = spl[2]
+        variation = spl[1]
+        histname = spl[0]
+        variations.add(variation)
+        triggers.add(trg)
+        histos.add(histname)
+
+    c1 = ROOT.TCanvas()
+    for h in histos:
+        for t in triggers:
+            centralName = h+"_central_" +t
+
+            maxima = []
+            hData =  finalMap["data"][centralName]
+            hMCCentral = finalMap["MC"][centralName]
+            maxima.append(hData.GetMaximum())
+            maxima.append(hMCCentral.GetMaximum())
+
+            uncHistos = []
+            for v in variations:
+                uncHistos.append(finalMap["MC"][h+"_"+v+"_"+t])
+                maxima.append(finalMap["MC"][h+"_"+v+"_"+t].GetMaximum())
+
+            unc = getUncertaintyBand(uncHistos, hMCCentral)
+            maxima.append(unc.GetMaximum())
+
+
+            maximum = max(maxima)*1.05
+            unc.SetMaximum(maximum)
+            hData.SetMaximum(maximum)
+            hMCCentral.SetMaximum(maximum)
+            hMCCentral.SetMarkerColor(4)
+            hMCCentral.SetMarkerSize(2)
+            hMCCentral.SetLineColor(4)
+
+
+            unc.SetFillColor(8);
+            hData.Draw()
+            unc.Draw("3SAME")
+            hMCCentral.Draw("SAME")
+
+            c1.Print("~/tmp/"+centralName+".png")
+
+
+
+            
+        
+        
+
+        #print d
+
 
 
                 
