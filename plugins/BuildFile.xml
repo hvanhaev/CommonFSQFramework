@@ -3,6 +3,7 @@
 <use name="FWCore/ParameterSet"/>
 <use name="PhysicsTools/UtilAlgos"/>
 
+
 <library   file="*.cc" name="MNTriggerStudiesMNTriggerAnaPlugins">
   <flags   EDM_PLUGIN="1"/>
 </library>

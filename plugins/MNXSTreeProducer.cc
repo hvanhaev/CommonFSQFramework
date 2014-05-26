@@ -493,7 +493,7 @@ bool MNXSTreeProducer::jetID(const pat::Jet & jet) {
         ret = caloJetID(jet, bs);
     } else if (jet.isPFJet()) {
         pat::strbitset bs = pfJetID.getBitTemplate(); 
-        ret = caloJetID(jet, bs);
+        ret = pfJetID(jet, bs);
 
     }else{
         throw "Jet type not known";

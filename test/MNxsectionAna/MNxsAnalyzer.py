@@ -23,6 +23,7 @@ from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader
 
 class MNxsAnalyzer(ExampleProofReader):
     def configureAnalyzer( self):
+
         #sys.stdout = sys.stderr
         #self.pr = cProfile.Profile()
         print "XXX configureAnalyzer - MNxsAnalyzer", self.datasetName, self.isData
@@ -114,6 +115,7 @@ class MNxsAnalyzer(ExampleProofReader):
 
     #def analyzeTT(self):
     def analyze(self):
+            
         #if self.fChain.jet15 > 0.5:
         #    print "XXX", self.fChain.run, self.fChain.lumi
         #    sys.stdout.flush()
@@ -248,6 +250,7 @@ if __name__ == "__main__":
     #sampleList=  ["JetMETTau-Run2010A-Apr21ReReco-v1"]
     #sampleList=  ["Jet-Run2010B-Apr21ReReco-v1"] 
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
+    #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
     #maxFiles = 2
     #maxFiles = 1
     #nWorkers = 1
@@ -255,8 +258,8 @@ if __name__ == "__main__":
 
     slaveParams = {}
     slaveParams["threshold"] = 35.
-    #slaveParams["doPtShifts"] = False
-    slaveParams["doPtShifts"] = True
+    slaveParams["doPtShifts"] = False
+    #slaveParams["doPtShifts"] = True
     #slaveParams["recoJetCollection"] = "pfJets"
     slaveParams["recoJetCollection"] = "pfJetsSmear"
     #slaveParams["recoJetCollection"] = "caloJets"

@@ -245,6 +245,17 @@ process.noscraping = cms.EDFilter("FilterOutScraping",
                                 thresh = cms.untracked.double(0.25)
                                 )
 
+#process.load('CommonTools.RecoAlgos.HBHENoiseFilter_cfi')
+process.load('CommonTools/RecoAlgos/HBHENoiseFilterResultProducer_cfi')
+process.HBHENoiseFilterResultProducer2 = process.HBHENoiseFilterResultProducer.clone()
+process.HBHENoiseFilterResultProducer2.minIsolatedNoiseSumE        = 999999.
+process.HBHENoiseFilterResultProducer2.minNumIsolatedNoiseChannels = 999999
+process.HBHENoiseFilterResultProducer2.minIsolatedNoiseSumEt       = 999999.
+
+
+
+
+
 
 # TODO - MC Z cut
 process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
@@ -368,11 +379,15 @@ if enableTur:
                         #* process.pfSortByTypeSequence
                         * process.muonPFIsolationSequence
                         * process.patDefaultSequence
+                        * process.HBHENoiseFilterResultProducer
+                        * process.HBHENoiseFilterResultProducer2
                         * process.noscraping * process.primaryVertexFilter)
 else:
     process.initialSequence = cms.Sequence(process.initialCntr
                         * process.hltJet
                         * process.patDefaultSequence
+                        * process.HBHENoiseFilterResultProducer
+                        * process.HBHENoiseFilterResultProducer2
                         * process.noscraping * process.primaryVertexFilter)
 
 if runOnMC or anaType == "ZMuMu":
@@ -547,7 +562,8 @@ keepProds = cms.untracked.vstring("drop *",
                                 #"keep double_kt6CaloJetsTur_rho_PAT",
                                 #"keep recoPFJets_ak5PFJetsTur__PAT",
                                 #"keep recoPFJets_ak5PFJets__PAT",
-                                "keep HcalNoiseSummary_hcalnoise__*"
+                                "keep HcalNoiseSummary_hcalnoise__*",
+                                "keep *"
                                 )
                                 
 
