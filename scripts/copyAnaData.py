@@ -167,19 +167,21 @@ def main():
                 time.sleep(1)
                 for p in myprocs[:]:
                     exitCode = p[0].poll()
+                    #print exitCode, p[1]
                     if exitCode != None:
                         if exitCode != 0:
                             print "Problem with ", p[1]
-                        del p
+                        myprocs.remove(p)
 
     while len(myprocs) > 0:
         time.sleep(1)
         for p in myprocs[:]:
             exitCode = p[0].poll()
+            #print exitCode, p[1]
             if exitCode != None:
                 if exitCode != 0:
                     print "Problem with ", p[1]
-                del p
+                myprocs.remove(p)
 
             
     ###
