@@ -72,7 +72,7 @@ elif anaType == "DiJetBalance":
     minJets =  2
     minDiMuons = 0
 elif anaType == "DiJet":
-    minJetPT =  30
+    minJetPT =  130
     minJets =    1
     minDiMuons = 0
 elif anaType == "JetTriggerEff":
@@ -563,7 +563,7 @@ keepProds = cms.untracked.vstring("drop *",
                                 #"keep recoPFJets_ak5PFJetsTur__PAT",
                                 #"keep recoPFJets_ak5PFJets__PAT",
                                 "keep HcalNoiseSummary_hcalnoise__*",
-                                "keep *"
+                                #"keep *"
                                 )
                                 
 
