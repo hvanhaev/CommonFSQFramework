@@ -258,14 +258,16 @@ if __name__ == "__main__":
 
     slaveParams = {}
     slaveParams["threshold"] = 35.
-    slaveParams["doPtShifts"] = False
-    #slaveParams["doPtShifts"] = True
+    #slaveParams["doPtShifts"] = False
+    slaveParams["doPtShifts"] = True
     #slaveParams["recoJetCollection"] = "pfJets"
     slaveParams["recoJetCollection"] = "pfJetsSmear"
     #slaveParams["recoJetCollection"] = "caloJets"
     #slaveParams["recoJetCollection"] = "caloJetsSmear"
 
-    jetUncFile = "START42_V11_AK5PF_Uncertainty.txt"
+    #jetUncFile = "START42_V11_AK5PF_Uncertainty.txt"
+    jetUncFile = "START41_V0_AK5PF_Uncertainty.txt"
+
 
     slaveParams["jetUncFile"] =  edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"+jetUncFile).fullPath()
 
