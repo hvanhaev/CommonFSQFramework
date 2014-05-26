@@ -115,6 +115,8 @@ def main():
         sys.exit()
 
     #333
+
+    myprocs = []
     for s in sampleList:
         if "pathSE" not in sampleList[s]:
             print "No SE path found for sample", s
@@ -150,6 +152,7 @@ def main():
             cnt += 1
             targetFile = targetDir + "/" + fname
 
+
             cpCommand = ['lcg-cp', srcFile, targetFile]
             #cpCommand = ['lcg-ls', srcFile]
             if os.path.isfile(targetFile):
@@ -158,10 +161,26 @@ def main():
 
             print "Copying", typeString, fname, " #"+str(cnt), "from", s
 
+            myproc = subprocess.Popen(cpCommand)
+            myprocs.append( (myproc, cpCommand) ) 
+            while len(myprocs) > 3:
+                time.sleep(1)
+                for p in myprocs[:]:
+                    exitCode = p[0].poll()
+                    if exitCode != None:
+                        if exitCode != 0:
+                            print "Problem with ", p[1]
+                        del p
 
-            result = subprocess.call(cpCommand)
-            if result != 0:
-                print "Problem within sample", s, "file", srcFile
+    while len(myprocs) > 0:
+        time.sleep(1)
+        for p in myprocs[:]:
+            exitCode = p[0].poll()
+            if exitCode != None:
+                if exitCode != 0:
+                    print "Problem with ", p[1]
+                del p
+
             
     ###
 
