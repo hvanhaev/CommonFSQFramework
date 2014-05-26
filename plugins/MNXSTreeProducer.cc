@@ -42,9 +42,18 @@
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 
+#include <algorithm>
+
+#include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
+#include "PhysicsTools/SelectorUtils/interface/JetIDSelectionFunctor.h"
+
 //
 // class declaration
 //
+
+bool ptSort(const reco::Candidate::LorentzVector & p1, const reco::Candidate::LorentzVector & p2) {
+    return p1.pt() > p2.pt();
+}
 
 
 
@@ -62,14 +71,19 @@ class MNXSTreeProducer : public edm::EDAnalyzer {
       virtual void analyze(const edm::Event&, const edm::EventSetup&);
       virtual void endJob();
       reco::Candidate::LorentzVector smear(const pat::Jet & jet);
+      bool jetID(const pat::Jet & jet);
 
       TTree *m_tree;
       std::map<std::string, int> m_integerBranches;
       std::map<std::string, float> m_floatBranches;
       std::map<std::string, std::vector<reco::Candidate::LorentzVector> > m_vectorBranches;
+      std::map<std::string, std::vector<int> > m_vecIntBranches;
 
       std::map<std::string, edm::InputTag> m_todo;
       std::map<std::string, std::vector<std::string> > m_todoTriggers;
+
+      PFJetIDSelectionFunctor pfJetID;
+      JetIDSelectionFunctor caloJetID;
 
 
       //virtual void beginRun(edm::Run const&, edm::EventSetup const&) override;
@@ -91,8 +105,9 @@ class MNXSTreeProducer : public edm::EDAnalyzer {
 //
 // constructors and destructor
 //
-MNXSTreeProducer::MNXSTreeProducer(const edm::ParameterSet& iConfig)
-
+MNXSTreeProducer::MNXSTreeProducer(const edm::ParameterSet& iConfig):
+pfJetID(PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE),
+caloJetID(JetIDSelectionFunctor::PURE09,  JetIDSelectionFunctor::LOOSE)
 {
 
     edm::Service<TFileService> tFileService;
@@ -125,6 +140,8 @@ MNXSTreeProducer::MNXSTreeProducer(const edm::ParameterSet& iConfig)
     m_integerBranches["lumi"] = 0;
     m_integerBranches["event"] = 0;
     m_integerBranches["ngoodVTX"] = 0;
+    m_integerBranches["HBHENoiseFilterResult"] = 0;
+    m_integerBranches["HBHENoiseFilterResult2"] = 0;
 
     std::map<std::string, std::vector<std::string> >::iterator itTrg = m_todoTriggers.begin();
     for (;itTrg != m_todoTriggers.end(); ++itTrg){
@@ -140,9 +157,12 @@ MNXSTreeProducer::MNXSTreeProducer(const edm::ParameterSet& iConfig)
     std::map<std::string, edm::InputTag>::iterator it = m_todo.begin(), itEnd = m_todo.end() ;
     for (; it != itEnd; ++it){
         m_vectorBranches[it->first] = std::vector<reco::Candidate::LorentzVector>();
+        m_vectorBranches[it->first+"_top3"] = std::vector<reco::Candidate::LorentzVector>();    // dijet balance ugly hack.
         m_vectorBranches[it->first+"2Gen"] = std::vector<reco::Candidate::LorentzVector>();
         m_vectorBranches[it->first+"Smear"] = std::vector<reco::Candidate::LorentzVector>();
+        m_vectorBranches[it->first+"Smear_top3"] = std::vector<reco::Candidate::LorentzVector>(); // dijet balance ugly hack
         m_vectorBranches[it->first+"Uncorrected"] = std::vector<reco::Candidate::LorentzVector>();
+        m_vecIntBranches[it->first+"_jetID"] = std::vector<int>();
     }
 
     m_vectorBranches["genJets"] = std::vector<reco::Candidate::LorentzVector>();
@@ -169,7 +189,7 @@ MNXSTreeProducer::MNXSTreeProducer(const edm::ParameterSet& iConfig)
     }
 
 
-    // vector branches autoreg
+    // p4 vector branches autoreg
     {   
         std::map<std::string, std::vector<reco::Candidate::LorentzVector> >::iterator it =  m_vectorBranches.begin();
         std::map<std::string, std::vector<reco::Candidate::LorentzVector> >::iterator itE =  m_vectorBranches.end();
@@ -177,6 +197,16 @@ MNXSTreeProducer::MNXSTreeProducer(const edm::ParameterSet& iConfig)
             m_tree->Branch(it->first.c_str(), &it->second);//#;, (it->first+"/I").c_str());
         }
     }
+
+    // int vector branches autoreg
+    {
+        std::map<std::string, std::vector<int> >::iterator it =  m_vecIntBranches.begin();
+        std::map<std::string, std::vector<int> >::iterator itE =  m_vecIntBranches.end();
+        for (;it != itE;++it){
+            m_tree->Branch(it->first.c_str(), &it->second);//#;, (it->first+"/I").c_str());
+        }
+    }
+
 
 
 
@@ -212,6 +242,14 @@ void MNXSTreeProducer::resetTrees(){
     }
 
 
+    // int vector branches autoreg
+    {   
+        std::map<std::string, std::vector<int> >::iterator it =  m_vecIntBranches.begin();
+        std::map<std::string, std::vector<int> >::iterator itE =  m_vecIntBranches.end();
+        for (;it != itE;++it){
+            m_vecIntBranches[it->first].clear();
+        }
+    }
 
 
 }
@@ -256,6 +294,19 @@ MNXSTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     m_integerBranches["ngoodVTX"] = vtxCnt;
 
 
+    edm::Handle< bool > hHBHENoise;
+    iEvent.getByLabel(edm::InputTag("HBHENoiseFilterResultProducer", "HBHENoiseFilterResult"), hHBHENoise);
+    if (*hHBHENoise == true) 
+        m_integerBranches["HBHENoiseFilterResult"] = 1;
+    else
+        m_integerBranches["HBHENoiseFilterResult"] = 0;
+    edm::Handle< bool > hHBHENoise2;
+    iEvent.getByLabel(edm::InputTag("HBHENoiseFilterResultProducer2", "HBHENoiseFilterResult"), hHBHENoise2);
+    if (*hHBHENoise2 == true) 
+        m_integerBranches["HBHENoiseFilterResult2"] = 1;
+    else
+        m_integerBranches["HBHENoiseFilterResult2"] = 0;
+
     bool isMC = iEvent.eventAuxiliary().run() < 100;
 
 
@@ -267,6 +318,8 @@ MNXSTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         iEvent.getByLabel(it->second, hJets);
 
         for (unsigned int i = 0; i<hJets->size(); ++i){
+
+
             // Check if reconstructed jet or his matched genJet are above thr
             bool isGood = false;
             if (hJets->at(i).pt() > ptMin) isGood = true;
@@ -278,16 +331,48 @@ MNXSTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
             reco::Candidate::LorentzVector smearedP4 = this->smear(hJets->at(i));
             if (smearedP4.pt() > ptMin) isGood = true;
 
+            m_vectorBranches[it->first+"_top3"].push_back(hJets->at(i).p4());
+            m_vectorBranches[it->first+"Smear_top3"].push_back(smearedP4);
 
 
             if (!isGood) continue;
 
+            int jetId = 0;
+            if (this->jetID(hJets->at(i)))  jetId = 1;
+            m_vecIntBranches[it->first+"_jetID"].push_back(jetId);
             m_vectorBranches[it->first].push_back(hJets->at(i).p4());
             m_vectorBranches[it->first+"2Gen"].push_back(genP4);
             m_vectorBranches[it->first+"Smear"].push_back(smearedP4);
             m_vectorBranches[it->first+"Uncorrected"].push_back(hJets->at(i).correctedJet("Uncorrected").p4());
         }
+
+        // for diJet balance use jetID from above. For jet veto jetId not important
+        std::sort(m_vectorBranches[it->first+"_top3"].begin(), m_vectorBranches[it->first+"_top3"].end(), ptSort);
+        std::sort(m_vectorBranches[it->first+"Smear_top3"].begin(), m_vectorBranches[it->first+"Smear_top3"].end(), ptSort);
+        while (m_vectorBranches[it->first+"_top3"].size() > 3) m_vectorBranches[it->first+"_top3"].pop_back();
+        while (m_vectorBranches[it->first+"Smear_top3"].size() > 3) m_vectorBranches[it->first+"Smear_top3"].pop_back();
+
+        /*
+        std::cout << "XX " << m_vectorBranches[it->first+"_top3"].size() << " " << m_vectorBranches[it->first+"Smear_top3"].size() << std::endl;
+        if (m_vectorBranches[it->first+"Smear_top3"].size()==3){
+            std::cout << m_vectorBranches[it->first+"Smear_top3"].at(0).pt() << std::endl;
+            std::cout << m_vectorBranches[it->first+"Smear_top3"].at(1).pt() << std::endl;
+            std::cout << m_vectorBranches[it->first+"Smear_top3"].at(2).pt() << std::endl;
+        }
+        std::cout << "11"<<std::endl;
+        if (m_vectorBranches[it->first+"_top3"].size()==3){
+            std::cout << m_vectorBranches[it->first+"_top3"].at(0).pt() << std::endl;
+            std::cout << m_vectorBranches[it->first+"_top3"].at(1).pt() << std::endl;
+            std::cout << m_vectorBranches[it->first+"_top3"].at(2).pt() << std::endl;
+        }*/
+
     }
+
+
+
+
+
+
 
     if (!isMC){ // check triggers. No trigger simulation in MC
         edm::Handle< pat::TriggerEvent > hTrgEvent;
@@ -400,6 +485,26 @@ MNXSTreeProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions)
   desc.setUnknown();
   descriptions.addDefault(desc);
 }
+
+bool MNXSTreeProducer::jetID(const pat::Jet & jet) {
+    bool ret = true;
+    if (jet.isCaloJet()) {  
+        pat::strbitset bs = caloJetID.getBitTemplate(); 
+        ret = caloJetID(jet, bs);
+    } else if (jet.isPFJet()) {
+        pat::strbitset bs = pfJetID.getBitTemplate(); 
+        ret = caloJetID(jet, bs);
+
+    }else{
+        throw "Jet type not known";
+
+    }
+
+
+    return ret;
+}
+
+
 
 reco::Candidate::LorentzVector MNXSTreeProducer::smear(const pat::Jet & jet) {
     if (!jet.genJet()){
