@@ -46,6 +46,7 @@
 
 #include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
 #include "PhysicsTools/SelectorUtils/interface/JetIDSelectionFunctor.h"
+#include <DataFormats/Math/interface/deltaR.h>
 
 //
 // class declaration
@@ -71,7 +72,7 @@ class MNXSTreeProducer : public edm::EDAnalyzer {
       virtual void analyze(const edm::Event&, const edm::EventSetup&);
       virtual void endJob();
       reco::Candidate::LorentzVector smear(const pat::Jet & jet);
-      bool jetID(const pat::Jet & jet);
+      bool jetID(const pat::Jet & jet, const edm::Event& iEvent);
 
       TTree *m_tree;
       std::map<std::string, int> m_integerBranches;
@@ -203,7 +204,7 @@ caloJetID(JetIDSelectionFunctor::PURE09,  JetIDSelectionFunctor::LOOSE)
         std::map<std::string, std::vector<int> >::iterator it =  m_vecIntBranches.begin();
         std::map<std::string, std::vector<int> >::iterator itE =  m_vecIntBranches.end();
         for (;it != itE;++it){
-            m_tree->Branch(it->first.c_str(), &it->second);//#;, (it->first+"/I").c_str());
+            m_tree->Branch(it->first.c_str(), "std::vector< int >", &it->second);//#;, (it->first+"/I").c_str());
         }
     }
 
@@ -338,7 +339,7 @@ MNXSTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
             if (!isGood) continue;
 
             int jetId = 0;
-            if (this->jetID(hJets->at(i)))  jetId = 1;
+            if (this->jetID(hJets->at(i), iEvent))  jetId = 1;
             m_vecIntBranches[it->first+"_jetID"].push_back(jetId);
             m_vectorBranches[it->first].push_back(hJets->at(i).p4());
             m_vectorBranches[it->first+"2Gen"].push_back(genP4);
@@ -486,11 +487,36 @@ MNXSTreeProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions)
   descriptions.addDefault(desc);
 }
 
-bool MNXSTreeProducer::jetID(const pat::Jet & jet) {
+bool MNXSTreeProducer::jetID(const pat::Jet & jet, const edm::Event& iEvent) {
     bool ret = true;
     if (jet.isCaloJet()) {  
-        pat::strbitset bs = caloJetID.getBitTemplate(); 
-        ret = caloJetID(jet, bs);
+        // We are doing this in a wicked way, since having jetID and jetArea in calo jets is not possible at same time (4_2 series)
+        JetIDSelectionFunctor jetIDSelector( JetIDSelectionFunctor::PURE09, JetIDSelectionFunctor::LOOSE); //loose
+        pat::strbitset bset = jetIDSelector.getBitTemplate();
+        edm::Handle<edm::View< reco::CaloJet > > hJets;
+        edm::Handle<reco::JetIDValueMap> hJetIDMap;
+        iEvent.getByLabel(edm::InputTag("ak5CaloJets","","RECO"), hJets );
+        iEvent.getByLabel( "ak5JetID", hJetIDMap );
+
+        bool passed = false;
+        float bestDR = 99;
+        for ( edm::View<reco::CaloJet>::const_iterator ibegin = hJets->begin(),
+                iend = hJets->end(), ijet = ibegin; ijet != iend; ++ijet )
+        {
+
+                float dr = reco::deltaR(ijet->p4(), jet.p4());
+                if (dr > 0.5 ) continue;
+                if (dr > bestDR) continue;
+                bestDR = dr;
+                unsigned int idx = ijet - ibegin;
+                edm::RefToBase<reco::CaloJet> jetRef = hJets->refAt(idx);
+                const reco::CaloJet *calojet = dynamic_cast<const reco::CaloJet *>(jetRef.get());
+                reco::JetID jetId = (*hJetIDMap)[ jetRef ];
+                bset.set(false);
+                passed = jetIDSelector(*calojet,jetId, bset);
+        }
+        ret = passed;
+
     } else if (jet.isPFJet()) {
         pat::strbitset bs = pfJetID.getBitTemplate(); 
         ret = pfJetID(jet, bs);
