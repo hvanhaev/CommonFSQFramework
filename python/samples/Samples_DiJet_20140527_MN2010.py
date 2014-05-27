@@ -38,9 +38,12 @@ sam["Jet-Run2010B-Apr21ReReco-v1"]["isData"]=True
 sam["Jet-Run2010B-Apr21ReReco-v1"]["weightJet15Inverse"]='RooFormulaVar("weight","weight", "invtrgWeightJet15RawTF2", RooArgList(v["invtrgWeightJet15RawTF2"]["RooVar"]))'
 sam["Jet-Run2010B-Apr21ReReco-v1"]["numEvents"]=-1
 sam["Jet-Run2010B-Apr21ReReco-v1"]["lumiJet15"]=0.0033470000000000001
+sam["Jet-Run2010B-Apr21ReReco-v1"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/Jet/DiJet_20140527_MN2010_Jet-Run2010B-Apr21ReReco-v1/c0561d0f43f52ca8d573416a777eea80//'
 sam["Jet-Run2010B-Apr21ReReco-v1"]["json"]='MNTriggerStudies/MNTriggerAna/lumi/Cert_136033-149442_7TeV_Apr21ReReco_Collisions10_JSON_v2.txt'
 sam["Jet-Run2010B-Apr21ReReco-v1"]["lumiDiJet15FB"]='crashMe'
 sam["Jet-Run2010B-Apr21ReReco-v1"]["XS"]=-1
+sam["Jet-Run2010B-Apr21ReReco-v1"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/Jet/DiJet_20140527_MN2010_Jet-Run2010B-Apr21ReReco-v1/c0561d0f43f52ca8d573416a777eea80//'
+sam["Jet-Run2010B-Apr21ReReco-v1"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/Jet/DiJet_20140527_MN2010_Jet-Run2010B-Apr21ReReco-v1/c0561d0f43f52ca8d573416a777eea80/'
 sam["Jet-Run2010B-Apr21ReReco-v1"]["DS"]='/Jet/Run2010B-Apr21ReReco-v1/AOD'
 
 sam["JetMET-Run2010A-Apr21ReReco-v1"]={}
@@ -99,7 +102,10 @@ sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["lumiJet15"]
 sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["weightNoPu"]='RooFormulaVar("weight","weight", "generatorWeight", RooArgList(v["generatorWeight"]["RooVar"]))'
 sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["json"]=''
 sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["lumiDiJet15FB"]='crashMeMC'
+sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/DiJet_20140527_MN2010_QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/dc49a3a846a0616b4c26d411d2222690//'
 sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["XS"]=22130000000.0
+sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/DiJet_20140527_MN2010_QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/dc49a3a846a0616b4c26d411d2222690//'
+sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/DiJet_20140527_MN2010_QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/dc49a3a846a0616b4c26d411d2222690/'
 sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["DS"]='/QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/Summer12-LowPU2010_DR42_PU_S0_START42_V17B-v1/AODSIM'
 
 def icm(sam):

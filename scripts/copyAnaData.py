@@ -248,8 +248,8 @@ def main():
         # needed for srm access to dirs with >1000 files.
         #command = ["lcg-ls", sampleList[s]["pathSE"]]
         
-        flist = getFileListSrmLS(sampleList[s]["pathSE"])
-        #flist = getFileListLcgLs(sampleList[s]["pathSE"])
+        #flist = getFileListSrmLS(sampleList[s]["pathSE"])
+        flist = getFileListLcgLs(sampleList[s]["pathSE"])
         cnt = 0
         for srcFile in flist:
             fname = srcFile.split("/")[-1]
