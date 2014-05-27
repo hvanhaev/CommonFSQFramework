@@ -35,6 +35,7 @@ def getFileListSrmLS(path):
 
     ret = []
     lastTime = 0
+    cnt = 0
     while True: # handle maxResults results at a time
         command = ["srmls", "-2", "--offset", str(offset), "--count", str(maxResults),  path]
         retryCnt = 1
@@ -74,8 +75,8 @@ def getFileListSrmLS(path):
                 ret.append(srcFile)
 
             if lineCnt <= 1:
-                if retryCnt == 8:
-                    err = "Cannot get filelist for sample "+s+"\n"
+                if retryCnt == 10:
+                    err = "Cannot get filelist for  "+path+"\n"
                     err += " - if  some files were copied allready this probably means some server related problems."
                     err += " Please retry in couple of minutes. \n"  
                     err += " - if none of the files were copied please check your certificate proxy.\n"
@@ -92,6 +93,110 @@ def getFileListSrmLS(path):
 
     return ret
 
+
+def checkRootFile(fp):
+    while "//" in fp:
+       fp = fp.replace("//","/")
+    cmd = ["root", "-l", "-b", "-q", fp]
+    #ret = subprocess.call(cmd)
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    while proc.poll() == None:
+        time.sleep(1)
+
+    errInStdout = False
+    outData =""
+    for line in proc.stdout:
+        outData += line
+        if "Error " in line:
+            errInStdout = True
+            break
+
+    outData += "stderr::\n"
+    for line in proc.stderr:
+        outData += line
+        if "Error " in line:
+            errInStdout = True
+            break
+
+    if errInStdout:
+        raise Exception("\nProblem processing call: "+" ".join(cmd)+ "\n\noutdata:\n\n" + outData)
+
+    ret = proc.poll()
+    return ret
+    
+
+def checkDataIntegrity(remove = False, checkFilesWithRoot = False):
+
+    sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
+    for s in sampleList:
+        print "Doing", s
+        todo = [sampleList[s]["pathPAT"], sampleList[s]["pathTrees"]]
+        for t in todo:
+            fileMap = {}
+            for root, dirs, files in os.walk(t):
+                for f in files:
+                    fp = root + "/" + f
+                    if not f.endswith(".root"):
+                        print "Non root file:", fp
+                        continue
+                    spl = f.split("_")
+                    try:
+                        fileNum = int(spl[1])
+                    except:
+                        print "Error processing", fp,"- skipping"
+                        continue
+
+                    while "//" in fp:
+                        fp = fp.replace("//","/")
+
+                    if checkFilesWithRoot:
+                        ret = checkRootFile(fp)
+                        if ret != 0:
+                            print "Bad file:", fp
+                            continue
+
+                    # root -l -b -q
+                    fileMap.setdefault(fileNum, []).append(fp)
+                    #print f
+
+            for num in fileMap:
+                if len(fileMap[num]) > 1:
+                    print "Multiple files:", s, num, "-", len(fileMap[num])
+                    for f in fileMap[num][:]:
+                        #ret = 0
+                        ret = checkRootFile(f)
+                        if ret != 0:
+                            print "Bad file:", f
+                            if remove:
+                                os.system("rm "+f)
+                                filemap[num].remove(f)
+
+                    if len(fileMap[num]) > 1: # after root file check
+                        biggestFile = ""
+                        biggestFileSize = 0
+                        for f in fileMap[num]:
+                            fsize = os.path.getsize(f)
+                            if fsize > biggestFileSize:
+                                biggestFileSize = fsize
+                                biggestFile = f
+
+                        for f in fileMap[num]:
+                            if f == biggestFile:
+                                continue
+                            else:
+                                print "Will remove", f
+                                if remove:
+                                    os.system("rm "+f)
+                        
+
+                        
+                        
+                            
+
+
+        
+
+
 def main():
     sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
 
@@ -100,7 +205,20 @@ def main():
 
     parser.add_option("-p", "--doPat", action="store_true", dest="pat")
     parser.add_option("-t", "--doTrees", action="store_true",  dest="trees")
+    parser.add_option("-c", "--checkDataIntegrity", action="store_true",  dest="check")
+    parser.add_option("-d", "--deleteBadFiles", action="store_true",  dest="remove")
+    parser.add_option("-r", "--rootCheck", action="store_true",  dest="checkFilesWithRoot")
     (options, args) = parser.parse_args()
+
+
+    if options.check:
+        remove = False
+        checkFilesWithRoot = False
+        if options.remove: remove = True
+        if options.checkFilesWithRoot: checkFilesWithRoot = options.checkFilesWithRoot
+        
+        checkDataIntegrity(remove, checkFilesWithRoot)
+        sys.exit(0)
 
     doPAT = False
     doTrees = False
@@ -130,8 +248,8 @@ def main():
         # needed for srm access to dirs with >1000 files.
         #command = ["lcg-ls", sampleList[s]["pathSE"]]
         
-        #flist = getFileListSrmLS(sampleList[s]["pathSE"])
-        flist = getFileListLcgLs(sampleList[s]["pathSE"])
+        flist = getFileListSrmLS(sampleList[s]["pathSE"])
+        #flist = getFileListLcgLs(sampleList[s]["pathSE"])
         cnt = 0
         for srcFile in flist:
             fname = srcFile.split("/")[-1]
