@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-
 import sys, os, time
 sys.path.append(os.path.dirname(__file__))
 
@@ -9,7 +8,7 @@ ROOT.gROOT.SetBatch(True)
 from ROOT import *
 
 from array import *
-#import cProfile
+
 
 # please note that python selector class name (here: DiJetBalanceTreeProducer) 
 # should be consistent with this file name (DiJetBalanceTreeProducer.py)
@@ -19,7 +18,6 @@ from array import *
 
 from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader
 
-#import DiJetBalancePlugin
 
 class DiJetBalanceTreeProducer(ExampleProofReader):
     def configureAnalyzer( self):
@@ -28,21 +26,24 @@ class DiJetBalanceTreeProducer(ExampleProofReader):
         self.GetOutputList().Add(self.tree)
 
         self.var = {}
-        self.var["tagPt"] = array('f', [0])
-        self.var["tagEta"] = array('f', [0])
-
-        for v in self.var:
-            self.tree.Branch(v, self.var[v], v+"/F")
-
         self.todoShifts = ["_central"]
         if hasattr(self, "jetUncFile") and not self.isData and self.doPtShifts:
             self.todoShifts.append("_ptUp")
             self.todoShifts.append("_ptDown")
             self.jetUnc = JetCorrectionUncertainty(self.jetUncFile)
 
-        
-        
+        for t in self.todoShifts:
+            self.var["tagPt"+t] = array('f', [0])
+            self.var["tagEta"+t] = array('f', [0])
+            self.var["probePt"+t] = array('f', [0])
+            self.var["probeEta"+t] = array('f', [0])
+            self.var["ptAve"+t] = array('f', [0])
 
+        self.var["weight"] = array('f', [0])
+        
+        for v in self.var:
+            self.tree.Branch(v, self.var[v], v+"/F")
+        
         jet15FileV2 = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/PUJet15V2.root").fullPath()   # MC gen distribution
         puFiles = {}
         puFiles["dj15_1"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_dj15_1_0.root").fullPath()
@@ -82,45 +83,72 @@ class DiJetBalanceTreeProducer(ExampleProofReader):
         return pt 
 
 
-
-    #def analyzeTT(self):
     def analyze(self):
+        if self.fChain.ngoodVTX == 0: return
+        if self.isData:
+            if self.fChain.jet15 < 0.5:
+                return 1
             
-        #if self.fChain.jet15 > 0.5:
-        #    print "XXX", self.fChain.run, self.fChain.lumi
-        #    sys.stdout.flush()
-        #print "testXX", self.datasetName, self.isData
-        #sys.stdout.flush()
-        #event = self.fChain.event
-        #run = self.fChain.run
-        #lumi = self.fChain.lumi
-        #print event
+        for v in self.var:
+            self.var[v][0] = 0
+    
 
         #print "XXDS", self.datasetName, self.isData
-        if self.fChain.ngoodVTX == 0: return
 
         recoJets = getattr(self.fChain, self.recoJetCollection)
 
+
+        fill = False
         for shift in self.todoShifts:
-            weightBase = 1. 
+            weight = 1. 
             if not self.isData:
-                weightBase *= self.fChain.genWeight # keep inside shift iter
+                weight *= self.fChain.genWeight # keep inside shift iter
+                truePU = self.fChain.puTrueNumInteractions
+                puWeight =  self.lumiWeighters["_jet15_central"].weight(truePU)
+                weight *= puWeight
+
+            self.var["weight"][0] = weight
 
 
-            fill = False
+            tagI = None
+            probeI = None
+
             for i in xrange(0, recoJets.size()):
                 jet = recoJets.at(i)
                 pt = self.ptShifted(jet, shift)
-                if pt < 30: continue
+                if pt < 35: continue
                 eta = abs(jet.eta())
+                if eta > 4.7: continue
                 if eta < 1.4:
-                    self.var["tagPt"][0] = pt
-                    self.var["tagEta"][0] = eta
+                    tagI = i
+                else:
+                    probeI = i
+
+            if tagI != None and probeI != None:
+                # check veto:
+                badEvent = False
+                ptAve = (recoJets.at(probeI).pt() + recoJets.at(tagI).pt())/2
+                for i in xrange(0, recoJets.size()):
+                    if i == tagI or probeI == i: continue
+                    eta = abs(jet.eta())
+                    if eta > 4.7: continue
+                    veto =  recoJets.at(i).pt()/ptAve
+                    if veto > 0.2:
+                        badEvent = True
+                        break
+                if not badEvent:
+                    self.var["tagPt"+shift][0] =  recoJets.at(tagI).pt()
+                    self.var["tagEta"+shift][0] =  abs(recoJets.at(tagI).eta())
+                    self.var["probePt"+shift][0] = recoJets.at(probeI).pt()
+                    self.var["probeEta"+shift][0] = abs(recoJets.at(probeI).eta())
+                    self.var["ptAve"+shift][0] = ptAve
                     fill = True
-                
-            if fill:
-                print "Filll!"
-                self.tree.Fill()
+
+   
+        # at least one variation ok.
+        if fill:
+            #print "Filll!"
+            self.tree.Fill()
 
         return 1
 
@@ -135,14 +163,14 @@ if __name__ == "__main__":
     nWorkers = None # Use all
 
     # debug config:
-    sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
+    #sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
     #sampleList=  ["JetMETTau-Run2010A-Apr21ReReco-v1"]
     #sampleList=  ["Jet-Run2010B-Apr21ReReco-v1"] 
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
     #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
     #maxFiles = 2
-    maxFiles = 1
-    nWorkers = 1
+    #maxFiles = 1
+    #nWorkers = 1
 
 
     slaveParams = {}
