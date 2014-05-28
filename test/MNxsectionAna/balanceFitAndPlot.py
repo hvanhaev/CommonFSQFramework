@@ -61,10 +61,14 @@ def main():
 
     sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
 
-    infile = "~/plotsMNxs.root"
+    infile = "treeDiJetBalance.root"
 
     f = ROOT.TFile(infile, "r")
     lst = f.GetListOfKeys()
+
+    MCTrees = []
+    dataTrees = []
+    samplesData = ["Jet-Run2010B-Apr21ReReco-v1", "JetMETTau-Run2010A-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1"]
 
     for l in lst:
         #print "Going through", l.GetName(), l.ClassName()
@@ -81,12 +85,26 @@ def main():
         sampleName = l.GetName()
         if sampleName not in sampleList:
             raise Exception("Thats confusing...")
-
         tree = currentDir.Get("data")
-        print type(tree)
+        isData = sampleList[sampleName]["isData"]
+        if isData:
+            if sampleName in samplesData:
+                dataTrees.append(tree)
+        else:
+            MCTrees.append(tree)
+
+        print sampleName, tree.GetEntries()
 
         #print d
 
+    tlist = ROOT.TList()
+    for t in dataTrees:
+        tlist.Add(t)
+
+    dummyFile = ROOT.TFile("/tmp/dummy.root", "recreate")
+    mergedDataTree= ROOT.TTree.MergeTrees(tlist)
+    
+    print "data tree after merge: ", mergedDataTree.GetEntries()
 
 
                 
