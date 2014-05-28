@@ -89,9 +89,12 @@ sam["METFwd-Run2010B-Apr21ReReco-v1"]["isData"]=True
 sam["METFwd-Run2010B-Apr21ReReco-v1"]["weightJet15Inverse"]='RooFormulaVar("weight","weight", "invtrgWeightJet15RawTF2", RooArgList(v["invtrgWeightJet15RawTF2"]["RooVar"]))'
 sam["METFwd-Run2010B-Apr21ReReco-v1"]["numEvents"]=-1
 sam["METFwd-Run2010B-Apr21ReReco-v1"]["lumiJet15"]='crashMe'
+sam["METFwd-Run2010B-Apr21ReReco-v1"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/METFwd/DiJet_20140527_MN2010_METFwd-Run2010B-Apr21ReReco-v1/c0561d0f43f52ca8d573416a777eea80//'
 sam["METFwd-Run2010B-Apr21ReReco-v1"]["json"]='MNTriggerStudies/MNTriggerAna/lumi/Cert_136033-149442_7TeV_Apr21ReReco_Collisions10_JSON_v2.txt'
 sam["METFwd-Run2010B-Apr21ReReco-v1"]["lumiDiJet15FB"]=2.2403189999999999
 sam["METFwd-Run2010B-Apr21ReReco-v1"]["XS"]=-1
+sam["METFwd-Run2010B-Apr21ReReco-v1"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/METFwd/DiJet_20140527_MN2010_METFwd-Run2010B-Apr21ReReco-v1/c0561d0f43f52ca8d573416a777eea80//'
+sam["METFwd-Run2010B-Apr21ReReco-v1"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/METFwd/DiJet_20140527_MN2010_METFwd-Run2010B-Apr21ReReco-v1/c0561d0f43f52ca8d573416a777eea80/'
 sam["METFwd-Run2010B-Apr21ReReco-v1"]["DS"]='/METFwd/Run2010B-Apr21ReReco-v1/AOD'
 
 sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]={}
