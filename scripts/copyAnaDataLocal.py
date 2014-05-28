@@ -58,8 +58,14 @@ if __name__ == "__main__":
                 print "File not known: ", f # shouldnt happen
                 continue
 
+
             if os.path.isfile(trg): 
-                continue
+                s1 = os.path.getsize(src)
+                s2 = os.path.getsize(trg)
+                if s1 != s2:
+                    print "File size dont match. Will overwrite", trg
+                else:
+                    continue
             dirname = os.path.dirname(trg)
             os.system("mkdir -p "+  dirname)
             #print src, trg

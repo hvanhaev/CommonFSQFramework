@@ -47,7 +47,7 @@ import MNTriggerStudies.MNTriggerAna.Util
 #
 ###############################################################################
 
-import sys, os, time
+import sys, os, time, traceback
 sys.path.append(os.path.dirname(__file__))
 
 import ROOT
@@ -115,8 +115,15 @@ class ExampleProofReader( TPySelector ):
 
     def SlaveBegin( self, tree ):
         #print 'py: slave beginning'
-        self.getVariables()
-        self.configureAnalyzer() 
+
+        try:
+            self.getVariables()
+            self.configureAnalyzer() 
+        except:
+            print "Exception catched during worker configuration. Traceback:"
+            traceback.print_exc(file=sys.stdout)
+            sys.stdout.flush()
+            raise Exception("Whooopps!")
 
 
     # this method will be overridden in derived class
@@ -134,8 +141,16 @@ class ExampleProofReader( TPySelector ):
         if self.fChain.GetEntry( entry ) <= 0:
            return 0
 
-        self.analyze()
+        try:
+            self.analyze()
+        except:
+            print "Exception catched from analyze function. Traceback:"
+            traceback.print_exc(file=sys.stdout)
+            sys.stdout.flush()
+            raise Exception("Whooopps!")
         return 1
+
+
 
     # this method will be overridden in derived class
     def analyze(self):
