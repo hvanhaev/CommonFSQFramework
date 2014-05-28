@@ -10,8 +10,8 @@ from ROOT import *
 from array import *
 
 
-# please note that python selector class name (here: DiJetBalanceTreeProducer) 
-# should be consistent with this file name (DiJetBalanceTreeProducer.py)
+# please note that python selector class name (here: BalanceTreeProducer) 
+# should be consistent with this file name (BalanceTreeProducer.py)
 
 # you have to run this file from directory where it is saved
 
@@ -19,7 +19,7 @@ from array import *
 from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader
 
 
-class DiJetBalanceTreeProducer(ExampleProofReader):
+class BalanceTreeProducer(ExampleProofReader):
     def configureAnalyzer( self):
 
         self.tree = ROOT.TTree("data", "data")
@@ -189,7 +189,7 @@ if __name__ == "__main__":
     slaveParams["jetUncFile"] =  edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"+jetUncFile).fullPath()
 
 
-    DiJetBalanceTreeProducer.runAll(treeName="mnXS",
+    BalanceTreeProducer.runAll(treeName="mnXS",
                                slaveParameters=slaveParams,
                                sampleList=sampleList,
                                maxFiles = maxFiles,
