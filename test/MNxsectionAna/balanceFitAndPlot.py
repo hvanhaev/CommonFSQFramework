@@ -66,8 +66,11 @@ def main():
     f = ROOT.TFile(infile, "r")
     lst = f.GetListOfKeys()
 
-    MCTrees = []
-    dataTrees = []
+
+    trees = {}
+    trees["MC"] = []
+    trees["data"] = []
+
     samplesData = ["Jet-Run2010B-Apr21ReReco-v1", "JetMETTau-Run2010A-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1"]
 
     for l in lst:
@@ -89,22 +92,57 @@ def main():
         isData = sampleList[sampleName]["isData"]
         if isData:
             if sampleName in samplesData:
-                dataTrees.append(tree)
+                trees["data"].append(tree)
         else:
-            MCTrees.append(tree)
+            trees["MC"].append(tree)
 
         print sampleName, tree.GetEntries()
 
         #print d
 
-    tlist = ROOT.TList()
-    for t in dataTrees:
-        tlist.Add(t)
-
     dummyFile = ROOT.TFile("/tmp/dummy.root", "recreate")
-    mergedDataTree= ROOT.TTree.MergeTrees(tlist)
-    
-    print "data tree after merge: ", mergedDataTree.GetEntries()
+    for t in trees:
+        tlist = ROOT.TList()
+        if len(trees[t]) == 1 and False:
+            trees[t] = trees[t][0]
+        else:
+            for tree in trees[t]:
+                tlist.Add(tree)
+            trees[t] =  ROOT.TTree.MergeTrees(tlist)
+            print "data tree after merge: ", trees[t].GetEntries()
+
+
+    vars = [] # note: we whave to save the variables outside the loop, otherwise they get
+              #       garbage collected by python leading to a crash
+    for t in trees:
+        print "RooDataset:",t
+        tree = trees[t]
+        observables = ROOT.RooArgSet()
+        print "  min/max"
+        for b in tree.GetListOfBranches():
+            name =  b.GetName()
+            rmin = tree.GetMinimum(name)
+            rmax = tree.GetMaximum(name)
+            rmin = rmin-abs(rmin/100.)
+            rmax = rmax+abs(rmin/100.)
+            #print name, rmin, rmax
+            roovar = ROOT.RooRealVar( name, name, rmin, rmax, "")
+            vars.append(roovar)
+            print "Creating variable", name, type(roovar)
+            sys.stdout.flush()
+            observables.add(roovar)
+        #importCMD = RooFit.Import(tree)
+        #cutCMD = RooFit.Cut(preselectionString)
+        print "  create dataset..."
+        ds = ROOT.RooDataSet(t, t, tree, observables, "", "weight")
+        print "        ...done"
+
+        print "Dataset:", t, ds.numEntries()
+
+
+    #todo = {}
+    #todo["MC"] = 
+    #                 branches =  current.GetListOfBranches()
 
 
                 
