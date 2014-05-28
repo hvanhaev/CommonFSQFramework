@@ -86,6 +86,7 @@ class MNxsAnalyzer(ExampleProofReader):
         self.jetUnc.setJetEta(jet.eta())
         self.jetUnc.setJetPt(pt) # corrected pt
         unc = self.jetUnc.getUncertainty(true)
+        #print "XXX", unc
         if "_ptUp" == shift:
             ptFactor = 1.
         elif "_ptDown" == shift:
@@ -109,7 +110,7 @@ class MNxsAnalyzer(ExampleProofReader):
         dname = "/scratch/scratch0/tfruboes/2014.05.NewFWAnd4_2/CMSSW_4_2_8_patch7/src/MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/stats/"
         profName = dname + "stats"
         self.pr.dump_stats(profName)
-    '''
+   # '''
         
 
 
@@ -130,6 +131,8 @@ class MNxsAnalyzer(ExampleProofReader):
         if self.fChain.ngoodVTX == 0: return
 
         recoJets = getattr(self.fChain, self.recoJetCollection)
+        recoJetsNoSmear = getattr(self.fChain, self.recoJetCollection.replace("Smear",""))
+        jetID = getattr(self.fChain, self.jetID)
 
         for shift in self.todoShifts:
             weightBase = 1. 
@@ -142,14 +145,18 @@ class MNxsAnalyzer(ExampleProofReader):
             mostFwdJetEta = None
             mostBkgJetEta = None
             for i in xrange(0, recoJets.size()):
+                if jetID.at(i) < 0.5: continue
                 jet = recoJets.at(i)
+                eta =  jet.eta()
+                eta2 = recoJetsNoSmear.at(i).eta()
+                if eta*eta2 < 0:
+                    print "XXX Whoa!", eta, eta2
+                    continue
 
-
-
-                if self.ptShifted(jet, shift) < self.threshold: continue
-                eta = jet.eta()
                 if abs(eta) > 4.7: continue
                 #if abs(eta) > 3: continue
+                if self.ptShifted(jet, shift) < self.threshold: continue
+
                 if  mostFwdJet == None or mostFwdJetEta < eta:
                     mostFwdJet = i
                     mostFwdJetEta = eta
@@ -262,6 +269,8 @@ if __name__ == "__main__":
     slaveParams["doPtShifts"] = True
     #slaveParams["recoJetCollection"] = "pfJets"
     slaveParams["recoJetCollection"] = "pfJetsSmear"
+    slaveParams["jetID"] = "pfJets_jetID"
+
     #slaveParams["recoJetCollection"] = "caloJets"
     #slaveParams["recoJetCollection"] = "caloJetsSmear"
 
