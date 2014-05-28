@@ -194,7 +194,7 @@ if __name__ == "__main__":
                                sampleList=sampleList,
                                maxFiles = maxFiles,
                                nWorkers=nWorkers,
-                               outFile = "~/treeDiJetBalance.root" )
+                               outFile = "treeDiJetBalance.root" )
 
 
 
