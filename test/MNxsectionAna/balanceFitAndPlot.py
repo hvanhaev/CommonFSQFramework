@@ -242,8 +242,10 @@ def main():
             outputHistos.setdefault(t, {})
             etaArray = array('d', etaRanges)
             histName = "balance_"+v
-            hist = ROOT.TH1F(histName, histName, len(etaArray), etaArray)
-            for i in xrange(results):
+            print etaRanges
+            print etaArray
+            hist = ROOT.TH1F(histName, histName, len(etaArray)-1, etaArray)
+            for i in xrange(len(results)):
                 res = results[i]
                 iEta = res["iEta"]
                 etaMin = etaRanges[iEta-1]
@@ -251,7 +253,9 @@ def main():
                 etaAvg = (etaMin+etaMax)/2.
                 bin = hist.FindBin(etaAvg)
                 if bin != iEta:
+                    print bin, iEta, etaAvg
                     raise Exception("Problem with binning")
+                
 
 
         # all variations done
