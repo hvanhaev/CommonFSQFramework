@@ -9,7 +9,8 @@ import os,re,sys,math
 import MNTriggerStudies.MNTriggerAna.Util
 
 from array import array
-
+import resource
+import time
 
 
 def getUncertaintyBand(histos, hCentral):
@@ -92,8 +93,11 @@ def main():
         isData = sampleList[sampleName]["isData"]
         if isData:
             if sampleName in samplesData:
+                #tree.SetDirectory(0)
                 trees["data"].append(tree)
+                
         else:
+            #tree.SetDirectory(0)
             trees["MC"].append(tree)
 
         print sampleName, tree.GetEntries()
@@ -114,6 +118,10 @@ def main():
 
     vars = [] # note: we whave to save the variables outside the loop, otherwise they get
               #       garbage collected by python leading to a crash
+
+    ds = {}
+
+    variations = set()
     for t in trees:
         print "RooDataset:",t
         tree = trees[t]
@@ -121,6 +129,10 @@ def main():
         print "  min/max"
         for b in tree.GetListOfBranches():
             name =  b.GetName()
+            if name != "weight":
+                variation = name.split("_")[-1]
+                variations.add(variation)
+
             rmin = tree.GetMinimum(name)
             rmax = tree.GetMaximum(name)
             rmin = rmin-abs(rmin/100.)
@@ -134,12 +146,52 @@ def main():
         #importCMD = RooFit.Import(tree)
         #cutCMD = RooFit.Cut(preselectionString)
         print "  create dataset..."
-        ds = ROOT.RooDataSet(t, t, tree, observables, "", "weight")
+        ds[t] = ROOT.RooDataSet(t, t, tree, observables, "", "weight")
         print "        ...done"
 
-        print "Dataset:", t, ds.numEntries()
+        print "Dataset:", t, ds[t].numEntries()
+
+    if "central" not in variations:
+        raise Exception("Central value not found!")
 
 
+    etaRanges = []
+    etaRanges.extend([1.401, 1.701, 2.001, 2.322, 2.411, 2.601, 2.801, 3.001, 3.201, 3.501, 3.801, 4.101, 4.701])
+    minPtAVG = 45
+    for t in ds:
+        for v in variations:
+            if t=="data" and v != "central":
+                continue
+            for iEta in xrange(1, len(etaRanges)):
+                etaMin = etaRanges[iEta-1]
+                etaMax = etaRanges[iEta]
+                print "Doing", t, v, etaMin, etaMax
+
+                def vary(x, v=v):
+                    return x + "_" + v
+
+                cut = vary("tagPt") + " > 1"
+                cut += " && " + vary("probePt") + " > 35 "
+                cut += " && abs(" + vary("probeEta") + ") >  " + str(etaMin)
+                cut += " && abs(" + vary("probeEta") + ") <  " + str(etaMax)
+                cut += " && " + vary("ptAve") + " > " + str(minPtAVG)
+                print cut
+
+                dsReduced = ds[t].reduce(cut)
+                #mean2 = RooRealVar("mean","mean of gaussian", 0, -1.5, 1.5)
+                #sigma2 = RooRealVar("sigma","width of gaussian", .1, 0, 1)
+                #gauss2 = RooGaussian("gauss","gaussian PDF",myVar, mean2, sigma2)
+                #gauss2.fitTo(dsReduced, RooFit.Range(rangeLow, rangeHigh), RooFit.PrintLevel(-1)) # this exludes -1 point ("no jet matched point")
+
+
+
+
+
+
+
+    #print "Sleep"
+    #time.sleep(60)
+    #print "Meminfo:", resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     #todo = {}
     #todo["MC"] = 
     #                 branches =  current.GetListOfBranches()
