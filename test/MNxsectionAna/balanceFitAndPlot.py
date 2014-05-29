@@ -160,10 +160,15 @@ def main():
     etaRanges.extend([1.401, 1.701, 2.001, 2.322, 2.411, 2.601, 2.801, 3.001, 3.201, 3.501, 3.801, 4.101, 4.701])
     minPtAVG = 45
     canvas = ROOT.TCanvas()
+    outputHistos = {}
+
     for t in ds:
         for v in variations:
             if t=="data" and v != "central":
                 continue
+
+
+            results = []
             for iEta in xrange(1, len(etaRanges)):
                 etaMin = etaRanges[iEta-1]
                 etaMax = etaRanges[iEta]
@@ -224,6 +229,32 @@ def main():
                 fname = preName + ".png"
                 canvas.Print(fname)
 
+                fitResult = {}
+                fitResult["iEta"] = iEta
+                fitResult["mean"]      = mean2.getVal()
+                fitResult["meanErr"] = mean2.getError()
+                fitResult["gaussWidth"] = sigma2.getVal()
+                fitResult["gaussWidthErr"] = sigma2.getError()
+                results.append(fitResult)
+
+
+            # all etas done. Create summary (vs eta) histogram
+            outputHistos.setdefault(t, {})
+            etaArray = array('d', etaRanges)
+            histName = "balance_"+v
+            hist = ROOT.TH1F(histName, histName, len(etaArray), etaArray)
+            for i in xrange(results):
+                res = results[i]
+                iEta = res["iEta"]
+                etaMin = etaRanges[iEta-1]
+                etaMax = etaRanges[iEta]
+                etaAvg = (etaMin+etaMax)/2.
+                bin = hist.FindBin(etaAvg)
+                if bin != iEta:
+                    raise Exception("Problem with binning")
+
+
+        # all variations done
 
 
 
