@@ -160,7 +160,15 @@ def main():
     etaRanges.extend([1.401, 1.701, 2.001, 2.322, 2.411, 2.601, 2.801, 3.001, 3.201, 3.501, 3.801, 4.101, 4.701])
     minPtAVG = 45
     canvas = ROOT.TCanvas()
+
+
+    curPath = ROOT.gDirectory.GetPath()
+    of = ROOT.TFile("~/tmp/balanceHistos.root","RECREATE")
     outputHistos = {}
+    outputHistos["data"] = of.mkdir("data")
+    outputHistos["MC"] = of.mkdir("MC")
+    ROOT.gDirectory.cd(curPath)
+
 
     for t in ds:
         for v in variations:
@@ -184,7 +192,10 @@ def main():
                 cut += " && " + vary("ptAve") + " > " + str(minPtAVG)
                 print cut
 
+                print "Reduce"
                 dsReduced = ds[t].reduce(cut)
+                print "Reduce...done"
+
                 myVar = vars[t][vary("balance")]
                 meanVal = dsReduced.mean(myVar)
                 sigma   = dsReduced.sigma(myVar)
@@ -239,11 +250,10 @@ def main():
 
 
             # all etas done. Create summary (vs eta) histogram
-            outputHistos.setdefault(t, {})
             etaArray = array('d', etaRanges)
             histName = "balance_"+v
-            print etaRanges
-            print etaArray
+            #print etaRanges
+            #print etaArray
             hist = ROOT.TH1F(histName, histName, len(etaArray)-1, etaArray)
             for i in xrange(len(results)):
                 res = results[i]
@@ -255,7 +265,9 @@ def main():
                 if bin != iEta:
                     print bin, iEta, etaAvg
                     raise Exception("Problem with binning")
-                
+                hist.SetBinContent(bin, res["mean"])
+                hist.SetBinError(bin, res["meanErr"])
+            outputHistos[t].WriteTObject(hist,histName)
 
 
         # all variations done
