@@ -33,16 +33,17 @@ class BalanceTreeProducer(ExampleProofReader):
             self.jetUnc = JetCorrectionUncertainty(self.jetUncFile)
 
         for t in self.todoShifts:
-            self.var["tagPt"+t] = array('f', [0])
-            self.var["tagEta"+t] = array('f', [0])
-            self.var["probePt"+t] = array('f', [0])
-            self.var["probeEta"+t] = array('f', [0])
-            self.var["ptAve"+t] = array('f', [0])
+            self.var["tagPt"+t] = array('d', [0])
+            self.var["tagEta"+t] = array('d', [0])
+            self.var["probePt"+t] = array('d', [0])
+            self.var["probeEta"+t] = array('d', [0])
+            self.var["ptAve"+t] = array('d', [0])
+            self.var["balance"+t] = array('d', [0])
 
-        self.var["weight"] = array('f', [0])
+        self.var["weight"] = array('d', [0])
         
         for v in self.var:
-            self.tree.Branch(v, self.var[v], v+"/F")
+            self.tree.Branch(v, self.var[v], v+"/D")
         
         jet15FileV2 = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/PUJet15V2.root").fullPath()   # MC gen distribution
         puFiles = {}
@@ -142,6 +143,7 @@ class BalanceTreeProducer(ExampleProofReader):
                     self.var["probePt"+shift][0] = recoJets.at(probeI).pt()
                     self.var["probeEta"+shift][0] = abs(recoJets.at(probeI).eta())
                     self.var["ptAve"+shift][0] = ptAve
+                    self.var["balance"+shift][0] = (recoJets.at(probeI).pt()-recoJets.at(tagI).pt())/ptAve
                     fill = True
 
    
