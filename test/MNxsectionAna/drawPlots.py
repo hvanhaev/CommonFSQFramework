@@ -11,6 +11,7 @@ import MNTriggerStudies.MNTriggerAna.Util
 from array import array
 
 
+from optparse import OptionParser
 
 def getUncertaintyBand(histos, hCentral):
     if len(histos) == 0:
@@ -119,13 +120,35 @@ def getTarget(histoName, sampleName):
 
     return retName
 
+def applyScale(histoName, sampleName):
+    if histoName.startswith("balance"): return False
+    return True
+
+
+
 
 
 def main():
 
     sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
+    parser = OptionParser(usage="usage: %prog [options] filename",
+                            version="%prog 1.0")
 
-    infile = "~/plotsMNxs.root"
+    parser.add_option("-i", "--infilee", action="store", type="string",  dest="infile" )
+    parser.add_option("-o", "--outfile", action="store", type="string", dest="outfile")
+    parser.add_option("-s", "--skipFinalMap", action="store_true", dest="skipFinalMap")
+    (options, args) = parser.parse_args()
+
+
+    if options.infile:
+        infile = options.infile
+    else:
+        infile = "~/plotsMNxs.root"
+
+    if options.outfile:
+        outfile = options.outfile
+    else:
+        outfile = "~/plotsMNxs_norm.root"
 
     f = ROOT.TFile(infile, "r")
     lst = f.GetListOfKeys()
@@ -133,76 +156,109 @@ def main():
     finalMap = {}
     targetsToSamples = {}
 
+    # options.skipFinalMap - input root file has following structure:
+    #    TFile
+    #      MC_XXX  ;TDirectory
+    #       ptLead_central_XXX ; TH1
+    #       ptLead_var1up_XXX ; TH1
+    #       (...)
+    #      data_XXX  ;TDirectory
+    #       ptLead_central_XXX ; TH1
+    #
+    #  othwerwise:
+    #    TFile
+    #      QCD_15to3000....  ;TDirectory 
+    #       ptLead_central_XXX ; TH1
+        
 
-
-
-    samplesSeen = []
-    for l in lst:
-        #print "Going through", l.GetName(), l.ClassName()
-        currentDir = l.ReadObj()
-
-        if not currentDir:
-            print "Problem reading", l.GetName(), " - skipping"
-            continue
-
-        if type(currentDir) != ROOT.TDirectoryFile:
-            print "Expected TDirectoryFile,", type(currentDir), "found"
-            continue
-
-        sampleName = l.GetName()
-        if sampleName not in sampleList:
-            raise Exception("Thats confusing...")
-
-        isData = sampleList[sampleName]["isData"]
-
-        samplesSeen.append(currentDir)
-        dirContents = currentDir.GetListOfKeys()
-        for c in dirContents:
-            if "PROOF_" in c.GetName(): continue
-            if "norm" == c.GetName(): continue # not needed since we expect to get normalized histos
-            curObj = c.ReadObj()
-            if not curObj.InheritsFrom("TH1"):
-                print "Dont know how to merge", curObj.GetName(), curObj.ClassName()
+    if options.skipFinalMap:
+        for l in lst:
+            currentDir = l.ReadObj()
+            if not currentDir:
+                print "Problem reading", l.GetName(), " - skipping"
                 continue
-            if "isNormalized"  == c.GetName(): # check HIST normalization for MC
-                if not isData:
-                    val = curObj.GetBinContent(1)
-                    if val < 0.5:
-                        errMsg = "Expected to find normalized histograms in dir " + l.GetName()
-                        raise Exception(errMsg)
+            if type(currentDir) != ROOT.TDirectoryFile:
+                print "Expected TDirectoryFile,", type(currentDir), "found"
                 continue
 
+            target =  l.GetName()#.replace("_j15", "_jet15")
+            dirContents = currentDir.GetListOfKeys()
+            for c in dirContents:
+                curObj = c.ReadObj()
+                curObjClone = curObj.Clone()
+                curObjClone.SetDirectory(0)
+                finalMap.setdefault(target, {})
+                targetsToSamples.setdefault(target, set()) # keep empty
+                if curObjClone.GetName() in finalMap[target]:
+                    finalMap[target][curObjClone.GetName()].Add(curObjClone)
+                else:
+                    finalMap[target][curObjClone.GetName()] = curObjClone
+    else:
+        for l in lst:
+            #print "Going through", l.GetName(), l.ClassName()
+            currentDir = l.ReadObj()
 
-
-            curObjClone = curObj.Clone()
-            curObjClone.SetDirectory(0)
-
-            target = getTarget(curObjClone.GetName(), sampleName)
-            if target == None:
-                print "Skipping histo ", curObjClone.GetName(), "from sample", sampleName
+            if not currentDir:
+                print "Problem reading", l.GetName(), " - skipping"
                 continue
 
+            if type(currentDir) != ROOT.TDirectoryFile:
+                print "Expected TDirectoryFile,", type(currentDir), "found"
+                continue
 
-            # save histogram in a map for future
-            finalMap.setdefault(target, {})
-            targetsToSamples.setdefault(target, set()).add(sampleName)
-            if curObjClone.GetName() in finalMap[target]:
-                finalMap[target][curObjClone.GetName()].Add(curObjClone)
-            else:
-                finalMap[target][curObjClone.GetName()] = curObjClone
+            sampleName = l.GetName()
+            if sampleName not in sampleList:
+                raise Exception("Thats confusing...")
 
-    #for histName in finalMap["data"]
-    oName = "~/plotsMNxs_norm.root"
-    fOut = ROOT.TFile(oName, "RECREATE")
+            isData = sampleList[sampleName]["isData"]
+
+            dirContents = currentDir.GetListOfKeys()
+            for c in dirContents:
+                if "PROOF_" in c.GetName(): continue
+                if "norm" == c.GetName(): continue # not needed since we expect to get normalized histos
+                curObj = c.ReadObj()
+                if not curObj.InheritsFrom("TH1"):
+                    print "Dont know how to merge", curObj.GetName(), curObj.ClassName()
+                    continue
+                if "isNormalized"  == c.GetName(): # check HIST normalization for MC
+                    if not isData:
+                        val = curObj.GetBinContent(1)
+                        if val < 0.5:
+                            errMsg = "Expected to find normalized histograms in dir " + l.GetName()
+                            raise Exception(errMsg)
+                    continue
+
+
+
+                curObjClone = curObj.Clone()
+                curObjClone.SetDirectory(0)
+
+                target = getTarget(curObjClone.GetName(), sampleName)
+                if target == None:
+                    print "Skipping histo ", curObjClone.GetName(), "from sample", sampleName
+                    continue
+
+
+                # save histogram in a map for future
+                finalMap.setdefault(target, {})
+                targetsToSamples.setdefault(target, set()).add(sampleName)
+                if curObjClone.GetName() in finalMap[target]:
+                    finalMap[target][curObjClone.GetName()].Add(curObjClone)
+                else:
+                    finalMap[target][curObjClone.GetName()] = curObjClone
+
+    # final map done
+
+    fOut = ROOT.TFile(outfile, "RECREATE")
 
     # write all histograms to root file.
     # for data histograms - divide by lumi
     for target in finalMap: # data/MC
         for histoName in finalMap[target]:
+            if not applyScale(histoName, targetsToSamples[target]): continue
             if "data_" in target: # divide by lumi
                 lumi = getLumi(target, targetsToSamples[target]) # TODO
                 scale = 1./lumi
-                #print "Scaling:", target, lumi, histoName
                 finalMap[target][histoName].Scale(scale)
             finalMap[target][histoName].Write(target+"_"+histoName)
 
@@ -255,6 +311,8 @@ def main():
                 centralName = h+"_central_" +t
 
                 maxima = []
+
+                print targetData, centralName, finalMap.keys(), finalMap[targetData].keys()
                 hData =  finalMap[targetData][centralName]
                 maxima.append(hData.GetMaximum())
 
@@ -306,11 +364,6 @@ def main():
 
                 c1.Print("~/tmp/"+ targetCat + "_" + centralName+".png")
 
-
-
-            
-        
-        
 
         #print d
 
