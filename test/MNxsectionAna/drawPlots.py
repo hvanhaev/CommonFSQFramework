@@ -54,6 +54,70 @@ def getUncertaintyBand(histos, hCentral):
 
     return ret
 
+def getLumi(target, samples):
+    if "data_" not in target:
+        raise Exception("getLumi called for "+ target )
+
+    spl = target.split("_")
+    if len(spl) < 1:
+        raise Exception("Cannot extract trigger name from " + target)
+
+    trg = spl[-1]
+    triggersToSamples = {} # TODO make accessible from self
+    triggersToSamples["jet15"] = ["Jet-Run2010B-Apr21ReReco-v1", "JetMETTau-Run2010A-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1"]
+    triggersToSamples["dj15fb"] = ["METFwd-Run2010B-Apr21ReReco-v1", "JetMETTau-Run2010A-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1"]
+
+    if trg not in triggersToSamples.keys():
+        raise Exception("Dont know how to get lumi for "+ trg + ". Known triggers are " + " ".join(triggersToSamples.keys()))
+
+    triggerToKey = {}
+    triggerToKey["jet15"] = "lumiJet15"
+    triggerToKey["dj15fb"] = "lumiDiJet15FB"
+
+    sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
+    #print "-----"
+    lumi = 0.
+    for s in samples:
+        #print s
+        if s in triggersToSamples[trg]:
+            lumiKeyName = triggerToKey[trg]
+            lumi += sampleList[s][lumiKeyName]
+            #print " lumi->",lumi
+
+    return lumi
+
+
+
+def getTarget(histoName, sampleName):
+    ''' target naming convention:
+            - name should consist of two parts separated by underscore
+
+            - part after underscore should contain your trigger label
+            -- e.g. dj15fb (which for 2010 MN XS analysis coresponds to
+               HLT_DoubleJet15_ForwardBackward and HLT_DoubleJet15_ForwardBackward_v3)
+
+            - part before underscore should start with string "data" or "MC"
+            -- to distinguish different MC use descriptive names eg MCqcd or MCdymumu
+    '''
+    sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
+
+    trgSplt = histoName.split("_")
+    if len(trgSplt) < 1:
+        raise "Cannot extract trigger name from" , histoName
+    triggerName =  trgSplt[-1]
+
+    isData = sampleList[sampleName]["isData"]
+    retName = None
+    if not isData:
+        retName = "MC_" + triggerName
+    else:
+        triggersToSamples = {} # TODO make accessible from self
+        triggersToSamples["jet15"] = ["Jet-Run2010B-Apr21ReReco-v1", "JetMETTau-Run2010A-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1"]
+        triggersToSamples["dj15fb"] = ["METFwd-Run2010B-Apr21ReReco-v1", "JetMETTau-Run2010A-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1"]
+        if sampleName in triggersToSamples[triggerName]:
+            retName = "data_" + triggerName
+
+    return retName
 
 
 
@@ -67,24 +131,12 @@ def main():
     lst = f.GetListOfKeys()
 
     finalMap = {}
-    finalMap["MC"] = {}
-    finalMap["data"] = {}
+    targetsToSamples = {}
 
-    lumiMap = {}
-    lumiMap["jet15"]   = 0.
-    lumiMap["dj15fb"]  = 0.
 
-    triggersToSamples = {}
-    #triggersToSamples["jet15"] = ["JetMETTau-Run2010A-Apr21ReReco-v1"]
-    #triggersToSamples["jet15"]=     [ "JetMET-Run2010A-Apr21ReReco-v1"]
-    triggersToSamples["jet15"] = ["Jet-Run2010B-Apr21ReReco-v1", "JetMETTau-Run2010A-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1"]
-    triggersToSamples["dj15fb"] = ["METFwd-Run2010B-Apr21ReReco-v1", "JetMETTau-Run2010A-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1"]
-    #  QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6
 
-    triggerToKey = {}
-    triggerToKey["jet15"] = "lumiJet15"
-    triggerToKey["dj15fb"] = "lumiDiJet15FB"
 
+    samplesSeen = []
     for l in lst:
         #print "Going through", l.GetName(), l.ClassName()
         currentDir = l.ReadObj()
@@ -103,129 +155,156 @@ def main():
 
         isData = sampleList[sampleName]["isData"]
 
-        print sampleName, isData
-        if isData:
-            for trg in triggersToSamples:
-                if sampleName in triggersToSamples[trg]:
-                    lumiKeyName = triggerToKey[trg]
-                    lumiMap[trg] += sampleList[sampleName][lumiKeyName]
-
-
+        samplesSeen.append(currentDir)
         dirContents = currentDir.GetListOfKeys()
         for c in dirContents:
             if "PROOF_" in c.GetName(): continue
             if "norm" == c.GetName(): continue # not needed since we expect to get normalized histos
-            if "isNormalized" == c.GetName(): continue # not needed since we expect to get normalized histos
-
-
             curObj = c.ReadObj()
             if not curObj.InheritsFrom("TH1"):
                 print "Dont know how to merge", curObj.GetName(), curObj.ClassName()
                 continue
-
-            if not isData:
-                if "isNormalized"  == c.GetName(): 
+            if "isNormalized"  == c.GetName(): # check HIST normalization for MC
+                if not isData:
                     val = curObj.GetBinContent(1)
                     if val < 0.5:
                         errMsg = "Expected to find normalized histograms in dir " + l.GetName()
                         raise Exception(errMsg)
-                    continue
+                continue
+
+
 
             curObjClone = curObj.Clone()
             curObjClone.SetDirectory(0)
 
-            addThisHistogram = True
-            if isData:
-                target = "data"
+            target = getTarget(curObjClone.GetName(), sampleName)
+            if target == None:
+                print "Skipping histo ", curObjClone.GetName(), "from sample", sampleName
+                continue
 
-                nameSplit = curObjClone.GetName().split("_")
-                if len(nameSplit)<2:
-                    raise Exception("Not able to extract trigger name :(")
-                triggerNameFromThisHisto = nameSplit[-1]
 
-                addThisHistogram = sampleName in triggersToSamples[triggerNameFromThisHisto]
-
-                if not addThisHistogram:
-                    print "Skipping sample", sampleName, "for histogram", curObjClone.GetName()
-
+            # save histogram in a map for future
+            finalMap.setdefault(target, {})
+            targetsToSamples.setdefault(target, set()).add(sampleName)
+            if curObjClone.GetName() in finalMap[target]:
+                finalMap[target][curObjClone.GetName()].Add(curObjClone)
             else:
-                target = "MC"
-
-            if addThisHistogram:
-                if curObjClone.GetName() in finalMap[target]:
-                    finalMap[target][curObjClone.GetName()].Add(curObjClone)
-                else:
-                    finalMap[target][curObjClone.GetName()] = curObjClone
+                finalMap[target][curObjClone.GetName()] = curObjClone
 
     #for histName in finalMap["data"]
     oName = "~/plotsMNxs_norm.root"
     fOut = ROOT.TFile(oName, "RECREATE")
 
-    print lumiMap
-
-    for histoType in finalMap: # data/MC
-        for histoName in finalMap[histoType]:
-            if histoType == "data": # divide by lumi
-                nameSplit = finalMap[histoType][histoName].GetName().split("_")
-                if len(nameSplit)<2:
-                    raise Exception("Not able to extract trigger name :(")
-                triggerNameFromThisHisto = nameSplit[-1]
-                lumi = lumiMap[triggerNameFromThisHisto]
+    # write all histograms to root file.
+    # for data histograms - divide by lumi
+    for target in finalMap: # data/MC
+        for histoName in finalMap[target]:
+            if "data_" in target: # divide by lumi
+                lumi = getLumi(target, targetsToSamples[target]) # TODO
                 scale = 1./lumi
-                finalMap[histoType][histoName].Scale(scale)
-            finalMap[histoType][histoName].Write(histoType+"_"+histoName)
+                #print "Scaling:", target, lumi, histoName
+                finalMap[target][histoName].Scale(scale)
+            finalMap[target][histoName].Write(target+"_"+histoName)
 
-    #for d in finalMap["data"]: 
+
+    # extract variations from MC
     variations = set()
     triggers = set()
     histos = set()
-    for d in finalMap["MC"]: 
-        spl = d.split("_")
-        if len(spl)!=3:
-            print "Skipping: ", d
 
-        trg = spl[2]
-        variation = spl[1]
-        histname = spl[0]
-        variations.add(variation)
-        triggers.add(trg)
-        histos.add(histname)
+    targetCategories = set() # part after the underscore
+
+    for target in finalMap: # data_XXX / MC_XXX
+        targetCategories.add(target.split("_")[-1])
+        if not target.startswith("MC"): continue
+        for d in finalMap[target]: # histo names 
+            spl = d.split("_")
+            if len(spl)!=3:
+                print "Skipping: ", d
+
+            trg = spl[2]
+            variation = spl[1]
+            histname = spl[0]
+            variations.add(variation)
+            triggers.add(trg)
+            histos.add(histname)
 
     c1 = ROOT.TCanvas()
-    for h in histos:
-        for t in triggers:
-            centralName = h+"_central_" +t
+    for targetCat in targetCategories:
 
-            maxima = []
-            hData =  finalMap["data"][centralName]
-            hMCCentral = finalMap["MC"][centralName]
-            maxima.append(hData.GetMaximum())
-            maxima.append(hMCCentral.GetMaximum())
+        targetData = None
+        targetsMC = []
+        for target in finalMap:
+            if not target.endswith(targetCat):
+                continue
 
-            uncHistos = []
-            for v in variations:
-                uncHistos.append(finalMap["MC"][h+"_"+v+"_"+t])
-                maxima.append(finalMap["MC"][h+"_"+v+"_"+t].GetMaximum())
-
-            unc = getUncertaintyBand(uncHistos, hMCCentral)
-            maxima.append(unc.GetMaximum())
-
-
-            maximum = max(maxima)*1.05
-            unc.SetMaximum(maximum)
-            hData.SetMaximum(maximum)
-            hMCCentral.SetMaximum(maximum)
-            hMCCentral.SetMarkerColor(4)
-            hMCCentral.SetMarkerSize(2)
-            hMCCentral.SetLineColor(4)
+            if target.startswith("data_"):
+                if targetData == None:
+                    targetData = target
+                    continue
+                else:
+                    raise Exception("targetData allready set to "+targetData+ " (other="+target+")" )
+            else:
+                targetsMC.append(target)
 
 
-            unc.SetFillColor(8);
-            hData.Draw()
-            unc.Draw("3SAME")
-            hMCCentral.Draw("SAME")
 
-            c1.Print("~/tmp/"+centralName+".png")
+        for h in histos:
+            #for t in triggers:
+                t = targetCat.split("_")[-1]
+                centralName = h+"_central_" +t
+
+                maxima = []
+                hData =  finalMap[targetData][centralName]
+                maxima.append(hData.GetMaximum())
+
+
+                MCStack = ROOT.THStack()
+                summedVariations = {}
+                summedCentral = None
+                for targetMC in targetsMC:
+                    MCStack.Add(finalMap[targetMC][centralName])
+
+                    # value needed for unc band calculation
+                    if summedCentral == None:
+                        summedCentral = finalMap[targetMC][centralName].Clone()
+                    else:
+                        summedCentral.Add(finalMap[targetMC][centralName])
+
+                    for v in variations:
+                        thisVariationThisTarget = finalMap[targetMC][h+"_"+v+"_"+t]
+                        if v in summedVariations:
+                            summedVariations[v].Add(thisVariationThisTarget)
+                        else:
+                            summedVariations[v] = thisVariationThisTarget
+
+                        #uncHistos.append(finalMap["MC"][h+"_"+v+"_"+t])
+                        #maxima.append(finalMap["MC"][h+"_"+v+"_"+t].GetMaximum())
+
+
+                uncHistos = []
+                for v in summedVariations:
+                    uncHistos.append(summedVariations[v])
+
+                unc = getUncertaintyBand(uncHistos, summedCentral)
+                maxima.append(unc.GetMaximum())
+                maxima.append(MCStack.GetMaximum())
+
+                maximum = max(maxima)*1.05
+                unc.SetMaximum(maximum)
+                hData.SetMaximum(maximum)
+                MCStack.SetMaximum(maximum)
+                #hMCCentral.SetMarkerColor(4)
+                #hMCCentral.SetMarkerSize(2)
+                #hMCCentral.SetLineColor(4)
+
+
+                unc.SetFillColor(8);
+                hData.Draw()
+                unc.Draw("3SAME")
+                MCStack.Draw("SAME")
+
+                c1.Print("~/tmp/"+ targetCat + "_" + centralName+".png")
 
 
 
