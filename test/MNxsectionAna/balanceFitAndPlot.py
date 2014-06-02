@@ -23,7 +23,9 @@ class FitThread(threading.Thread):
     def run(self):
         inputMap = self.inputMap
         canvas = ROOT.TCanvas()
-        dsReduced = inputMap["dsReduced"]
+        #dsReduced = inputMap["dsReduced"]
+
+        dsReduced =  inputMap["ds"].reduce(inputMap["cut"])
         myVar = inputMap["myVar"]
 
         #myVar = vars[t][vary("balance")]
@@ -224,18 +226,23 @@ def main():
                 cut += " && " + vary("ptAve") + " > " + str(minPtAVG)
                 print cut
 
-                print "Reduce"
-                dsReduced = ds[t].reduce(cut)
-                print "Reduce...done"
+                #print "Reduce"
+                #dsReduced = ds[t].reduce(cut)
+                #print "Reduce...done"
+            
+
                 inputMap = {}
                 inputMap["name"] = t
-                inputMap["dsReduced"] = dsReduced
+                #inputMap["dsReduced"] = dsReduced
+                #inputMap["ds"] =  ds[t].Clone()
+                inputMap["ds"] =  ds[t]
                 inputMap["myVar"] = vars[t][vary("balance")]
                 inputMap["ptProbeJetVar"] = vars[t][vary("probePt")]
                 inputMap["etaMin"] = etaMin
                 inputMap["etaMax"] = etaMax
                 inputMap["minPtAVG"] = minPtAVG
                 inputMap["iEta"] = iEta # xcheck only
+                inputMap["cut"] = cut
 
 
                 thr = FitThread(inputMap)
