@@ -15,50 +15,6 @@ import time
 import Queue
 import threading
 
-def getUncertaintyBand(histos, hCentral):
-    if len(histos) == 0:
-        raise Exception("Empty histogram list")
-    nbins = hCentral.GetNbinsX()
-    for h in histos:
-        if h.GetNbinsX() != nbins:
-            raise Exception("Different number of bins - "+ h.GetName())
-
-    x = array('d')
-    xZeros = array('d')
-
-    y =  array('d')
-    yUp = array('d')
-    yDown = array('d')
-    for i in xrange(1, nbins+1):
-        x.append(histos[0].GetBinCenter(i))
-
-        centralValue = hCentral.GetBinContent(i)
-        yUpLocal  = 0.
-        yDownLocal  = 0.
-        for h in histos:
-            valLocal = h.GetBinContent(i)
-            delta = centralValue - valLocal
-            if delta > 0:
-                yUpLocal += delta*delta
-            else:
-                yDownLocal += delta*delta
-
-
-        xZeros.append(0)
-
-        y.append(centralValue)
-        yUp.append(sqrt(yUpLocal))
-        yDown.append(sqrt(yDownLocal))
-
-
-    ret = ROOT.TGraphAsymmErrors(len(x), x, y, xZeros, xZeros, yDown, yUp)
-    ret.SetFillStyle(3001);
-    #    graphBand.Draw("3") 
-
-    return ret
-
-
-#def fit(ds, q):
 class FitThread(threading.Thread):
     def __init__(self, inputMap):
         super(FitThread, self).__init__()
@@ -73,8 +29,13 @@ class FitThread(threading.Thread):
         #myVar = vars[t][vary("balance")]
         meanVal = dsReduced.mean(myVar)
         sigma   = dsReduced.sigma(myVar)
-        rangeLow = meanVal - sigma*0.75
-        rangeHigh = meanVal + sigma*0.75
+
+        print "XXXXX", meanVal, sigma
+
+        #rangeLow = meanVal - sigma*0.75
+        #rangeHigh = meanVal + sigma*0.75
+        rangeLow = meanVal - sigma*1.5
+        rangeHigh = meanVal + sigma*1.5
 
         mean2 = RooRealVar("mean","mean of gaussian", 0, -1.5, 1.5)
         sigma2 = RooRealVar("sigma","width of gaussian", .1, 0, 1)
@@ -111,7 +72,7 @@ class FitThread(threading.Thread):
         frame.addObject(box)
         frame.Draw()
         odir = "~/tmp/balance/"
-        preName = odir + myVar.GetName() + "_ptAveMin_" + str(minPtAVG)  \
+        preName = odir + myVar.GetName() + "_" + inputMap["name"] + "_ptAveMin_" + str(minPtAVG)  \
         + "_etaMin_" + str(etaMin).replace(".", "_") \
         + "_etaMax_" + str(etaMax).replace(".", "_") 
         #+ "_" + tag
@@ -138,8 +99,8 @@ def main():
 
 
     trees = {}
-    trees["MC"] = []
-    trees["data"] = []
+    trees["MC_jet15"] = []
+    trees["data_jet15"] = []
 
     samplesData = ["Jet-Run2010B-Apr21ReReco-v1", "JetMETTau-Run2010A-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1"]
 
@@ -163,11 +124,11 @@ def main():
         if isData:
             if sampleName in samplesData:
                 #tree.SetDirectory(0)
-                trees["data"].append(tree)
+                trees["data_jet15"].append(tree)
                 
         else:
             #tree.SetDirectory(0)
-            trees["MC"].append(tree)
+            trees["MC_jet15"].append(tree)
 
         print sampleName, tree.GetEntries()
 
@@ -229,21 +190,20 @@ def main():
 
     etaRanges = []
     etaRanges.extend([1.401, 1.701, 2.001, 2.322, 2.411, 2.601, 2.801, 3.001, 3.201, 3.501, 3.801, 4.101, 4.701])
+    #etaRanges.extend([3.801, 4.101, 4.701])
     minPtAVG = 45
 
 
     curPath = ROOT.gDirectory.GetPath()
     of = ROOT.TFile("~/tmp/balanceHistos.root","RECREATE")
     outputHistos = {}
-    outputHistos["data"] = of.mkdir("data")
-    outputHistos["MC"] = of.mkdir("MC")
+    outputHistos["data_jet15"] = of.mkdir("data_jet15")
+    outputHistos["MC_jet15"] = of.mkdir("MC_jet15")
     ROOT.gDirectory.cd(curPath)
-
-
     
     for t in ds:
         for v in variations:
-            if t=="data" and v != "central":
+            if t=="data_jet15" and v != "central":
                 continue
 
 
@@ -257,7 +217,7 @@ def main():
                 def vary(x, v=v):
                     return x + "_" + v
 
-                cut = vary("tagPt") + " > 1"
+                cut = vary("tagPt") + " > 35"
                 cut += " && " + vary("probePt") + " > 35 "
                 cut += " && abs(" + vary("probeEta") + ") >  " + str(etaMin)
                 cut += " && abs(" + vary("probeEta") + ") <  " + str(etaMax)
@@ -268,6 +228,7 @@ def main():
                 dsReduced = ds[t].reduce(cut)
                 print "Reduce...done"
                 inputMap = {}
+                inputMap["name"] = t
                 inputMap["dsReduced"] = dsReduced
                 inputMap["myVar"] = vars[t][vary("balance")]
                 inputMap["ptProbeJetVar"] = vars[t][vary("probePt")]
@@ -296,7 +257,7 @@ def main():
 
             # all etas done. Create summary (vs eta) histogram
             etaArray = array('d', etaRanges)
-            histName = "balance_"+v
+            histName = "balance_"+v + "_jet15"
             #print etaRanges
             #print etaArray
             hist = ROOT.TH1F(histName, histName, len(etaArray)-1, etaArray)
