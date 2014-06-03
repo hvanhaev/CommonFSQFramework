@@ -29,10 +29,13 @@ class MNxsAnalyzer(ExampleProofReader):
         print "XXX configureAnalyzer - MNxsAnalyzer", self.datasetName, self.isData
 
         self.todoShifts = ["_central"]
-        if hasattr(self, "jetUncFile") and not self.isData and self.doPtShifts:
+        if hasattr(self, "jetUncFile") and not self.isData and self.doPtShiftsJEC:
             self.todoShifts.append("_ptUp")
             self.todoShifts.append("_ptDown")
             self.jetUnc = JetCorrectionUncertainty(self.jetUncFile)
+
+        if not self.isData and self.doPtShiftsJER:
+            self.todoShifts.append("_jerUp")
 
 
         #self.djBalance = DiJetBalancePlugin.DiJetBalancePlugin(self.recoJetCollection)
@@ -75,26 +78,113 @@ class MNxsAnalyzer(ExampleProofReader):
         self.lumiWeighters["_dj15fb_puUp"] = edm.LumiReWeighting(jet15FileV2, puFiles["dj15_1_05"], "MC", "pileup")
         self.lumiWeighters["_dj15fb_puDown"] = edm.LumiReWeighting(jet15FileV2, puFiles["dj15_0_95"], "MC", "pileup")
 
+        calo = []
+        calo.append("1.1 1.088 0.007 0.07 0.075") 
+        calo.append("1.7 1.139 0.019 0.08 0.084") 
+        calo.append("2.3 1.082 0.030 0.14 0.139")
+        calo.append("5.0 1.065 0.042 0.23 0.235")
 
-    def ptShifted(self, jet, shift):
-        if not shift.startswith("_pt"): return jet.pt()
+        pf = []
+        pf.append("1.1 1.066 0.007 0.07 0.072") 
+        pf.append("1.7 1.191 0.019 0.06 0.062")
+        pf.append("2.3 1.096 0.030 0.08 0.085")
+        pf.append("5.0 1.166 0.050 0.19 0.199") 
+
+        ''' 2011 factors for xcheck
+        # for this factors obtained up/down values are
+        # consistent with those from JetResolution twiki
+        pf.append("0.5 1.052 0.012 0.062 0.061")
+        pf.append("1.1 1.057 0.012 0.056 0.055")
+        pf.append("1.7 1.096 0.017 0.063 0.062")
+        pf.append("2.3 1.134 0.035 0.087 0.085")
+        pf.append("5.0 1.288 0.127 0.155 0.153")
+        '''
+
+        todo = None
+        if self.recoJetCollection.startswith("pf"):
+            todo = pf
+        elif self.recoJetCollection.startswith("calo"):
+            todo = calo
+        else:
+            raise Exception("Dont know how to apply JER smearing to " + self.recoJetCollection)
+
+        self.jer = []
+        for line in todo:
+            spl = line.split()
+            etaMax = float(spl[0])
+            jer = float(spl[1])
+            err = float(spl[2])
+            errUp = float(spl[3])
+            errDown = float(spl[4])
+            jerUp   = jer + ROOT.TMath.Sqrt(err*err+errUp*errUp)
+            jerDown = jer - ROOT.TMath.Sqrt(err*err+errDown*errDown)
+            #jerUp = 1
+            #jerDown = 1 # XXAA
+            print "JER factors:", etaMax, jer, jerUp, jerDown, "|", err, errUp, errDown
+            self.jer.append( [etaMax, jer, jerUp, jerDown] )
+
+    def ptShifted(self, jet, jetIndex, shift):
+        isJEC = shift.startswith("_pt")
+        isJER = shift.startswith("_jer")
+        isCentral = shift.startswith("_central")
+        if not isJEC and not isJER and not isCentral:
+            return jet.pt()
+
         if self.isData:
-            raise Exception("pt shift for data called")
+            return jet.pt()
+            #raise Exception("pt shift for data called")
 
 
-        pt = jet.pt()
-        self.jetUnc.setJetEta(jet.eta())
-        self.jetUnc.setJetPt(pt) # corrected pt
-        unc = self.jetUnc.getUncertainty(true)
-        #print "XXX", unc
-        if "_ptUp" == shift:
-            ptFactor = 1.
-        elif "_ptDown" == shift:
-            ptFactor = -1.
-        pt *= (1. + ptFactor*unc)
+        if isJEC:
+            pt = jet.pt()
+            self.jetUnc.setJetEta(jet.eta())
+            self.jetUnc.setJetPt(pt) # corrected pt
+            unc = self.jetUnc.getUncertainty(true)
+            if "_ptUp" == shift:
+                ptFactor = 1.
+            elif "_ptDown" == shift:
+                ptFactor = -1.
+            pt *= (1. + ptFactor*unc)
 
-        if pt < 0: return 0
-        return pt 
+            if pt < 0: return 0
+            return pt 
+        if isJER or isCentral:
+            recoGenJets =  getattr(self.fChain, self.recoJetCollectionGEN)
+            genJet = recoGenJets.at(jetIndex)
+            if genJet.pt() < 1:
+                return jet.pt()
+
+
+            eta = abs(jet.eta())
+            isOK = False
+            for jerEntry in self.jer:
+                if eta < jerEntry[0]: 
+                    isOK = True
+                    break
+            if not isOK:
+                raise Exception("Cannot determine eta range "+ str(eta))
+
+            if shift.endswith("Down"):
+                factor = jerEntry[3]
+            elif shift.endswith("central"):
+                factor = jerEntry[1]
+            elif shift.endswith("Up"):
+                factor = jerEntry[2]
+
+            factorCentral = jerEntry[1]
+
+
+            recoJets    = getattr(self.fChain, self.recoJetCollectionBaseReco)
+            recoJet = recoJets.at(jetIndex)
+
+            ptRec = recoJet.pt()
+            ptGen = genJet.pt()
+            diff = ptRec-ptGen
+            ptRet = max(0, ptGen+factor*diff)
+
+            #ptSmearedCentral = max(0, ptGen+factorCentral*diff)
+            #print ptRec, jet.pt(), ptSmearedCentral, ptRet, shift
+            return ptRet
 
 
     '''
@@ -155,7 +245,7 @@ class MNxsAnalyzer(ExampleProofReader):
 
                 if abs(eta) > 4.7: continue
                 #if abs(eta) > 3: continue
-                if self.ptShifted(jet, shift) < self.threshold: continue
+                if self.ptShifted(jet, i, shift) < self.threshold: continue
 
                 if  mostFwdJet == None or mostFwdJetEta < eta:
                     mostFwdJet = i
@@ -190,8 +280,8 @@ class MNxsAnalyzer(ExampleProofReader):
                     leadJet = mostBkgJet
                     subleadJet = mostFwdJet
                     # self.ptShifted(jet.pt(), shift)
-                    ptLead =  self.ptShifted( recoJets.at(leadJet), shift)
-                    ptSublead =  self.ptShifted( recoJets.at(subleadJet), shift)
+                    ptLead =  self.ptShifted( recoJets.at(leadJet), leadJet, shift)
+                    ptSublead =  self.ptShifted( recoJets.at(subleadJet), subleadJet, shift)
 
                     if ptSublead > ptLead:
                         ptLead, ptSublead = ptSublead, ptLead
@@ -259,17 +349,27 @@ if __name__ == "__main__":
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
     #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
     #maxFiles = 2
-    #maxFiles = 1
-    #nWorkers = 1
+    maxFiles = 1
+    nWorkers = 1
 
 
     slaveParams = {}
     slaveParams["threshold"] = 35.
-    #slaveParams["doPtShifts"] = False
-    slaveParams["doPtShifts"] = True
+    #slaveParams["doPtShiftsJEC"] = False
+    slaveParams["doPtShiftsJEC"] = True
+
+    #slaveParams["doPtShiftsJER"] = False
+    slaveParams["doPtShiftsJER"] = True
+
     #slaveParams["recoJetCollection"] = "pfJets"
     slaveParams["recoJetCollection"] = "pfJetsSmear"
+    slaveParams["recoJetCollectionBaseReco"] = "pfJets"
+    slaveParams["recoJetCollectionGEN"] = "pfJets2Gen"
+
+
     slaveParams["jetID"] = "pfJets_jetID"
+
+
 
     #slaveParams["recoJetCollection"] = "caloJets"
     #slaveParams["recoJetCollection"] = "caloJetsSmear"
