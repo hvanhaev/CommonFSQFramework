@@ -124,11 +124,13 @@ class BalanceTreeProducer(ExampleProofReader):
     def ptShifted(self, jet, jetIndex, shift):
         isJEC = shift.startswith("_pt")
         isJER = shift.startswith("_jer")
-        if not isJEC and not isJER:
+        isCentral = shift.startswith("_central")
+        if not isJEC and not isJER and not isCentral:
             return jet.pt()
 
         if self.isData:
-            raise Exception("pt shift for data called")
+            return jet.pt()
+            #raise Exception("pt shift for data called")
 
 
         if isJEC:
@@ -144,7 +146,7 @@ class BalanceTreeProducer(ExampleProofReader):
 
             if pt < 0: return 0
             return pt 
-        if isJER:
+        if isJER or isCentral:
             recoGenJets =  getattr(self.fChain, self.recoJetCollectionGEN)
             genJet = recoGenJets.at(jetIndex)
             if genJet.pt() < 1:
@@ -162,6 +164,8 @@ class BalanceTreeProducer(ExampleProofReader):
 
             if shift.endswith("Down"):
                 factor = jerEntry[3]
+            elif shift.endswith("central"):
+                factor = jerEntry[1]
             elif shift.endswith("Up"):
                 factor = jerEntry[2]
 
@@ -173,7 +177,7 @@ class BalanceTreeProducer(ExampleProofReader):
 
             ptRec = recoJet.pt()
             ptGen = genJet.pt()
-            diff = -(ptRec-ptGen)
+            diff = ptRec-ptGen
             ptRet = max(0, ptGen+factor*diff)
 
             #ptSmearedCentral = max(0, ptGen+factorCentral*diff)
