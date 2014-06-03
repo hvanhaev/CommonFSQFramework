@@ -150,11 +150,8 @@ class ExampleProofReader( TPySelector ):
             raise Exception("Whooopps!")
         return 1
 
-
-
     # this method will be overridden in derived class
     def analyze(self):
-    
         #event = self.fChain.event
         #run = self.fChain.run
         #lumi = self.fChain.lumi
@@ -218,6 +215,8 @@ class ExampleProofReader( TPySelector ):
     @classmethod
     def runAll(cls, treeName, outFile, sampleList = None, maxFiles=None, \
                normalize=True, slaveParameters = None, nWorkers=None):
+
+
         if slaveParameters == None: # When default param is used reset contents on every call to runAll
             slaveParameters = {}
 
