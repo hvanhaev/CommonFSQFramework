@@ -12,10 +12,9 @@ from array import array
 import resource
 import time
 
-import Queue
-import threading
+import multiprocessing
 
-class FitThread(threading.Thread):
+class FitThread(multiprocessing.Process):
     def __init__(self, inputMap):
         super(FitThread, self).__init__()
         self.inputMap = inputMap
@@ -78,7 +77,7 @@ class FitThread(threading.Thread):
         + "_etaMin_" + str(etaMin).replace(".", "_") \
         + "_etaMax_" + str(etaMax).replace(".", "_") 
         #+ "_" + tag
-        fname = preName + ".png"
+        fname = preName + "__2.png"
         canvas.Print(fname)
 
         fitResult = {}
@@ -87,7 +86,7 @@ class FitThread(threading.Thread):
         fitResult["meanErr"] = mean2.getError()
         fitResult["gaussWidth"] = sigma2.getVal()
         fitResult["gaussWidthErr"] = sigma2.getError()
-        self.ret = fitResult
+        self.queue.put(fitResult)
 
 
 def main():
@@ -192,7 +191,7 @@ def main():
 
     etaRanges = []
     etaRanges.extend([1.401, 1.701, 2.001, 2.322, 2.411, 2.601, 2.801, 3.001, 3.201, 3.501, 3.801, 4.101, 4.701])
-    #etaRanges.extend([3.801, 4.101, 4.701])
+    #etaRanges.extend([4.101, 4.701])
     minPtAVG = 45
 
 
@@ -205,6 +204,8 @@ def main():
     
     for t in ds:
         for v in variations:
+
+            queue = multiprocessing.Queue()
             if t=="data_jet15" and v != "central":
                 continue
 
@@ -246,6 +247,7 @@ def main():
 
 
                 thr = FitThread(inputMap)
+                thr.queue = queue
                 thr.start()
                 myThreads.append(thr)
                 #ptProbeJetVar
@@ -259,8 +261,11 @@ def main():
             for thr in myThreads:
                 print "Joining!"
                 thr.join()
-                results.append(thr.ret)
-            
+                ret = queue.get()
+                print ret
+                results.append(ret)
+            #sys.exit()            
+
 
             # all etas done. Create summary (vs eta) histogram
             etaArray = array('d', etaRanges)
