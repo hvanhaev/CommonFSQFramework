@@ -349,8 +349,8 @@ if __name__ == "__main__":
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
     #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
     #maxFiles = 2
-    maxFiles = 1
-    nWorkers = 1
+    #maxFiles = 1
+    #nWorkers = 1
 
 
     slaveParams = {}
