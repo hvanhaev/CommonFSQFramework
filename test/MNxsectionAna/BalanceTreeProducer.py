@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import sys, os, time, math
+import sys, os, time
 sys.path.append(os.path.dirname(__file__))
 
 import ROOT
@@ -9,6 +9,9 @@ from ROOT import *
 
 from array import *
 
+
+# Following import breaks things. Why???
+#import math
 
 # please note that python selector class name (here: BalanceTreeProducer) 
 # should be consistent with this file name (BalanceTreeProducer.py)
@@ -107,8 +110,10 @@ class BalanceTreeProducer(ExampleProofReader):
             err = float(spl[2])
             errUp = float(spl[3])
             errDown = float(spl[4])
-            jerUp   = jer + math.sqrt(err*err+errUp*errUp)
-            jerDown = jer - math.sqrt(err*err+errDown*errDown)
+            jerUp   = jer + ROOT.TMath.Sqrt(err*err+errUp*errUp)
+            jerDown = jer - ROOT.TMath.Sqrt(err*err+errDown*errDown)
+            #jerUp = 1
+            #jerDown = 1 # XXAA
             print "JER factors:", etaMax, jer, jerUp, jerDown, "|", err, errUp, errDown
             self.jer.append( [etaMax, jer, jerUp, jerDown] )
 
@@ -260,30 +265,30 @@ if __name__ == "__main__":
     nWorkers = None # Use all
 
     # debug config:
-    sampleList=[]
+    #sampleList=[]
     #sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
-    sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
-    sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
+    #sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
+    #sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
     #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
-    maxFiles = 2
+    #maxFiles = 2
     #maxFiles = 1
-    nWorkers = 1
+    #nWorkers = 1
 
 
     slaveParams = {}
     slaveParams["threshold"] = 35.
-    slaveParams["doPtShiftsJEC"] = False
-    #slaveParams["doPtShiftsJEC"] = True
+    #slaveParams["doPtShiftsJEC"] = False
+    slaveParams["doPtShiftsJEC"] = True
 
-    slaveParams["doPtShiftsJER"] = False
-    #slaveParams["doPtShiftsJER"] = True
+    #slaveParams["doPtShiftsJER"] = False
+    slaveParams["doPtShiftsJER"] = True
 
 
     #slaveParams["recoJetCollection"] = "pfJets"
     slaveParams["recoJetCollection"] = "pfJetsSmear"
-    #slaveParams["recoJetCollectionBaseReco"] = "pfJets"
-    #slaveParams["recoJetCollectionGEN"] = "pfJets2Gen"
+    slaveParams["recoJetCollectionBaseReco"] = "pfJets"
+    slaveParams["recoJetCollectionGEN"] = "pfJets2Gen"
     #slaveParams["recoJetCollection"] = "caloJets"
     #slaveParams["recoJetCollection"] = "caloJetsSmear"
 
