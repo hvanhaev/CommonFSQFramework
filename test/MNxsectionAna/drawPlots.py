@@ -7,6 +7,7 @@ from ROOT import *
 import os,re,sys,math
 
 import MNTriggerStudies.MNTriggerAna.Util
+import MNTriggerStudies.MNTriggerAna.Style
 
 from array import array
 
@@ -124,12 +125,55 @@ def applyScale(histoName, sampleName):
     if histoName.startswith("balance"): return False
     return True
 
+def setGlobalStyle():
+    MNTriggerStudies.MNTriggerAna.Style.setStyle()
 
+
+keep = [] # avoid garbage collection
+def decorate(canvas, dataHisto, MCStack, errBand):
+
+    name = dataHisto.GetName()
+    nspl = name.split("_")
+    if len(nspl) > 0:
+        dataHisto.GetXaxis().SetTitle(nspl[0])
+
+    #MChistos = MCStack.GetHists()
+    legend = ROOT.TLegend(0.3,0.95,1,1)
+    legend.SetFillColor(0)
+    legend.SetNColumns(3)
+    legend.AddEntry(dataHisto, "data", "pel")
+
+
+
+    MChistos = MCStack.GetStack()
+    for h in MChistos:
+        h.SetMarkerColor(4)
+        h.SetMarkerSize(1)
+        h.SetLineColor(4)
+        h.SetMarkerStyle(22)
+        h.Draw("SAME*P")
+        legend.AddEntry(h, "MC", "pel")
+        #print type(h.GetDrawOption())
+        #h.SetOption("PE hist")
+        #print h.GetDrawOption()
+    
+    legend.AddEntry(errBand, "MC unc", "f")
+
+    dataHisto.SetMarkerSize(0.3)
+    dataHisto.SetMarkerStyle(8)
+
+    canvas.SetTopMargin(0.1)
+    canvas.SetRightMargin(0.07)
+
+    legend.Draw("SAME")
+    keep.append(legend)
 
 
 
 def main():
 
+    #setStyle()
+    setGlobalStyle()
     sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
     parser = OptionParser(usage="usage: %prog [options] filename",
                             version="%prog 1.0")
@@ -311,16 +355,20 @@ def main():
                 centralName = h+"_central_" +t
 
                 maxima = []
+                print "Doing", centralName
 
-                print targetData, centralName, finalMap.keys(), finalMap[targetData].keys()
+                #print targetData, centralName, finalMap.keys(), finalMap[targetData].keys()
                 hData =  finalMap[targetData][centralName]
+
                 maxima.append(hData.GetMaximum())
 
 
-                MCStack = ROOT.THStack()
+                MCStack = ROOT.THStack("stack_"+centralName, "stack_"+centralName)
+                ROOT.SetOwnership(MCStack, False)
                 summedVariations = {}
                 summedCentral = None
                 for targetMC in targetsMC:
+                    finalMap[targetMC][centralName].SetMarkerColor(2)
                     MCStack.Add(finalMap[targetMC][centralName])
 
                     # value needed for unc band calculation
@@ -345,6 +393,7 @@ def main():
                     uncHistos.append(summedVariations[v])
 
                 unc = getUncertaintyBand(uncHistos, summedCentral)
+
                 maxima.append(unc.GetMaximum())
                 maxima.append(MCStack.GetMaximum())
 
@@ -361,6 +410,7 @@ def main():
                 hData.Draw()
                 unc.Draw("3SAME")
                 MCStack.Draw("SAME")
+                decorate(c1, hData, MCStack, unc)
 
                 c1.Print("~/tmp/"+ targetCat + "_" + centralName+".png")
 
