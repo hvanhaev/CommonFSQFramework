@@ -124,8 +124,10 @@ caloJetID(JetIDSelectionFunctor::PURE09,  JetIDSelectionFunctor::LOOSE)
     m_todoTriggers["jet15"].push_back("HLT_Jet15U");
     m_todoTriggers["jet15"].push_back("HLT_Jet15U_v3");
 
-    m_todoTriggers["ttjet15"] = std::vector<std::string>();
-    m_todoTriggers["ttjet15"].push_back("HLT_Jet15Utt");
+    m_todoTriggers["djAve15"] = std::vector<std::string>();
+    m_todoTriggers["djAve15"].push_back("HLT_DiJetAve15U");
+    m_todoTriggers["djAve15"].push_back("HLT_DiJetAve15U_8E29");
+    m_todoTriggers["djAve15"].push_back("HLT_DiJetAve15U_v3");
 
 
     // define your branches. Registration will be made automagically
@@ -319,6 +321,29 @@ MNXSTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         iEvent.getByLabel(it->second, hJets);
 
         for (unsigned int i = 0; i<hJets->size(); ++i){
+
+            std::vector<std::string> jecs = hJets->at(i).availableJECLevels(0);
+            //std::vector<std::string> jecs = hJets->at(i).availableJECSets();
+
+            bool badJet = false;
+            for (unsigned int aa = 0; aa < jecs.size(); ++aa){
+                //std::cout << jecs[aa] <<  " " <<   hJets->at(i).jecFactor(jecs[aa]) << std::endl;
+                if (hJets->at(i).jecFactor(jecs[aa])<0) {
+                    badJet = true;
+                    break;
+                }
+            }
+            if (badJet){
+                /*
+                std::cout << "BJ " 
+                            << " " << hJets->at(i).pt()
+                            << " " << hJets->at(i).eta()
+                            << " | " << hJets->at(i).correctedJet("Uncorrected").pt()
+                            << " " << hJets->at(i).correctedJet("Uncorrected").eta()
+                            << std::endl;
+                */
+                continue;
+            }
 
 
             // Check if reconstructed jet or his matched genJet are above thr
@@ -589,7 +614,7 @@ reco::Candidate::LorentzVector MNXSTreeProducer::smear(const pat::Jet & jet) {
             throw "Cannot calculate factor!";
     }*/ 
     float ptGen = jet.genJet()->pt(); // not: we check for genJet presence earlier
-    float ptScaled = std::max(double(0.), double(ptGen + factor*(ptGen - jet.pt())));
+    float ptScaled = std::max(double(0.), double(ptGen + factor*(jet.pt()-ptGen)));
     float scale = ptScaled/jet.pt();
 
     //std::cout << scale << " " << jet.p4().pt() << " " << (jet.p4()*scale).pt() << std::endl;
