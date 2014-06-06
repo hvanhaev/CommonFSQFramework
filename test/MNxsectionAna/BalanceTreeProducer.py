@@ -120,22 +120,43 @@ class BalanceTreeProducer(ExampleProofReader):
         sys.stdout.flush()
 
 
-
     def ptShifted(self, jet, jetIndex, shift):
         isJEC = shift.startswith("_pt")
         isJER = shift.startswith("_jer")
-        isCentral = shift.startswith("_central")
-        if not isJEC and not isJER and not isCentral:
-            return jet.pt()
+        #isCentral = shift.startswith("_central")
+        isCentral = not isJER and not isJEC
 
         if self.isData:
             return jet.pt()
             #raise Exception("pt shift for data called")
 
+        #ptBase = 
+        if isJEC or isCentral: 
+            recoGenJets =  getattr(self.fChain, self.recoJetCollectionGEN)
+            genJet = recoGenJets.at(jetIndex)
+            recoJets    = getattr(self.fChain, self.recoJetCollectionBaseReco)
+            recoJet = recoJets.at(jetIndex)
+            if genJet.pt() < 1:
+                ptBase = recoJet.pt()
+            else:
+                eta = abs(recoJet.eta())
+                isOK = False
+                for jerEntry in self.jer:
+                    if eta < jerEntry[0]:
+                        isOK = True
+                        break
+                if not isOK:
+                    raise Exception("Cannot determine eta range "+ str(eta))
+                factorCentral = jerEntry[1]
+                ptGen =  genJet.pt()
+                diff = -(recoJet.pt() - ptGen)
+                ptBase = max(0, ptGen+factorCentral*diff)
 
-        if isJEC:
-            pt = jet.pt()
-            self.jetUnc.setJetEta(jet.eta())
+            pt = ptBase
+            if  "_central" == shift:
+                return pt
+
+            self.jetUnc.setJetEta(recoJet.eta())
             self.jetUnc.setJetPt(pt) # corrected pt
             unc = self.jetUnc.getUncertainty(true)
             if "_ptUp" == shift:
@@ -146,43 +167,40 @@ class BalanceTreeProducer(ExampleProofReader):
 
             if pt < 0: return 0
             return pt 
-        if isJER or isCentral:
+
+        if isJER:
             recoGenJets =  getattr(self.fChain, self.recoJetCollectionGEN)
             genJet = recoGenJets.at(jetIndex)
+            recoJets = getattr(self.fChain, self.recoJetCollectionBaseReco)
+            recoJet = recoJets.at(jetIndex)
             if genJet.pt() < 1:
-                return jet.pt()
-
-
-            eta = abs(jet.eta())
+                return recoJet.pt()
+            eta = abs(recoJet.eta())
             isOK = False
             for jerEntry in self.jer:
-                if eta < jerEntry[0]: 
+                if eta < jerEntry[0]:
                     isOK = True
                     break
             if not isOK:
                 raise Exception("Cannot determine eta range "+ str(eta))
+            factorCentral = jerEntry[1]
 
             if shift.endswith("Down"):
                 factor = jerEntry[3]
-            elif shift.endswith("central"):
-                factor = jerEntry[1]
             elif shift.endswith("Up"):
                 factor = jerEntry[2]
 
             factorCentral = jerEntry[1]
 
-
-            recoJets    = getattr(self.fChain, self.recoJetCollectionBaseReco)
-            recoJet = recoJets.at(jetIndex)
-
             ptRec = recoJet.pt()
             ptGen = genJet.pt()
-            diff = ptRec-ptGen
+            diff = -(ptRec-ptGen)
             ptRet = max(0, ptGen+factor*diff)
 
             #ptSmearedCentral = max(0, ptGen+factorCentral*diff)
-            #print ptRec, jet.pt(), ptSmearedCentral, ptRet, shift
+            #print ptRec, recoJet.pt(), ptSmearedCentral, ptRet, shift
             return ptRet
+
 
     def analyze(self):
         if self.fChain.ngoodVTX == 0: return
@@ -216,7 +234,9 @@ class BalanceTreeProducer(ExampleProofReader):
 
 
             tagI = None
+            tagPT = None
             probeI = None
+            probePT = None
 
             for i in xrange(0, recoJets.size()):
                 jet = recoJets.at(i)
@@ -226,13 +246,15 @@ class BalanceTreeProducer(ExampleProofReader):
                 if pt < 35: continue
                 if eta < 1.4:
                     tagI = i
+                    tagPT = pt
                 else:
                     probeI = i
+                    probePT = pt
 
             if tagI != None and probeI != None:
                 # check veto:
                 badEvent = False
-                ptAve = (recoJets.at(probeI).pt() + recoJets.at(tagI).pt())/2
+                ptAve = (probePT+tagPT)/2
                 for i in xrange(0, recoJets.size()):
                     if i == tagI or probeI == i: continue
                     eta = abs(jet.eta())
@@ -242,12 +264,12 @@ class BalanceTreeProducer(ExampleProofReader):
                         badEvent = True
                         break
                 if not badEvent:
-                    self.var["tagPt"+shift][0] =  recoJets.at(tagI).pt()
+                    self.var["tagPt"+shift][0] = tagPT 
                     self.var["tagEta"+shift][0] =  abs(recoJets.at(tagI).eta())
-                    self.var["probePt"+shift][0] = recoJets.at(probeI).pt()
+                    self.var["probePt"+shift][0] = probePT
                     self.var["probeEta"+shift][0] = abs(recoJets.at(probeI).eta())
                     self.var["ptAve"+shift][0] = ptAve
-                    self.var["balance"+shift][0] = (recoJets.at(probeI).pt()-recoJets.at(tagI).pt())/ptAve
+                    self.var["balance"+shift][0] = (probePT-tagPT)/ptAve
                     fill = True
 
    
@@ -275,9 +297,9 @@ if __name__ == "__main__":
     #sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
     #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
-    #maxFiles = 2
-    #maxFiles = 1
-    #nWorkers = 1
+    #maxFilesMC = 2
+    #maxFilesMC = 1
+    #nWorkersMC = 1
 
 
     slaveParams = {}
@@ -289,8 +311,8 @@ if __name__ == "__main__":
     slaveParams["doPtShiftsJER"] = True
 
 
-    #slaveParams["recoJetCollection"] = "pfJets"
-    slaveParams["recoJetCollection"] = "pfJetsSmear"
+    slaveParams["recoJetCollection"] = "pfJets"
+    #slaveParams["recoJetCollection"] = "pfJetsSmear"
     slaveParams["recoJetCollectionBaseReco"] = "pfJets"
     slaveParams["recoJetCollectionGEN"] = "pfJets2Gen"
     #slaveParams["recoJetCollection"] = "caloJets"
@@ -306,7 +328,7 @@ if __name__ == "__main__":
     BalanceTreeProducer.runAll(treeName="mnXS",
                                slaveParameters=slaveParams,
                                sampleList=sampleList,
-                               maxFiles = maxFiles,
+                               maxFilesMC = maxFilesMC,
                                nWorkers=nWorkers,
                                outFile = "treeDiJetBalance.root" )
 
