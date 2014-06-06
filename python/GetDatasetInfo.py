@@ -15,7 +15,7 @@ sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
 anaVersion=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("anaVersion")
 
 # TODO: control verbosity
-def getTreeFilesAndNormalizations(maxFiles = None, quiet = False):
+def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet = False):
     if not quiet: print "if not quiet: printing info for: ",  anaVersion
 
     ret = {}
@@ -37,6 +37,10 @@ def getTreeFilesAndNormalizations(maxFiles = None, quiet = False):
             fileCnt = 0
             for dirpath, dirnames, filenames in os.walk(sampleList[s]["pathTrees"]):
                 for f in filenames:
+                    maxFiles = maxFilesData
+                    if not sampleList[s]["isData"]:
+                        maxFiles = maxFilesMC
+
                     if maxFiles != None and fileCnt >= maxFiles:
                         break # we dont need more
 
