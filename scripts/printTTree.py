@@ -18,7 +18,7 @@ def main():
     #parser.add_option("-s", "--sample",   action="store", type="string", dest="sample", help="sample name" )
     #parser.add_option("-l", "--listSamples",   action="store", type="string", dest="list", help="listAllSamples" )
     (options, args) = parser.parse_args()
-    treeFilesAndNormalizations = getTreeFilesAndNormalizations(maxFiles=1, quiet = True)
+    treeFilesAndNormalizations = getTreeFilesAndNormalizations(maxFilesMC=1, maxFilesData=1, quiet = True)
     if len(args) != 1 or args[0] not in treeFilesAndNormalizations:
         print "Usage: printTTree.py sampleName"
         print "Avaliable samples:"
