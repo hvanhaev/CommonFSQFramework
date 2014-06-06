@@ -213,15 +213,17 @@ class ExampleProofReader( TPySelector ):
         of.Close()
 
     @classmethod
-    def runAll(cls, treeName, outFile, sampleList = None, maxFiles=None, \
-               normalize=True, slaveParameters = None, nWorkers=None):
+    def runAll(cls, treeName, outFile, sampleList = None, \
+                maxFilesMC=None, maxFilesData=None, \
+                normalize=True, slaveParameters = None, nWorkers=None):
 
 
         if slaveParameters == None: # When default param is used reset contents on every call to runAll
             slaveParameters = {}
 
         cwd = os.getcwd()+"/"
-        treeFilesAndNormalizations = getTreeFilesAndNormalizations(maxFiles=maxFiles)
+        treeFilesAndNormalizations = getTreeFilesAndNormalizations(maxFilesMC=maxFilesMC, 
+                                maxFilesData=maxFilesData)
 
         if sampleList == None:
             todo = treeFilesAndNormalizations.keys() # run them all
@@ -364,7 +366,7 @@ if __name__ == "__main__":
     slaveParams["LEIA2"] = False
     #'''
 
-    ExampleProofReader.runAll(treeName="exampleTree", maxFiles = 10, \
+    ExampleProofReader.runAll(treeName="exampleTree", maxFilesMC = 10, \
                               slaveParameters=slaveParams, \
                               outFile = "~/tmp/plots.root", \
                               normalize = True)
