@@ -36,6 +36,7 @@ class MNxsAnalyzer(ExampleProofReader):
 
         if not self.isData and self.doPtShiftsJER:
             self.todoShifts.append("_jerUp")
+            self.todoShifts.append("_jerDown")
 
 
         #self.djBalance = DiJetBalancePlugin.DiJetBalancePlugin(self.recoJetCollection)
@@ -93,6 +94,7 @@ class MNxsAnalyzer(ExampleProofReader):
         ''' 2011 factors for xcheck
         # for this factors obtained up/down values are
         # consistent with those from JetResolution twiki
+        # https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetResolution
         pf.append("0.5 1.052 0.012 0.062 0.061")
         pf.append("1.1 1.057 0.012 0.056 0.055")
         pf.append("1.7 1.096 0.017 0.063 0.062")
@@ -127,17 +129,38 @@ class MNxsAnalyzer(ExampleProofReader):
         isJEC = shift.startswith("_pt")
         isJER = shift.startswith("_jer")
         isCentral = shift.startswith("_central")
-        if not isJEC and not isJER and not isCentral:
-            return jet.pt()
 
         if self.isData:
             return jet.pt()
             #raise Exception("pt shift for data called")
 
+        #ptBase = 
+        if isJEC or isCentral: 
+            recoGenJets =  getattr(self.fChain, self.recoJetCollectionGEN)
+            genJet = recoGenJets.at(jetIndex)
+            recoJets    = getattr(self.fChain, self.recoJetCollectionBaseReco)
+            recoJet = recoJets.at(jetIndex)
+            if genJet.pt() < 1:
+                ptBase = recoJet.pt()
+            else:
+                eta = abs(recoJet.eta())
+                isOK = False
+                for jerEntry in self.jer:
+                    if eta < jerEntry[0]:
+                        isOK = True
+                        break
+                if not isOK:
+                    raise Exception("Cannot determine eta range "+ str(eta))
+                factorCentral = jerEntry[1]
+                ptGen =  genJet.pt()
+                diff = recoJet.pt() - ptGen
+                ptBase = max(0, ptGen+factorCentral*diff)
 
-        if isJEC:
-            pt = jet.pt()
-            self.jetUnc.setJetEta(jet.eta())
+            pt = ptBase
+            if  "_central" == shift:
+                return pt
+
+            self.jetUnc.setJetEta(recoJet.eta())
             self.jetUnc.setJetPt(pt) # corrected pt
             unc = self.jetUnc.getUncertainty(true)
             if "_ptUp" == shift:
@@ -148,34 +171,30 @@ class MNxsAnalyzer(ExampleProofReader):
 
             if pt < 0: return 0
             return pt 
-        if isJER or isCentral:
+
+        if isJER:
             recoGenJets =  getattr(self.fChain, self.recoJetCollectionGEN)
             genJet = recoGenJets.at(jetIndex)
+            recoJets = getattr(self.fChain, self.recoJetCollectionBaseReco)
+            recoJet = recoJets.at(jetIndex)
             if genJet.pt() < 1:
-                return jet.pt()
-
-
-            eta = abs(jet.eta())
+                return recoJet.pt()
+            eta = abs(recoJet.eta())
             isOK = False
             for jerEntry in self.jer:
-                if eta < jerEntry[0]: 
+                if eta < jerEntry[0]:
                     isOK = True
                     break
             if not isOK:
                 raise Exception("Cannot determine eta range "+ str(eta))
+            factorCentral = jerEntry[1]
 
             if shift.endswith("Down"):
                 factor = jerEntry[3]
-            elif shift.endswith("central"):
-                factor = jerEntry[1]
             elif shift.endswith("Up"):
                 factor = jerEntry[2]
 
             factorCentral = jerEntry[1]
-
-
-            recoJets    = getattr(self.fChain, self.recoJetCollectionBaseReco)
-            recoJet = recoJets.at(jetIndex)
 
             ptRec = recoJet.pt()
             ptGen = genJet.pt()
@@ -183,7 +202,7 @@ class MNxsAnalyzer(ExampleProofReader):
             ptRet = max(0, ptGen+factor*diff)
 
             #ptSmearedCentral = max(0, ptGen+factorCentral*diff)
-            #print ptRec, jet.pt(), ptSmearedCentral, ptRet, shift
+            #print ptRec, recoJet.pt(), ptSmearedCentral, ptRet, shift
             return ptRet
 
 
@@ -234,6 +253,8 @@ class MNxsAnalyzer(ExampleProofReader):
             mostBkgJet = None
             mostFwdJetEta = None
             mostBkgJetEta = None
+            mostFwdJetPt = None
+            mostBkgJetPt = None
             for i in xrange(0, recoJets.size()):
                 if jetID.at(i) < 0.5: continue
                 jet = recoJets.at(i)
@@ -245,14 +266,17 @@ class MNxsAnalyzer(ExampleProofReader):
 
                 if abs(eta) > 4.7: continue
                 #if abs(eta) > 3: continue
-                if self.ptShifted(jet, i, shift) < self.threshold: continue
+                ptShifted = self.ptShifted(jet, i, shift)
+                if ptShifted < self.threshold: continue
 
                 if  mostFwdJet == None or mostFwdJetEta < eta:
                     mostFwdJet = i
                     mostFwdJetEta = eta
+                    mostFwdJetPt = ptShifted
                 if  mostBkgJet == None or mostBkgJetEta > eta:
                     mostBkgJet = i
                     mostBkgJetEta = eta
+                    mostBkgJetPt = ptShifted
 
             #if mostFwdJet != None:
             #    print "Pair: F/B",  recoJets.at(mostFwdJet).eta(), recoJets.at(mostBkgJet).eta()
@@ -280,12 +304,18 @@ class MNxsAnalyzer(ExampleProofReader):
                     leadJet = mostBkgJet
                     subleadJet = mostFwdJet
                     # self.ptShifted(jet.pt(), shift)
-                    ptLead =  self.ptShifted( recoJets.at(leadJet), leadJet, shift)
-                    ptSublead =  self.ptShifted( recoJets.at(subleadJet), subleadJet, shift)
+                    ptLead =  mostBkgJetPt #self.ptShifted( recoJets.at(leadJet), leadJet, shift)
+                    ptSublead = mostFwdJetPt # self.ptShifted( recoJets.at(subleadJet), subleadJet, shift)
+
+                    etaLead = mostBkgJetEta
+                    etaSublead = mostFwdJetEta
+
+                    #etaLead = 
 
                     if ptSublead > ptLead:
-                        ptLead, ptSublead = ptSublead, ptLead
                         leadJet, subleadJet = subleadJet, leadJet
+                        ptLead, ptSublead = ptSublead, ptLead
+                        etaLead, etaSublead = etaSublead, etaLead
 
                     #print recoJets.at(leadJet).pt(), weight
                     histoName = shift +triggerToUse
@@ -305,8 +335,17 @@ class MNxsAnalyzer(ExampleProofReader):
                     #  -- cost is not comming from python
                     self.hist["ptLead"+histoName].Fill(ptLead, weight)
                     self.hist["ptSublead"+histoName].Fill(ptSublead, weight)
-                    self.hist["etaLead"+histoName].Fill(recoJets.at(leadJet).eta(), weight)
-                    self.hist["etaSublead"+histoName].Fill(recoJets.at(subleadJet).eta(), weight)
+            
+                    #if abs(recoJets.at(leadJet).eta()) < 0.01:
+                    #    print "XYXX", leadJet, recoJets.at(leadJet).eta(), recoJets.at(leadJet).pt(), shift
+                    #    print "   -> ", mostBkgJet, mostBkgJetEta, mostBkgJetPt
+                    #    print "   -> ", mostFwdJet, mostFwdJetEta, mostFwdJetPt
+                    #    print "      --", recoJetsNoSmear.at(leadJet).eta(), recoJetsNoSmear.at(leadJet).pt()
+
+
+
+                    self.hist["etaLead"+histoName].Fill(etaLead, weight)
+                    self.hist["etaSublead"+histoName].Fill(etaSublead, weight)
                     #print "DETA", deta, weight, 
                     self.hist["xsVsDeltaEta"+histoName].Fill(deta, weight)
                     self.hist["vtx"+histoName].Fill(self.fChain.ngoodVTX, weight)
@@ -348,21 +387,20 @@ if __name__ == "__main__":
     #sampleList=  ["Jet-Run2010B-Apr21ReReco-v1"] 
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
     #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
-    #maxFiles = 2
-    #maxFiles = 1
+    #maxFilesMC = 2
+    maxFilesMC = 12
     #nWorkers = 1
-
 
     slaveParams = {}
     slaveParams["threshold"] = 35.
-    #slaveParams["doPtShiftsJEC"] = False
-    slaveParams["doPtShiftsJEC"] = True
+    slaveParams["doPtShiftsJEC"] = False
+    #slaveParams["doPtShiftsJEC"] = True
 
-    #slaveParams["doPtShiftsJER"] = False
-    slaveParams["doPtShiftsJER"] = True
+    slaveParams["doPtShiftsJER"] = False
+    #slaveParams["doPtShiftsJER"] = True
 
-    #slaveParams["recoJetCollection"] = "pfJets"
-    slaveParams["recoJetCollection"] = "pfJetsSmear"
+    slaveParams["recoJetCollection"] = "pfJets"
+    #slaveParams["recoJetCollection"] = "pfJetsSmear" # currently broken
     slaveParams["recoJetCollectionBaseReco"] = "pfJets"
     slaveParams["recoJetCollectionGEN"] = "pfJets2Gen"
 
@@ -384,9 +422,9 @@ if __name__ == "__main__":
     MNxsAnalyzer.runAll(treeName="mnXS",
                                slaveParameters=slaveParams,
                                sampleList=sampleList,
-                               maxFiles = maxFiles,
+                               maxFilesMC = maxFilesMC,
                                nWorkers=nWorkers,
-                               outFile = "~/plotsMNxs.root" )
+                               outFile = "plotsMNxs.root" )
 
 
 

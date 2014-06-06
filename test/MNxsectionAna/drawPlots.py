@@ -131,6 +131,7 @@ def setGlobalStyle():
 
 keep = [] # avoid garbage collection
 def decorate(canvas, dataHisto, MCStack, errBand):
+    canvas.SetLogy()
 
     name = dataHisto.GetName()
     nspl = name.split("_")
@@ -187,7 +188,7 @@ def main():
     if options.infile:
         infile = options.infile
     else:
-        infile = "~/plotsMNxs.root"
+        infile = "plotsMNxs.root"
 
     if options.outfile:
         outfile = options.outfile
@@ -276,6 +277,8 @@ def main():
 
                 curObjClone = curObj.Clone()
                 curObjClone.SetDirectory(0)
+                curObjClone.SetTitle(curObjClone.GetName() + "_" + sampleName)
+
 
                 target = getTarget(curObjClone.GetName(), sampleName)
                 if target == None:
@@ -358,6 +361,13 @@ def main():
                 print "Doing", centralName
 
                 #print targetData, centralName, finalMap.keys(), finalMap[targetData].keys()
+                if centralName not in finalMap[targetData]:
+                    print "#"*30
+                    print " Cannot find (expected) histo:", centralName
+                    print "#"*30
+                    continue
+    
+
                 hData =  finalMap[targetData][centralName]
 
                 maxima.append(hData.GetMaximum())
@@ -378,7 +388,13 @@ def main():
                         summedCentral.Add(finalMap[targetMC][centralName])
 
                     for v in variations:
-                        thisVariationThisTarget = finalMap[targetMC][h+"_"+v+"_"+t]
+                        vname = h+"_"+v+"_"+t
+                        if vname not in finalMap[targetMC]:
+                            print "#"*30
+                            print "Warning: variation not found: ", vname
+                            print "#"*30
+                            continue
+                        thisVariationThisTarget = finalMap[targetMC][vname]
                         if v in summedVariations:
                             summedVariations[v].Add(thisVariationThisTarget)
                         else:
@@ -413,6 +429,7 @@ def main():
                 decorate(c1, hData, MCStack, unc)
 
                 c1.Print("~/tmp/"+ targetCat + "_" + centralName+".png")
+                c1.Print("~/tmp/"+ targetCat + "_" + centralName+".C")
 
 
         #print d

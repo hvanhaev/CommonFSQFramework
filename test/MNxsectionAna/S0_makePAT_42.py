@@ -359,7 +359,7 @@ process.p = cms.Path(
 
 import HLTrigger.HLTfilters.triggerResultsFilter_cfi as hlt
 process.hltJet = hlt.triggerResultsFilter.clone(
-     triggerConditions = cms.vstring('HLT_DoubleJet15U_ForwardBackward* OR HLT_Jet15U* OR HLT_Jet30U*',),
+     triggerConditions = cms.vstring('HLT_DoubleJet15U_ForwardBackward* OR HLT_Jet15U* OR HLT_DiJetAve15U_*',),
      hltResults = cms.InputTag( "TriggerResults", "", "HLT" ),
      l1tResults = cms.InputTag(""),
      throw = cms.bool( False )
@@ -447,6 +447,7 @@ if anaType == "JetTriggerEff":
     #//iEvent.getByLabel( edm::InputTag("selectedPatJets"), patJets );
     #//iEvent.getByLabel( edm::InputTag("selectedPatJetsAK5Calo"), patJets );
 
+    
     process.jetTrgEffPF =  cms.EDAnalyzer("TrgEfficiency",
             jetCol = cms.InputTag("selectedPatJets"),
             triggerSelection = cms.string("HLT_Jet15U*"),
@@ -460,10 +461,13 @@ if anaType == "JetTriggerEff":
             )
     )
     process.jetTrgEffCalo = process.jetTrgEffPF.clone(jetCol = cms.InputTag("selectedPatJetsAK5Calo"))
-    process.tfMuons.replace(process.myMuons, process.myMuons*process.jetTrgEffPF * process.jetTrgEffCalo )
+    #process.tfMuons.replace(process.myMuons, process.myMuons*process.jetTrgEffPF * process.jetTrgEffCalo )
     #process.tfMuons.replace(process.myMuons, process.jetTrgEff)
 
-
+# minimal set of unprescaled muon triggers
+# HLT_Mu15_v1
+# HLT_Mu11
+# HLT_Mu9
 
 process.schedule.extend([process.pPF, process.pCalo])
 #process.schedule = cms.Schedule(process.pCalo, process.outpath)
