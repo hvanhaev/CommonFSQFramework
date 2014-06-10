@@ -1,8 +1,4 @@
 #!/usr/bin/env python
-
-from MNTriggerStudies.MNTriggerAna.GetDatasetInfo import getTreeFilesAndNormalizations
-import MNTriggerStudies.MNTriggerAna.Util
-
 ###############################################################################
 #
 #  TODO: 
@@ -49,17 +45,19 @@ import MNTriggerStudies.MNTriggerAna.Util
 
 import sys, os, time, traceback
 sys.path.append(os.path.dirname(__file__))
-
 import ROOT
 ROOT.gROOT.SetBatch(True)
-from ROOT import *
 
 from array import *
 
+from MNTriggerStudies.MNTriggerAna.GetDatasetInfo import getTreeFilesAndNormalizations
+import MNTriggerStudies.MNTriggerAna.Util
+
+
 # please note that python selector class name (here: ExampleProofReader) 
 # should be consistent with this file name (ExampleProofReader.py)
-from ROOT import TPySelector
-class ExampleProofReader( TPySelector ):
+#from ROOT import TPySelector
+class ExampleProofReader( ROOT.TPySelector ):
     uniqueEnvString = "TMFTMFqWeRtY_"
 
     @classmethod
@@ -252,7 +250,7 @@ class ExampleProofReader( TPySelector ):
                 skipped.append(t)
                 continue
 
-            dataset = TDSet( 'TTree', 'data', treeName) # the last name is the directory name inside the root file
+            dataset = ROOT.TDSet( 'TTree', 'data', treeName) # the last name is the directory name inside the root file
             for file in treeFilesAndNormalizations[t]["files"]:
                 dataset.Add( 'root://'+file)
             
@@ -260,7 +258,7 @@ class ExampleProofReader( TPySelector ):
             slaveParameters["isData"] = sampleListFullInfo[t]["isData"]
             slaveParameters["normalizationFactor"] =  treeFilesAndNormalizations[t]["normFactor"]
 
-            TProof.AddEnvVar("PATH2",ROOT.gSystem.Getenv("PYTHONPATH")+":"+os.getcwd())
+            ROOT.TProof.AddEnvVar("PATH2",ROOT.gSystem.Getenv("PYTHONPATH")+":"+os.getcwd())
 
             #ROOT.gSystem.Setenv("TMFDatasetName", t)
 
@@ -286,9 +284,9 @@ class ExampleProofReader( TPySelector ):
             variablesToSetInProof[cls.encodeEnvString("VariablesToFetch")] = variablesToFetch
 
             if nWorkers == None:
-                proof = TProof.Open('')
+                proof = ROOT.TProof.Open('')
             else:
-                proof = TProof.Open('workers='+str(nWorkers))
+                proof = ROOT.TProof.Open('workers='+str(nWorkers))
 
             
             proof.Exec( 'gSystem->Setenv("PYTHONPATH",gSystem->Getenv("PATH2"));') # for some reason cannot use method below for python path
@@ -296,9 +294,8 @@ class ExampleProofReader( TPySelector ):
             for v in variablesToSetInProof:  
                 # if you get better implemenation (GetParameter?) mail me
                 proof.Exec('gSystem->Setenv("'+v+'","'+variablesToSetInProof[v]+'");')
-            #print dataset.Process( 'TPySelector', 'ExampleProofReader')
             print "Running:", cls.__name__
-            print dataset.Process( 'TPySelector', cls.__name__)
+            print dataset.Process( 'TPySelector',  cls.__name__)
             curPath = ROOT.gDirectory.GetPath()
 
 
@@ -352,7 +349,7 @@ class ExampleProofReader( TPySelector ):
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
     ROOT.gSystem.Load("libFWCoreFWLite.so")
-    AutoLibraryLoader.enable()
+    ROOT.AutoLibraryLoader.enable()
 
     slaveParams = {}
 
