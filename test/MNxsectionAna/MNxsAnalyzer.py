@@ -6,10 +6,12 @@ sys.path.append(os.path.dirname(__file__))
 
 import ROOT
 ROOT.gROOT.SetBatch(True)
-from ROOT import *
+ROOT.gSystem.Load("libFWCoreFWLite.so")
+ROOT.AutoLibraryLoader.enable()
+from ROOT import edm, JetCorrectionUncertainty
 
 from array import *
-#import cProfile
+import cProfile
 
 # please note that python selector class name (here: MNxsAnalyzer) 
 # should be consistent with this file name (MNxsAnalyzer.py)
@@ -25,7 +27,7 @@ class MNxsAnalyzer(ExampleProofReader):
     def configureAnalyzer( self):
 
         #sys.stdout = sys.stderr
-        #self.pr = cProfile.Profile()
+        self.pr = cProfile.Profile()
         print "XXX configureAnalyzer - MNxsAnalyzer", self.datasetName, self.isData
 
         self.todoShifts = ["_central"]
@@ -162,7 +164,7 @@ class MNxsAnalyzer(ExampleProofReader):
 
             self.jetUnc.setJetEta(recoJet.eta())
             self.jetUnc.setJetPt(pt) # corrected pt
-            unc = self.jetUnc.getUncertainty(true)
+            unc = self.jetUnc.getUncertainty(True)
             if "_ptUp" == shift:
                 ptFactor = 1.
             elif "_ptDown" == shift:
@@ -206,7 +208,7 @@ class MNxsAnalyzer(ExampleProofReader):
             return ptRet
 
 
-    '''
+    #'''
     # stuff for code profiling
     def analyze(self):
         self.pr.enable()
@@ -219,12 +221,12 @@ class MNxsAnalyzer(ExampleProofReader):
         dname = "/scratch/scratch0/tfruboes/2014.05.NewFWAnd4_2/CMSSW_4_2_8_patch7/src/MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/stats/"
         profName = dname + "stats"
         self.pr.dump_stats(profName)
-   # '''
+    # '''
         
 
 
-    #def analyzeTT(self):
-    def analyze(self):
+    def analyzeTT(self):
+    #def analyze(self):
             
         #if self.fChain.jet15 > 0.5:
         #    print "XXX", self.fChain.run, self.fChain.lumi
@@ -331,22 +333,11 @@ class MNxsAnalyzer(ExampleProofReader):
                         weight *= puWeight
 
 
-                    # why calling a fill method is so costly ?!?
-                    #  -- cost is not comming from python
                     self.hist["ptLead"+histoName].Fill(ptLead, weight)
                     self.hist["ptSublead"+histoName].Fill(ptSublead, weight)
             
-                    #if abs(recoJets.at(leadJet).eta()) < 0.01:
-                    #    print "XYXX", leadJet, recoJets.at(leadJet).eta(), recoJets.at(leadJet).pt(), shift
-                    #    print "   -> ", mostBkgJet, mostBkgJetEta, mostBkgJetPt
-                    #    print "   -> ", mostFwdJet, mostFwdJetEta, mostFwdJetPt
-                    #    print "      --", recoJetsNoSmear.at(leadJet).eta(), recoJetsNoSmear.at(leadJet).pt()
-
-
-
                     self.hist["etaLead"+histoName].Fill(etaLead, weight)
                     self.hist["etaSublead"+histoName].Fill(etaSublead, weight)
-                    #print "DETA", deta, weight, 
                     self.hist["xsVsDeltaEta"+histoName].Fill(deta, weight)
                     self.hist["vtx"+histoName].Fill(self.fChain.ngoodVTX, weight)
 
@@ -374,11 +365,10 @@ class MNxsAnalyzer(ExampleProofReader):
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
-    ROOT.gSystem.Load("libFWCoreFWLite.so")
-    AutoLibraryLoader.enable()
 
     sampleList = None
-    maxFiles = None
+    maxFilesMC = None
+    maxFilesData = None
     nWorkers = None # Use all
 
     # debug config:
@@ -387,20 +377,21 @@ if __name__ == "__main__":
     #sampleList=  ["Jet-Run2010B-Apr21ReReco-v1"] 
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
     #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
-    #maxFilesMC = 2
-    maxFilesMC = 12
+    #maxFilesMC = 1
+    #maxFilesData = 1
+    #maxFilesMC = 12
     #nWorkers = 1
 
     slaveParams = {}
     slaveParams["threshold"] = 35.
-    slaveParams["doPtShiftsJEC"] = False
-    #slaveParams["doPtShiftsJEC"] = True
+    #slaveParams["doPtShiftsJEC"] = False
+    slaveParams["doPtShiftsJEC"] = True
 
-    slaveParams["doPtShiftsJER"] = False
-    #slaveParams["doPtShiftsJER"] = True
+    #slaveParams["doPtShiftsJER"] = False
+    slaveParams["doPtShiftsJER"] = True
 
     slaveParams["recoJetCollection"] = "pfJets"
-    #slaveParams["recoJetCollection"] = "pfJetsSmear" # currently broken
+    #slaveParams["recoJetCollection"] = "pfJetsSmear" 
     slaveParams["recoJetCollectionBaseReco"] = "pfJets"
     slaveParams["recoJetCollectionGEN"] = "pfJets2Gen"
 
@@ -423,6 +414,7 @@ if __name__ == "__main__":
                                slaveParameters=slaveParams,
                                sampleList=sampleList,
                                maxFilesMC = maxFilesMC,
+                               maxFilesData = maxFilesData,
                                nWorkers=nWorkers,
                                outFile = "plotsMNxs.root" )
 
