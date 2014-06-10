@@ -65,7 +65,7 @@ for s in sampleListTodo:
   command+=" -GRID.ce_black_list="+blacklist
 
   #if int(sampleList[s]["crabJobs"]) < 500:
-  #    command+=" -submit "
+  #    command+=" -submit 1-10"
 
   if isData:
     print isData, sampleList[s]["json"]
