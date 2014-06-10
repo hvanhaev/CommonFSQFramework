@@ -51,12 +51,11 @@ class CMS_FWD_11_002(ExampleProofReader):
         for shift in self.todoShifts:
             for trg in todoTrg:
                 t = shift+trg
-                self.hist["ptFwd"+t] =  ROOT.TH1F("ptFwd"+t,   "ptFwd"+t,  100, 0, 100)
-                self.hist["ptCen"+t] =  ROOT.TH1F("ptCen"+t,   "ptCen"+t,  100, 0, 100)
                 self.hist["etaFwd"+t] =  ROOT.TH1F("etaFwd"+t,   "etaFwd"+t,  100, -5, 5)
                 self.hist["etaCen"+t] =  ROOT.TH1F("etaCen"+t,   "etaCen"+t,  100, -5, 5)
                 self.hist["vtx"+t] =  ROOT.TH1F("vtx"+t,   "vtx"+t,  10, -0.5, 9.5)
-                self.hist["pedro"+t] = ROOT.TH1F("ptFwdNormBinw"+t, "ptFwdNormBinw"+t, len(pedroPtBins)-1, pedroPtBins)
+                self.hist["ptFwd"+t] = ROOT.TH1F("ptFwd"+t, "ptFwd"+t, len(pedroPtBins)-1, pedroPtBins)
+                self.hist["ptCen"+t] =  ROOT.TH1F("ptCen"+t,   "ptCen"+t,   len(pedroPtBins)-1, pedroPtBins)
                 
 
         # follow the histogram naming convention even if it makes no sense for gen - needed for drawPlots.py
@@ -328,14 +327,20 @@ class CMS_FWD_11_002(ExampleProofReader):
                     weight *= puWeight
 
                 etaFactor = 3.
-                binN =  self.hist["pedro"+histoName].FindBin(pt)
-                binWidthFactor = self.hist["pedro"+histoName].GetBinWidth(binN)
-                self.hist["pedro"+histoName].Fill(fwdPt, weight/(etaFactor*binWidthFactor))
+                binN =  self.hist["ptFwd"+histoName].FindBin(fwdPt)
+                binWidthFactor = self.hist["ptFwd"+histoName].GetBinWidth(binN)
+                factor = etaFactor*binWidthFactor
+                self.hist["ptFwd"+histoName].Fill(fwdPt, weight/factor)
+                self.hist["etaFwd"+histoName].Fill(fwdEta , weight/factor)
 
-                self.hist["ptFwd"+histoName].Fill(fwdPt, weight)
-                self.hist["ptCen"+histoName].Fill(cenPt, weight)
-                self.hist["etaFwd"+histoName].Fill(fwdEta , weight)
-                self.hist["etaCen"+histoName].Fill(cenEta, weight)
+                etaFactor = 5.6
+                binN =  self.hist["ptCen"+histoName].FindBin(cenPt)
+                binWidthFactor = self.hist["ptCen"+histoName].GetBinWidth(binN)
+                factor = etaFactor*binWidthFactor
+                self.hist["ptCen"+histoName].Fill(cenPt, weight/factor)
+                self.hist["etaCen"+histoName].Fill(cenEta, weight/factor)
+
+
                 self.hist["vtx"+histoName].Fill(self.fChain.ngoodVTX, weight)
 
         return 1
@@ -376,11 +381,11 @@ if __name__ == "__main__":
     #sampleList=  ["Jet-Run2010B-Apr21ReReco-v1"] 
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
     #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
-    maxFilesMC = 1
-    maxFilesData = 1
+    #maxFilesMC = 1
+    #maxFilesData = 1
     #nWorkers = 16
     #maxFilesData = 1
-    nWorkers = 1
+    #nWorkers = 1
 
 
     slaveParams = {}
