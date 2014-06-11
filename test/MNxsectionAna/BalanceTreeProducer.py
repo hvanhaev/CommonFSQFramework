@@ -5,7 +5,9 @@ sys.path.append(os.path.dirname(__file__))
 
 import ROOT
 ROOT.gROOT.SetBatch(True)
-from ROOT import *
+ROOT.gSystem.Load("libFWCoreFWLite.so")
+ROOT.AutoLibraryLoader.enable()
+from ROOT import edm, JetCorrectionUncertainty
 
 from array import *
 
@@ -21,6 +23,122 @@ from array import *
 
 from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader
 
+class JetGetter:
+    def __init__(self, jType, JER, JECunc):
+        self.JER = JER
+        self.JECunc = JECunc
+
+        if jType == "PF":
+            self.jetcol = "pfJetsSmear"
+            self.jetcolGen ="pfJets2Gen"
+            self.jetcolReco = "pfJets"
+        elif jType == "Calo":
+            raise Exception("Jet collection not known "+jType)
+        else:
+            raise Exception("Jet collection not known "+jType)
+
+        self.cnt = 0
+        self.knownShifts = set(["_central", "_ptUp", "_ptDown", "_jerUp", "_jerDown"])
+        self.shiftsTODO = set()
+
+    def shiftsAvaliable(self):
+        return self.knownShifts
+
+    def doShifts(self, shifts):
+        for s in shifts:
+            if s not in self.knownShifts:
+                print "#"*30
+                print "Shift not known:", s
+                continue
+            self.shiftsTODO.add(s)
+
+        if len(self.shiftsTODO) == 0:
+            raise Exception("No shifts given!")
+
+    def newEvent(self, chain):
+        self.jets =  getattr(chain, self.jetcol) # smeared
+        sTODO = len(self.shiftsTODO)
+        hasCentral = "_central" in self.shiftsTODO
+        if sTODO > 1 or not hasCentral: # TODO: actually used only by JER
+            self.recoGenJets =  getattr(chain, self.jetcolGen)
+            self.recoBaseJets =  getattr(chain, self.jetcolReco)
+
+    def get(self, shift):
+        self.cnt = 0
+        if shift not in self.knownShifts:   # variation of a different kind, e.g. from PU
+            shift = "_central"
+
+        isJEC = shift.startswith("_pt")
+        isJER = shift.startswith("_jer")
+        isCentral = shift == ("_central")
+
+        
+        while self.cnt < self.jets.size():
+            jetSmeared = self.jets.at(self.cnt)
+            if isCentral:
+                yield jetSmeared
+                self.cnt += 1 # we could use a single cnt+=1 at the end, but this would be error prone
+                continue 
+            else:
+                if isJEC:
+                    self.JECunc.setJetEta(jetSmeared.eta())
+                    self.JECunc.setJetPt(jetSmeared.pt()) # should I use here smeared or normal pt??
+                    unc = self.JECunc.getUncertainty(True)
+                    if "_ptUp" == shift:
+                        ptFactor = 1.
+                    elif "_ptDown" == shift:
+                        ptFactor = -1.
+                    factor = (1. + ptFactor*unc)
+                    if factor <= 0: 
+                        yield ROOT.reco.Candidate.LorentzVector(0, 0, 0, 0)
+                        self.cnt+=1
+                        continue 
+                    else:
+                        yield jetSmeared*factor
+                        self.cnt+=1
+                        continue 
+                elif isJER:
+                    genJet = self.recoGenJets.at(self.cnt)
+                    recoJetNoSmear = self.recoBaseJets.at(self.cnt)
+                    if genJet.pt() < 0.01: 
+                        yield recoJetNoSmear
+                        self.cnt+=1
+                        continue 
+                    #
+                    eta = abs(recoJetNoSmear.eta())
+                    if eta > 5.:
+                        yield jetSmeared
+                        self.cnt+=1
+                        continue
+
+                    isOK = False
+                    for jerEntry in self.JER:
+                        if eta < jerEntry[0]:
+                            isOK = True
+                            break
+                    if not isOK:
+                        raise Exception("Cannot determine eta range "+ str(eta))
+                    if shift.endswith("Down"):
+                        factor = jerEntry[3]
+                    elif shift.endswith("Up"):
+                        factor = jerEntry[2]
+
+                    ptRec = recoJetNoSmear.pt()
+                    ptGen = genJet.pt()
+                    diff = ptRec-ptGen
+                    ptRet = max(0, ptGen+factor*diff)
+                    if ptRet == 0:
+                        yield ROOT.reco.Candidate.LorentzVector(0, 0, 0, 0)
+                        self.cnt+=1
+                        continue
+                    else:
+                        scaleFactor = ptRec/ptGen
+                        yield recoJetNoSmear* scaleFactor
+                        self.cnt+=1
+                        continue
+
+
+
 
 class BalanceTreeProducer(ExampleProofReader):
     def configureAnalyzer( self):
@@ -34,12 +152,12 @@ class BalanceTreeProducer(ExampleProofReader):
             self.todoShifts.append("_ptUp")
             self.todoShifts.append("_ptDown")
             self.jetUnc = JetCorrectionUncertainty(self.jetUncFile)
+        else:
+            self.jetUnc = None
 
         if not self.isData and self.doPtShiftsJER:
             self.todoShifts.append("_jerUp")
             self.todoShifts.append("_jerDown")
-
-
 
         for t in self.todoShifts:
             self.var["tagPt"+t] = array('d', [0])
@@ -117,6 +235,9 @@ class BalanceTreeProducer(ExampleProofReader):
             print "JER factors:", etaMax, jer, jerUp, jerDown, "|", err, errUp, errDown
             self.jer.append( [etaMax, jer, jerUp, jerDown] )
 
+        #     def __init__(self, jType, JER, JECunc):
+
+        self.jetGetter = JetGetter("PF", self.jer, self.jetUnc)
         sys.stdout.flush()
 
 
@@ -149,7 +270,7 @@ class BalanceTreeProducer(ExampleProofReader):
                     raise Exception("Cannot determine eta range "+ str(eta))
                 factorCentral = jerEntry[1]
                 ptGen =  genJet.pt()
-                diff = -(recoJet.pt() - ptGen)
+                diff = recoJet.pt() - ptGen
                 ptBase = max(0, ptGen+factorCentral*diff)
 
             pt = ptBase
@@ -194,7 +315,7 @@ class BalanceTreeProducer(ExampleProofReader):
 
             ptRec = recoJet.pt()
             ptGen = genJet.pt()
-            diff = -(ptRec-ptGen)
+            diff = ptRec-ptGen
             ptRet = max(0, ptGen+factor*diff)
 
             #ptSmearedCentral = max(0, ptGen+factorCentral*diff)
@@ -212,12 +333,9 @@ class BalanceTreeProducer(ExampleProofReader):
             self.var[v][0] = 0
     
 
-        #print "XXDS", self.datasetName, self.isData
 
-        recoJets = getattr(self.fChain, self.recoJetCollection)
-        #j1    = getattr(self.fChain, self.recoJetCollectionBaseReco)
-        #j2    =  getattr(self.fChain, self.recoJetCollectionGEN)
-        #print recoJets.size(), j1.size(), j2.size()
+        self.jetGetter.newEvent(self.fChain)
+        # xx recoJets = getattr(self.fChain, self.recoJetCollection)
 
 
 
@@ -233,41 +351,43 @@ class BalanceTreeProducer(ExampleProofReader):
             self.var["weight"][0] = weight
 
 
-            tagI = None
-            tagPT = None
-            probeI = None
+            tagJet = None
+            probeJet = None
             probePT = None
+            tagPT = None
 
-            for i in xrange(0, recoJets.size()):
-                jet = recoJets.at(i)
+            for jet in self.jetGetter.get(shift):
+            #for i in xrange(0, recoJets.size()):
+            #    jet = recoJets.at(i)
+                pt = jet.pt()
+                if pt < 35: continue
                 eta = abs(jet.eta())
                 if eta > 4.7: continue
-                pt = self.ptShifted(jet, i, shift)
-                if pt < 35: continue
                 if eta < 1.4:
-                    tagI = i
+                    tagJet = jet
                     tagPT = pt
                 else:
-                    probeI = i
+                    probeJet = jet
                     probePT = pt
 
-            if tagI != None and probeI != None:
+            if tagJet != None and probeJet != None:
                 # check veto:
                 badEvent = False
                 ptAve = (probePT+tagPT)/2
-                for i in xrange(0, recoJets.size()):
-                    if i == tagI or probeI == i: continue
+                for jet in self.jetGetter.get(shift):
+                #for i in xrange(0, recoJets.size()):
+                    if jet == tagJet or probeJet == jet: continue
                     eta = abs(jet.eta())
                     if eta > 4.7: continue
-                    veto =  recoJets.at(i).pt()/ptAve
+                    veto =  jet.pt()/ptAve
                     if veto > 0.2:
                         badEvent = True
                         break
                 if not badEvent:
                     self.var["tagPt"+shift][0] = tagPT 
-                    self.var["tagEta"+shift][0] =  abs(recoJets.at(tagI).eta())
+                    self.var["tagEta"+shift][0] =  abs(tagJet.eta())
                     self.var["probePt"+shift][0] = probePT
-                    self.var["probeEta"+shift][0] = abs(recoJets.at(probeI).eta())
+                    self.var["probeEta"+shift][0] = abs(probeJet.eta())
                     self.var["ptAve"+shift][0] = ptAve
                     self.var["balance"+shift][0] = (probePT-tagPT)/ptAve
                     fill = True
@@ -284,10 +404,11 @@ class BalanceTreeProducer(ExampleProofReader):
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
     ROOT.gSystem.Load("libFWCoreFWLite.so")
-    AutoLibraryLoader.enable()
+    ROOT.AutoLibraryLoader.enable()
 
     sampleList = None
-    maxFiles = None
+    maxFilesMC = None
+    maxFilesData = None
     nWorkers = None # Use all
 
     # debug config:
