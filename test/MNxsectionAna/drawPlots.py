@@ -265,15 +265,6 @@ def main():
                 if not curObj.InheritsFrom("TH1"):
                     print "Dont know how to merge", curObj.GetName(), curObj.ClassName()
                     continue
-                if "isNormalized"  == c.GetName(): # check HIST normalization for MC
-                    if not isData:
-                        val = curObj.GetBinContent(1)
-                        if val < 0.5:
-                            errMsg = "Expected to find normalized histograms in dir " + l.GetName()
-                            raise Exception(errMsg)
-                    continue
-
-
 
                 curObjClone = curObj.Clone()
                 curObjClone.SetDirectory(0)
