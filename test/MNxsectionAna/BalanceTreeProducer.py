@@ -56,13 +56,53 @@ class JetGetter:
             raise Exception("No shifts given!")
 
     def newEvent(self, chain):
-        self.jets =  getattr(chain, self.jetcol) # smeared
+        '''
+        self.jets =  getattr(chain, self.jetcol) # smeared / broken again
         sTODO = len(self.shiftsTODO)
         hasCentral = "_central" in self.shiftsTODO
         if sTODO > 1 or not hasCentral: # TODO: actually used only by JER
             self.recoGenJets =  getattr(chain, self.jetcolGen)
             self.recoBaseJets =  getattr(chain, self.jetcolReco)
+        '''
+        self.recoGenJets =  getattr(chain, self.jetcolGen)
+        self.recoBaseJets =  getattr(chain, self.jetcolReco)
 
+    # TODO: cacheing
+    def getSmeared(self, recoJetNoSmear, genJet, shift):
+        if genJet.pt() < 0.01: 
+            return recoJetNoSmear
+        eta = abs(recoJetNoSmear.eta())
+        if eta > 5.:
+            return recoJetNoSmear
+
+        isOK = False
+        for jerEntry in self.JER:
+            if eta < jerEntry[0]:
+                isOK = True
+                break
+        if not isOK:
+            raise Exception("Cannot determine eta range "+ str(eta))
+        if shift == "_central":
+            factor = jerEntry[1]
+        elif shift.endswith("Down"):
+            factor = jerEntry[3]
+        elif shift.endswith("Up"):
+            factor = jerEntry[2]
+        else:
+            raise Exception("Smear shift not known " + shift)
+
+        ptRec = recoJetNoSmear.pt()
+        ptGen = genJet.pt()
+        diff = ptRec-ptGen
+        ptRet = max(0, ptGen+factor*diff)
+        #print "    ", shift, eta, "d="+str(diff), "f="+str(factor), "|", ptGen, ptRec, ptRet
+        if ptRet == 0:
+            return ROOT.reco.Candidate.LorentzVector(0, 0, 0, 0)
+        else:
+            scaleFactor = ptRet/ptRec
+            return recoJetNoSmear* scaleFactor
+
+    # TODO: cacheing
     def get(self, shift):
         self.cnt = 0
         if shift not in self.knownShifts:   # variation of a different kind, e.g. from PU
@@ -71,10 +111,15 @@ class JetGetter:
         isJEC = shift.startswith("_pt")
         isJER = shift.startswith("_jer")
         isCentral = shift == ("_central")
-
         
-        while self.cnt < self.jets.size():
-            jetSmeared = self.jets.at(self.cnt)
+        #while self.cnt < self.jets.size():
+        while self.cnt < self.recoBaseJets.size():
+            #jetSmeared = self.jets.at(self.cnt)
+            genJet = self.recoGenJets.at(self.cnt)
+            recoJetNoSmear = self.recoBaseJets.at(self.cnt)
+            if isCentral or isJEC:
+                jetSmeared =  self.getSmeared(recoJetNoSmear, genJet, "_central")
+
             if isCentral:
                 yield jetSmeared
                 self.cnt += 1 # we could use a single cnt+=1 at the end, but this would be error prone
@@ -98,46 +143,13 @@ class JetGetter:
                         self.cnt+=1
                         continue 
                 elif isJER:
-                    genJet = self.recoGenJets.at(self.cnt)
-                    recoJetNoSmear = self.recoBaseJets.at(self.cnt)
-                    if genJet.pt() < 0.01: 
-                        yield recoJetNoSmear
-                        self.cnt+=1
-                        continue 
-                    #
-                    eta = abs(recoJetNoSmear.eta())
-                    if eta > 5.:
-                        yield jetSmeared
-                        self.cnt+=1
-                        continue
-
-                    isOK = False
-                    for jerEntry in self.JER:
-                        if eta < jerEntry[0]:
-                            isOK = True
-                            break
-                    if not isOK:
-                        raise Exception("Cannot determine eta range "+ str(eta))
-                    if shift.endswith("Down"):
-                        factor = jerEntry[3]
-                    elif shift.endswith("Up"):
-                        factor = jerEntry[2]
-
-                    ptRec = recoJetNoSmear.pt()
-                    ptGen = genJet.pt()
-                    diff = ptRec-ptGen
-                    ptRet = max(0, ptGen+factor*diff)
-                    if ptRet == 0:
-                        yield ROOT.reco.Candidate.LorentzVector(0, 0, 0, 0)
-                        self.cnt+=1
-                        continue
-                    else:
-                        scaleFactor = ptRec/ptGen
-                        yield recoJetNoSmear* scaleFactor
-                        self.cnt+=1
-                        continue
-
-
+                    #genJet = self.recoGenJets.at(self.cnt)
+                    #recoJetNoSmear = self.recoBaseJets.at(self.cnt)
+                    yield self.getSmeared(recoJetNoSmear, genJet, shift)
+                    self.cnt+=1
+                    continue 
+                else:
+                    raise Exception("getJets - never should get here")
 
 
 class BalanceTreeProducer(ExampleProofReader):
@@ -324,6 +336,7 @@ class BalanceTreeProducer(ExampleProofReader):
 
 
     def analyze(self):
+        #print "----"
         if self.fChain.ngoodVTX == 0: return
         if self.isData:
             if self.fChain.jet15 < 0.5:
@@ -335,7 +348,7 @@ class BalanceTreeProducer(ExampleProofReader):
 
 
         self.jetGetter.newEvent(self.fChain)
-        # xx recoJets = getattr(self.fChain, self.recoJetCollection)
+        recoJets = getattr(self.fChain, self.recoJetCollection)
 
 
 
@@ -356,9 +369,15 @@ class BalanceTreeProducer(ExampleProofReader):
             probePT = None
             tagPT = None
 
+
+            dbgCnt = 0
             for jet in self.jetGetter.get(shift):
             #for i in xrange(0, recoJets.size()):
             #    jet = recoJets.at(i)
+                dbgJet = recoJets.at(dbgCnt)
+                dbgCnt+=1
+                #print shift, dbgCnt,"|", jet.pt(), jet.eta(), "|", dbgJet.pt(), dbgJet.eta()
+
                 pt = jet.pt()
                 if pt < 35: continue
                 eta = abs(jet.eta())
@@ -418,9 +437,9 @@ if __name__ == "__main__":
     #sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
     #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
-    #maxFilesMC = 2
+    #maxFilesData = 1
     #maxFilesMC = 1
-    #nWorkersMC = 1
+    #nWorkers = 1
 
 
     slaveParams = {}
@@ -432,8 +451,8 @@ if __name__ == "__main__":
     slaveParams["doPtShiftsJER"] = True
 
 
-    slaveParams["recoJetCollection"] = "pfJets"
-    #slaveParams["recoJetCollection"] = "pfJetsSmear"
+    #slaveParams["recoJetCollection"] = "pfJets"
+    slaveParams["recoJetCollection"] = "pfJetsSmear"
     slaveParams["recoJetCollectionBaseReco"] = "pfJets"
     slaveParams["recoJetCollectionGEN"] = "pfJets2Gen"
     #slaveParams["recoJetCollection"] = "caloJets"
