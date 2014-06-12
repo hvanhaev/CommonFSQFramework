@@ -92,7 +92,7 @@ class BalanceTreeProducer(ExampleProofReader):
 
 
         self.jetGetter.newEvent(self.fChain)
-        recoJets = getattr(self.fChain, self.recoJetCollection)
+        # recoJets = getattr(self.fChain, self.recoJetCollection)
 
 
 
@@ -114,12 +114,12 @@ class BalanceTreeProducer(ExampleProofReader):
             tagPT = None
 
 
-            dbgCnt = 0
+            #dbgCnt = 0
             for jet in self.jetGetter.get(shift):
             #for i in xrange(0, recoJets.size()):
             #    jet = recoJets.at(i)
-                dbgJet = recoJets.at(dbgCnt)
-                dbgCnt+=1
+                #dbgJet = recoJets.at(dbgCnt)
+                #dbgCnt+=1
                 #print shift, dbgCnt,"|", jet.pt(), jet.eta(), "|", dbgJet.pt(), dbgJet.eta()
 
                 pt = jet.pt()
