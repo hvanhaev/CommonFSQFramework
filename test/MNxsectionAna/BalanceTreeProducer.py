@@ -24,22 +24,74 @@ from array import *
 from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader
 
 class JetGetter:
-    def __init__(self, jType, JER, JECunc):
-        self.JER = JER
-        self.JECunc = JECunc
+    def __init__(self, jType):
 
         if jType == "PF":
             self.jetcol = "pfJetsSmear"
             self.jetcolGen ="pfJets2Gen"
             self.jetcolReco = "pfJets"
+            self.setJERScenario("PF10")
         elif jType == "Calo":
             raise Exception("Jet collection not known "+jType)
+            self.setJERScenario("Calo10")
         else:
             raise Exception("Jet collection not known "+jType)
+        jetUncFile = "START41_V0_AK5PF_Uncertainty.txt"
+        jecFileFP =  edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"+jetUncFile).fullPath()
+        self.JECunc = JetCorrectionUncertainty(jecFileFP)
 
         self.cnt = 0
         self.knownShifts = set(["_central", "_ptUp", "_ptDown", "_jerUp", "_jerDown"])
         self.shiftsTODO = set()
+
+    def setJERScenario(self, scenario):
+        known = set(["PF10", "PF11", "Calo10"])
+        if scenario not in known:
+            raise Exception("JER scenario not known: "+scenario)
+        calo = []
+        calo.append("1.1 1.088 0.007 0.07 0.075") 
+        calo.append("1.7 1.139 0.019 0.08 0.084") 
+        calo.append("2.3 1.082 0.030 0.14 0.139")
+        calo.append("5.0 1.065 0.042 0.23 0.235")
+
+        pf = []
+        pf.append("1.1 1.066 0.007 0.07 0.072") 
+        pf.append("1.7 1.191 0.019 0.06 0.062")
+        pf.append("2.3 1.096 0.030 0.08 0.085")
+        pf.append("5.0 1.166 0.050 0.19 0.199") 
+
+        pf11 = []
+        pf11.append("0.5 1.052 0.012 0.062 0.061")
+        pf11.append("1.1 1.057 0.012 0.056 0.055")
+        pf11.append("1.7 1.096 0.017 0.063 0.062")
+        pf11.append("2.3 1.134 0.035 0.087 0.085")
+        pf11.append("5.0 1.288 0.127 0.155 0.153")
+
+        if scenario == "PF10":
+            self.setJER(pf)
+        elif scenario == "Calo10":
+            self.setJER(calo)
+        elif scenario == "PF11":
+            self.setJER(pf11)
+        else:
+            raise Exception("Thats confusing "+scenario)
+
+    def setJER(self, todo):
+        self.JER = []
+        for line in todo:
+            spl = line.split()
+            etaMax = float(spl[0])
+            jer = float(spl[1])
+            err = float(spl[2])
+            errUp = float(spl[3])
+            errDown = float(spl[4])
+            jerUp   = jer + ROOT.TMath.Sqrt(err*err+errUp*errUp)
+            jerDown = jer - ROOT.TMath.Sqrt(err*err+errDown*errDown)
+            print "JER factors:", etaMax, jer, jerUp, jerDown, "|", err, errUp, errDown
+            self.JER.append( [etaMax, jer, jerUp, jerDown] )
+
+    def setJecUncertainty(self, jecUncPath):
+        self.JECunc = JetCorrectionUncertainty(jecUncPath)
 
     def shiftsAvaliable(self):
         return self.knownShifts
@@ -160,12 +212,10 @@ class BalanceTreeProducer(ExampleProofReader):
 
         self.var = {}
         self.todoShifts = ["_central"]
-        if hasattr(self, "jetUncFile") and not self.isData and self.doPtShiftsJEC:
+
+        if not self.isData and self.doPtShiftsJEC:
             self.todoShifts.append("_ptUp")
             self.todoShifts.append("_ptDown")
-            self.jetUnc = JetCorrectionUncertainty(self.jetUncFile)
-        else:
-            self.jetUnc = None
 
         if not self.isData and self.doPtShiftsJER:
             self.todoShifts.append("_jerUp")
@@ -202,54 +252,11 @@ class BalanceTreeProducer(ExampleProofReader):
         self.lumiWeighters["_dj15fb_puUp"] = edm.LumiReWeighting(jet15FileV2, puFiles["dj15_1_05"], "MC", "pileup")
         self.lumiWeighters["_dj15fb_puDown"] = edm.LumiReWeighting(jet15FileV2, puFiles["dj15_0_95"], "MC", "pileup")
 
-        calo = []
-        calo.append("1.1 1.088 0.007 0.07 0.075") 
-        calo.append("1.7 1.139 0.019 0.08 0.084") 
-        calo.append("2.3 1.082 0.030 0.14 0.139")
-        calo.append("5.0 1.065 0.042 0.23 0.235")
 
-        pf = []
-        pf.append("1.1 1.066 0.007 0.07 0.072") 
-        pf.append("1.7 1.191 0.019 0.06 0.062")
-        pf.append("2.3 1.096 0.030 0.08 0.085")
-        pf.append("5.0 1.166 0.050 0.19 0.199") 
+        self.jetGetter = JetGetter("PF")
+        if hasattr(self, "jetUncFile"):
+            self.jetGetter.setJecUncertainty(self.jetUncFile)
 
-        ''' 2011 factors for xcheck
-        # for this factors obtained up/down values are
-        # consistent with those from JetResolution twiki
-        pf.append("0.5 1.052 0.012 0.062 0.061")
-        pf.append("1.1 1.057 0.012 0.056 0.055")
-        pf.append("1.7 1.096 0.017 0.063 0.062")
-        pf.append("2.3 1.134 0.035 0.087 0.085")
-        pf.append("5.0 1.288 0.127 0.155 0.153")
-        '''
-
-        todo = None
-        if self.recoJetCollection.startswith("pf"):
-            todo = pf
-        elif self.recoJetCollection.startswith("calo"):
-            todo = calo
-        else:
-            raise Exception("Dont know how to apply JER smearing to " + self.recoJetCollection)
-
-        self.jer = []
-        for line in todo:
-            spl = line.split()
-            etaMax = float(spl[0])
-            jer = float(spl[1])
-            err = float(spl[2])
-            errUp = float(spl[3])
-            errDown = float(spl[4])
-            jerUp   = jer + ROOT.TMath.Sqrt(err*err+errUp*errUp)
-            jerDown = jer - ROOT.TMath.Sqrt(err*err+errDown*errDown)
-            #jerUp = 1
-            #jerDown = 1 # XXAA
-            print "JER factors:", etaMax, jer, jerUp, jerDown, "|", err, errUp, errDown
-            self.jer.append( [etaMax, jer, jerUp, jerDown] )
-
-        #     def __init__(self, jType, JER, JECunc):
-
-        self.jetGetter = JetGetter("PF", self.jer, self.jetUnc)
         sys.stdout.flush()
 
     def analyze(self):
@@ -348,16 +355,17 @@ if __name__ == "__main__":
     nWorkers = None # Use all
 
     # debug config:
-    #sampleList=[]
-    #sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
+    '''
+    sampleList=[]
+    sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
     #sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
     #sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
     #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
-    #maxFilesData = 1
-    #maxFilesMC = 1
-    #nWorkers = 1
-
+    maxFilesData = 1
+    maxFilesMC = 1
+    nWorkers = 1
+    #'''
 
     slaveParams = {}
     slaveParams["threshold"] = 35.
