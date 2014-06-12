@@ -208,7 +208,7 @@ class MNxsAnalyzer(ExampleProofReader):
             return ptRet
 
 
-    #'''
+    '''
     # stuff for code profiling
     def analyze(self):
         self.pr.enable()
@@ -225,8 +225,8 @@ class MNxsAnalyzer(ExampleProofReader):
         
 
 
-    def analyzeTT(self):
-    #def analyze(self):
+    #def analyzeTT(self):
+    def analyze(self):
             
         #if self.fChain.jet15 > 0.5:
         #    print "XXX", self.fChain.run, self.fChain.lumi
