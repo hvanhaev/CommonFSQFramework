@@ -26,7 +26,7 @@ if __name__ == "__main__":
     target = args[0]
 
 
-    treeFilesAndNormalizations = getTreeFilesAndNormalizations(maxFiles = None)
+    treeFilesAndNormalizations = getTreeFilesAndNormalizations()
 
     anaDefFile = os.environ["SmallXAnaDefFile"]
     mod_dir, filename = os.path.split(anaDefFile)

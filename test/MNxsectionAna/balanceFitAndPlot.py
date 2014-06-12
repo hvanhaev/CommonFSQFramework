@@ -315,3 +315,6 @@ if __name__ == "__main__":
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     AutoLibraryLoader.enable()
     main()
+    print "./drawPlots.py -s -i ~/tmp/balanceHistos.root"
+
+

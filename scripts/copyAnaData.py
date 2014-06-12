@@ -166,7 +166,13 @@ def checkDataIntegrity(remove = False, checkFilesWithRoot = False):
                             continue
 
                     # root -l -b -q
-                    fileMap.setdefault(fileNum, []).append(fp)
+                    fsize = os.path.getsize(fp)
+                    if fsize == 0:
+                        print "Empty file:", fp
+                        if remove:
+                            os.system("rm "+fp)
+                    else:
+                        fileMap.setdefault(fileNum, []).append(fp)
                     #print f
 
             for num in fileMap:

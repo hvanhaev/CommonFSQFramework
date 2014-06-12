@@ -19,8 +19,8 @@ from array import *
 from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader
 
 class DerivedProofReader(ExampleProofReader):
-    def configureAnalyzer( self):
-        print "configureAnalyzer - DerivedProofReader"
+    def init( self):
+        print "init - DerivedProofReader"
         self.hist = {}
 
         self.hist["ptLeadHisto"] =  ROOT.TH1F("ptLead",   "ptLead",  100, 0, 100)
@@ -70,7 +70,12 @@ class DerivedProofReader(ExampleProofReader):
             cls.runAll(treeName="exampleTree", outFile = oname, maxFiles = t)
             os.system("../../scripts/normalizeAndAddHistograms.py -i "+oname + " -o " + onameMerged)
 
-
+    def finalize(self):
+        print "Finalize:"
+        normFactor = self.getNormalizationFactor()
+        print "  applying norm", normFactor
+        for h in self.hist:
+            self.hist[h].Scale(normFactor)
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)

@@ -1,8 +1,4 @@
 #!/usr/bin/env python
-
-from MNTriggerStudies.MNTriggerAna.GetDatasetInfo import getTreeFilesAndNormalizations
-import MNTriggerStudies.MNTriggerAna.Util
-
 ###############################################################################
 #
 #  TODO: 
@@ -49,17 +45,19 @@ import MNTriggerStudies.MNTriggerAna.Util
 
 import sys, os, time, traceback
 sys.path.append(os.path.dirname(__file__))
-
 import ROOT
 ROOT.gROOT.SetBatch(True)
-from ROOT import *
 
 from array import *
 
+from MNTriggerStudies.MNTriggerAna.GetDatasetInfo import getTreeFilesAndNormalizations
+import MNTriggerStudies.MNTriggerAna.Util
+
+
 # please note that python selector class name (here: ExampleProofReader) 
 # should be consistent with this file name (ExampleProofReader.py)
-from ROOT import TPySelector
-class ExampleProofReader( TPySelector ):
+#from ROOT import TPySelector
+class ExampleProofReader( ROOT.TPySelector ):
     uniqueEnvString = "TMFTMFqWeRtY_"
 
     @classmethod
@@ -118,7 +116,7 @@ class ExampleProofReader( TPySelector ):
 
         try:
             self.getVariables()
-            self.configureAnalyzer() 
+            self.init() 
         except:
             print "Exception catched during worker configuration. Traceback:"
             traceback.print_exc(file=sys.stdout)
@@ -127,7 +125,7 @@ class ExampleProofReader( TPySelector ):
 
 
     # this method will be overridden in derived class
-    def configureAnalyzer(self):
+    def init(self):
         self.histograms = {}
         self.ptLeadHisto = ROOT.TH1F("ptLead",   "ptLead",  100, 0, 100)      
         self.ptRatioHisto = ROOT.TH1F("ptRatio", "ptRatio", 100, -0.0001, 10)      
@@ -183,31 +181,26 @@ class ExampleProofReader( TPySelector ):
 
     def SlaveTerminate( self ):
         print 'py: slave terminating'
+        self.finalize()
+
+    def finalize(self):
+        print "Please implement finalize function."
+
+    def getNormalizationFactor(self):
+        if self.isData:
+            return 1.
+        else:
+            return self.normalizationFactor
 
     def Terminate( self ): # executed once on client
         #print 'py: terminating' 
         olist =  self.GetOutputList()
-
         of = ROOT.TFile(self.outFile, "UPDATE") # TODO - take dir name from Central file
-
         outDir = of.mkdir(self.datasetName)
         outDir.cd()
 
-        if self.doNormalization:
-            print "Will try to apply scale:", self.normalizationFactor
-
         #print "XXXX", ROOT.gDirectory.GetPath()
         for o in olist:
-            if self.doNormalization:
-                if not o.InheritsFrom("TH1"):
-                    print "Dont know how to scale object:", o.GetName(), o.ClassName()
-                else:
-                    if self.isData:
-                        print "Cowardly refusing to apply normalization constant to data sample", self.datasetName[:20]
-                    else:
-                        print " Applying  normalization constant", self.normalizationFactor, \
-                              "to data sample", self.datasetName[:20], "histo", o.GetName()
-                        o.Scale(self.normalizationFactor)
             o.Write()
 
         of.Close()
@@ -215,7 +208,7 @@ class ExampleProofReader( TPySelector ):
     @classmethod
     def runAll(cls, treeName, outFile, sampleList = None, \
                 maxFilesMC=None, maxFilesData=None, \
-                normalize=True, slaveParameters = None, nWorkers=None):
+                slaveParameters = None, nWorkers=None):
 
 
         if slaveParameters == None: # When default param is used reset contents on every call to runAll
@@ -237,11 +230,9 @@ class ExampleProofReader( TPySelector ):
             sys.exit()
         of.Close() # so we dont mess with file opens during proof ana
         
-        slaveParameters["doNormalization"] = normalize # normalization factor set in event loop
         slaveParameters["outFile"] = outFile
 
 
-        #print "XXX", normalize, slaveParameters["doNormalization"]
 
         skipped = []
 
@@ -252,7 +243,7 @@ class ExampleProofReader( TPySelector ):
                 skipped.append(t)
                 continue
 
-            dataset = TDSet( 'TTree', 'data', treeName) # the last name is the directory name inside the root file
+            dataset = ROOT.TDSet( 'TTree', 'data', treeName) # the last name is the directory name inside the root file
             for file in treeFilesAndNormalizations[t]["files"]:
                 dataset.Add( 'root://'+file)
             
@@ -260,7 +251,7 @@ class ExampleProofReader( TPySelector ):
             slaveParameters["isData"] = sampleListFullInfo[t]["isData"]
             slaveParameters["normalizationFactor"] =  treeFilesAndNormalizations[t]["normFactor"]
 
-            TProof.AddEnvVar("PATH2",ROOT.gSystem.Getenv("PYTHONPATH")+":"+os.getcwd())
+            ROOT.TProof.AddEnvVar("PATH2",ROOT.gSystem.Getenv("PYTHONPATH")+":"+os.getcwd())
 
             #ROOT.gSystem.Setenv("TMFDatasetName", t)
 
@@ -286,9 +277,9 @@ class ExampleProofReader( TPySelector ):
             variablesToSetInProof[cls.encodeEnvString("VariablesToFetch")] = variablesToFetch
 
             if nWorkers == None:
-                proof = TProof.Open('')
+                proof = ROOT.TProof.Open('')
             else:
-                proof = TProof.Open('workers='+str(nWorkers))
+                proof = ROOT.TProof.Open('workers='+str(nWorkers))
 
             
             proof.Exec( 'gSystem->Setenv("PYTHONPATH",gSystem->Getenv("PATH2"));') # for some reason cannot use method below for python path
@@ -296,9 +287,8 @@ class ExampleProofReader( TPySelector ):
             for v in variablesToSetInProof:  
                 # if you get better implemenation (GetParameter?) mail me
                 proof.Exec('gSystem->Setenv("'+v+'","'+variablesToSetInProof[v]+'");')
-            #print dataset.Process( 'TPySelector', 'ExampleProofReader')
             print "Running:", cls.__name__
-            print dataset.Process( 'TPySelector', cls.__name__)
+            print dataset.Process( 'TPySelector',  cls.__name__)
             curPath = ROOT.gDirectory.GetPath()
 
 
@@ -317,15 +307,6 @@ class ExampleProofReader( TPySelector ):
             #saveDir.WriteObject(hist, hist.GetName())
             hist.Write(hist.GetName())
 
-
-
-            hist = ROOT.TH1D("isNormalized", "isNormalized", 1,0,1)
-            value = 0
-            if normalize:
-                value = 1
-            hist.SetBinContent(1, value)
-            #saveDir.WriteObject(hist, hist.GetName())
-            hist.Write(hist.GetName())
             of.Close()
             ROOT.gDirectory.cd(curPath)
 
@@ -352,7 +333,7 @@ class ExampleProofReader( TPySelector ):
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
     ROOT.gSystem.Load("libFWCoreFWLite.so")
-    AutoLibraryLoader.enable()
+    ROOT.AutoLibraryLoader.enable()
 
     slaveParams = {}
 
@@ -368,6 +349,6 @@ if __name__ == "__main__":
 
     ExampleProofReader.runAll(treeName="exampleTree", maxFilesMC = 10, \
                               slaveParameters=slaveParams, \
-                              outFile = "~/tmp/plots.root", \
-                              normalize = True)
+                              outFile = "~/tmp/plots.root")
+                              
     # '''

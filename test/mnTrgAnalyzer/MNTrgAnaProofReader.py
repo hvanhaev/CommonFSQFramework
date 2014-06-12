@@ -19,7 +19,7 @@ from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader
 
 class MNTrgAnaProofReader(ExampleProofReader):
     #def SlaveBegin( self, tree ):
-    def configureAnalyzer(self):
+    def init(self):
         print 'configure: MNTrgAnaProofReader'
         self.lastEv  = 0
         self.lastRun = 0
@@ -272,6 +272,12 @@ class MNTrgAnaProofReader(ExampleProofReader):
 
             del getBinCenter
 
+    def finalize(self):
+        print "Finalize:"
+        normFactor = self.getNormalizationFactor()
+        print "  applying norm", normFactor
+        for h in self.hist:
+            self.hist[h].Scale(normFactor)
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
