@@ -129,8 +129,18 @@ def checkDataIntegrity(remove = False, checkFilesWithRoot = False):
 
     sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
     for s in sampleList:
-        print "Doing", s
-        todo = [sampleList[s]["pathPAT"], sampleList[s]["pathTrees"]]
+        todo = []
+        if "pathTrees" in sampleList[s]:
+            todo.append(sampleList[s]["pathTrees"])
+        if "pathPAT" in sampleList[s]:
+            todo.append(sampleList[s]["pathPAT"])
+
+        if len(todo)>0:
+            print "Doing", s
+        else:
+            print "No files found for sample", s, ",skipping"
+            continue
+        
         for t in todo:
             fileMap = {}
             for root, dirs, files in os.walk(t):
