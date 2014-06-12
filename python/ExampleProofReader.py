@@ -116,7 +116,7 @@ class ExampleProofReader( ROOT.TPySelector ):
 
         try:
             self.getVariables()
-            self.configureAnalyzer() 
+            self.init() 
         except:
             print "Exception catched during worker configuration. Traceback:"
             traceback.print_exc(file=sys.stdout)
@@ -125,7 +125,7 @@ class ExampleProofReader( ROOT.TPySelector ):
 
 
     # this method will be overridden in derived class
-    def configureAnalyzer(self):
+    def init(self):
         self.histograms = {}
         self.ptLeadHisto = ROOT.TH1F("ptLead",   "ptLead",  100, 0, 100)      
         self.ptRatioHisto = ROOT.TH1F("ptRatio", "ptRatio", 100, -0.0001, 10)      
@@ -181,31 +181,26 @@ class ExampleProofReader( ROOT.TPySelector ):
 
     def SlaveTerminate( self ):
         print 'py: slave terminating'
+        self.finalize()
+
+    def finalize(self):
+        print "Please implement finalize function."
+
+    def getNormalizationFactor(self):
+        if self.isData:
+            return 1.
+        else:
+            return self.normalizationFactor
 
     def Terminate( self ): # executed once on client
         #print 'py: terminating' 
         olist =  self.GetOutputList()
-
         of = ROOT.TFile(self.outFile, "UPDATE") # TODO - take dir name from Central file
-
         outDir = of.mkdir(self.datasetName)
         outDir.cd()
 
-        if self.doNormalization:
-            print "Will try to apply scale:", self.normalizationFactor
-
         #print "XXXX", ROOT.gDirectory.GetPath()
         for o in olist:
-            if self.doNormalization:
-                if not o.InheritsFrom("TH1"):
-                    print "Dont know how to scale object:", o.GetName(), o.ClassName()
-                else:
-                    if self.isData:
-                        print "Cowardly refusing to apply normalization constant to data sample", self.datasetName[:20]
-                    else:
-                        print " Applying  normalization constant", self.normalizationFactor, \
-                              "to data sample", self.datasetName[:20], "histo", o.GetName()
-                        o.Scale(self.normalizationFactor)
             o.Write()
 
         of.Close()
@@ -213,7 +208,7 @@ class ExampleProofReader( ROOT.TPySelector ):
     @classmethod
     def runAll(cls, treeName, outFile, sampleList = None, \
                 maxFilesMC=None, maxFilesData=None, \
-                normalize=True, slaveParameters = None, nWorkers=None):
+                slaveParameters = None, nWorkers=None):
 
 
         if slaveParameters == None: # When default param is used reset contents on every call to runAll
@@ -235,11 +230,9 @@ class ExampleProofReader( ROOT.TPySelector ):
             sys.exit()
         of.Close() # so we dont mess with file opens during proof ana
         
-        slaveParameters["doNormalization"] = normalize # normalization factor set in event loop
         slaveParameters["outFile"] = outFile
 
 
-        #print "XXX", normalize, slaveParameters["doNormalization"]
 
         skipped = []
 
@@ -314,15 +307,6 @@ class ExampleProofReader( ROOT.TPySelector ):
             #saveDir.WriteObject(hist, hist.GetName())
             hist.Write(hist.GetName())
 
-
-
-            hist = ROOT.TH1D("isNormalized", "isNormalized", 1,0,1)
-            value = 0
-            if normalize:
-                value = 1
-            hist.SetBinContent(1, value)
-            #saveDir.WriteObject(hist, hist.GetName())
-            hist.Write(hist.GetName())
             of.Close()
             ROOT.gDirectory.cd(curPath)
 
@@ -365,6 +349,6 @@ if __name__ == "__main__":
 
     ExampleProofReader.runAll(treeName="exampleTree", maxFilesMC = 10, \
                               slaveParameters=slaveParams, \
-                              outFile = "~/tmp/plots.root", \
-                              normalize = True)
+                              outFile = "~/tmp/plots.root")
+                              
     # '''

@@ -25,11 +25,11 @@ from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
 #import DiJetBalancePlugin
 
 class MNxsAnalyzer(ExampleProofReader):
-    def configureAnalyzer( self):
+    def init( self):
 
         #sys.stdout = sys.stderr
         #self.pr = cProfile.Profile()
-        print "XXX configureAnalyzer - MNxsAnalyzer", self.datasetName, self.isData
+        print "XXX init - MNxsAnalyzer", self.datasetName, self.isData
 
         self.todoShifts = ["_central"]
         if not self.isData and self.doPtShiftsJEC:
@@ -182,6 +182,12 @@ class MNxsAnalyzer(ExampleProofReader):
                     self.hist["etaLead"+histoName].Fill(etaLead, weight)
                     self.hist["etaSublead"+histoName].Fill(etaSublead, weight)
 
+    def finalize(self):
+        print "Finalize:"
+        normFactor = self.getNormalizationFactor()
+        print "  applying norm", normFactor
+        for h in self.hist:
+            self.hist[h].Scale(normFactor)
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
@@ -193,8 +199,8 @@ if __name__ == "__main__":
 
     # debug config:
     '''
-    #sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
-    sampleList=  ["JetMETTau-Run2010A-Apr21ReReco-v1"]
+    sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
+    #sampleList=  ["JetMETTau-Run2010A-Apr21ReReco-v1"]
     #sampleList=  ["Jet-Run2010B-Apr21ReReco-v1"] 
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
     #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
@@ -203,6 +209,8 @@ if __name__ == "__main__":
     #maxFilesMC = 12
     nWorkers = 1
     # '''
+    maxFilesMC = 12
+    nWorkers = 12
 
     slaveParams = {}
     slaveParams["threshold"] = 35.

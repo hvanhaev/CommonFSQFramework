@@ -25,7 +25,7 @@ from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader
 from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
 
 class BalanceTreeProducer(ExampleProofReader):
-    def configureAnalyzer( self):
+    def init( self):
 
         self.tree = ROOT.TTree("data", "data")
         self.GetOutputList().Add(self.tree)
@@ -163,6 +163,12 @@ class BalanceTreeProducer(ExampleProofReader):
 
         return 1
 
+    def finalize(self):
+        print "Finalize:"
+        normFactor = self.getNormalizationFactor()
+        print "  applying norm", normFactor
+        for h in self.hist:
+            self.hist[h].Scale(normFactor)
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)

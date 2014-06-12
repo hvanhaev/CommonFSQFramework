@@ -22,8 +22,8 @@ from array import *
 from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
 
 class CMS_FWD_11_002(ExampleProofReader):
-    def configureAnalyzer( self):
-        print "XXX configureAnalyzer - CMS_FWD_11_002", self.datasetName, self.isData
+    def init( self):
+        print "XXX init - CMS_FWD_11_002", self.datasetName, self.isData
 
         self.todoShifts = ["_central"]
         if not self.isData and self.doPtShiftsJEC:
@@ -164,24 +164,12 @@ class CMS_FWD_11_002(ExampleProofReader):
                 self.hist["vtx"+histoName].Fill(self.fChain.ngoodVTX, weight)
         return 1
 
-
-
-    @classmethod
-    def testAll(cls):
-        # same as the label of EDProducer that was used to produce the trees
-        #todo = [400, 100, 25, 8, 2]
-        todo =[1,6,25,100,400]
-        #todo = [8]
-        for t in todo:
-            oname = "~/tmp/plots_"+str(t)+".root"
-            onameMerged = "~/tmp/plotsMerged_"+str(t)+".root"
-            #pr = CMS_FWD_11_002()
-            #pr.runAll(treeName="exampleTree", outFile = oname, maxFiles = t)
-            #CMS_FWD_11_002.CMS_FWD_11_002().runAll(treeName="exampleTree", outFile = oname, maxFiles = t)
-            cls.runAll(treeName="exampleTree", outFile = oname, maxFiles = t)
-            os.system("../../scripts/normalizeAndAddHistograms.py -i "+oname + " -o " + onameMerged)
-
-
+    def finalize(self):
+        print "Finalize:"
+        normFactor = self.getNormalizationFactor()
+        print "  applying norm", normFactor
+        for h in self.hist:
+            self.hist[h].Scale(normFactor)
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
