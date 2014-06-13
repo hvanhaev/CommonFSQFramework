@@ -62,7 +62,7 @@ class DrawPlots():
 
         return ret
 
-    def getLumi(self, target, samples):
+    def getLumi(self, target, samples): # override
         if "data_" not in target:
             raise Exception("getLumi called for "+ target )
 
@@ -96,7 +96,7 @@ class DrawPlots():
 
 
 
-    def getTarget(self, histoName, sampleName):
+    def getTarget(self, histoName, sampleName): # override
         ''' target naming convention:
                 - name should consist of two parts separated by underscore
 
@@ -127,15 +127,15 @@ class DrawPlots():
 
         return retName
 
-    def applyScale(self, histoName, sampleName):
+    def applyScale(self, histoName, sampleName): # override
         if histoName.startswith("balance"): return False
         return True
 
-    def setGlobalStyle(self):
+    def setGlobalStyle(self):  # override
         MNTriggerStudies.MNTriggerAna.Style.setStyle()
 
 
-    def decorate(self, canvas, dataHisto, MCStack, errBand):
+    def decorate(self, canvas, dataHisto, MCStack, errBand): # override
         canvas.SetLogy()
 
         name = dataHisto.GetName()
@@ -174,7 +174,7 @@ class DrawPlots():
         legend.Draw("SAME")
         self.keep.append(legend)
 
-    def draw(self):
+    def draw(self): # core function
         self.setGlobalStyle()
         sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
         parser = OptionParser(usage="usage: %prog [options] filename",
