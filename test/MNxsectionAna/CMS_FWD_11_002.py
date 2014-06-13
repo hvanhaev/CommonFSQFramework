@@ -46,11 +46,13 @@ class CMS_FWD_11_002(ExampleProofReader):
                 self.hist["vtx"+t] =  ROOT.TH1F("vtx"+t,   "vtx"+t,  10, -0.5, 9.5)
                 self.hist["ptFwd"+t] = ROOT.TH1F("ptFwd"+t, "ptFwd"+t, len(pedroPtBins)-1, pedroPtBins)
                 self.hist["ptCen"+t] =  ROOT.TH1F("ptCen"+t,   "ptCen"+t,   len(pedroPtBins)-1, pedroPtBins)
+                self.hist["xs"+t] = ROOT.TH1F("xs"+t, "xs"+t, 1, 0, 1)
                 
 
         # follow the histogram naming convention even if it makes no sense for gen - needed for drawPlots.py
         self.hist["genFwd"] = ROOT.TH1F("genJetFwd_central_jet15", "genJetFwd_central_jet15", len(pedroPtBins)-1, pedroPtBins)
         self.hist["genCen"] = ROOT.TH1F("genJetCen_central_jet15", "genJetCen_central_jet15", len(pedroPtBins)-1, pedroPtBins)
+        self.hist["xsGen"] = ROOT.TH1F("genTot_central_jet15", "genTot_central_jet15", 1, 0, 1)
 
         for h in self.hist:
             self.hist[h].Sumw2()
@@ -105,6 +107,8 @@ class CMS_FWD_11_002(ExampleProofReader):
                 binWidthFactor = self.hist["genCen"].GetBinWidth(binN)
                 self.hist["genCen"].Fill(cenPt, weight/(5.6*binWidthFactor))
 
+                self.hist["xsGen"].Fill(0.5, weight)
+
 
 
         if self.fChain.ngoodVTX == 0: return
@@ -147,6 +151,8 @@ class CMS_FWD_11_002(ExampleProofReader):
                 else:
                     weight = 1.
 
+                self.hist["xs"+histoName].Fill(0.5, weight)
+
                 etaFactor = 3.
                 binN =  self.hist["ptFwd"+histoName].FindBin(fwdPt)
                 binWidthFactor = self.hist["ptFwd"+histoName].GetBinWidth(binN)
@@ -182,18 +188,18 @@ if __name__ == "__main__":
     nWorkers = None # Use all
 
     # debug config:
-    '''
+    #'''
     sampleList = []
-    sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
-    #sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
+    #sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
+    sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
     #sampleList=  ["Jet-Run2010B-Apr21ReReco-v1"] 
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
     #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
-    maxFilesMC = 1
-    maxFilesData = 1
+    #maxFilesMC = 1
+    #maxFilesData = 2
     #nWorkers = 16
     #maxFilesData = 1
-    nWorkers = 1
+    #nWorkers = 1
     # '''
 
 

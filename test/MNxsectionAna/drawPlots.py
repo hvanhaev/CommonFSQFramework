@@ -131,7 +131,7 @@ def setGlobalStyle():
 
 keep = [] # avoid garbage collection
 def decorate(canvas, dataHisto, MCStack, errBand):
-    #canvas.SetLogy()
+    canvas.SetLogy()
 
     name = dataHisto.GetName()
     nspl = name.split("_")
@@ -420,7 +420,7 @@ def main():
                 decorate(c1, hData, MCStack, unc)
 
                 c1.Print("~/tmp/"+ targetCat + "_" + centralName+".png")
-                #c1.Print("~/tmp/"+ targetCat + "_" + centralName+".C")
+                c1.Print("~/tmp/"+ targetCat + "_" + centralName+".C")
 
 
         #print d

@@ -25,6 +25,18 @@ else:
     import MNTriggerStudies.MNTriggerAna.Util
     sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
     anaVersion=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("anaVersion")
+    print anaVersion
+    knownJEC = ["V17TFFull", "V17TFPart", "V16TFFull", "V16TFPart"]
+    ver = None
+    for k in knownJEC:
+        if k in anaVersion:
+            ver = k
+            break
+    print "JEC set to:", ver
+
+    if ver == None:
+        raise Exception("Cannot determine JECset to use")
+
     XS = sampleList[s]["XS"]
     process.GlobalTag.globaltag = sampleList[s]["GT"]
     isData =  sampleList[s]["isData"]
@@ -625,6 +637,11 @@ if anaType == "JetTriggerEff":
 
 
 #'''
+
+#ver = "V17TFFull"
+#ver = "V17TFPart"
+#ver = "V16TFFull"
+#ver = "V16TFPart"
 process.load("CondCore.DBCommon.CondDBCommon_cfi")
 from CondCore.DBCommon.CondDBSetup_cfi import *
 process.jec = cms.ESSource("PoolDBESSource",
@@ -635,16 +652,16 @@ process.jec = cms.ESSource("PoolDBESSource",
       toGet = cms.VPSet(
       cms.PSet(
             record = cms.string('JetCorrectionsRecord'),
-            tag    = cms.string('JetCorrectorParametersCollection_START42_V16A_AK5PF'),
+            tag    = cms.string('JetCorrectorParametersCollection_START42_'+ver+'_AK5PF'),
             label  = cms.untracked.string('AK5PF')
             ),
       cms.PSet(
             record = cms.string('JetCorrectionsRecord'),
-            tag    = cms.string('JetCorrectorParametersCollection_START42_V16A_AK5Calo'),
+            tag    = cms.string('JetCorrectorParametersCollection_START42_'+ver+'_AK5Calo'),
             label  = cms.untracked.string('AK5Calo')
             ),
       ), 
-      connect = cms.string('sqlite:START42_V16A.db')
+      connect = cms.string('sqlite:START42_'+ver+'.db')
 )
 ## add an es_prefer statement to resolve a possible conflict from simultaneous connection to a global tag
 process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
