@@ -64,8 +64,8 @@ for s in sampleListTodo:
   command+=" -CMSSW.number_of_jobs="+str(sampleList[s]["crabJobs"])
   command+=" -GRID.ce_black_list="+blacklist
 
-  #if int(sampleList[s]["crabJobs"]) < 500:
-  #    command+=" -submit 1-10"
+  if int(sampleList[s]["crabJobs"]) < 500:
+      command+=" -submit 1-10"
 
   if isData:
     print isData, sampleList[s]["json"]
