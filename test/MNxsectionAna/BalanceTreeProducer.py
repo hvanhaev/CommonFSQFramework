@@ -165,10 +165,10 @@ class BalanceTreeProducer(ExampleProofReader):
 
     def finalize(self):
         print "Finalize:"
-        normFactor = self.getNormalizationFactor()
-        print "  applying norm", normFactor
-        for h in self.hist:
-            self.hist[h].Scale(normFactor)
+        #normFactor = self.getNormalizationFactor()
+        #print "  applying norm", normFactor
+        #for h in self.hist:
+        #    self.hist[h].Scale(normFactor)
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
@@ -181,10 +181,10 @@ if __name__ == "__main__":
     nWorkers = None # Use all
 
     # debug config:
-    #'''
+    '''
     sampleList=[]
-    sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
-    #sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
+    #sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
+    sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
     #sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
     #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
@@ -220,6 +220,7 @@ if __name__ == "__main__":
                                slaveParameters=slaveParams,
                                sampleList=sampleList,
                                maxFilesMC = maxFilesMC,
+                               maxFilesData = maxFilesData,
                                nWorkers=nWorkers,
                                outFile = "treeDiJetBalance.root" )
 

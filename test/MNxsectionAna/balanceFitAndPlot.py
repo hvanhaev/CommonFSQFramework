@@ -13,6 +13,7 @@ import resource
 import time
 
 import multiprocessing
+from optparse import OptionParser
 
 class FitThread(multiprocessing.Process):
     def __init__(self, inputMap):
@@ -72,7 +73,7 @@ class FitThread(multiprocessing.Process):
 
         frame.addObject(box)
         frame.Draw()
-        odir = "~/tmp/balance/"
+        odir = inputMap["odir"]
         preName = odir + myVar.GetName() + "_" + inputMap["name"] + "_ptAveMin_" + str(minPtAVG)  \
         + "_etaMin_" + str(etaMin).replace(".", "_") \
         + "_etaMax_" + str(etaMax).replace(".", "_") 
@@ -91,9 +92,28 @@ class FitThread(multiprocessing.Process):
 
 def main():
 
+    parser = OptionParser(usage="usage: %prog [options] filename",
+                            version="%prog 1.0")
+
+    parser.add_option("-i", "--infile", action="store", type="string",  dest="infile" )
+    parser.add_option("-o", "--outdir", action="store", type="string",  dest="outdir" )
+    (options, args) = parser.parse_args()
+
+    if options.infile:
+        infile = options.infile
+    else:
+        infile = "treeDiJetBalance.root"
+        
+
+    if options.outdir:
+        odir = options.outdir
+    else:
+        odir = "~/tmp/balance"
+
+    os.system("mkdir -p "+odir)
+
     sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
 
-    infile = "treeDiJetBalance.root"
 
     f = ROOT.TFile(infile, "r")
     lst = f.GetListOfKeys()
@@ -196,7 +216,7 @@ def main():
 
 
     curPath = ROOT.gDirectory.GetPath()
-    of = ROOT.TFile("~/tmp/balanceHistos.root","RECREATE")
+    of = ROOT.TFile(odir+"balanceHistos.root","RECREATE")
     outputHistos = {}
     outputHistos["data_jet15"] = of.mkdir("data_jet15")
     outputHistos["MC_jet15"] = of.mkdir("MC_jet15")
@@ -234,6 +254,7 @@ def main():
 
                 inputMap = {}
                 inputMap["name"] = t
+                inputMap["odir"] = odir
                 #inputMap["dsReduced"] = dsReduced
                 #inputMap["ds"] =  ds[t].Clone()
                 inputMap["ds"] =  ds[t]
