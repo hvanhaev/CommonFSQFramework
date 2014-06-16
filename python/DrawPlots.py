@@ -16,8 +16,16 @@ from optparse import OptionParser
 
 
 class DrawPlots():
-    def __init__(self):
+    def __init__(self, infile, outdir=None, outfile=None, skipFinalMap=False):
         self.keep = [] # avoid garbage collection
+        self.infile = infile
+        self.outfile=outfile
+        if outdir == None:
+            self.outdir = "./"
+        else:
+            self.outdir = outdir
+        self.skipFinalMap = skipFinalMap
+
         pass
 
     def getUncertaintyBand(self, histos, hCentral):
@@ -82,6 +90,7 @@ class DrawPlots():
         parser = OptionParser(usage="usage: %prog [options] filename",
                                 version="%prog 1.0")
 
+        '''
         parser.add_option("-i", "--infilee", action="store", type="string",  dest="infile" )
         parser.add_option("-o", "--outfile", action="store", type="string", dest="outfile")
         parser.add_option("-s", "--skipFinalMap", action="store_true", dest="skipFinalMap")
@@ -97,8 +106,9 @@ class DrawPlots():
             outfile = options.outfile
         else:
             outfile = "~/plotsMNxs_norm.root"
+        '''
 
-        f = ROOT.TFile(infile, "r")
+        f = ROOT.TFile(self.infile, "r")
         lst = f.GetListOfKeys()
 
         finalMap = {}
@@ -119,7 +129,7 @@ class DrawPlots():
         #       ptLead_central_XXX ; TH1
             
 
-        if options.skipFinalMap:
+        if self.skipFinalMap:
             for l in lst:
                 currentDir = l.ReadObj()
                 if not currentDir:
@@ -190,7 +200,8 @@ class DrawPlots():
 
         # final map done
 
-        fOut = ROOT.TFile(outfile, "RECREATE")
+        if self.outfile:
+            fOut = ROOT.TFile(self.outfile, "RECREATE")
 
         # write all histograms to root file.
         # for data histograms - divide by lumi
@@ -201,7 +212,8 @@ class DrawPlots():
                     lumi = self.getLumi(target, targetsToSamples[target]) # TODO
                     scale = 1./lumi
                     finalMap[target][histoName].Scale(scale)
-                finalMap[target][histoName].Write(target+"_"+histoName)
+                if self.outfile:
+                    finalMap[target][histoName].Write(target+"_"+histoName)
 
 
         # extract variations from MC
@@ -322,8 +334,8 @@ class DrawPlots():
                     MCStack.Draw("SAME")
                     self.decorate(c1, hData, MCStack, unc)
 
-                    c1.Print("~/tmp/"+ targetCat + "_" + centralName+".png")
-                    c1.Print("~/tmp/"+ targetCat + "_" + centralName+".C")
+                    c1.Print(self.outdir + "/" + targetCat + "_" + centralName+".png")
+                    c1.Print(self.outdir + "/"+ targetCat + "_" + centralName+".C")
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
