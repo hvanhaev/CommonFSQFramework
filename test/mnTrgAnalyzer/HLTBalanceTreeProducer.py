@@ -9,7 +9,7 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 from ROOT import edm, JetCorrectionUncertainty
 
-from array import *
+#from array import *
 
 
 # Following import breaks things. Why???
@@ -23,20 +23,50 @@ from array import *
 
 # TODO:
 # ln -s ../MNxsectionAna/BalanceTreeProducer.py
-from BalanceTreeProducer import BalanceTreeProducer
+from BalanceTreeProducer import BalanceTreeProducer as EE
+#from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader as EE
 from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
 
-class HLTBalanceTreeProducer(BalanceTreeProducer):
-    pass
-#    def init(self):
-#        pass
+class HLTBalanceTreeProducer(EE):
+    #def init(self):
+    #    print "XX2!"
+        #self.balanceProd =  BalanceTreeProducer()
+        #self.GetOutputList().Add(self.tree)
+
+    def analyze(self):
+        print "XAXA" ,  self.HLTptAve
+        # hltAK5PFJetL1FastL2L3Corrected
+        #setattr(self.fChain, "ngoodVTX", 2) # TODO: fChain proxy ?!?
+
+        hltJets = self.fChain.hltAK5PFJetL1FastL2L3Corrected
+        probe = None
+        tag = None
+
+        for j in hltJets:
+            pt = j.pt()
+            eta = abs(j.eta())
+            tagCand = eta < 1.4
+            probeCand = eta > 2.8 and eta < 5.2
+
+            if probeCand and (probe == None or probe.pt() < pt): probe = j
+            if tagCand and (tag == None or tag.pt() < pt): tag = j
+
+        if probe != None and tag!=None  and probe != tag:
+            ptAve = (tag.pt() + probe.pt())/2.
+            if ptAve > self.HLTptAve:
+                #print "XX"
+                EE.analyze(self)
+
+    def finalize(self):
+        print "Finalize HLTBala:"
+
 
 
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
-    ROOT.gSystem.Load("libFWCoreFWLite.so")
-    ROOT.AutoLibraryLoader.enable()
+    #ROOT.gSystem.Load("libFWCoreFWLite.so")
+    #ROOT.AutoLibraryLoader.enable()
 
     sampleList = None
     maxFilesMC = None
@@ -62,19 +92,27 @@ if __name__ == "__main__":
     slaveParams["HLT2015TempWorkaround"] =  True
     slaveParams["doPtShiftsJER"] = False
     slaveParams["doPtShiftsJEC"] = False
+
+    #slaveParams["HLTptAve"] = 15
+
     sampleList=["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]
-    maxFilesMC = 10
-    treeName = "mnTriggerAna"
+    nWorkers = 1
+    maxFilesMC = 1
+    #treeName = "mnTriggerAna"
 
 
-
-
-    HLTBalanceTreeProducer.runAll(treeName=treeName,
+    todo = [300, 400]
+    o = HLTBalanceTreeProducer()
+    for t in todo:
+        out = "treeDiJetBalance_"+str(t)+".root"
+        slaveParams["HLTptAve"] = t
+        o.runAll(treeName="mnTriggerAna",
                                slaveParameters=slaveParams,
                                sampleList=sampleList,
                                maxFilesMC = maxFilesMC,
                                maxFilesData = maxFilesData,
                                nWorkers=nWorkers,
-                               outFile = "treeDiJetBalance.root" )
+                               outFile = out )
+        del o
 
 
