@@ -89,9 +89,9 @@ class DrawBalancePlots(DrawPlots):
 
     def decorate(self, canvas, dataHisto, MCStack, errBand): # override
         name = dataHisto.GetName()
-        nspl = name.split("_")
-        if len(nspl) > 0:
-            dataHisto.GetXaxis().SetTitle(nspl[0])
+        if "balance" in name:
+            dataHisto.GetXaxis().SetTitle("|#eta|")
+            dataHisto.GetYaxis().SetTitle("avg balance")
 
 
         dataHisto.SetMinimum(-0.5)
@@ -144,6 +144,7 @@ if __name__ == "__main__":
     (options, args) = parser.parse_args()
 
     if options.outdir:
+        os.system("mkdir -p " + options.outdir)
         d = DrawBalancePlots(options.infile, outdir = options.outdir, skipFinalMap = True)
     else:
         d = DrawBalancePlots(options.infile,skipFinalMap = True)

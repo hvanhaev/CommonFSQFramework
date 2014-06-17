@@ -88,7 +88,7 @@ class DrawMNPlots(DrawPlots):
 
 
     def decorate(self, canvas, dataHisto, MCStack, errBand): # override
-        canvas.SetLogy()
+        #canvas.SetLogy()
 
         name = dataHisto.GetName()
         nspl = name.split("_")
@@ -132,6 +132,23 @@ if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     ROOT.AutoLibraryLoader.enable()
-    d = DrawMNPlots()
+    parser = OptionParser(usage="usage: %prog [options] filename",
+                            version="%prog 1.0")
+
+    parser.add_option("-i", "--infile", action="store", type="string",  dest="infile" )
+    parser.add_option("-o", "--outdir", action="store", type="string",  dest="outdir" )
+    (options, args) = parser.parse_args()
+
+    infile = "plotsMNxs.root"
+    if options.infile:
+        infile = options.infile
+
+    if options.outdir:
+        os.system("mkdir -p " + options.outdir)
+        d = DrawMNPlots(infile, outdir = options.outdir)
+    else:
+        d = DrawMNPlots(infile)
+
+
     d.draw()
 
