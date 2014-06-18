@@ -285,8 +285,14 @@ if __name__ == "__main__":
     AutoLibraryLoader.enable()
 
     sampleList = None # run through all
-    #sampleList = ["QCD_Pt-30to50_Tune4C_13TeV_pythia8",]
+    maxFilesMC = None
+
+    '''
+    sampleList = ["QCD_Pt-30to50_Tune4C_13TeV_pythia8",]
     #sampleList = ["QCD_Pt-10to15_Tune4C_13TeV_pythia8",]
+    maxFilesMC = 1
+    # '''
+
 
 
     slaveParams = {}
@@ -299,6 +305,6 @@ if __name__ == "__main__":
     MNTrgAnaProofReader.runAll(treeName="mnTriggerAna", 
                                slaveParameters=slaveParams,
                                sampleList=sampleList,
-                               maxFiles = 10,
+                               maxFilesMC = maxFilesMC,
                                outFile = "~/plotsHLT.root" )
                                 
