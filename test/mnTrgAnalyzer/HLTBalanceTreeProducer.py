@@ -23,18 +23,21 @@ from ROOT import edm, JetCorrectionUncertainty
 
 # TODO:
 # ln -s ../MNxsectionAna/BalanceTreeProducer.py
-from BalanceTreeProducer import BalanceTreeProducer as EE
+from BalanceTreeProducer import BalanceTreeProducer as BalanceTreeProducerObscuredName
 #from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader as EE
 from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
 
-class HLTBalanceTreeProducer(EE):
-    #def init(self):
+class HLTBalanceTreeProducer(BalanceTreeProducerObscuredName):
+    def init(self):
+        BalanceTreeProducerObscuredName.init(self)
+        self.addExternalVar(["hltPtAve"])
+
     #    print "XX2!"
         #self.balanceProd =  BalanceTreeProducer()
         #self.GetOutputList().Add(self.tree)
 
     def analyze(self):
-        print "XAXA" ,  self.HLTptAve
+        #print "XAXA" ,  self.HLTptAve
         # hltAK5PFJetL1FastL2L3Corrected
         #setattr(self.fChain, "ngoodVTX", 2) # TODO: fChain proxy ?!?
 
@@ -53,9 +56,9 @@ class HLTBalanceTreeProducer(EE):
 
         if probe != None and tag!=None  and probe != tag:
             ptAve = (tag.pt() + probe.pt())/2.
-            if ptAve > self.HLTptAve:
-                #print "XX"
-                EE.analyze(self)
+            if ptAve > 10.:
+                self.setExternalVar("hltPtAve", ptAve)
+                BalanceTreeProducerObscuredName.analyze(self)
 
     def finalize(self):
         print "Finalize HLTBala:"
@@ -93,26 +96,19 @@ if __name__ == "__main__":
     slaveParams["doPtShiftsJER"] = False
     slaveParams["doPtShiftsJEC"] = False
 
-    #slaveParams["HLTptAve"] = 15
 
     sampleList=["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]
     nWorkers = 1
     maxFilesMC = 1
     #treeName = "mnTriggerAna"
 
-
-    todo = [300, 400]
-    o = HLTBalanceTreeProducer()
-    for t in todo:
-        out = "treeDiJetBalance_"+str(t)+".root"
-        slaveParams["HLTptAve"] = t
-        o.runAll(treeName="mnTriggerAna",
-                               slaveParameters=slaveParams,
-                               sampleList=sampleList,
-                               maxFilesMC = maxFilesMC,
-                               maxFilesData = maxFilesData,
-                               nWorkers=nWorkers,
-                               outFile = out )
-        del o
+    out = "treeDiJetBalance.root"
+    HLTBalanceTreeProducer().runAll(treeName="mnTriggerAna",
+                           slaveParameters=slaveParams,
+                           sampleList=sampleList,
+                           maxFilesMC = maxFilesMC,
+                           maxFilesData = maxFilesData,
+                           nWorkers=nWorkers,
+                           outFile = out )
 
 
