@@ -5,7 +5,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <vector>
-#define constexpr static
+#define constexpr static const
 #include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
 
 
