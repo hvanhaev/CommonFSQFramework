@@ -108,7 +108,7 @@ def main():
     if options.outdir:
         odir = options.outdir
     else:
-        odir = "~/tmp/balance"
+        odir = "~/tmp/balance/"
 
     os.system("mkdir -p "+odir)
 
@@ -156,6 +156,10 @@ def main():
         #print d
 
     dummyFile = ROOT.TFile("/tmp/dummy.root", "recreate")
+    if len(trees["data_jet15"]) == 0:
+            print "Cleaning data (no sample found)"
+            del trees["data_jet15"]
+
     for t in trees:
         tlist = ROOT.TList()
         if len(trees[t]) == 1 and False:
@@ -184,8 +188,12 @@ def main():
         for b in tree.GetListOfBranches():
             name =  b.GetName()
             if name != "weight":
-                variation = name.split("_")[-1]
-                variations.add(variation)
+                spl = name.split("_")
+                if len(spl) > 1:
+                    variation = name.split("_")[-1]
+                    variations.add(variation)
+                else:
+                    print "Not a variation, skip:", name
 
             rmin = tree.GetMinimum(name)
             rmax = tree.GetMaximum(name)
