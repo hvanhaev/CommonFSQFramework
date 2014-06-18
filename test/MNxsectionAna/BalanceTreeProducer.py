@@ -26,6 +26,7 @@ from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
 
 class BalanceTreeProducer(ExampleProofReader):
     def init(self):
+        self.normFactor = self.getNormalizationFactor()
 
         self.tree = ROOT.TTree("data", "data")
         self.GetOutputList().Add(self.tree)
@@ -120,7 +121,7 @@ class BalanceTreeProducer(ExampleProofReader):
 
         fill = False
         for shift in self.todoShifts:
-            weight = 1. 
+            weight = self.normFactor 
             if not self.isData and not self.HLT2015TempWorkaround:
                 weight *= self.fChain.genWeight # keep inside shift iter
                 truePU = self.fChain.puTrueNumInteractions
