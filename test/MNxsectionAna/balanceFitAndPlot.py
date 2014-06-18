@@ -80,6 +80,8 @@ class FitThread(multiprocessing.Process):
         #+ "_" + tag
         fname = preName + "__2.png"
         canvas.Print(fname)
+        fname = preName + "__2.root"
+        canvas.Print(fname)
 
         fitResult = {}
         fitResult["iEta"] = inputMap["iEta"]
@@ -97,13 +99,13 @@ def main():
 
     parser.add_option("-i", "--infile", action="store", type="string",  dest="infile" )
     parser.add_option("-o", "--outdir", action="store", type="string",  dest="outdir" )
+    parser.add_option("-c", "--cutExtra", action="store", type="string",  dest="cutExtra" )
     (options, args) = parser.parse_args()
 
     if options.infile:
         infile = options.infile
     else:
         infile = "treeDiJetBalance.root"
-        
 
     if options.outdir:
         odir = options.outdir
@@ -114,11 +116,8 @@ def main():
 
     sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
 
-
     f = ROOT.TFile(infile, "r")
     lst = f.GetListOfKeys()
-
-
     trees = {}
     trees["MC_jet15"] = []
     trees["data_jet15"] = []
@@ -253,6 +252,10 @@ def main():
                 cut += " && abs(" + vary("probeEta") + ") >  " + str(etaMin)
                 cut += " && abs(" + vary("probeEta") + ") <  " + str(etaMax)
                 cut += " && " + vary("ptAve") + " > " + str(minPtAVG)
+                if options.cutExtra != None:
+                    cut += options.cutExtra
+
+
                 print cut
 
                 #print "Reduce"
