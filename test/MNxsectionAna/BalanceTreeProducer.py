@@ -83,16 +83,33 @@ class BalanceTreeProducer(ExampleProofReader):
         if hasattr(self, "jetUncFile"):
             self.jetGetter.setJecUncertainty(self.jetUncFile)
 
+        self.varE = {}
         sys.stdout.flush()
+
+    def addExternalVar(self, names):
+        for name in names:
+            self.varE[name] =  0.
+            self.var[name] = array('d', [0])
+            self.tree.Branch(name, self.var[name], name+"/D")
+
+            
+
+    def setExternalVar(self, name, val):
+        self.varE[name] = val
 
     def analyze(self):
         if not self.HLT2015TempWorkaround and self.fChain.ngoodVTX == 0: return
+
         if self.isData:
             if self.fChain.jet15 < 0.5:
                 return 1
             
         for v in self.var:
             self.var[v][0] = 0
+
+        # reset is done after fill
+        for v in self.varE:
+            self.var[v][0] = self.varE[v]
     
 
 
@@ -165,6 +182,8 @@ class BalanceTreeProducer(ExampleProofReader):
         if fill:
             #print "Filll!"
             self.tree.Fill()
+            for v in self.varE: # reset external variables
+                self.varE[v] = 0
 
         return 1
 
