@@ -10,8 +10,9 @@ outDir = "~/tmp/balanceHLT_XXX/"
 
 #infile = "treeDiJetBalance_15.root"
 infile = "treeDiJetBalance.root"
-#todo = [10, 15, 20, 25, 30, 35, 40]
+#todo = [10, 20, 30,  40, 50]
 todo = [10,  20, 40]
+#todo = [40, 50, 55, 60, 65]
 
 
 def fit():
@@ -61,23 +62,22 @@ def plot():
 
     #print histoMap
     canvas = ROOT.TCanvas()
-    hFrame = canvas.DrawFrame(2.8, -0.3, 5.2, 0.3)
+    hFrame = canvas.DrawFrame(2.8, -0.15, 5.2, 0.05)
     hFrame.GetXaxis().SetTitle("#eta")
     hFrame.GetYaxis().SetTitle("balance")
 
-    #fHist = histoMap.itervalues().next()
-    #fHist.Draw()
-    #fHist.GetXaxis().SetLimits(2.8, 5.2)
-    #fHist.GetYaxis().SetLimits(-0.3, 0.3)
-    #canvas.Range(2.8, -0.3, 5.2, 0.3)
-    for h in histoMap:
-        histoMap[h].Draw("SAME")
+    markerCnt = 20
+    leg = ROOT.TLegend(0.6,0.6,1,1)
+    leg.SetHeader("HLT ptAve:")
+    for t in sorted(histoMap.keys()):
+        histoMap[t].SetMarkerStyle(markerCnt)
+        markerCnt += 1
+        histoMap[t].Draw("e p same")
+        leg.AddEntry(histoMap[t], str(t), "p")
 
+    leg.Draw("SAME")
     canvas.Print("~/tmp/ttt.png")
         
-
-
-
 
 
 

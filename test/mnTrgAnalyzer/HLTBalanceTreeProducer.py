@@ -9,22 +9,17 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 from ROOT import edm, JetCorrectionUncertainty
 
-#from array import *
-
-
-# Following import breaks things. Why???
-#import math
-
-# please note that python selector class name (here: BalanceTreeProducer) 
-# should be consistent with this file name (BalanceTreeProducer.py)
+# please note that python selector class name (here: HLTBalanceTreeProducer) 
+# should be consistent with this file name (HLTBalanceTreeProducer.py)
 
 # you have to run this file from directory where it is saved
 
 
-# TODO:
+# Setup:
 # ln -s ../MNxsectionAna/BalanceTreeProducer.py
+# ln -s ../MNxsectionAna/balanceFitAndPlot.py
+# ln -s ../MNxsectionAna/drawBalance.py
 from BalanceTreeProducer import BalanceTreeProducer as BalanceTreeProducerObscuredName
-#from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader as EE
 from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
 
 class HLTBalanceTreeProducer(BalanceTreeProducerObscuredName):
@@ -97,9 +92,9 @@ if __name__ == "__main__":
     slaveParams["doPtShiftsJEC"] = False
 
 
-    sampleList=["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]
-    nWorkers = 1
-    maxFilesMC = 1
+    #sampleList=["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]
+    #nWorkers = 1
+    #maxFilesMC = 32
     #treeName = "mnTriggerAna"
 
     out = "treeDiJetBalance.root"
