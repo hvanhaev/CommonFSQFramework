@@ -199,15 +199,15 @@ if __name__ == "__main__":
 
     # debug config:
     '''
-    #sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
+    sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
     #sampleList=  ["JetMETTau-Run2010A-Apr21ReReco-v1"]
     #sampleList=  ["Jet-Run2010B-Apr21ReReco-v1"] 
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
     #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
-    #maxFilesMC = 1
-    #maxFilesData = 2
+    maxFilesMC = 1
+    maxFilesData = 2
     #maxFilesMC = 12
-    #nWorkers = 1
+    nWorkers = 1
     # '''
     #maxFilesMC = 12
     #nWorkers = 12
