@@ -15,7 +15,7 @@ from array import array
 
 from optparse import OptionParser
 
-class DrawMNPlots(DrawPlots):
+class DrawBalancePlots(DrawPlots):
     def getLumi(self, target, samples): # override
         if "data_" not in target:
             raise Exception("getLumi called for "+ target )
@@ -88,12 +88,14 @@ class DrawMNPlots(DrawPlots):
 
 
     def decorate(self, canvas, dataHisto, MCStack, errBand): # override
-        #canvas.SetLogy()
-
         name = dataHisto.GetName()
-        nspl = name.split("_")
-        if len(nspl) > 0:
-            dataHisto.GetXaxis().SetTitle(nspl[0])
+        if "balance" in name:
+            dataHisto.GetXaxis().SetTitle("|#eta|")
+            dataHisto.GetYaxis().SetTitle("avg balance")
+
+
+        dataHisto.SetMinimum(-0.5)
+        dataHisto.SetMaximum(0.2)
 
         #MChistos = MCStack.GetHists()
         legend = ROOT.TLegend(0.3,0.95,1,1)
@@ -132,6 +134,8 @@ if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     ROOT.AutoLibraryLoader.enable()
+
+
     parser = OptionParser(usage="usage: %prog [options] filename",
                             version="%prog 1.0")
 
@@ -139,16 +143,10 @@ if __name__ == "__main__":
     parser.add_option("-o", "--outdir", action="store", type="string",  dest="outdir" )
     (options, args) = parser.parse_args()
 
-    infile = "plotsMNxs.root"
-    if options.infile:
-        infile = options.infile
-
     if options.outdir:
         os.system("mkdir -p " + options.outdir)
-        d = DrawMNPlots(infile, outdir = options.outdir)
+        d = DrawBalancePlots(options.infile, outdir = options.outdir, skipFinalMap = True)
     else:
-        d = DrawMNPlots(infile)
-
-
+        d = DrawBalancePlots(options.infile,skipFinalMap = True)
     d.draw()
 

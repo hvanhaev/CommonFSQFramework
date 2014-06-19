@@ -25,7 +25,8 @@ from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader
 from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
 
 class BalanceTreeProducer(ExampleProofReader):
-    def init( self):
+    def init(self):
+        self.normFactor = self.getNormalizationFactor()
 
         self.tree = ROOT.TTree("data", "data")
         self.GetOutputList().Add(self.tree)
@@ -74,20 +75,42 @@ class BalanceTreeProducer(ExampleProofReader):
 
 
         self.jetGetter = JetGetter("PF")
+        if self.HLT2015TempWorkaround:
+            self.jetGetter.setJERScenario("PF11")
+            self.jetGetter.jetcol = "pfJets"
+            self.jetGetter.jetcolGen ="pfJets"
+            self.jetGetter.jetcolReco = "pfJets"
+
         if hasattr(self, "jetUncFile"):
             self.jetGetter.setJecUncertainty(self.jetUncFile)
 
+        self.varE = {}
         sys.stdout.flush()
 
+    def addExternalVar(self, names):
+        for name in names:
+            self.varE[name] =  0.
+            self.var[name] = array('d', [0])
+            self.tree.Branch(name, self.var[name], name+"/D")
+
+            
+
+    def setExternalVar(self, name, val):
+        self.varE[name] = val
+
     def analyze(self):
-        #print "----"
-        if self.fChain.ngoodVTX == 0: return
+        if not self.HLT2015TempWorkaround and self.fChain.ngoodVTX == 0: return
+
         if self.isData:
             if self.fChain.jet15 < 0.5:
                 return 1
             
         for v in self.var:
             self.var[v][0] = 0
+
+        # reset is done after fill
+        for v in self.varE:
+            self.var[v][0] = self.varE[v]
     
 
 
@@ -98,8 +121,8 @@ class BalanceTreeProducer(ExampleProofReader):
 
         fill = False
         for shift in self.todoShifts:
-            weight = 1. 
-            if not self.isData:
+            weight = self.normFactor 
+            if not self.isData and not self.HLT2015TempWorkaround:
                 weight *= self.fChain.genWeight # keep inside shift iter
                 truePU = self.fChain.puTrueNumInteractions
                 puWeight =  self.lumiWeighters["_jet15_central"].weight(truePU)
@@ -160,15 +183,17 @@ class BalanceTreeProducer(ExampleProofReader):
         if fill:
             #print "Filll!"
             self.tree.Fill()
+            for v in self.varE: # reset external variables
+                self.varE[v] = 0
 
         return 1
 
     def finalize(self):
         print "Finalize:"
-        normFactor = self.getNormalizationFactor()
-        print "  applying norm", normFactor
-        for h in self.hist:
-            self.hist[h].Scale(normFactor)
+        #normFactor = self.getNormalizationFactor()
+        #print "  applying norm", normFactor
+        #for h in self.hist:
+        #    self.hist[h].Scale(normFactor)
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
@@ -179,12 +204,13 @@ if __name__ == "__main__":
     maxFilesMC = None
     maxFilesData = None
     nWorkers = None # Use all
+    treeName = "mnXS"
 
     # debug config:
-    #'''
+    '''
     sampleList=[]
-    sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
-    #sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
+    #sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
+    sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
     #sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
     #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
@@ -214,9 +240,19 @@ if __name__ == "__main__":
 
 
     slaveParams["jetUncFile"] =  edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"+jetUncFile).fullPath()
+    slaveParams["HLT2015TempWorkaround"] =  True
+    if slaveParams["HLT2015TempWorkaround"]:
+        slaveParams["doPtShiftsJER"] = False
+        slaveParams["doPtShiftsJEC"] = False
+        sampleList=["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]
+        maxFilesMC = 1
+        #nWorkers = 1
+        treeName = "mnTriggerAna"
 
 
-    BalanceTreeProducer.runAll(treeName="mnXS",
+
+
+    BalanceTreeProducer.runAll(treeName=treeName,
                                slaveParameters=slaveParams,
                                sampleList=sampleList,
                                maxFilesMC = maxFilesMC,
