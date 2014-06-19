@@ -240,7 +240,7 @@ if __name__ == "__main__":
 
 
     slaveParams["jetUncFile"] =  edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"+jetUncFile).fullPath()
-    slaveParams["HLT2015TempWorkaround"] =  True
+    slaveParams["HLT2015TempWorkaround"] =  False
     if slaveParams["HLT2015TempWorkaround"]:
         slaveParams["doPtShiftsJER"] = False
         slaveParams["doPtShiftsJEC"] = False
