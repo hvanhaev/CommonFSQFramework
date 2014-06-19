@@ -4,6 +4,33 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 from ROOT import edm, JetCorrectionUncertainty
 
+class Jet():
+    def __init__(self, p4, i, genJetCollection):
+        self.p4 = p4
+        self.i = i
+        self.genCol = genJetCollection
+
+    def p4(self):
+        return self.p4
+
+    def pt(self):
+        return self.p4.pt()
+
+    def phi(self):
+        return self.p4.phi()
+
+    def eta(self):
+        return self.p4.eta()
+
+    def genP4(self):
+        if self.i == None:
+            return ROOT.reco.Candidate.LorentzVector(0, 0, 0, 0)
+
+        return genJetCollection.at(self.i)
+
+
+
+
 class JetGetter:
     def __init__(self, jType):
 
@@ -153,8 +180,12 @@ class JetGetter:
             if isCentral or isJEC:
                 jetSmeared =  self.getSmeared(recoJetNoSmear, genJet, "_central")
 
+
+            # genJetCollection
+            #    def __init__(self, p4, i, genJetCollection):
             if isCentral:
-                yield jetSmeared
+                #yield jetSmeared
+                yield Jet(jetSmeared, self.cnt, self.recoGenJets)
                 self.cnt += 1 # we could use a single cnt+=1 at the end, but this would be error prone
                 continue 
             else:
@@ -168,17 +199,20 @@ class JetGetter:
                         ptFactor = -1.
                     factor = (1. + ptFactor*unc)
                     if factor <= 0: 
-                        yield ROOT.reco.Candidate.LorentzVector(0, 0, 0, 0)
+                        ret = ROOT.reco.Candidate.LorentzVector(0, 0, 0, 0)
+                        yield Jet(ret, None, None)
                         self.cnt+=1
                         continue 
                     else:
-                        yield jetSmeared*factor
+                        ret = jetSmeared*factor
+                        yield Jet(ret, self.cnt, self.recoGenJets)
                         self.cnt+=1
                         continue 
                 elif isJER:
                     #genJet = self.recoGenJets.at(self.cnt)
                     #recoJetNoSmear = self.recoBaseJets.at(self.cnt)
-                    yield self.getSmeared(recoJetNoSmear, genJet, shift)
+                    ret = self.getSmeared(recoJetNoSmear, genJet, shift)
+                    yield Jet(ret, self.cnt, self.recoGenJets)
                     self.cnt+=1
                     continue 
                 else:
