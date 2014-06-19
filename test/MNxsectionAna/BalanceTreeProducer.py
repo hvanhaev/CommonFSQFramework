@@ -220,6 +220,7 @@ if __name__ == "__main__":
                                slaveParameters=slaveParams,
                                sampleList=sampleList,
                                maxFilesMC = maxFilesMC,
+                               maxFilesData = maxFilesData,
                                nWorkers=nWorkers,
                                outFile = "treeDiJetBalance.root" )
 
