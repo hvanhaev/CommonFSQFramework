@@ -11,8 +11,8 @@ outDir = "~/tmp/balanceHLT_XXX/"
 #infile = "treeDiJetBalance_15.root"
 infile = "treeDiJetBalance.root"
 #todo = [10, 20, 30,  40, 50]
-todo = [10,  20, 40]
-#todo = [40, 50, 55, 60, 65]
+#todo = [10,  20, 40]
+todo = [40, 45, 50, 55]
 
 
 def fit():
@@ -82,7 +82,7 @@ def plot():
 
 
 def main():
-    #fit()
+    fit()
     plot()
 
 
