@@ -15,9 +15,9 @@ from array import *
 
 # you have to run this file from directory where it is saved
 
-from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader
+import MNTriggerStudies.MNTriggerAna.ExampleProofReader 
 
-class MNTrgAnaProofReader(ExampleProofReader):
+class MNTrgAnaProofReader(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
     #def SlaveBegin( self, tree ):
     def init(self):
         print 'configure: MNTrgAnaProofReader'

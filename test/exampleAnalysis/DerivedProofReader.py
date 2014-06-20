@@ -16,9 +16,9 @@ from array import *
 # you have to run this file from directory where it is saved
 
 
-from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader
+import MNTriggerStudies.MNTriggerAna.ExampleProofReader
 
-class DerivedProofReader(ExampleProofReader):
+class DerivedProofReader(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
     def init( self):
         print "init - DerivedProofReader"
         self.hist = {}

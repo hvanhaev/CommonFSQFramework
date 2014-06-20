@@ -4,7 +4,7 @@
 # http://cdsweb.cern.ch/record/1421692?ln=en
 # http://arxiv.org/abs/arXiv:1202.0704
 # http://rivet.hepforge.org/code/2.1.0/a00543_source.html
-from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader
+import MNTriggerStudies.MNTriggerAna.ExampleProofReader
 
 import sys, os, time
 sys.path.append(os.path.dirname(__file__))
@@ -21,7 +21,7 @@ from array import *
 
 from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
 
-class CMS_FWD_11_002(ExampleProofReader):
+class CMS_FWD_11_002(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
     def init( self):
         print "XXX init - CMS_FWD_11_002", self.datasetName, self.isData
 

@@ -21,14 +21,10 @@ from array import array
 # you have to run this file from directory where it is saved
 
 
-#from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader as ExampleProofReaderObscuredName
 import MNTriggerStudies.MNTriggerAna.ExampleProofReader
 from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
 
 class RecoGenRatio(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
-#class RecoGenRatio(ExampleProofReaderObscuredName, ROOT.TPySelector):
-#class RecoGenRatio(ExampleProofReaderObscuredName):
-#class ExampleProofReader( ROOT.TPySelector ):
     def init( self):
 
         self.tree = ROOT.TTree("data", "data")

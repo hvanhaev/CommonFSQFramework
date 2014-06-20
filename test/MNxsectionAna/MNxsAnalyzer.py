@@ -19,12 +19,12 @@ import cProfile
 # you have to run this file from directory where it is saved
 
 
-from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader
+import MNTriggerStudies.MNTriggerAna.ExampleProofReader
 from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
 
 #import DiJetBalancePlugin
 
-class MNxsAnalyzer(ExampleProofReader):
+class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
     def init( self):
 
         #sys.stdout = sys.stderr

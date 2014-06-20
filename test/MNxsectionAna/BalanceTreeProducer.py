@@ -21,10 +21,10 @@ from array import *
 # you have to run this file from directory where it is saved
 
 
-from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader
+import MNTriggerStudies.MNTriggerAna.ExampleProofReader 
 from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
 
-class BalanceTreeProducer(ExampleProofReader):
+class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
     def init(self):
         self.normFactor = self.getNormalizationFactor()
 
