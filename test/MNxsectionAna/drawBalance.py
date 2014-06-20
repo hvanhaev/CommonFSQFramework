@@ -88,22 +88,27 @@ class DrawBalancePlots(DrawPlots):
 
 
     def decorate(self, canvas, dataHisto, MCStack, errBand): # override
-        name = dataHisto.GetName()
-        if "balance" in name:
-            dataHisto.GetXaxis().SetTitle("|#eta|")
-            dataHisto.GetYaxis().SetTitle("avg balance")
+        if dataHisto != None:
+            name = dataHisto.GetName()
+            if "balance" in name:
+                dataHisto.GetXaxis().SetTitle("|#eta|")
+                dataHisto.GetYaxis().SetTitle("avg balance")
 
 
-        dataHisto.SetMinimum(-0.5)
-        dataHisto.SetMaximum(0.2)
+            dataHisto.SetMinimum(-0.5)
+            dataHisto.SetMaximum(0.2)
+            dataHisto.SetMarkerSize(0.3)
+            dataHisto.SetMarkerStyle(8)
+        else:
+            MCStack.SetMinimum(-0.5)
+            MCStack.SetMaximum(0.2)
 
         #MChistos = MCStack.GetHists()
         legend = ROOT.TLegend(0.3,0.95,1,1)
         legend.SetFillColor(0)
         legend.SetNColumns(3)
-        legend.AddEntry(dataHisto, "data", "pel")
-
-
+        if dataHisto != None:
+            legend.AddEntry(dataHisto, "data", "pel")
 
         MChistos = MCStack.GetStack()
         for h in MChistos:
@@ -119,8 +124,6 @@ class DrawBalancePlots(DrawPlots):
         
         legend.AddEntry(errBand, "MC unc", "f")
 
-        dataHisto.SetMarkerSize(0.3)
-        dataHisto.SetMarkerStyle(8)
 
         canvas.SetTopMargin(0.1)
         canvas.SetRightMargin(0.07)

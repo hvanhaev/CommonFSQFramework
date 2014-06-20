@@ -86,8 +86,8 @@ class FitThread(multiprocessing.Process):
         #+ "_" + tag
         fname = preName + "__2.png"
         canvas.Print(fname)
-        fname = preName + "__2.root"
-        canvas.Print(fname)
+        #fname = preName + "__2.root"
+        #canvas.Print(fname)
 
         fitResult = {}
         fitResult["iEta"] = inputMap["iEta"]
@@ -223,6 +223,7 @@ def main():
 
 
     etaRanges = []
+    #etaRanges.extend([0.001, 0.201, 0.401, 0.601, 0.801, 1.001, 1.201])
     etaRanges.extend([1.401, 1.701, 2.001, 2.322, 2.411, 2.601, 2.801, 3.001, 3.201, 3.501, 3.801, 4.101, 4.701])
     #etaRanges.extend([4.101, 4.701])
     minPtAVG = 45
@@ -258,6 +259,8 @@ def main():
                 cut += " && abs(" + vary("probeEta") + ") >  " + str(etaMin)
                 cut += " && abs(" + vary("probeEta") + ") <  " + str(etaMax)
                 cut += " && " + vary("ptAve") + " > " + str(minPtAVG)
+                cut += " && " + vary("balance") + " > " + str(-1)
+                cut += " && " + vary("balance") + " < " + str(1)
                 if options.cutExtra != None:
                     cut += options.cutExtra
 

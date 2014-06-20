@@ -267,16 +267,17 @@ class DrawPlots():
                     print "Doing", centralName
 
                     #print targetData, centralName, finalMap.keys(), finalMap[targetData].keys()
-                    if centralName not in finalMap[targetData]:
-                        print "#"*30
-                        print " Cannot find (expected) histo:", centralName
-                        print "#"*30
-                        continue
-        
+                    if targetData != None:
+                        if centralName not in finalMap[targetData]:
+                            print "#"*30
+                            print " Cannot find (expected) histo:", centralName
+                            print "#"*30
+                            continue
+                        hData =  finalMap[targetData][centralName]
 
-                    hData =  finalMap[targetData][centralName]
-
-                    maxima.append(hData.GetMaximum())
+                        maxima.append(hData.GetMaximum())
+                    else:
+                        hData = None
 
 
                     MCStack = ROOT.THStack("stack_"+centralName, "stack_"+centralName)
@@ -321,7 +322,8 @@ class DrawPlots():
 
                     maximum = max(maxima)*1.05
                     unc.SetMaximum(maximum)
-                    hData.SetMaximum(maximum)
+                    if hData != None:
+                        hData.SetMaximum(maximum)
                     MCStack.SetMaximum(maximum)
                     #hMCCentral.SetMarkerColor(4)
                     #hMCCentral.SetMarkerSize(2)
@@ -329,9 +331,15 @@ class DrawPlots():
 
 
                     unc.SetFillColor(8);
-                    hData.Draw()
-                    unc.Draw("3SAME")
-                    MCStack.Draw("SAME")
+                    if hData != None:
+                        hData.Draw()
+                        unc.Draw("3SAME")
+                        MCStack.Draw("SAME")
+                    else:
+                        MCStack.Draw()
+                        unc.Draw("3SAME")
+                        MCStack.Draw("SAME")
+
                     self.decorate(c1, hData, MCStack, unc)
 
                     c1.Print(self.outdir + "/" + targetCat + "_" + centralName+".png")

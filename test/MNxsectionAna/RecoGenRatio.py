@@ -108,13 +108,14 @@ class RecoGenRatio(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                 pt = jet.pt()
                 if pt < 35: continue
                 eta = jet.eta()
-                if abs(eta) > 5: continue
+                if abs(eta) > self.etaMax: continue
+                if abs(eta) < self.etaMin: continue
                 if not jet.looseId(): continue
 
                 genPt = jet.genP4().pt()
-                r = -2
-                if genPt > 0.01:
-                    r = (genPt-pt)/genPt
+                if genPt < 0.01:
+                    continue
+                r = (genPt-pt)/genPt
 
                 self.var["tagPt"+shift][0]  = 99
                 self.var["tagEta"+shift][0] = 0.
@@ -149,6 +150,9 @@ if __name__ == "__main__":
     maxFilesMC = 1
     nWorkers = 1
     #'''
+    maxFilesMC = 12
+    #nWorkers = 2
+    maxFilesData = 1
 
     slaveParams = {}
     slaveParams["threshold"] = 35.
@@ -172,6 +176,18 @@ if __name__ == "__main__":
 
     slaveParams["jetUncFile"] =  edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"+jetUncFile).fullPath()
 
+    slaveParams["etaMin"] = 3
+    slaveParams["etaMax"] = 5
+    maxFilesMC = 100
+    oFile = "treeJetGenRatio_2.root"
+
+    '''
+    slaveParams["etaMin"] = -0.1
+    slaveParams["etaMax"] = 3
+    maxFilesMC = 12
+    oFile = "treeJetGenRatio_1.root"
+    #'''
+
 
     RecoGenRatio.runAll(treeName="mnXS",
                                slaveParameters=slaveParams,
@@ -179,6 +195,6 @@ if __name__ == "__main__":
                                maxFilesMC = maxFilesMC,
                                maxFilesData = maxFilesData,
                                nWorkers=nWorkers,
-                               outFile = "treeJetGenRatio.root" )
+                               outFile = oFile )
 
 
