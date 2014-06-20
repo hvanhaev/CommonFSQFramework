@@ -9,7 +9,7 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 from ROOT import edm, JetCorrectionUncertainty
 
-from array import *
+from array import array
 
 
 # Following import breaks things. Why???
@@ -21,10 +21,10 @@ from array import *
 # you have to run this file from directory where it is saved
 
 
-from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader
+from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader as ExampleProofReaderObscuredName
 from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
 
-class RecoGenRatio(ExampleProofReader):
+class RecoGenRatio(ExampleProofReaderObscuredName):
     def init( self):
 
         self.tree = ROOT.TTree("data", "data")
@@ -41,9 +41,19 @@ class RecoGenRatio(ExampleProofReader):
             self.todoShifts.append("_jerUp")
             self.todoShifts.append("_jerDown")
 
+        # this is ugly
+        #  by mimicking the tree structure of the balance method
+        #  we will be able to use same plot/fit util
         for t in self.todoShifts:
-            self.var["jetEta"+t] = array('d', [0])
-            self.var["jetR"+t] = array('d', [0])
+            self.var["tagPt"+t] = array('d', [0])
+            self.var["tagEta"+t] = array('d', [0])
+            self.var["probePt"+t] = array('d', [0])
+            self.var["probeEta"+t] = array('d', [0])
+            self.var["ptAve"+t] = array('d', [0])
+            self.var["balance"+t] = array('d', [0])
+
+            #self.var["jetEta"+t] = array('d', [0])
+            #self.var["jetR"+t] = array('d', [0])
 
         self.var["weight"] = array('d', [0])
         
@@ -85,11 +95,6 @@ class RecoGenRatio(ExampleProofReader):
 
 
         self.jetGetter.newEvent(self.fChain)
-        # recoJets = getattr(self.fChain, self.recoJetCollection)
-
-
-
-        fill = False
         for shift in self.todoShifts:
             weight = 1. 
             if not self.isData:
@@ -99,63 +104,32 @@ class RecoGenRatio(ExampleProofReader):
                 weight *= puWeight
 
             self.var["weight"][0] = weight
-
-
-            #dbgCnt = 0
             for jet in self.jetGetter.get(shift):
-            #for i in xrange(0, recoJets.size()):
-            #    jet = recoJets.at(i)
-                #dbgJet = recoJets.at(dbgCnt)
-                #dbgCnt+=1
-                #print shift, dbgCnt,"|", jet.pt(), jet.eta(), "|", dbgJet.pt(), dbgJet.eta()
-
                 pt = jet.pt()
                 if pt < 35: continue
-                eta = abs(jet.eta())
-                if eta > 4.7: continue
-                if eta < 1.4:
-                    tagJet = jet
-                    tagPT = pt
-                else:
-                    probeJet = jet
-                    probePT = pt
+                eta = jet.eta()
+                if abs(eta) > 5: continue
+                if not jet.looseId(): continue
 
-            if tagJet != None and probeJet != None:
-                # check veto:
-                badEvent = False
-                ptAve = (probePT+tagPT)/2
-                for jet in self.jetGetter.get(shift):
-                #for i in xrange(0, recoJets.size()):
-                    if jet == tagJet or probeJet == jet: continue
-                    eta = abs(jet.eta())
-                    if eta > 4.7: continue
-                    veto =  jet.pt()/ptAve
-                    if veto > 0.2:
-                        badEvent = True
-                        break
-                if not badEvent:
-                    self.var["tagPt"+shift][0] = tagPT 
-                    self.var["tagEta"+shift][0] =  abs(tagJet.eta())
-                    self.var["probePt"+shift][0] = probePT
-                    self.var["probeEta"+shift][0] = abs(probeJet.eta())
-                    self.var["ptAve"+shift][0] = ptAve
-                    self.var["balance"+shift][0] = (probePT-tagPT)/ptAve
-                    fill = True
+                genPt = jet.genP4().pt()
+                r = -2
+                if genPt > 0.01:
+                    r = (genPt-pt)/genPt
 
-   
-        # at least one variation ok.
-        if fill:
-            #print "Filll!"
-            self.tree.Fill()
+                self.var["tagPt"+shift][0]  = 99
+                self.var["tagEta"+shift][0] = 0.
+                self.var["probePt"+shift][0] = pt
+                self.var["probeEta"+shift][0] = eta
+                self.var["ptAve"+shift][0][0] = 99
+                self.var["balance"+shift][0] = r
+                self.tree.Fill()
+
+
 
         return 1
 
     def finalize(self):
         print "Finalize:"
-        normFactor = self.getNormalizationFactor()
-        print "  applying norm", normFactor
-        for h in self.hist:
-            self.hist[h].Scale(normFactor)
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
@@ -207,7 +181,8 @@ if __name__ == "__main__":
                                slaveParameters=slaveParams,
                                sampleList=sampleList,
                                maxFilesMC = maxFilesMC,
+                               maxFilesData = maxFilesData,
                                nWorkers=nWorkers,
-                               outFile = "treeDiJetBalance.root" )
+                               outFile = "treeJetGenRatio.root" )
 
 
