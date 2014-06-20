@@ -97,7 +97,7 @@ if __name__ == "__main__":
     nWorkers = 1
     maxFilesMC = 12
     #'''
-    maxFilesMC = 12
+    #maxFilesMC = 12
     #treeName = "mnTriggerAna"
     slaveParams["ptMin"] = 20
     slaveParams["etaMax"] = 5

@@ -6,7 +6,7 @@ from ROOT import edm, JetCorrectionUncertainty
 
 class Jet():
     def __init__(self, p4, i, genJetCollection, jetID):
-        self.p4 = p4
+        self.p4vec = p4
         self.i = i
         self.genCol = genJetCollection
         self.jetID = jetID
@@ -14,16 +14,16 @@ class Jet():
 
 
     def p4(self):
-        return self.p4
+        return self.p4vec
 
     def pt(self):
-        return self.p4.pt()
+        return self.p4vec.pt()
 
     def phi(self):
-        return self.p4.phi()
+        return self.p4vec.phi()
 
     def eta(self):
-        return self.p4.eta()
+        return self.p4vec.eta()
 
     def looseId(self):
         if self.i == None:
@@ -40,7 +40,7 @@ class Jet():
 
     def __eq__(self, other):
         #if self.p4 == other.p4: return True # could speed up a bit
-        dr = self.dr(self.p4, other.p4)
+        dr = self.dr(self.p4vec, other.p4vec)
         ret  = dr == 0.
         ret2 = dr < 0.001
         if ret != ret2:

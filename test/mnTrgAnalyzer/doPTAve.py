@@ -55,7 +55,8 @@ def plot(todo, plotName):
 
     markerCnt = 20
 
-    leg = ROOT.TLegend(0.4, 0.7, 0.8, 0.9)
+    xS = 0.3
+    leg = ROOT.TLegend(0.4+xS, 0.7, 0.6+xS, 0.9)
     leg.SetFillColor(0)
 
     #colorBase = ROOT.EColor.kRed
@@ -64,7 +65,7 @@ def plot(todo, plotName):
 
     #print colorBase
     #sys.exit()
-    leg.SetHeader("HLT p_{T}^{ave}\n threshold:")
+    leg.SetHeader("p_{T}^{ave min HLT}")
     cnt = 0
     for t in sorted(histoMap.keys()):
         histoMap[t].SetMarkerStyle(markerCnt)
@@ -86,7 +87,7 @@ def main():
     MNTriggerStudies.MNTriggerAna.Style.setStyle()
     low = [10, 15, 20]
     high = [20, 25, 30]
-    fit(low+high)
+    #fit(set(low+high))
     plot(low, "hltPtThreshods_low.png")
     plot(high, "hltPtThreshods_high.png")
 
