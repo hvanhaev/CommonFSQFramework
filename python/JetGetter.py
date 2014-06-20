@@ -9,6 +9,8 @@ class Jet():
         self.p4 = p4
         self.i = i
         self.genCol = genJetCollection
+        self.dr = ROOT.Math.VectorUtil.DeltaR
+
 
     def p4(self):
         return self.p4
@@ -27,6 +29,26 @@ class Jet():
             return ROOT.reco.Candidate.LorentzVector(0, 0, 0, 0)
 
         return genJetCollection.at(self.i)
+
+    def __eq__(self, other):
+        #if self.p4 == other.p4: return True # could speed up a bit
+        dr = self.dr(self.p4, other.p4)
+        ret  = dr == 0.
+        ret2 = dr < 0.001
+        if ret != ret2:
+            print "Warning:Jet:dr equality may be calculated wrong for", self.pt(), self.eta(), "|", other.pt(), other.eta()
+        if not ret: return ret
+        pt1 = self.pt()
+        pt2 = other.pt()
+        
+        if pt1 != pt2:
+            print "Warning:Jet:pt equality may be calculated wrong for", self.pt(), self.eta(), "|", other.pt(), other.eta()
+
+        return ret
+        
+
+    def __neq__(self, other):
+        return not self.__eq__(other)
 
 
 
