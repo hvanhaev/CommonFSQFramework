@@ -237,7 +237,12 @@ class ExampleProofReader( ROOT.TPySelector ):
         skipped = []
 
         sampleListFullInfo = MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
+        sampleCnt = 0
         for t in todo:
+            sampleCnt += 1
+            print "#"*60
+            print "Next sample:", t, "("+str(sampleCnt)+"/"+str(len(todo))+")"
+            print "#"*60
             if len(treeFilesAndNormalizations[t]["files"])==0:
                 print "Skipping, empty filelist for",t
                 skipped.append(t)
@@ -287,7 +292,6 @@ class ExampleProofReader( ROOT.TPySelector ):
             for v in variablesToSetInProof:  
                 # if you get better implemenation (GetParameter?) mail me
                 proof.Exec('gSystem->Setenv("'+v+'","'+variablesToSetInProof[v]+'");')
-            print "Running:", cls.__name__
             print dataset.Process( 'TPySelector',  cls.__name__)
             curPath = ROOT.gDirectory.GetPath()
 
