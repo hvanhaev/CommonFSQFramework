@@ -151,6 +151,7 @@ class BalanceTreeProducer(ExampleProofReader):
                 if pt < 35: continue
                 eta = abs(jet.eta())
                 if eta > 4.7: continue
+                if not jet.looseId(): continue
                 if eta < 1.4:
                     tagJet = jet
                     tagPT = pt
@@ -239,7 +240,6 @@ if __name__ == "__main__":
     #jetUncFile = "START42_V11_AK5PF_Uncertainty.txt"
     jetUncFile = "START41_V0_AK5PF_Uncertainty.txt"
 
-
     slaveParams["jetUncFile"] =  edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"+jetUncFile).fullPath()
     slaveParams["HLT2015TempWorkaround"] =  False
     if slaveParams["HLT2015TempWorkaround"]:
@@ -250,9 +250,6 @@ if __name__ == "__main__":
         #nWorkers = 1
         treeName = "mnTriggerAna"
 
-
-
-
     BalanceTreeProducer.runAll(treeName=treeName,
                                slaveParameters=slaveParams,
                                sampleList=sampleList,
@@ -260,5 +257,4 @@ if __name__ == "__main__":
                                maxFilesData = maxFilesData,
                                nWorkers=nWorkers,
                                outFile = "treeDiJetBalance.root" )
-
 
