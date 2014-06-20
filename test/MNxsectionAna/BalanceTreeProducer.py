@@ -11,16 +11,10 @@ from ROOT import edm, JetCorrectionUncertainty
 
 from array import *
 
-
-# Following import breaks things. Why???
-#import math
-
 # please note that python selector class name (here: BalanceTreeProducer) 
 # should be consistent with this file name (BalanceTreeProducer.py)
 
 # you have to run this file from directory where it is saved
-
-
 import MNTriggerStudies.MNTriggerAna.ExampleProofReader 
 from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
 
@@ -80,6 +74,7 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
             self.jetGetter.jetcol = "pfJets"
             self.jetGetter.jetcolGen ="pfJets"
             self.jetGetter.jetcolReco = "pfJets"
+            self.jetGetter.jetcolID = "pfJets"
 
         if hasattr(self, "jetUncFile"):
             self.jetGetter.setJecUncertainty(self.jetUncFile)
@@ -148,10 +143,12 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
 
                 pt = jet.pt()
 
-                if pt < 35: continue
+                if pt < self.ptMin: continue
                 eta = abs(jet.eta())
-                if eta > 4.7: continue
-                if not jet.looseId(): continue
+                if eta > self.etaMax: continue
+
+                if not self.HLT2015TempWorkaround:
+                    if not jet.looseId(): continue
                 if eta < 1.4:
                     tagJet = jet
                     tagPT = pt
@@ -228,6 +225,9 @@ if __name__ == "__main__":
 
     #slaveParams["doPtShiftsJER"] = False
     slaveParams["doPtShiftsJER"] = True
+
+    slaveParams["ptMin"] = 35
+    slaveParams["etaMax"] = 4.7
 
 
     #slaveParams["recoJetCollection"] = "pfJets"

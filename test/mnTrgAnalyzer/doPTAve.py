@@ -16,6 +16,7 @@ def fit(todo):
         fitResultsDir = outDir.replace("XXX",str(t))
         command  = "./balanceFitAndPlot.py"
         command += " -i " + infile
+        command += " -e 1 " 
         command += " -o " + fitResultsDir
         command += " -c '" + cutBase.replace("XXX", str(t)) + "'"
         os.system(command)
@@ -85,7 +86,7 @@ def main():
     MNTriggerStudies.MNTriggerAna.Style.setStyle()
     low = [10, 15, 20]
     high = [20, 25, 30]
-    #fit(low+high)
+    fit(low+high)
     plot(low, "hltPtThreshods_low.png")
     plot(high, "hltPtThreshods_high.png")
 

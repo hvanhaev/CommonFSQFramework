@@ -106,6 +106,7 @@ def main():
     parser.add_option("-i", "--infile", action="store", type="string",  dest="infile" )
     parser.add_option("-o", "--outdir", action="store", type="string",  dest="outdir" )
     parser.add_option("-c", "--cutExtra", action="store", type="string",  dest="cutExtra" )
+    parser.add_option("-e", "--etaTable", action="store", type="int",  dest="etaTable" )
     (options, args) = parser.parse_args()
 
     if options.infile:
@@ -120,6 +121,31 @@ def main():
 
     os.system("mkdir -p "+odir)
 
+    etaRanges = []
+
+    etaCen = [0.001, 0.201, 0.401, 0.601, 0.801, 1.001, 1.201]
+    etaProbeCEN = [1.401, 1.701, 2.001, 2.322, 2.411, 2.601]
+    etaProbeHF  = [2.801, 3.001, 3.201, 3.501, 3.801, 4.101]
+    etaProbeFwdWide = [4.701]
+    etaProbeFwdDense = [4.401, 4.701]
+    etaProbeFwdDense5 = [4.401, 4.701, 5.001]
+    if options.etaTable:
+        if options.etaTable == 1:
+            #etaRanges.extend(etaProbeCEN)
+            etaRanges.extend(etaProbeHF)
+            etaRanges.extend(etaProbeFwdDense5)
+        elif options.etaTable == 2:
+            etaRanges.extend(etaCen)
+            etaRanges.extend(etaProbeCEN)
+            etaRanges.extend(etaProbeHF)
+            etaRanges.extend(etaProbeFwdDense5)
+        else:
+            raise Exception("Eta tab not known "+str(options.etaTable))
+    else:   # no option or option == 0
+        etaRanges.extend(etaProbeCEN)
+        etaRanges.extend(etaProbeHF)
+        etaRanges.extend(etaProbeFwdWide)
+    
     sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
 
     f = ROOT.TFile(infile, "r")
@@ -222,12 +248,13 @@ def main():
         raise Exception("Central value not found!")
 
 
-    etaRanges = []
+    #etaRanges = []
     #etaRanges.extend([0.001, 0.201, 0.401, 0.601, 0.801, 1.001, 1.201])
-    etaRanges.extend([1.401, 1.701, 2.001, 2.322, 2.411, 2.601, 2.801, 3.001, 3.201, 3.501, 3.801, 4.101, 4.701])
+    #etaRanges.extend([1.401, 1.701, 2.001, 2.322, 2.411, 2.601, 2.801, 3.001, 3.201, 3.501, 3.801, 4.101, 4.701])
+    #etaRanges.extend([2.801, 3.001, 3.201, 3.501, 3.801, 4.101, 4.401, 4.701, 5.001])
     #etaRanges.extend([4.101, 4.701])
-    minPtAVG = 45
-
+    minPtAVG = 25
+    minPt = 20
 
     curPath = ROOT.gDirectory.GetPath()
     of = ROOT.TFile(odir+"balanceHistos.root","RECREATE")
@@ -254,13 +281,13 @@ def main():
                 def vary(x, v=v):
                     return x + "_" + v
 
-                cut = vary("tagPt") + " > 35"
-                cut += " && " + vary("probePt") + " > 35 "
+                cut = vary("tagPt") + " > " + str(minPt)
+                cut += " && " + vary("probePt") + " > " + str(minPt)
                 cut += " && abs(" + vary("probeEta") + ") >  " + str(etaMin)
                 cut += " && abs(" + vary("probeEta") + ") <  " + str(etaMax)
                 cut += " && " + vary("ptAve") + " > " + str(minPtAVG)
-                cut += " && " + vary("balance") + " > " + str(-1)
-                cut += " && " + vary("balance") + " < " + str(1)
+                #cut += " && " + vary("balance") + " > " + str(-1)
+                #cut += " && " + vary("balance") + " < " + str(1)
                 if options.cutExtra != None:
                     cut += options.cutExtra
 
@@ -314,6 +341,7 @@ def main():
             #print etaRanges
             #print etaArray
             hist = ROOT.TH1F(histName, histName, len(etaArray)-1, etaArray)
+            hist.Sumw2()
             for i in xrange(len(results)):
                 res = results[i]
                 iEta = res["iEta"]
