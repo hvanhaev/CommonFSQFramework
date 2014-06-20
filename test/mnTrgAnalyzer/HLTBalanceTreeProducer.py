@@ -19,12 +19,12 @@ from ROOT import edm, JetCorrectionUncertainty
 # ln -s ../MNxsectionAna/BalanceTreeProducer.py
 # ln -s ../MNxsectionAna/balanceFitAndPlot.py
 # ln -s ../MNxsectionAna/drawBalance.py
-from BalanceTreeProducer import BalanceTreeProducer as BalanceTreeProducerObscuredName
+import BalanceTreeProducer 
 from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
 
-class HLTBalanceTreeProducer(BalanceTreeProducerObscuredName):
+class HLTBalanceTreeProducer(BalanceTreeProducer.BalanceTreeProducer):
     def init(self):
-        BalanceTreeProducerObscuredName.init(self)
+        BalanceTreeProducer.BalanceTreeProducer.init(self)
         self.addExternalVar(["hltPtAve"])
 
     #    print "XX2!"
@@ -53,7 +53,7 @@ class HLTBalanceTreeProducer(BalanceTreeProducerObscuredName):
             ptAve = (tag.pt() + probe.pt())/2.
             if ptAve > 10.:
                 self.setExternalVar("hltPtAve", ptAve)
-                BalanceTreeProducerObscuredName.analyze(self)
+                BalanceTreeProducer.BalanceTreeProducer.analyze(self)
 
     def finalize(self):
         print "Finalize HLTBala:"
@@ -92,10 +92,15 @@ if __name__ == "__main__":
     slaveParams["doPtShiftsJEC"] = False
 
 
-    #sampleList=["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]
-    #nWorkers = 1
-    #maxFilesMC = 32
+    '''
+    sampleList=["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]
+    nWorkers = 1
+    maxFilesMC = 12
+    #'''
+    maxFilesMC = 12
     #treeName = "mnTriggerAna"
+    slaveParams["ptMin"] = 20
+    slaveParams["etaMax"] = 5
 
     out = "treeDiJetBalance.root"
     HLTBalanceTreeProducer().runAll(treeName="mnTriggerAna",
