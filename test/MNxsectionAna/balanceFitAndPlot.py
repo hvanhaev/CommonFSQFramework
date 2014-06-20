@@ -42,7 +42,13 @@ class FitThread(multiprocessing.Process):
         mean2 = RooRealVar("mean","mean of gaussian", 0, -1.5, 1.5)
         sigma2 = RooRealVar("sigma","width of gaussian", .1, 0, 1)
         gauss2 = RooGaussian("gauss","gaussian PDF",myVar, mean2, sigma2)
-        gauss2.fitTo(dsReduced, ROOT.RooFit.Range(rangeLow, rangeHigh), ROOT.RooFit.PrintLevel(-1)) # this exludes -1 point ("no jet matched point")
+
+        ''' RooFit info:      
+            If you want the errors to reflect the information contained in the provided dataset, choose kTRUE.
+            If you want the errors to reflect the precision you would be able to obtain with an unweighted dataset
+               with 'sum-of-weights' events, choose kFALSE.'''
+        gauss2.fitTo(dsReduced, ROOT.RooFit.Range(rangeLow, rangeHigh), \
+                     ROOT.RooFit.PrintLevel(-1), ROOT.RooFit.SumW2Error(True)) # this exludes -1 point ("no jet matched point")
 
         balanceVariable = "diJet balance"
         frame = myVar.frame(ROOT.RooFit.Range(-1.5,1))
@@ -347,6 +353,6 @@ if __name__ == "__main__":
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     AutoLibraryLoader.enable()
     main()
-    print "./drawPlots.py -s -i ~/tmp/balanceHistos.root"
+    print "./drawBalance.py  -i ~/tmp/balance/balanceHistos.root"
 
 

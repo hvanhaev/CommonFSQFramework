@@ -144,8 +144,10 @@ class BalanceTreeProducer(ExampleProofReader):
                 #dbgJet = recoJets.at(dbgCnt)
                 #dbgCnt+=1
                 #print shift, dbgCnt,"|", jet.pt(), jet.eta(), "|", dbgJet.pt(), dbgJet.eta()
+                #print pt, jet.eta()
 
                 pt = jet.pt()
+
                 if pt < 35: continue
                 eta = abs(jet.eta())
                 if eta > 4.7: continue
@@ -181,7 +183,6 @@ class BalanceTreeProducer(ExampleProofReader):
    
         # at least one variation ok.
         if fill:
-            #print "Filll!"
             self.tree.Fill()
             for v in self.varE: # reset external variables
                 self.varE[v] = 0
@@ -209,8 +210,8 @@ if __name__ == "__main__":
     # debug config:
     '''
     sampleList=[]
-    #sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
-    sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
+    sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
+    #sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
     #sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
     #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
