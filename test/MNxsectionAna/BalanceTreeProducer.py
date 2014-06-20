@@ -21,6 +21,7 @@ from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
 class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
     def init(self):
         self.normFactor = self.getNormalizationFactor()
+        self.dphi = ROOT.Math.VectorUtil.DeltaPhi
 
         self.tree = ROOT.TTree("data", "data")
         self.GetOutputList().Add(self.tree)
@@ -157,6 +158,9 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
                     probePT = pt
 
             if tagJet != None and probeJet != None:
+                dphi = self.dphi(tagJet.p4(), probeJet.p4())
+                if dphi < 2.7: continue
+                
                 # check veto:
                 badEvent = False
                 ptAve = (probePT+tagPT)/2
