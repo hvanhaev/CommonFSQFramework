@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import sys, os, time
-sys.path.append(os.path.dirname(__file__))
+#sys.path.append(os.path.dirname(__file__))
 
 import ROOT
 ROOT.gROOT.SetBatch(True)
@@ -21,10 +21,14 @@ from array import array
 # you have to run this file from directory where it is saved
 
 
-from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader as ExampleProofReaderObscuredName
+#from MNTriggerStudies.MNTriggerAna.ExampleProofReader import ExampleProofReader as ExampleProofReaderObscuredName
+import MNTriggerStudies.MNTriggerAna.ExampleProofReader
 from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
 
-class RecoGenRatio(ExampleProofReaderObscuredName):
+class RecoGenRatio(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
+#class RecoGenRatio(ExampleProofReaderObscuredName, ROOT.TPySelector):
+#class RecoGenRatio(ExampleProofReaderObscuredName):
+#class ExampleProofReader( ROOT.TPySelector ):
     def init( self):
 
         self.tree = ROOT.TTree("data", "data")
@@ -120,7 +124,7 @@ class RecoGenRatio(ExampleProofReaderObscuredName):
                 self.var["tagEta"+shift][0] = 0.
                 self.var["probePt"+shift][0] = pt
                 self.var["probeEta"+shift][0] = eta
-                self.var["ptAve"+shift][0][0] = 99
+                self.var["ptAve"+shift][0] = 99
                 self.var["balance"+shift][0] = r
                 self.tree.Fill()
 
@@ -136,19 +140,15 @@ if __name__ == "__main__":
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     ROOT.AutoLibraryLoader.enable()
 
-    sampleList = None
     maxFilesMC = None
     maxFilesData = None
     nWorkers = None # Use all
 
-    # debug config:
-    #'''
     sampleList=[]
     sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
-    #sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
-    #sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
-    #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
-    #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
+
+    # debug config:
+    '''
     maxFilesData = 1
     maxFilesMC = 1
     nWorkers = 1
