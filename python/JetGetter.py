@@ -29,14 +29,14 @@ class Jet():
         if self.i == None:
             return False
         ret = self.jetID.at(self.i)
-        print "XXX", ret
+        #print "XXX", ret
         return ret
 
     def genP4(self):
         if self.i == None:
             return ROOT.reco.Candidate.LorentzVector(0, 0, 0, 0)
 
-        return genJetCollection.at(self.i)
+        return self.genCol.at(self.i)
 
     def __eq__(self, other):
         #if self.p4 == other.p4: return True # could speed up a bit
