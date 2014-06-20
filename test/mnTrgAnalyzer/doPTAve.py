@@ -4,18 +4,14 @@ import os
 import ROOT
 ROOT.gROOT.SetBatch(True)
 
+import MNTriggerStudies.MNTriggerAna.Style
 
 cutBase = " && hltPtAve  > XXX"
 outDir = "~/tmp/balanceHLT_XXX/"
-
-#infile = "treeDiJetBalance_15.root"
 infile = "treeDiJetBalance.root"
-#todo = [10, 20, 30,  40, 50]
-#todo = [10,  20, 40]
-todo = [40, 45, 50, 55]
 
 
-def fit():
+def fit(todo):
     for t in todo:
         fitResultsDir = outDir.replace("XXX",str(t))
         command  = "./balanceFitAndPlot.py"
@@ -24,21 +20,11 @@ def fit():
         command += " -c '" + cutBase.replace("XXX", str(t)) + "'"
         os.system(command)
 
-        #plotCommand = "./drawBalance.py"
-        #plotCommand += " -i "+fitResultsDir+"/balanceHistos.root" 
-        #plotCommand += " -o "+fitResultsDir
-        #os.system(plotCommand)
-
-
-def plot():
-
+def plot(todo, plotName):
     histoMap = {}
-
-    #histMin, histMax = (0,0)
     for t in todo:
         fitResultsDir = outDir.replace("XXX",str(t))
         histoFile = fitResultsDir+"/balanceHistos.root"
-        #print histoFile
         rootfile = ROOT.TFile(histoFile, "read")
         lst = rootfile.GetListOfKeys()
         cnt = 0
@@ -62,28 +48,46 @@ def plot():
 
     #print histoMap
     canvas = ROOT.TCanvas()
-    hFrame = canvas.DrawFrame(2.8, -0.15, 5.2, 0.05)
-    hFrame.GetXaxis().SetTitle("#eta")
+    hFrame = canvas.DrawFrame(2.8, -0.3, 5.2, 0.1)
+    hFrame.GetXaxis().SetTitle("#eta_{probe}")
     hFrame.GetYaxis().SetTitle("balance")
 
     markerCnt = 20
-    leg = ROOT.TLegend(0.6,0.6,1,1)
-    leg.SetHeader("HLT ptAve:")
+
+    leg = ROOT.TLegend(0.4, 0.7, 0.8, 0.9)
+    leg.SetFillColor(0)
+
+    #colorBase = ROOT.EColor.kRed
+    colorBase = ROOT.EColor.kOrange
+    colors = [colorBase+1, colorBase+2, colorBase+3,colorBase+4]
+
+    #print colorBase
+    #sys.exit()
+    leg.SetHeader("HLT p_{T}^{ave}\n threshold:")
+    cnt = 0
     for t in sorted(histoMap.keys()):
         histoMap[t].SetMarkerStyle(markerCnt)
         markerCnt += 1
-        histoMap[t].Draw("e p same")
+        histoMap[t].Draw("e1 p same")
+        color = colors[cnt]
+        cnt +=1
+        histoMap[t].SetMarkerColor(color)
+        histoMap[t].SetLineColor(color)
         leg.AddEntry(histoMap[t], str(t), "p")
 
     leg.Draw("SAME")
-    canvas.Print("~/tmp/ttt.png")
+    canvas.Print("~/tmp/"+plotName)
         
 
 
 
 def main():
-    fit()
-    plot()
+    MNTriggerStudies.MNTriggerAna.Style.setStyle()
+    low = [10, 15, 20]
+    high = [20, 25, 30]
+    #fit(low+high)
+    plot(low, "hltPtThreshods_low.png")
+    plot(high, "hltPtThreshods_high.png")
 
 
 
