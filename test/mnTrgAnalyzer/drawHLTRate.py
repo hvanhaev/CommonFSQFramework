@@ -1,0 +1,121 @@
+#!/usr/bin/env python
+
+import ROOT
+ROOT.gROOT.SetBatch(True)
+from ROOT import *
+
+import os,re,sys,math
+
+def main():
+
+    #infile = "~/plotsHLT.root"
+    infile = "TestHLTPlots.root"
+    f = ROOT.TFile(infile, "r")
+    lst = f.GetListOfKeys()
+
+    # merge histograms across directories
+    finalMap = {}
+    for l in lst:
+        #print "Going through", l.GetName(), l.ClassName()
+        currentDir = l.ReadObj()
+
+        if not currentDir:
+            print "Problem reading", l.GetName(), " - skipping"
+            continue
+
+        if type(currentDir) != ROOT.TDirectoryFile:
+            print "Expected TDirectoryFile,", type(currentDir), "found"
+            continue
+
+        dirContents = currentDir.GetListOfKeys()
+        for c in dirContents:
+            if "PROOF_" in c.GetName(): continue
+            if "norm" == c.GetName(): continue # not needed since we expect to get normalized histos
+
+
+            curObj = c.ReadObj()
+            if not curObj.InheritsFrom("TH1"):
+                print "Dont know how to merge", curObj.GetName(), curObj.ClassName()
+                continue
+
+
+            if "isNormalized"  == c.GetName(): 
+                val = curObj.GetBinContent(1)
+                if val < 0.5:
+                    errMsg = "Expected to find normalized histograms in dir " + l.GetName()
+                    raise Exception(errMsg)
+                continue
+
+
+
+            curObjClone = curObj.Clone()
+            curObjClone.SetDirectory(0)
+
+            if curObjClone.GetName() in finalMap:
+                finalMap[curObjClone.GetName()].Add(curObjClone)
+            else:
+                finalMap[curObjClone.GetName()] = curObjClone
+
+
+
+    todoEff  = {"fb": "fb",
+                "singleJet": "singleJet",
+                "ptAveHFJEC": "ptAveHFJEC",
+                "test": "test"
+                }
+
+
+    # verification - single jet trigger for PU=25
+    #   https://twiki.cern.ch/twiki/bin/view/CMS/TriggerMenuDevelopment#Rate_Studies
+    #
+    #  -> rate scale factor (equal to instantaneous luminosity) correctly calculated 
+    #       (you need to set avgPU to 25)
+    #       
+    #  -> single jet rates (click JetHT) @ 13 TeV
+    #
+    #     HLT_PFJet320  97.77 pm 1.71 
+    #     HLT_PFJet400  29.27 pm 0.07 
+    #
+
+
+
+    totalBunches = 3564
+    collidingBunches = 2*1380 # take the highest value from 2012, mul x2 (50ns - > 25 ns)
+    #avgPU = 25
+    avgPU = 1
+    minBiasXS = 78.42 * 1E9 # pb
+    #minBiasXS = 69.3 * 1E9 # pb // 8 TeV
+    #minBiasXS = 68. * 1E9 # pb // 7 TeV
+
+    perBunchXSLumi = avgPU/minBiasXS # in pb-1
+    print "per bunch lumi", perBunchXSLumi, "(pb^-1)"
+    LHCFrequency = 40. * 1E6 # 40 MHz
+
+    rateScaleFactor = perBunchXSLumi*LHCFrequency*float(collidingBunches)/float(totalBunches)
+
+
+    print "Inst lumi", rateScaleFactor, "(pb^-1 * s^-1)"
+
+
+    c1 = ROOT.TCanvas()
+    for t in todoEff:
+        fname = "~/"+t+".png"
+
+        rate = finalMap[todoEff[t] + "_rate"]
+        fname = "~/"+t+"_rate.png"
+        rate.Scale(rateScaleFactor)
+
+        rate.Draw()
+        #rate.GetXaxis().SetRange(15, 50)
+        rate.GetXaxis().SetTitle("trigger threshold [GeV]")
+        rate.GetYaxis().SetTitle("rate  [Hz]")
+        
+
+        c1.Print(fname)
+
+
+if __name__ == "__main__":
+    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+    ROOT.gSystem.Load("libFWCoreFWLite.so")
+    AutoLibraryLoader.enable()
+    main()
