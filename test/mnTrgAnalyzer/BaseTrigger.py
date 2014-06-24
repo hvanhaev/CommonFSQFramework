@@ -41,12 +41,13 @@ class BaseTrigger:
     def getMaxThr(self):
         return 0
 
-class ForwardBackward:
+class ForwardBackwardTrigger(BaseTrigger):
     def getMaxThr(self):
         hltJets = self.objectsGetter.get()
+        #print "XXX", len(hltJets)
         bestF = None
         bestB = None
-        for j in self.hltJets:
+        for j in hltJets:
             eta = j.eta()
             if abs(eta) < 3.: continue
             pt = j.pt()
