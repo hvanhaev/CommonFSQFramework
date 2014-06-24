@@ -11,7 +11,7 @@ def main():
     MNTriggerStudies.MNTriggerAna.Style.setStyle()
 
     #infile = "~/plotsHLT.root"
-    infile = "TestHLTPlots_ref.root"
+    infile = "TestHLTPlots.root"
     f = ROOT.TFile(infile, "r")
     lst = f.GetListOfKeys()
 
@@ -60,13 +60,6 @@ def main():
 
 
 
-    todoEff  = {"fb": "fb",
-                "singleJet": "singleJet",
-                "ptAveHFJEC": "ptAveHFJEC",
-                "test": "test"
-                }
-
-
     # verification - single jet trigger for PU=25
     #   https://twiki.cern.ch/twiki/bin/view/CMS/TriggerMenuDevelopment#Rate_Studies
     #
@@ -100,10 +93,10 @@ def main():
 
 
     c1 = ROOT.TCanvas()
-    for t in todoEff:
+    for t in finalMap:
         fname = "~/"+t+".png"
 
-        rate = finalMap[todoEff[t] + "_rate"]
+        rate = finalMap[t]
         fname = "~/"+t+"_rate.png"
         rate.Scale(rateScaleFactor)
 
