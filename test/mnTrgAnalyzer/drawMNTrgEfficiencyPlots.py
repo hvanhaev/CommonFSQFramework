@@ -9,6 +9,7 @@ import os,re,sys,math
 def main():
 
     infile = "~/plotsHLT.root"
+    #infile = "TestHLTPlots.root"
     f = ROOT.TFile(infile, "r")
     lst = f.GetListOfKeys()
 
@@ -56,7 +57,7 @@ def main():
                 finalMap[curObjClone.GetName()] = curObjClone
 
 
-
+    #'''xxx
     todoEff  = { "HLT": "signalEffVsHLTThreshold",
                   "L1": "signalEffVsL1Threshold",
                  "L1_bothForward":   "signalEffVsL1Threshold_bothForward",
@@ -66,6 +67,8 @@ def main():
                  "HLTrateSinglePF": "signalEffVsHLTThreshold_SinglePFJet"
 
                 }
+    #    '''
+    #todoEff = {"test": "test"}
 
 
     # verification - single jet trigger for PU=25
@@ -84,6 +87,7 @@ def main():
 
     totalBunches = 3564
     collidingBunches = 2*1380 # take the highest value from 2012, mul x2 (50ns - > 25 ns)
+    #avgPU = 1
     avgPU = 1
     minBiasXS = 78.42 * 1E9 # pb
     #minBiasXS = 69.3 * 1E9 # pb // 8 TeV
@@ -104,6 +108,8 @@ def main():
         fname = "~/"+t+".png"
         #nom = f.Get(todo[t][0])
         #denom = f.Get(todo[t][1])
+
+        ''' xxx
         nom = finalMap[todoEff[t] + "_NOM"]
         denom = finalMap[todoEff[t] + "_DENOM"]
 
@@ -112,6 +118,7 @@ def main():
         nom.GetYaxis().SetTitle("signal efficiency")
         nom.Draw()
         c1.Print(fname)
+        #'''
 
         rate = finalMap[todoEff[t] + "_rate"]
         fname = "~/"+t+"_rate.png"

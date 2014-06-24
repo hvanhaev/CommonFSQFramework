@@ -5,8 +5,10 @@ ROOT.gROOT.SetBatch(True)
 from ROOT import *
 
 import os,re,sys,math
+import MNTriggerStudies.MNTriggerAna.Style
 
 def main():
+    MNTriggerStudies.MNTriggerAna.Style.setStyle()
 
     #infile = "~/plotsHLT.root"
     infile = "TestHLTPlots.root"
@@ -107,7 +109,11 @@ def main():
 
         rate.Draw()
         #rate.GetXaxis().SetRange(15, 50)
-        rate.GetXaxis().SetTitle("trigger threshold [GeV]")
+        if "ptAveHFJEC" in t:
+            rate.GetXaxis().SetTitle("p_{T}^{ave min HLT}")
+            rate.GetYaxis().SetTitleOffset(2)
+        else:
+            rate.GetXaxis().SetTitle("trigger threshold [GeV]")
         rate.GetYaxis().SetTitle("rate  [Hz]")
         
 

@@ -137,7 +137,7 @@ class MNTrgAnaProofReader(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
             for i in xrange(1,nbins+1):
                 binCenter = getBinCenter(i)
                 if binCenter <= hardest:
-                    print "  fl!", i, rateVsPtThreshold.GetXaxis().GetBinCenter(i)
+                    #print "  fl!", i, rateVsPtThreshold.GetXaxis().GetBinCenter(i)
                     fill(binCenter)
                 else:
                     break
@@ -292,6 +292,7 @@ if __name__ == "__main__":
     #sampleList = ["QCD_Pt-10to15_Tune4C_13TeV_pythia8",]
     maxFilesMC = 1
     # '''
+    maxFilesMC = 32
 
 
 
