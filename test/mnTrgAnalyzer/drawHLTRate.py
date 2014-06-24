@@ -113,10 +113,10 @@ def main():
             rate.GetXaxis().SetTitle("p_{T}^{ave min HLT}")
         elif "test" in t or "singleJet" in t:
             rate.GetXaxis().SetTitle("trigger threshold [GeV]")
-            rate.GetXaxis().SetLimits(300, 400)
+            rate.GetXaxis().SetRangeUser(300, 400)
         else:
             rate.GetXaxis().SetTitle("trigger threshold [GeV]")
-            rate.GetXaxis().SetLimits(15, 50)
+            rate.GetXaxis().SetRangeUser(15, 50)
         rate.GetYaxis().SetTitle("rate  [Hz]")
         
 
