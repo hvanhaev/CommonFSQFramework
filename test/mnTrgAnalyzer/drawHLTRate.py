@@ -11,7 +11,7 @@ def main():
     MNTriggerStudies.MNTriggerAna.Style.setStyle()
 
     #infile = "~/plotsHLT.root"
-    infile = "TestHLTPlots.root"
+    infile = "TestHLTPlots_ref.root"
     f = ROOT.TFile(infile, "r")
     lst = f.GetListOfKeys()
 
@@ -108,12 +108,15 @@ def main():
         rate.Scale(rateScaleFactor)
 
         rate.Draw()
-        #rate.GetXaxis().SetRange(15, 50)
+        rate.GetYaxis().SetTitleOffset(2)
         if "ptAveHFJEC" in t:
             rate.GetXaxis().SetTitle("p_{T}^{ave min HLT}")
-            rate.GetYaxis().SetTitleOffset(2)
+        elif "test" in t or "singleJet" in t:
+            rate.GetXaxis().SetTitle("trigger threshold [GeV]")
+            rate.GetXaxis().SetLimits(300, 400)
         else:
             rate.GetXaxis().SetTitle("trigger threshold [GeV]")
+            rate.GetXaxis().SetLimits(15, 50)
         rate.GetYaxis().SetTitle("rate  [Hz]")
         
 
