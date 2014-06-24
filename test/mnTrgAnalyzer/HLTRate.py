@@ -17,12 +17,17 @@ from array import *
 
 import MNTriggerStudies.MNTriggerAna.ExampleProofReader 
 
+import BaseTrigger
+
 class HLTRate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
     #def SlaveBegin( self, tree ):
     def init(self):
         print 'configure: HLTRate'
         self.lastEv  = 0
         self.lastRun = 0
+
+        getter = BaseTrigger.TriggerObjectsGetter(self.fChain, self.hltCollection)
+        self.fbTrigger = BaseTrigger.ForwardBackwardTrigger(getter)
 
         self.hist = {}
 
@@ -86,25 +91,6 @@ class HLTRate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReade
                     self.allL1 = sorted(cur, reverse = True, key = lambda j: j.pt())
                 else:
                     self.allHLT  = sorted(cur, reverse = True, key = lambda j: j.pt())
-
-    def fbX(self):
-        bestF = None
-        bestB = None
-        for j in self.allHLT:
-            eta = j.eta()
-            if abs(eta) < 3.: continue
-            pt = j.pt()
-            if eta > 0:
-                if bestF == None or pt > bestF:
-                    bestF= pt
-            else:
-                if bestB == None or pt > bestB:
-                    bestB = pt
-
-        if None in [bestF, bestB]:
-            return 0.
-
-        return min(bestF, bestB)
 
     def ptAveHFJEC(self):
         #ptAveHFJEC_rate
@@ -182,16 +168,14 @@ class HLTRate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReade
         if hardest > 0.5:
             self.fillRate(self.hist["singleJet_rate"], hardest )
 
-
-        maxThr = self.fbX()
-        if maxThr > 0.5:
-            self.fillRate(self.hist["fb_rate"], maxThr )
-
         ptAveMaxThr = self.ptAveHFJEC()
         #print ptAveMaxThr
         if ptAveMaxThr > 0.5:
             self.fillRate(self.hist["ptAveHFJEC_rate"], ptAveMaxThr )
-            
+
+        ttt= self.fbTrigger.getMaxThr()
+        if ttt > 0.5:
+            self.fillRate(self.hist["fb_rate"], ttt )            
     def finalize(self):
         print "Finalize:"
         normFactor = self.getNormalizationFactor()
@@ -205,11 +189,11 @@ if __name__ == "__main__":
     AutoLibraryLoader.enable()
 
     sampleList = None # run through all
-    #maxFilesMC = 32
-    maxFilesMC = None
+    maxFilesMC = 32
+    #maxFilesMC = None
     nWorkers = None
 
-    '''
+    #'''
     sampleList = ["QCD_Pt-30to50_Tune4C_13TeV_pythia8",]
     #sampleList = ["QCD_Pt-10to15_Tune4C_13TeV_pythia8",]
     maxFilesMC = 1
