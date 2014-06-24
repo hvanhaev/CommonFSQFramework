@@ -38,15 +38,13 @@ class BaseTrigger:
 
     #def getDecision(self, threshold):
         
-    def getMaxThr(self):
+    def getMaxThreshold(self):
         return 0
 
 class ForwardBackwardTrigger(BaseTrigger):
-    def getMaxThr(self):
+    def getMaxThreshold(self):
         hltJets = self.objectsGetter.get()
-        #print "XXX", len(hltJets)
-        bestF = None
-        bestB = None
+        bestF, bestB = (None, None)
         for j in hltJets:
             eta = j.eta()
             if abs(eta) < 3.: continue
@@ -63,3 +61,27 @@ class ForwardBackwardTrigger(BaseTrigger):
 
         return min(bestF, bestB)
 
+class PTAveForHFJecTrigger(BaseTrigger):
+    def getMaxThreshold(self):
+        hltJets = self.objectsGetter.get()
+        tag, probe = (None, None) 
+        for j in hltJets:
+            eta = abs(j.eta())
+            tagCand = eta < 1.4
+            probeCand = eta > 2.8 and eta < 5.2
+            if probeCand or tagCand:
+                pt = j.pt() 
+                if probeCand and (probe == None or probe < pt): probe = pt
+                if tagCand and (tag == None or tag < pt): tag = pt
+            
+        if None in [tag, probe]:
+            return 0.
+        return  (tag+probe)/2
+
+
+class SingleJetTrigger(BaseTrigger):
+    def getMaxThreshold(self):
+        hltJets = self.objectsGetter.get()
+        if len(hltJets) > 0:
+            return hltJets[0].pt()
+        return 0
