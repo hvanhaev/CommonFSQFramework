@@ -84,11 +84,11 @@ class MNSignalEfficiencyVsTriggerThreshold(MNTriggerStudies.MNTriggerAna.Example
         topologies["FB"] =  f + "&" + b 
         topologies["FB"] +=  "|" + f + "&" + f # allow ff or bb combinations
         topologies["FB"] +=  "|" + b + "&" + b
-        topologies["atLeastOneCentral"] = c + "&" + c + 
+        topologies["atLeastOneCentral"] = c + "&" + c 
         topologies["atLeastOneCentral"] += "|"+ c + "&" + f 
         topologies["atLeastOneCentral"] += "|" + c + "&" + b 
-        self.topologies = {}
 
+        self.topologies = {} # convert strings to actual representation. Store it
         for t in topologies:
             self.topologies[t] = self.topologyParser(topologies[t])
 
@@ -96,24 +96,23 @@ class MNSignalEfficiencyVsTriggerThreshold(MNTriggerStudies.MNTriggerAna.Example
         getterL1 = BaseTrigger.TriggerObjectsGetter(self.fChain, self.l1Collection)
         #self.fbTrigger = BaseTrigger.ForwardBackwardTrigger(getter)
         self.fbTrigger = BaseTrigger.DoubldForwardTrigger(getter)
-        self.atLeastOneCentral = BaseTrigger.ForwardBackwardTrigger(getter)
+        self.atLeastOneCentral = BaseTrigger.DoubleJetWithAtLeastOneCentralJetTrigger(getter)
         self.L1SingleJetSeed = BaseTrigger.SingleJetTrigger(getterL1)
 
-
         self.effHistos = {} # histoName:       [topologyName,trigger, effNom, effDenom]
-        self.effHistos["FB_HLT"] = ["FB", self.fbTrigger,       Null, Null]
-        self.effHistos["FB_L1"] = ["FB",  self.L1SingleJetSeed, Null, Null]
-        self.effHistos["atLeastOneCentral_HLT"] = ["atLeastOneCentral",  self.atLeastOneCentral, Null, Null]
-        self.effHistos["atLeastOneCentral_L1"] = ["atLeastOneCentral",  self.L1SingleJetSeed, Null, Null]
+        self.effHistos["FB_HLT"] = ["FB", self.fbTrigger,       None, None]
+        self.effHistos["FB_L1"] = ["FB",  self.L1SingleJetSeed, None, None]
+        self.effHistos["atLeastOneCentral_HLT"] = ["atLeastOneCentral",  self.atLeastOneCentral, None, None]
+        self.effHistos["atLeastOneCentral_L1"] = ["atLeastOneCentral",  self.L1SingleJetSeed, None, None]
         for h in self.effHistos:
                 name = h+"_nom"
-                self.effHistos[t][2] = ROOT.TH1F(name, name, 50, -0.5, 49.5)
-                self.effHistos[t][2].Sumw2()
-                self.GetOutputList().Add(self.effHistos[t][2])
+                self.effHistos[h][2] = ROOT.TH1F(name, name, 50, -0.5, 49.5)
+                self.effHistos[h][2].Sumw2()
+                self.GetOutputList().Add(self.effHistos[h][2])
                 name = h+"_denom"
-                self.effHistos[t][3] = ROOT.TH1F(name, name, 50, -0.5, 49.5)
-                self.effHistos[t][3].Sumw2()
-                self.GetOutputList().Add(self.effHistos[t][3])
+                self.effHistos[h][3] = ROOT.TH1F(name, name, 50, -0.5, 49.5)
+                self.effHistos[h][3].Sumw2()
+                self.GetOutputList().Add(self.effHistos[h][3])
                             
     def analyze(self):
         weight = 1. # calculate your event weight here
@@ -127,16 +126,31 @@ class MNSignalEfficiencyVsTriggerThreshold(MNTriggerStudies.MNTriggerAna.Example
             #print jet.pt(), jet.eta()
 
         topologies =  self.getTopologies(jetsAbovePtThr)
-        '''
+        for h in self.effHistos:
+            topologyName = self.effHistos[h][0]
+            if not topologyName in topologies: continue
+            maxThr = self.effHistos[h][1].getMaxThreshold()
+
+            fillNom = self.effHistos[h][2].Fill
+            fillDenom = self.effHistos[h][3].Fill
+            getBinCenter = self.effHistos[h][2].GetXaxis().GetBinCenter
+            nbins = self.effHistos[h][2].GetNbinsX()
+            for i in xrange(1,nbins+1):
+                binCenter = getBinCenter(i)
+                fillDenom(binCenter, weight)
+                if binCenter <= maxThr:
+                    fillNom(binCenter, weight)
+            del getBinCenter
+            del fillNom
+            del fillDenom
+
+        ''' XCheck
         if len(jetsAbovePtThr) > 1 and len(topologies) == 0:
             print "Warning! More then two jets and no topologies!!!"
             for j in jetsAbovePtThr:
                 print j.eta(), j.pt()
-        '''
-
-
-
-
+        #'''
+ 
     def finalize(self):
         print "Finalize:"
         normFactor = self.getNormalizationFactor()
@@ -176,5 +190,5 @@ if __name__ == "__main__":
                                sampleList=sampleList,
                                maxFilesMC = maxFilesMC,
                                nWorkers=nWorkers,
-                               outFile = "~/plotsHLT.root" )
+                               outFile = "RecoSignalVsHLTEfficiency.root" )
                                 
