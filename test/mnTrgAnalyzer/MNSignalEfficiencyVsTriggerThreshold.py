@@ -155,8 +155,9 @@ class MNSignalEfficiencyVsTriggerThreshold(MNTriggerStudies.MNTriggerAna.Example
         print "Finalize:"
         normFactor = self.getNormalizationFactor()
         print "  applying norm", normFactor
-        for h in self.hist:
-            self.hist[h].Scale(normFactor)
+        for h in self.effHistos:
+            self.effHistos[h][2].Scale(normFactor)
+            self.effHistos[h][3].Scale(normFactor)
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
@@ -168,12 +169,12 @@ if __name__ == "__main__":
     nWorkers = None
 
     #'''
-    sampleList = ["QCD_Pt-30to50_Tune4C_13TeV_pythia8",]
+    #sampleList = ["QCD_Pt-30to50_Tune4C_13TeV_pythia8",]
     #sampleList = ["QCD_Pt-10to15_Tune4C_13TeV_pythia8",]
-    maxFilesMC = 1
-    nWorkers = 1
+    #maxFilesMC = 1
+    #nWorkers = 1
     # '''
-    #maxFilesMC = 32
+    maxFilesMC = 32
 
 
 
