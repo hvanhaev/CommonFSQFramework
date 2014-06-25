@@ -10,8 +10,7 @@ import MNTriggerStudies.MNTriggerAna.Style
 def main():
     MNTriggerStudies.MNTriggerAna.Style.setStyle()
 
-    #infile = "~/plotsHLT.root"
-    infile = "TestHLTPlots.root"
+    infile = "HLTRatePlots.root"
     f = ROOT.TFile(infile, "r")
     lst = f.GetListOfKeys()
 
