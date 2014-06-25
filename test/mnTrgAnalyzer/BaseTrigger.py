@@ -71,7 +71,7 @@ class DoubldForwardTrigger(BaseTrigger):
             if abs(eta) < 3.: continue
             pts.append(j.pt())
 
-        if len(pts) == 0:
+        if len(pts) < 2:
             return 0
 
         return min(pts[:2])
