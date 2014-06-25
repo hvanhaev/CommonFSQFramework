@@ -23,24 +23,26 @@ class HLTRate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReade
     def init(self):
         getter = BaseTrigger.TriggerObjectsGetter(self.fChain, self.hltCollection)
         self.fbTrigger = BaseTrigger.ForwardBackwardTrigger(getter)
+        self.doubleFwdTrigger = BaseTrigger.DoubldForwardTrigger(getter)
+        self.atLeastOneCentral = BaseTrigger.DoubleJetWithAtLeastOneCentralJetTrigger(getter)
         self.ptAveForJecTrigger = BaseTrigger.PTAveForHFJecTrigger(getter)
         self.singleJetTrigger = BaseTrigger.SingleJetTrigger(getter)
                     
-        self.hist = {}
+        self.histos = {} # name -> trigger, histo, rLow, rHigh
+        self.histos["fb"] = [self.fbTrigger, None, -0.5, 29.5]
+        self.histos["doubleForward"] = [self.doubleFwdTrigger, None, -0.5, 29.5]
+        self.histos["atLeastOneCentral"] = [self.atLeastOneCentral, None, -0.5, 29.5]
+        self.histos["singleJet"] = [self.singleJetTrigger, None, 299.5, 399.5]
+        self.histos["ptAveHFJEC"] = [self.ptAveForJecTrigger, None, 14.5, 39.5]
 
-        n = "fb_rate"
-        self.hist[n] = ROOT.TH1F(n, n, 30, -0.5, 29.5)
+        for t in self.histos:
+            nbins = int(self.histos[t][3]-self.histos[t][2])
+            name = t+"_rate"
+            self.histos[t][1] = ROOT.TH1F(name, name, nbins, self.histos[t][2], self.histos[t][3])
+            self.histos[t][1].Sumw2()
+            self.GetOutputList().Add(self.histos[t][1])
 
-        n = "singleJet_rate"
-        self.hist[n] = ROOT.TH1F(n, n, 100, 299.5, 399.5)
-
-        n = "ptAveHFJEC_rate"
-        self.hist[n] = ROOT.TH1F(n, n, 25, 14.5, 39.5)
-
-        for t in self.hist:
-            self.hist[t].Sumw2()
-            self.GetOutputList().Add(self.hist[t])
-
+    # TODO: implement weighting!!!!
     def fillRate(self, hist, maxThr):
         nbins = hist.GetNbinsX()
         getBinCenter = hist.GetXaxis().GetBinCenter
@@ -57,25 +59,18 @@ class HLTRate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReade
 
     def analyze(self):
         weight = 1. # calculate your event weight here
-
-        thr = self.singleJetTrigger.getMaxThreshold()
-        if thr > 0.5:
-            self.fillRate(self.hist["singleJet_rate"], thr )
-
-        thr = self.ptAveForJecTrigger.getMaxThreshold()
-        if thr > 0.5:
-            self.fillRate(self.hist["ptAveHFJEC_rate"], thr )
-
-        thr = self.fbTrigger.getMaxThreshold()
-        if thr > 0.5:
-            self.fillRate(self.hist["fb_rate"], thr)            
+        # TODO: implement weighting!!!!
+        for t in self.histos:
+            thr = self.histos[t][0].getMaxThreshold()
+            if thr > 0.5:
+                self.fillRate(self.histos[t][1], thr )
 
     def finalize(self):
         print "Finalize:"
         normFactor = self.getNormalizationFactor()
         print "  applying norm", normFactor
-        for h in self.hist:
-            self.hist[h].Scale(normFactor)
+        for h in self.histos:
+            self.histos[h][1].Scale(normFactor)
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
@@ -83,7 +78,6 @@ if __name__ == "__main__":
     AutoLibraryLoader.enable()
 
     sampleList = None # run through all
-    maxFilesMC = 32
     #maxFilesMC = None
     nWorkers = None
 
@@ -93,6 +87,7 @@ if __name__ == "__main__":
     maxFilesMC = 1
     nWorkers = 1
     # '''
+    maxFilesMC = 32
 
     slaveParams = {}
 
@@ -105,5 +100,5 @@ if __name__ == "__main__":
                                sampleList=sampleList,
                                maxFilesMC = maxFilesMC,
                                nWorkers=nWorkers,
-                               outFile = "TestHLTPlots.root" )
+                               outFile = "HLTRatePlots.root" )
                                 
