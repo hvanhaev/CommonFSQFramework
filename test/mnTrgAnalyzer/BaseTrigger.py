@@ -74,25 +74,29 @@ class DoubldForwardTrigger(BaseTrigger):
         if len(pts) == 0:
             return 0
 
-        return min(pts)
+        return min(pts[:2])
 
 
-class ForwardAtLeastOneCentralTrigger(BaseTrigger):
+class DoubleJetWithAtLeastOneCentralJetTrigger(BaseTrigger):
     def getMaxThreshold(self):
         hltJets = self.objectsGetter.get()
-        bestF, bestC = (None, None)
+        jetsF = []
+        jetsC = []
         for j in hltJets:
             eta = j.eta()
             cen = abs(eta) < 3.
             fwd = abs(eta) > 3.
             pt = j.pt()
-            if cen and (bestC == None or bestC < pt): bestC = pt
-            if fwd and (bestF == None or bestF < pt): bestF = pt
-
-        if None in [bestF, bestC]:
-            return 0.
-
-        return min(bestF, bestC)
+            if cen: jetsC.append(pt)
+            if fwd: jetsF.append(pt)
+        
+        if len(jetsC) == 0 : return 0
+        if len(jetsC) + len(jetsF) < 2 : return 0
+        pt1 = jetsC[0]
+        jetsC.append(0) # Q&D way of making sure, we dont get out of range 
+        jetsF.append(0) #    when calculating pt2 below
+        pt2 = max(jetsC[1], jetsF[0])
+        return min(pt1, pt2)
 
 class PTAveForHFJecTrigger(BaseTrigger):
     def getMaxThreshold(self):
