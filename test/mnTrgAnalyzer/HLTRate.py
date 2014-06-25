@@ -29,9 +29,9 @@ class HLTRate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReade
         self.singleJetTrigger = BaseTrigger.SingleJetTrigger(getter)
                     
         self.histos = {} # name -> trigger, histo, rLow, rHigh
-        self.histos["fb"] = [self.fbTrigger, None, -0.5, 29.5]
-        self.histos["doubleForward"] = [self.doubleFwdTrigger, None, -0.5, 29.5]
-        self.histos["atLeastOneCentral"] = [self.atLeastOneCentral, None, -0.5, 29.5]
+        self.histos["fb"] = [self.fbTrigger, None, -14.5, 29.5]
+        self.histos["doubleForward"] = [self.doubleFwdTrigger, None, -14.5, 29.5]
+        self.histos["atLeastOneCentral"] = [self.atLeastOneCentral, None, -14.5, 29.5]
         self.histos["singleJet"] = [self.singleJetTrigger, None, 299.5, 399.5]
         self.histos["ptAveHFJEC"] = [self.ptAveForJecTrigger, None, 14.5, 39.5]
 
