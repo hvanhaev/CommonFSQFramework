@@ -5,11 +5,13 @@ ROOT.gROOT.SetBatch(True)
 from ROOT import *
 
 import os,re,sys,math
+import MNTriggerStudies.MNTriggerAna.Style
 
 def main():
+    MNTriggerStudies.MNTriggerAna.Style.setStyle()
 
-    infile = "~/plotsHLT.root"
-    #infile = "TestHLTPlots.root"
+    infile = "RecoSignalVsHLTEfficiency.root"
+
     f = ROOT.TFile(infile, "r")
     lst = f.GetListOfKeys()
 
@@ -57,79 +59,23 @@ def main():
                 finalMap[curObjClone.GetName()] = curObjClone
 
 
-    #'''xxx
-    todoEff  = { "HLT": "signalEffVsHLTThreshold",
-                  "L1": "signalEffVsL1Threshold",
-                 "L1_bothForward":   "signalEffVsL1Threshold_bothForward",
-                 "HLT_bothForward":   "signalEffVsHLTThreshold_bothForward",
-                 "HLT_atLeastOneNonForward":"signalEffVsHLTThreshold_atLeastOneNonForward",
-                 "L1_atLeastOneNonForward": "signalEffVsL1Threshold_atLeastOneNonForward",
-                 "HLTrateSinglePF": "signalEffVsHLTThreshold_SinglePFJet"
-
-                }
-    #    '''
-    #todoEff = {"test": "test"}
-
-
-    # verification - single jet trigger for PU=25
-    #   https://twiki.cern.ch/twiki/bin/view/CMS/TriggerMenuDevelopment#Rate_Studies
-    #
-    #  -> rate scale factor (equal to instantaneous luminosity) correctly calculated 
-    #       (you need to set avgPU to 25)
-    #       
-    #  -> single jet rates (click JetHT) @ 13 TeV
-    #
-    #     HLT_PFJet320  97.77 pm 1.71 
-    #     HLT_PFJet400  29.27 pm 0.07 
-    #
-
-
-
-    totalBunches = 3564
-    collidingBunches = 2*1380 # take the highest value from 2012, mul x2 (50ns - > 25 ns)
-    #avgPU = 1
-    avgPU = 1
-    minBiasXS = 78.42 * 1E9 # pb
-    #minBiasXS = 69.3 * 1E9 # pb // 8 TeV
-    #minBiasXS = 68. * 1E9 # pb // 7 TeV
-
-    perBunchXSLumi = avgPU/minBiasXS # in pb-1
-    print "per bunch lumi", perBunchXSLumi, "(pb^-1)"
-    LHCFrequency = 40. * 1E6 # 40 MHz
-
-    rateScaleFactor = perBunchXSLumi*LHCFrequency*float(collidingBunches)/float(totalBunches)
-
-
-    print "Inst lumi", rateScaleFactor, "(pb^-1 * s^-1)"
-
+    todo = []
+    for f in finalMap:
+        name = f.replace("_nom","").replace("_denom","")
+        if name not in todo:
+            todo.append(name)
 
     c1 = ROOT.TCanvas()
-    for t in todoEff:
+    for t in todo:
         fname = "~/"+t+".png"
-        #nom = f.Get(todo[t][0])
-        #denom = f.Get(todo[t][1])
-
-        ''' xxx
-        nom = finalMap[todoEff[t] + "_NOM"]
-        denom = finalMap[todoEff[t] + "_DENOM"]
+        nom = finalMap[t + "_nom"]
+        denom = finalMap[t + "_denom"]
 
         nom.Divide(denom)
         nom.GetXaxis().SetTitle("trigger threshold [GeV]")
         nom.GetYaxis().SetTitle("signal efficiency")
         nom.Draw()
-        c1.Print(fname)
-        #'''
-
-        rate = finalMap[todoEff[t] + "_rate"]
-        fname = "~/"+t+"_rate.png"
-        rate.Scale(rateScaleFactor)
-
-        rate.Draw()
-        rate.GetXaxis().SetRange(15, 50)
-        rate.GetXaxis().SetTitle("trigger threshold [GeV]")
-        rate.GetYaxis().SetTitle("rate  [Hz]")
-        
-
+        nom.GetYaxis().SetTitleOffset(2)
         c1.Print(fname)
 
 
