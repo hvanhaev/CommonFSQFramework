@@ -78,7 +78,7 @@ if __name__ == "__main__":
     AutoLibraryLoader.enable()
 
     sampleList = None # run through all
-    #maxFilesMC = None
+    maxFilesMC = None
     nWorkers = None
 
     '''
@@ -87,7 +87,7 @@ if __name__ == "__main__":
     maxFilesMC = 1
     nWorkers = 1
     # '''
-    maxFilesMC = 32
+    #maxFilesMC = 32
 
     slaveParams = {}
 
