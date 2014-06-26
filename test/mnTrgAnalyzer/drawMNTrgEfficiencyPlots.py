@@ -75,6 +75,7 @@ def main():
         nom.GetXaxis().SetTitle("trigger threshold [GeV]")
         nom.GetYaxis().SetTitle("signal efficiency")
         nom.Draw()
+        nom.SetMaximum(1.03)
         nom.GetYaxis().SetTitleOffset(2)
         c1.Print(fname)
 

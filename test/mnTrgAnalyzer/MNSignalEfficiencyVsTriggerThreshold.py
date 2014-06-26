@@ -82,8 +82,8 @@ class MNSignalEfficiencyVsTriggerThreshold(MNTriggerStudies.MNTriggerAna.Example
         b = "-4.7 to -3"
         c = " -3 to 3"
         topologies["FB"] =  f + "&" + b 
-        topologies["FB"] +=  "|" + f + "&" + f # allow ff or bb combinations
-        topologies["FB"] +=  "|" + b + "&" + b
+        #topologies["FB"] +=  "|" + f + "&" + f # allow ff or bb combinations
+        #topologies["FB"] +=  "|" + b + "&" + b
         topologies["atLeastOneCentral"] = c + "&" + c 
         topologies["atLeastOneCentral"] += "|"+ c + "&" + f 
         topologies["atLeastOneCentral"] += "|" + c + "&" + b 
@@ -94,8 +94,8 @@ class MNSignalEfficiencyVsTriggerThreshold(MNTriggerStudies.MNTriggerAna.Example
 
         getter = BaseTrigger.TriggerObjectsGetter(self.fChain, self.hltCollection)
         getterL1 = BaseTrigger.TriggerObjectsGetter(self.fChain, self.l1Collection)
-        #self.fbTrigger = BaseTrigger.ForwardBackwardTrigger(getter)
-        self.fbTrigger = BaseTrigger.DoubldForwardTrigger(getter)
+        self.fbTrigger = BaseTrigger.ForwardBackwardTrigger(getter)
+        #self.fbTrigger = BaseTrigger.DoubldForwardTrigger(getter)
         self.atLeastOneCentral = BaseTrigger.DoubleJetWithAtLeastOneCentralJetTrigger(getter)
         self.L1SingleJetSeed = BaseTrigger.SingleJetTrigger(getterL1)
 
@@ -174,7 +174,7 @@ if __name__ == "__main__":
     #maxFilesMC = 1
     #nWorkers = 1
     # '''
-    maxFilesMC = 32
+    #maxFilesMC = 32
 
 
 

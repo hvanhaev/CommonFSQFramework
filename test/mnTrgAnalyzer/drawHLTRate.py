@@ -74,10 +74,10 @@ def main():
 
 
     totalBunches = 3564
-    collidingBunches = 1380 # the highest value from 2012
-    #collidingBunches = 2*1380 # take the highest value from 2012, mul x2 (50ns - > 25 ns)
-    #avgPU = 25
-    avgPU = 1
+    #collidingBunches = 1380 # the highest value from 2012
+    collidingBunches = 2*1380 # take the highest value from 2012, mul x2 (50ns - > 25 ns)
+    avgPU = 25
+    #avgPU = 1
     minBiasXS = 78.42 * 1E9 # pb
     #minBiasXS = 69.3 * 1E9 # pb // 8 TeV
     #minBiasXS = 68. * 1E9 # pb // 7 TeV
