@@ -5,7 +5,7 @@
 #include "TTree.h"
 #include <algorithm>
 #include "DataFormats/Candidate/interface/Candidate.h"
-#include "EventViewBase.h"
+#include "MNTriggerStudies/MNTriggerAna/interface/EventViewBase.h"
 
 // Note: in c++ a reference to a map element is guaranteed to stay valid 
 // (ie the element wont change place in the memory) - AKA "this is a safe 
