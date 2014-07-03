@@ -16,7 +16,7 @@ class EventViewBase {
       virtual void fill(const edm::Event&, const edm::EventSetup&) = 0;
       ~EventViewBase();
 
-   private:
+    protected:
       void resetVariables();
       void registerInt(std::string name,  TTree * tree);
       void registerFloat(std::string name, TTree * tree);
@@ -24,6 +24,7 @@ class EventViewBase {
       void registerVecInt(std::string name,  TTree * tree);
 
 
+   private:
       std::map<std::string, int> m_integerBranches;
       std::map<std::string, float> m_floatBranches;
       std::map<std::string, std::vector<reco::Candidate::LorentzVector> > m_vectorBranches;
