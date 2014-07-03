@@ -11,7 +11,8 @@
 
 class EventViewBase {
    public:
-      EventViewBase(const edm::ParameterSet&);
+      EventViewBase() {};
+      EventViewBase(const edm::ParameterSet&, TTree * tree);
       virtual void fill(const edm::Event&, const edm::EventSetup&) = 0;
       ~EventViewBase();
 

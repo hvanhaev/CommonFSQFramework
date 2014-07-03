@@ -27,7 +27,7 @@ void EventViewBase::registerVecInt(std::string name,  TTree * tree){
     tree->Branch(name.c_str(), "std::vector< int >", &m_vecIntBranches[name]);
 }
 
-EventViewBase::EventViewBase(const edm::ParameterSet& iConfig){}
+EventViewBase::EventViewBase(const edm::ParameterSet& iConfig, TTree * tree){}
 
 
 void EventViewBase::resetVariables(){
