@@ -1,48 +1,10 @@
-// -*- C++ -*-
-//
-// Package:    EventViewBase
-// Class:      EventViewBase
-// 
-/**\class EventViewBase EventViewBase.cc MNTriggerStudies/EventViewBase/plugins/EventViewBase.cc
-
- Description: [one line class summary]
-
- Implementation:
-     [Notes on implementation]
-*/
-//
-// Original Author:  Tomasz Fruboes
-//         Created:  Thu, 17 Apr 2014 16:06:29 GMT
-// $Id$
-//
-//
-
-
-
-
-// system include files
-#include <memory>
-
-// user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
-
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
-
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
-
 #include "TTree.h"
-
 #include <algorithm>
 #include "DataFormats/Candidate/interface/Candidate.h"
-
-
-//
-// class declaration
-//
-
-
-
 
 class EventViewBase {
    public:
@@ -88,13 +50,10 @@ void EventViewBase::registerVecInt(std::string name,  TTree * tree){
     tree->Branch(name.c_str(), "std::vector< int >", &m_vecIntBranches[name]);
 }
 
-
-
 EventViewBase::EventViewBase(const edm::ParameterSet& iConfig){}
 
 
 void EventViewBase::resetVariables(){
-
     // int branches
     {
         std::map<std::string, int>::iterator it =  m_integerBranches.begin();
@@ -103,7 +62,6 @@ void EventViewBase::resetVariables(){
                 m_integerBranches[it->first]=0;
         }
     }
-
     // float branches
     {
         std::map<std::string, float>::iterator it =  m_floatBranches.begin();
@@ -112,8 +70,6 @@ void EventViewBase::resetVariables(){
                 m_floatBranches[it->first]=0;
         }
     }
-
-
     //
     {
         std::map<std::string, std::vector<reco::Candidate::LorentzVector> >::iterator it =  m_vectorBranches.begin();
@@ -122,8 +78,6 @@ void EventViewBase::resetVariables(){
             m_vectorBranches[it->first].clear();
         }
     }
-
-
     // int vector branches autoreg
     {   
         std::map<std::string, std::vector<int> >::iterator it =  m_vecIntBranches.begin();
@@ -133,14 +87,11 @@ void EventViewBase::resetVariables(){
         }
     }
 
-
 }
-//%
+
 EventViewBase::~EventViewBase()
 {
  
-   // do anything here that needs to be done at desctruction time
-   // (e.g. close files, deallocate resources etc.)
 
 }
 
