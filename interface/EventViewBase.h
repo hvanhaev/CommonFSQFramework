@@ -9,6 +9,7 @@
 #include <algorithm>
 #include "DataFormats/Candidate/interface/Candidate.h"
 
+
 class EventViewBase {
    public:
       EventViewBase() {};
@@ -16,12 +17,13 @@ class EventViewBase {
       virtual void fill(const edm::Event&, const edm::EventSetup&) = 0;
       ~EventViewBase();
 
-    protected:
       void resetVariables();
+      // TODO: add protection against booking two branches with same name
       void registerInt(std::string name,  TTree * tree);
       void registerFloat(std::string name, TTree * tree);
       void registerVecP4(std::string name,  TTree * tree);
       void registerVecInt(std::string name,  TTree * tree);
+      void set(std::string name, int val);
 
 
    private:

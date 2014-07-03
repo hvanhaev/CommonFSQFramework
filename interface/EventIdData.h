@@ -3,9 +3,9 @@
 
 #include "MNTriggerStudies/MNTriggerAna/interface/EventViewBase.h"
 
-class EventIdData: protected EventViewBase{
+class EventIdData: public EventViewBase{
    public:
-      EventIdData(const edm::ParameterSet&, TTree * tree);
+      EventIdData(const edm::ParameterSet& ps, TTree * tree);
       virtual void fill(const edm::Event&, const edm::EventSetup&);
 
 

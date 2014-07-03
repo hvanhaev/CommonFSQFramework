@@ -33,7 +33,7 @@ usePFCHSJetsInSelection = False
 #process.GlobalTag.globaltag = "START62_V1::All" 
 process.GlobalTag.globaltag = "POSTLS162_V2::All" 
 
-process.maxEvents.input = 100
+process.maxEvents.input = 15
 #indir = '/scratch/scratch0/data/store/mc/Fall13dr/QCD_Pt-50to80_Tune4C_13TeV_pythia8/AODSIM/castor_tsg_PU1bx50_POSTLS162_V1-v1/00000/'
 #f = indir + '00108F5C-D873-E311-BD7F-002618943914.root'
 
@@ -218,8 +218,9 @@ for jc in interestingJetsCollections:
 
 process.exampleTree = cms.EDAnalyzer("ExampleTreeProducer")
 process.mnTriggerAna = cms.EDAnalyzer("MNTriggerAna")
+process.mnTriggerAnaNew = cms.EDAnalyzer("MNTriggerAnaNew")
 process.infoHisto = cms.EDAnalyzer("SaveCountHistoInTreeFile")
-process.pTreeProducers = cms.Path(process.infoHisto*process.exampleTree*process.mnTriggerAna)
+process.pTreeProducers = cms.Path(process.infoHisto*process.exampleTree*process.mnTriggerAna*process.mnTriggerAnaNew)
 
 # Note: despite we are putting this value into every event waste of space is neglible thanks to root branch compression.
 process.XS =  cms.EDProducer("DoubleProducer",
