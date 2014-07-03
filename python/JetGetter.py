@@ -39,6 +39,7 @@ class Jet():
         return self.genCol.at(self.i)
 
     def __eq__(self, other):
+        if other == None: return False
         #if self.p4 == other.p4: return True # could speed up a bit
         dr = self.dr(self.p4vec, other.p4vec)
         ret  = dr == 0.
