@@ -209,7 +209,7 @@ if __name__ == "__main__":
     #maxFilesMC = 12
     nWorkers = 1
     # '''
-    #maxFilesMC = 12
+    #maxFilesMC = 16
     #nWorkers = 12
 
     slaveParams = {}
