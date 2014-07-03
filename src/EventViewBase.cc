@@ -27,9 +27,20 @@ void EventViewBase::registerVecInt(std::string name,  TTree * tree){
     tree->Branch(name.c_str(), "std::vector< int >", &m_vecIntBranches[name]);
 }
 
-void EventViewBase::set(std::string name, int val){
+void EventViewBase::setI(std::string name, int val){
     m_integerBranches[name] = val;
+}
 
+void EventViewBase::setF(std::string name, float val){
+    m_floatBranches[name] = val;
+}
+
+void EventViewBase::addToIVec(std::string name, int val){
+    m_vecIntBranches[name].push_back(val);
+}
+
+void EventViewBase::addToP4Vec(std::string name, reco::Candidate::LorentzVector val){
+    m_vectorBranches[name].push_back(val);
 }
 
 

@@ -23,7 +23,11 @@ class EventViewBase {
       void registerFloat(std::string name, TTree * tree);
       void registerVecP4(std::string name,  TTree * tree);
       void registerVecInt(std::string name,  TTree * tree);
-      void set(std::string name, int val);
+
+      void setI(std::string name, int val);
+      void setF(std::string name, float val);
+      void addToIVec(std::string name, int val);
+      void addToP4Vec(std::string name, reco::Candidate::LorentzVector val);
 
 
    private:
