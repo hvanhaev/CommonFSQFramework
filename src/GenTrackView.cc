@@ -4,6 +4,9 @@
 
 GenTrackView::GenTrackView(const edm::ParameterSet& iConfig, TTree * tree){
     registerVecP4("genTracks", tree);
+    m_maxEta = iConfig.getUntrackedParameter<double>("maxEta", 6);
+    m_charge = iConfig.getUntrackedParameter<int>("charge", 1);
+
 }
 
 
