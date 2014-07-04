@@ -11,41 +11,41 @@
 // (ie the element wont change place in the memory) - AKA "this is a safe 
 // approach to doing root trees
 void EventViewBase::registerInt(std::string name,  TTree * tree){
-    m_integerBranches[name] = 0;
-    tree->Branch(name.c_str(), & m_integerBranches[name], (name+"/I").c_str());
+    m_integerBranches[m_branchPrefix+name] = 0;
+    tree->Branch((m_branchPrefix+name).c_str(), & m_integerBranches[m_branchPrefix+name], (m_branchPrefix+name+"/I").c_str());
 }
 void EventViewBase::registerFloat(std::string name,  TTree * tree){
-    m_floatBranches[name] = 0;
-    tree->Branch(name.c_str(), & m_floatBranches[name], (name+"/F").c_str());
+    m_floatBranches[m_branchPrefix+name] = 0;
+    tree->Branch((m_branchPrefix+name).c_str(), & m_floatBranches[m_branchPrefix+name], (m_branchPrefix+name+"/F").c_str());
 }
 void EventViewBase::registerVecP4(std::string name,  TTree * tree){
-    m_vectorBranches[name] = std::vector<reco::Candidate::LorentzVector>();
-    tree->Branch(name.c_str(), &m_vectorBranches[name]);
+    m_vectorBranches[m_branchPrefix+name] = std::vector<reco::Candidate::LorentzVector>();
+    tree->Branch((m_branchPrefix+name).c_str(), &m_vectorBranches[m_branchPrefix+name]);
 }
 void EventViewBase::registerVecInt(std::string name,  TTree * tree){
-    m_vecIntBranches[name] = std::vector<int>();
-    tree->Branch(name.c_str(), "std::vector< int >", &m_vecIntBranches[name]);
+    m_vecIntBranches[m_branchPrefix+name] = std::vector<int>();
+    tree->Branch((m_branchPrefix+name).c_str(), "std::vector< int >", &m_vecIntBranches[m_branchPrefix+name]);
 }
 
 void EventViewBase::setI(std::string name, int val){
-    m_integerBranches[name] = val;
+    m_integerBranches[m_branchPrefix+name] = val;
 }
 
 void EventViewBase::setF(std::string name, float val){
-    m_floatBranches[name] = val;
+    m_floatBranches[m_branchPrefix+name] = val;
 }
 
 void EventViewBase::addToIVec(std::string name, int val){
-    m_vecIntBranches[name].push_back(val);
+    m_vecIntBranches[m_branchPrefix+name].push_back(val);
 }
 
 void EventViewBase::addToP4Vec(std::string name, reco::Candidate::LorentzVector val){
-    m_vectorBranches[name].push_back(val);
+    m_vectorBranches[m_branchPrefix+name].push_back(val);
 }
 
-
-
-EventViewBase::EventViewBase(const edm::ParameterSet& iConfig, TTree * tree){}
+EventViewBase::EventViewBase(const edm::ParameterSet& iConfig, TTree * tree){
+    m_branchPrefix = iConfig.getUntrackedParameter<std::string>("branchPrefix","");
+}
 
 
 void EventViewBase::resetVariables(){

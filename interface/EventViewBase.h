@@ -36,5 +36,8 @@ class EventViewBase {
       std::map<std::string, std::vector<reco::Candidate::LorentzVector> > m_vectorBranches;
       std::map<std::string, std::vector<int> > m_vecIntBranches;
 
+      std::string m_branchPrefix;  
+
+
 };
 #endif
