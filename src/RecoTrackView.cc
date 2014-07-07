@@ -10,7 +10,7 @@ RecoTrackView::RecoTrackView(const edm::ParameterSet& iConfig, TTree * tree){
 }
 
 
-void RecoTrackView::fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
+void RecoTrackView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSetup){
     edm::Handle<std::vector<reco::Track> > hIn;
     iEvent.getByLabel(m_inputCol, hIn);
     for (unsigned int i = 0; i< hIn->size();++i){

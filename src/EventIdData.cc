@@ -14,7 +14,7 @@ EventIdData::EventIdData(const edm::ParameterSet& iConfig, TTree * tree){
 }
 
 
-void EventIdData::fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
+void EventIdData::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSetup){
 
     setI("run", iEvent.eventAuxiliary().run());
     setI("lumi", iEvent.eventAuxiliary().luminosityBlock());

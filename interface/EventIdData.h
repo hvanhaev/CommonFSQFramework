@@ -6,7 +6,8 @@
 class EventIdData: public EventViewBase{
    public:
       EventIdData(const edm::ParameterSet& ps, TTree * tree);
-      virtual void fill(const edm::Event&, const edm::EventSetup&);
+   private:
+      virtual void fillSpecific(const edm::Event&, const edm::EventSetup&);
 
 
 };

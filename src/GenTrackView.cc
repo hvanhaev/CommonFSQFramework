@@ -24,7 +24,7 @@ GenTrackView::GenTrackView(const edm::ParameterSet& iConfig, TTree * tree){
 }
 
 
-void GenTrackView::fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
+void GenTrackView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSetup){
 
     // vector<reco::GenParticle>             "genParticles"              ""                "SIM"          recoGenParticles_genParticles__SIM
     edm::Handle<std::vector<reco::GenParticle> > hIn;

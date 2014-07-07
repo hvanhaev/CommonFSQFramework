@@ -48,6 +48,13 @@ EventViewBase::EventViewBase(const edm::ParameterSet& iConfig, TTree * tree){
 }
 
 
+void EventViewBase::fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
+    resetVariables();
+    fillSpecific(iEvent, iSetup);
+}
+
+
+
 void EventViewBase::resetVariables(){
     // int branches
     {
