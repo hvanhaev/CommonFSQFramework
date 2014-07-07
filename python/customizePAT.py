@@ -1,5 +1,16 @@
 import FWCore.ParameterSet.Config as cms
 
+def addTreeProducer(process, prod):
+    if not hasattr(process, "schedule"):
+        raise Exception("Given process seems not to have a valid scheduler. Run the base customize function first")
+    pathName = "p"+prod.label()
+    if hasattr(process, pathName):
+        raise Exception("Path " + pathName + "allready in process definition. Try using different name")
+    setattr(process, pathName, cms.Path(prod))
+    # this inserts the path on last possible possition - just before the endPath
+    process.schedule.insert(-1, getattr(process, pathName)) 
+    return process
+
 # TODO: remove jobs output
 def customize(process):
     process.out.outputCommands  = [ 'drop *' ]
@@ -8,12 +19,10 @@ def customize(process):
     process.out.fileName = 'mnTrgAna_PAT.root'
     process.TFileService = cms.Service("TFileService", fileName = cms.string("trees.root") )
 
-    process.exampleTree = cms.EDAnalyzer("ExampleTreeProducer")
-    #process.mnTriggerAna = cms.EDAnalyzer("MNTriggerAna")
-    #process.mnTriggerAnaNew = cms.EDAnalyzer("MNTriggerAnaNew")
     process.infoHisto = cms.EDAnalyzer("SaveCountHistoInTreeFile")
     #process.pTreeProducers = cms.Path(process.infoHisto*process.exampleTree*process.mnTriggerAna*process.mnTriggerAnaNew)
-    process.pTreeProducers = cms.Path(process.infoHisto*process.exampleTree)
+    #process.pTreeProducers = cms.Path(process.infoHisto*process.exampleTree)
+    process.pTreeProducers = cms.Path(process.infoHisto)
 
     # Note: despite we are putting this value into every event waste of space is neglible thanks to root branch compression.
     process.XS =  cms.EDProducer("DoubleProducer",
@@ -39,7 +48,7 @@ def customize(process):
     process.schedule = cms.Schedule()
     process.pUtil = cms.Path(process.XS)
     process.schedule.append(process.pUtil)
-    process.schedule.append(process.pTreeProducers) # TODO tree producer will run through all events, not depending on the filtering results
+    process.schedule.append(process.pTreeProducers)
     process.schedule.append(process.outpath)
 
     import os

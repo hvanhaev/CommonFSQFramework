@@ -113,4 +113,20 @@ process.source.fileNames = [
 
 import MNTriggerStudies.MNTriggerAna.customizePAT
 process = MNTriggerStudies.MNTriggerAna.customizePAT.customize(process)
+process.exampleTree = cms.EDAnalyzer("ExampleTreeProducer")
+process = MNTriggerStudies.MNTriggerAna.customizePAT.addTreeProducer(process, process.exampleTree)
+process.tracksTree = cms.EDAnalyzer("TracksTreeProducer",
+    EventData = cms.PSet(),
+    GenTrackView = cms.PSet(maxEta = cms.double(5.), charge = cms.int32(1)),
+)
+process = MNTriggerStudies.MNTriggerAna.customizePAT.addTreeProducer(process, process.tracksTree)
+
+
+#process.pexampleTree = cms.Path(process.exampleTree)
+#process.schedule.insert(-1, process.pexampleTree)
+#print process.pTreeProducers
+
+    #process.mnTriggerAna = cms.EDAnalyzer("MNTriggerAna")
+    #process.mnTriggerAnaNew = cms.EDAnalyzer("MNTriggerAnaNew")
+
 #                                         ##
