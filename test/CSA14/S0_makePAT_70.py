@@ -98,7 +98,7 @@ process.out.outputCommands.append( 'drop *_selectedPatJets_pfCandidates_*' )
 #   process.GlobalTag.globaltag =  ...    ##  (according to https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideFrontierConditions)
 #                                         ##
 #                                         ##
-process.maxEvents.input = 10
+process.maxEvents.input = 100
 #                                         ##
 #   process.out.outputCommands = [ ... ]  ##  (e.g. taken from PhysicsTools/PatAlgos/python/patEventContent_cff.py)
 #                                         ##
@@ -125,6 +125,7 @@ process.tracksTree = cms.EDAnalyzer("TracksTreeProducer",
     ),
     RecoTrackView  = cms.PSet(
         maxEta = cms.double(5.),
+        maxDZ  = cms.double(0.2),
         minPt = cms.double(0.5),
         tracks = cms.InputTag("generalTracks")
     ),

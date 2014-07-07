@@ -10,6 +10,7 @@ class RecoTrackView: public EventViewBase{
     private:
       virtual void fillSpecific(const edm::Event&, const edm::EventSetup&);
       float m_maxEta; // 
+      float m_maxDZ; // 
       float m_minPt;
       int   m_charge; // -1 - take all, 0 - neutral, +1 - charged  
       edm::InputTag m_inputCol;
