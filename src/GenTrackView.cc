@@ -1,32 +1,49 @@
 #include "MNTriggerStudies/MNTriggerAna/interface/GenTrackView.h"
-#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
-#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
 GenTrackView::GenTrackView(const edm::ParameterSet& iConfig, TTree * tree){
+
+    // register branches
     registerVecP4("genTracks", tree);
-    m_maxEta = iConfig.getUntrackedParameter<double>("maxEta", 6);
-    m_charge = iConfig.getUntrackedParameter<int>("charge", 1);
+
+    // fetch config data
+    m_maxEta = iConfig.getParameter<double>("maxEta");
+    m_minPt = iConfig.getParameter<double>("minPt");
+    m_charge = iConfig.getParameter<int>("charge");
+    m_genTracks = iConfig.getParameter<edm::InputTag>("genTracks");
+
+    if (m_charge != 0 && m_charge != 1 && m_charge != -1){
+        throw "charge parameter not equal to -1(save all)/0(save neutrals)/1(save charded)\n";
+    }
+
+
+
+
+    //std::cout << "XX "  << m_maxEta << " " << m_charge << std::endl;
 
 }
 
 
 void GenTrackView::fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
 
-    setI("run", iEvent.eventAuxiliary().run());
-    setI("lumi", iEvent.eventAuxiliary().luminosityBlock());
-    setI("event", iEvent.eventAuxiliary().event());
-
-    edm::Handle<GenEventInfoProduct> hGW; 
-    iEvent.getByLabel(edm::InputTag("generator"), hGW);
-    setF("genWeight", hGW->weight());
-
-    edm::Handle< std::vector<PileupSummaryInfo> > hPU;
-    iEvent.getByLabel(edm::InputTag("addPileupInfo"), hPU);
-    for (unsigned int i = 0; i< hPU->size();++i){
-        if (hPU->at(i).getBunchCrossing() == 0) {
-            setF("puTrueNumInteractions",  hPU->at(i).getTrueNumInteractions());
-            break;
+    // vector<reco::GenParticle>             "genParticles"              ""                "SIM"          recoGenParticles_genParticles__SIM
+    edm::Handle<std::vector<reco::GenParticle> > hIn;
+    iEvent.getByLabel(m_genTracks, hIn);
+    for (unsigned int i = 0; i< hIn->size();++i){
+        if (hIn->at(i).status() != 1  ) continue;
+        if (m_charge != -1){   // -1 - save all particles
+            int c = hIn->at(i).charge();
+            bool good = false;
+            if ( m_charge == 1 and c != 0 ) // m_charge==1 - drop neutrals, save charged
+                good = true;
+            if ( m_charge == 0 and c == 0 )
+                good = true;
+            if (!good) continue;
         }
+        if (hIn->at(i).pt() < m_minPt ) continue;
+        if (std::abs(hIn->at(i).eta()) > m_maxEta ) continue;
+        addToP4Vec("genTracks", hIn->at(i).p4());
+
     }
 
 }

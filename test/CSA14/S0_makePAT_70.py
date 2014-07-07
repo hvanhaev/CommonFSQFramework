@@ -117,7 +117,12 @@ process.exampleTree = cms.EDAnalyzer("ExampleTreeProducer")
 process = MNTriggerStudies.MNTriggerAna.customizePAT.addTreeProducer(process, process.exampleTree)
 process.tracksTree = cms.EDAnalyzer("TracksTreeProducer",
     EventData = cms.PSet(),
-    GenTrackView = cms.PSet(maxEta = cms.double(5.), charge = cms.int32(1)),
+    GenTrackView = cms.PSet(
+        maxEta = cms.double(5.), 
+        charge = cms.int32(1), 
+        minPt = cms.double(0.5),
+        genTracks = cms.InputTag("genParticles")
+    ),
 )
 process = MNTriggerStudies.MNTriggerAna.customizePAT.addTreeProducer(process, process.tracksTree)
 

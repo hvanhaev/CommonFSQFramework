@@ -10,7 +10,9 @@ class GenTrackView: public EventViewBase{
 
     private:
       float m_maxEta; // 
+      float m_minPt;
       int   m_charge; // -1 - take all, 0 - neutral, +1 - charged  
+      edm::InputTag m_genTracks;
 
 
 
