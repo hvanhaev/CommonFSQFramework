@@ -123,6 +123,14 @@ process.tracksTree = cms.EDAnalyzer("TracksTreeProducer",
         minPt = cms.double(0.5),
         genTracks = cms.InputTag("genParticles")
     ),
+    RecoTrackView  = cms.PSet(
+        maxEta = cms.double(5.),
+        minPt = cms.double(0.5),
+        tracks = cms.InputTag("generalTracks")
+    ),
+
+
+
 )
 process = MNTriggerStudies.MNTriggerAna.customizePAT.addTreeProducer(process, process.tracksTree)
 
