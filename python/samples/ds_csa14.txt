@@ -1,0 +1,2 @@
+/MinBias_TuneA2MB_13TeV_pythia8/Spring14dr-castor_PU_S14_POSTLS170_V6-v1/AODSIM
+/MinBias_TuneZ2star_13TeV_pythia6/Spring14dr-castor_PU_S14_POSTLS170_V6-v1/AODSIM

@@ -7,7 +7,11 @@ ROOT.gROOT.SetBatch(True)
 from ROOT import *
 
 import pprint
-from elementtree import ElementTree
+
+try:
+    from elementtree import ElementTree
+except:
+    from xml.etree.ElementTree import ElementTree
 
 
 def main(sam):
