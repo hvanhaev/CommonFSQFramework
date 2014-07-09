@@ -299,7 +299,7 @@ class ExampleProofReader( ROOT.TPySelector ):
                 logs = proof.GetManager().GetSessionLogs().GetListOfLogs()
                 for l in logs:
                     print l.GetTitle()
-            except
+            except:
                 print "Cannot get lognames"
 
             curPath = ROOT.gDirectory.GetPath()
