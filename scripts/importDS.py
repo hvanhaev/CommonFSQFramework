@@ -11,7 +11,7 @@ import pprint
 try:
     from elementtree import ElementTree
 except:
-    from xml.etree.ElementTree import ElementTree
+    from xml.etree.ElementTree import ElementTree 
 
 
 def main(sam):
@@ -51,7 +51,8 @@ def main(sam):
                 if "Submission_" in r: continue
                 crabFjr = r+"/"+file
                 fp = open(crabFjr,"r")
-                mydoc = ElementTree.parse(fp)
+                et = ElementTree()
+                mydoc = et.parse(fp)
                 pfnDir=None
                 for e in mydoc.findall('./File/PFN'):
                     if pfnDir != None:
@@ -185,7 +186,6 @@ from optparse import OptionParser
 import imp
 
 if __name__ == "__main__":
-    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)    # disable buffering
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     ROOT.AutoLibraryLoader.enable()
 
