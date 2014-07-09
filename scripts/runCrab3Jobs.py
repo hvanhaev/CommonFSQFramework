@@ -50,7 +50,9 @@ for s in sampleListTodo:
     isData=sampleList[s]["isData"]
 
   name=anaVersion+"_"+s
-  if os.path.exists(name):
+
+  targetPath = anaVersion + "/" + "crab_" + name
+  if os.path.exists(targetPath):
     print "Path", name, "allready exists. Doing nothing"
     continue    
 
@@ -114,6 +116,6 @@ for s in sampleListTodo:
   if not cfgName:
     print "Unable to determine cfg name from crab.cfg!"
   else:
-    fOut = name + "/" + cfgName
+    fOut = targetPath + "/" + cfgName
     shutil.copy(cfgName, fOut)
   sys.exit()  
