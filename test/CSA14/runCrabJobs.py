@@ -58,7 +58,7 @@ for s in sampleListTodo:
 
 
   pycfgextra = []  
-  pycfgextra.append("config.General.workArea='"+name+"'")
+  pycfgextra.append("config.General.workArea='"+anaVersion+"'")
   pycfgextra.append("config.General.requestName='"+name+"'")
   pycfgextra.append("config.Data.publishDataName='"+name+"'")
   pycfgextra.append("config.Data.inputDataset='"+sampleList[s]["DS"]+"'")
