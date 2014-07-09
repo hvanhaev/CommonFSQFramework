@@ -64,10 +64,11 @@ for s in sampleListTodo:
   command+=" -CMSSW.number_of_jobs="+str(sampleList[s]["crabJobs"])
   command+=" -GRID.ce_black_list="+blacklist
 
-  if int(sampleList[s]["crabJobs"]) < 500:
-      command+=" -submit 1-10"
+  #if int(sampleList[s]["crabJobs"]) < 500:
+  #    command+=" -submit 1-10"
 
-  if isData:
+  #''' XXX csa
+  if isData and not "CSA14" in name:
     print isData, sampleList[s]["json"]
     command+=" -CMSSW.total_number_of_lumis=-1"
     
@@ -75,6 +76,7 @@ for s in sampleListTodo:
     command+=" -CMSSW.lumi_mask="+jsonFile.fullPath()
   else:
     command+=" -CMSSW.total_number_of_events="+str(sampleList[s]["numEvents"])
+  #'''
 
   # TODO save old value and set it at exit   
   os.environ["TMFSampleName"]=s
