@@ -14,14 +14,17 @@ class CSA14_UEAna(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofR
     def init( self):
 
         self.hist = {}
-        self.hist["numGenTracks"] =  ROOT.TH1F("numGenTracks",   "numGenTracks",  100, -0.5, 99.5)
-        self.hist["etaGenTracks"] =  ROOT.TH1F("etaGenTracks",   "etaGenTracks",  100, -2.5, 2.5)
-        self.hist["etaRecoTracks"] =  ROOT.TH1F("etaRecoTracks",   "etaRecoTracks",  100, -2.5, 2.5)
-        self.hist["dz"] =  ROOT.TH1F("dz",   "dz",  100, -0.5, 0.5)
-        self.hist["dxy"] =  ROOT.TH1F("dxy",   "dxy",  100, -0.5, 0.5)
+        p = "_central_B" # a placeholder for different triggers ("B") and uncertainty variations
+                         #  "central" means this is a central value (ie no variations were applied)
 
-        self.hist["dzAlt"] =  ROOT.TH1F("dzBuiltFromClass",   "dz",  100, -0.5, 0.5)
-        self.hist["dxyAlt"] =  ROOT.TH1F("dxyBuiltFromClass",   "dxy",  100, -0.5, 0.5)
+        self.hist["numGenTracks"] =  ROOT.TH1F("numGenTracks"+p,   "numGenTracks",  100, -0.5, 99.5)
+        self.hist["etaGenTracks"] =  ROOT.TH1F("etaGenTracks"+p,   "etaGenTracks",  100, -2.5, 2.5)
+        self.hist["etaRecoTracks"] =  ROOT.TH1F("etaRecoTracks"+p,   "etaRecoTracks",  100, -2.5, 2.5)
+        self.hist["dz"] =  ROOT.TH1F("dz"+p,   "dz",  100, -0.5, 0.5)
+        self.hist["dxy"] =  ROOT.TH1F("dxy"+p,   "dxy",  100, -0.5, 0.5)
+
+        self.hist["dzAlt"] =  ROOT.TH1F("dzBuiltFromClass"+p,   "dz",  100, -0.5, 0.5)
+        self.hist["dxyAlt"] =  ROOT.TH1F("dxyBuiltFromClass"+p,   "dxy",  100, -0.5, 0.5)
 
         for h in self.hist:
             self.hist[h].Sumw2()
@@ -94,7 +97,7 @@ if __name__ == "__main__":
     maxFilesData = 1
     #nWorkers = 16
     #maxFilesData = 1
-    nWorkers = 1
+    nWorkers = 4
     # '''
 
 
