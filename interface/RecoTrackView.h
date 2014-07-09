@@ -2,6 +2,7 @@
 #define RecoTrackView_h
 
 #include "MNTriggerStudies/MNTriggerAna/interface/EventViewBase.h"
+#include "MNTriggerStudies/MNTriggerAna/interface/TestTrackData.h"
 
 class RecoTrackView: public EventViewBase{
     public:
@@ -14,6 +15,10 @@ class RecoTrackView: public EventViewBase{
       float m_minPt;
       int   m_charge; // -1 - take all, 0 - neutral, +1 - charged  
       edm::InputTag m_inputCol;
+
+
+      std::map<std::string, std::vector<tmf::TestTrackData> > m_testTrackData;
+      void resetLocal();
 
 
 

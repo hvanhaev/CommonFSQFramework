@@ -1,6 +1,8 @@
 #include "MNTriggerStudies/MNTriggerAna/interface/RecoTrackView.h"
 #include <DataFormats/TrackReco/interface/Track.h>
 #include <DataFormats/VertexReco/interface/Vertex.h>
+#include "MNTriggerStudies/MNTriggerAna/interface/TestTrackData.h"
+
 
 
 RecoTrackView::RecoTrackView(const edm::ParameterSet& iConfig, TTree * tree){
@@ -11,13 +13,33 @@ RecoTrackView::RecoTrackView(const edm::ParameterSet& iConfig, TTree * tree){
     m_maxEta = iConfig.getParameter<double>("maxEta");
     m_minPt = iConfig.getParameter<double>("minPt");
     m_maxDZ = iConfig.getParameter<double>("maxDZ");
-    
+
 
     m_inputCol = iConfig.getParameter<edm::InputTag>("tracks");
+
+    m_testTrackData[getPrefix()+"testTrkData"] = std::vector<tmf::TestTrackData>();
+    tree->Branch((getPrefix()+"testTrkData").c_str(), "std::vector< tmf::TestTrackData >", &m_testTrackData[getPrefix()+"testTrkData"]);
+
+
+
+    
+
+}
+void RecoTrackView::resetLocal(){
+    std::map<std::string, std::vector<tmf::TestTrackData> >::iterator it, itE;
+    it = m_testTrackData.begin();
+    itE = m_testTrackData.end();
+    for (; it!= itE; ++it){
+        it->second.clear();
+    }
+
 }
 
 
+
 void RecoTrackView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSetup){
+    resetLocal();
+
     edm::Handle<std::vector<reco::Vertex> > hVtx;
     iEvent.getByLabel(edm::InputTag("offlinePrimaryVerticesWithBS"), hVtx); // TODO: take from config
 
@@ -56,6 +78,12 @@ void RecoTrackView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup
         addToP4Vec("recoTracks", reco::Candidate::LorentzVector(px,py,pz,E));
         addToFVec("dxy", dxy);
         addToFVec("dz", dz);
+        tmf::TestTrackData t;
+        t.dxy = dxy;
+        t.dz = dz;
+        m_testTrackData[getPrefix()+"testTrkData"].push_back(t);
+        
+
 
     }
 

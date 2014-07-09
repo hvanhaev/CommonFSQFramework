@@ -31,6 +31,7 @@ class EventViewBase {
       void addToFVec(std::string name, float val);
       void addToP4Vec(std::string name, reco::Candidate::LorentzVector val);
 
+      std::string getPrefix() { return m_branchPrefix;};
 
    private:
       virtual void fillSpecific(const edm::Event&, const edm::EventSetup&) = 0;
