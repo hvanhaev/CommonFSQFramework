@@ -106,6 +106,7 @@ process.maxEvents.input = 100
 process.out.fileName = 'pat.root'
 process.GlobalTag.globaltag = "POSTLS170_V6::All"
 f= "0012A88B-D4EB-E311-9B1E-0025905A6094.root"
+f = '/nfs/dust/cms/user/fruboest/2014.07.CSA14/data/66211A89-3DF8-E311-A6CB-02163E00E9CC.root'
 process.source.fileNames = [
      'file:'+f
 ]

@@ -85,12 +85,15 @@ def XS(ds):
     nano = 10^3 pico
     '''
 
-
     realData = isData(ds)
     if realData:
         return -1
 
+
+    # Give all XS in pb
     s = {}
+    s["MinBias_TuneZ2star_13TeV_pythia6"] = 78E9
+
 
     dsName = name(ds)
     if dsName in s:

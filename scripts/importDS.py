@@ -168,14 +168,17 @@ sam = fixLocalPaths(sam)
 
 
     ofile = "Samples_"+anaVersion+".py"
+    #'''
     if os.path.isfile(ofile):
         import random
         import string
         char_set = string.ascii_uppercase + string.digits
         name = ''.join(random.sample(char_set*6,6))
         ofileBak = ofile+"_"+name
+        print "BAK:", ofileBak
         os.system("cp " + ofile + " " + ofileBak)
-        print "diff " + ofile + " " + ofileBak
+    #'''
+    print "Please remember to do diff on new " + ofile + " and the one in python/samples dir"
 
     outputFile = open("Samples_"+anaVersion+".py", "w") 
     for line in toFile:

@@ -25,7 +25,7 @@ sam["MinBias_TuneZ2star_13TeV_pythia6"]["weightNoPu"]='RooFormulaVar("weight","w
 sam["MinBias_TuneZ2star_13TeV_pythia6"]["json"]=''
 sam["MinBias_TuneZ2star_13TeV_pythia6"]["lumiMinBias"]='crashMeMC'
 sam["MinBias_TuneZ2star_13TeV_pythia6"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/MinBias_TuneZ2star_13TeV_pythia6/Tracks_CSA14_20140708_MinBias_TuneZ2star_13TeV_pythia6/eae6850d2e9b1257be58864534a48860//'
-sam["MinBias_TuneZ2star_13TeV_pythia6"]["XS"]=-1
+sam["MinBias_TuneZ2star_13TeV_pythia6"]["XS"]=78000000000.0
 sam["MinBias_TuneZ2star_13TeV_pythia6"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/MinBias_TuneZ2star_13TeV_pythia6/Tracks_CSA14_20140708_MinBias_TuneZ2star_13TeV_pythia6/eae6850d2e9b1257be58864534a48860//'
 sam["MinBias_TuneZ2star_13TeV_pythia6"]["DS"]='/MinBias_TuneZ2star_13TeV_pythia6/Spring14dr-castor_PU_S14_POSTLS170_V6-v1/AODSIM'
 

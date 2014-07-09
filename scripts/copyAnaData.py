@@ -248,15 +248,20 @@ def main():
         print "Nothing to do. Run me with '-t' option to copy trees from current skim"
         sys.exit()
 
-    #333
-
+   #333
     myprocs = []
     for s in sampleList:
         if "pathSE" not in sampleList[s]:
             print "No SE path found for sample", s
-            continue
-        os.system("mkdir -p "+ sampleList[s]["pathPAT"] )
-        os.system("mkdir -p "+ sampleList[s]["pathTrees"] )
+
+        todo = [sampleList[s]["pathPAT"], sampleList[s]["pathTrees"]]
+        for d in todo:
+            os.system("mkdir -p "+ d)
+            if not os.path.isdir(d):
+                raise Exception("Cannot create output dir "+d)
+                continue
+
+        # TODO: check dir existence
 
 
 
