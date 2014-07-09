@@ -27,6 +27,14 @@ void EventViewBase::registerVecInt(std::string name,  TTree * tree){
     tree->Branch((m_branchPrefix+name).c_str(), "std::vector< int >", &m_vecIntBranches[m_branchPrefix+name]);
 }
 
+
+void EventViewBase::registerVecFloat(std::string name,  TTree * tree){
+    m_vecFloatBranches[m_branchPrefix+name] = std::vector<float>();
+    tree->Branch((m_branchPrefix+name).c_str(), "std::vector< float >", &m_vecFloatBranches[m_branchPrefix+name]);
+}
+
+
+
 void EventViewBase::setI(std::string name, int val){
     m_integerBranches[m_branchPrefix+name] = val;
 }
@@ -37,6 +45,10 @@ void EventViewBase::setF(std::string name, float val){
 
 void EventViewBase::addToIVec(std::string name, int val){
     m_vecIntBranches[m_branchPrefix+name].push_back(val);
+}
+
+void EventViewBase::addToFVec(std::string name, float val){
+    m_vecFloatBranches[m_branchPrefix+name].push_back(val);
 }
 
 void EventViewBase::addToP4Vec(std::string name, reco::Candidate::LorentzVector val){
@@ -80,7 +92,7 @@ void EventViewBase::resetVariables(){
             m_vectorBranches[it->first].clear();
         }
     }
-    // int vector branches autoreg
+    // 
     {   
         std::map<std::string, std::vector<int> >::iterator it =  m_vecIntBranches.begin();
         std::map<std::string, std::vector<int> >::iterator itE =  m_vecIntBranches.end();
@@ -88,6 +100,18 @@ void EventViewBase::resetVariables(){
             m_vecIntBranches[it->first].clear();
         }
     }
+
+    // 
+    {   
+        std::map<std::string, std::vector<float> >::iterator it =  m_vecFloatBranches.begin();
+        std::map<std::string, std::vector<float> >::iterator itE =  m_vecFloatBranches.end();
+        for (;it != itE;++it){
+            m_vecFloatBranches[it->first].clear();
+        }
+    }
+
+
+
 
 }
 

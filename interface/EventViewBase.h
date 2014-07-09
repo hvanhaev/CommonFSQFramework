@@ -23,10 +23,12 @@ class EventViewBase {
       void registerFloat(std::string name, TTree * tree);
       void registerVecP4(std::string name,  TTree * tree);
       void registerVecInt(std::string name,  TTree * tree);
+      void registerVecFloat(std::string name,  TTree * tree);
 
       void setI(std::string name, int val);
       void setF(std::string name, float val);
       void addToIVec(std::string name, int val);
+      void addToFVec(std::string name, float val);
       void addToP4Vec(std::string name, reco::Candidate::LorentzVector val);
 
 
@@ -36,6 +38,7 @@ class EventViewBase {
       std::map<std::string, float> m_floatBranches;
       std::map<std::string, std::vector<reco::Candidate::LorentzVector> > m_vectorBranches;
       std::map<std::string, std::vector<int> > m_vecIntBranches;
+      std::map<std::string, std::vector<float> > m_vecFloatBranches;
 
       std::string m_branchPrefix;  
 

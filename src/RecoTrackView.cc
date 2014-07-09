@@ -5,6 +5,8 @@
 
 RecoTrackView::RecoTrackView(const edm::ParameterSet& iConfig, TTree * tree){
     registerVecP4("recoTracks", tree);
+    registerVecFloat("dz", tree);
+    registerVecFloat("dxy", tree);
 
     m_maxEta = iConfig.getParameter<double>("maxEta");
     m_minPt = iConfig.getParameter<double>("minPt");
@@ -42,14 +44,18 @@ void RecoTrackView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup
         if (hIn->at(i).pt() < m_minPt ) continue;
         if (std::abs(hIn->at(i).eta()) > m_maxEta ) continue;
         float dz = hIn->at(i).dz( hVtx->at(bestVtx).position() );
-        if (dz  > m_maxDZ) continue;
+        if (std::abs(dz)  > m_maxDZ) continue;
+        float dxy = hIn->at(i).dxy( hVtx->at(bestVtx).position() );
 
         double px = hIn->at(i).px();
         double py = hIn->at(i).py();
         double pz = hIn->at(i).pz();
         double E = px*px + py*py + pz*pz;
 
+        // Note: all fills (below) should be done consistently after all cuts are applied
         addToP4Vec("recoTracks", reco::Candidate::LorentzVector(px,py,pz,E));
+        addToFVec("dxy", dxy);
+        addToFVec("dz", dz);
 
     }
 
