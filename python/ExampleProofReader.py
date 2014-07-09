@@ -293,6 +293,15 @@ class ExampleProofReader( ROOT.TPySelector ):
                 # if you get better implemenation (GetParameter?) mail me
                 proof.Exec('gSystem->Setenv("'+v+'","'+variablesToSetInProof[v]+'");')
             print dataset.Process( 'TPySelector',  cls.__name__)
+
+            try:
+                print "Logs saved to:"
+                logs = proof.GetManager().GetSessionLogs().GetListOfLogs()
+                for l in logs:
+                    print l.GetTitle()
+            except
+                print "Cannot get lognames"
+
             curPath = ROOT.gDirectory.GetPath()
 
 
