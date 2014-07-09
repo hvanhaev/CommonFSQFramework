@@ -114,6 +114,7 @@ def getLumi(ds, trg):
 
     s = {}
     s.setdefault("minbias", {})
+    s["minbias"]["data_MinBias_TuneA2MB_13TeV_pythia8"] =  1 # in pb
 
 
     dsName = name(ds)
