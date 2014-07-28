@@ -1,6 +1,5 @@
 #ifndef TestTrackData_h
 #define TestTrackData_h
-
 namespace tmf{
     class TestTrackData{
         public:
@@ -13,7 +12,7 @@ namespace tmf{
 
 
     };
-};
+}
 
 
 #endif
