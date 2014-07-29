@@ -224,6 +224,7 @@ def main():
     parser.add_option("-c", "--checkDataIntegrity", action="store_true",  dest="check")
     parser.add_option("-d", "--deleteBadFiles", action="store_true",  dest="remove")
     parser.add_option("-r", "--rootCheck", action="store_true",  dest="checkFilesWithRoot")
+    parser.add_option("-s", "--srmls", action="store_true",  dest="usesrmls")
     (options, args) = parser.parse_args()
 
 
@@ -254,12 +255,15 @@ def main():
         if "pathSE" not in sampleList[s]:
             print "No SE path found for sample", s
 
-        todo = [sampleList[s]["pathPAT"], sampleList[s]["pathTrees"]]
-        for d in todo:
-            os.system("mkdir -p "+ d)
-            if not os.path.isdir(d):
-                raise Exception("Cannot create output dir "+d)
-                continue
+        try:
+            todo = [sampleList[s]["pathPAT"], sampleList[s]["pathTrees"]]
+            for d in todo:
+                os.system("mkdir -p "+ d)
+                if not os.path.isdir(d):
+                    raise Exception("Cannot create output dir "+d)
+                    continue
+        except:
+            continue
 
         # TODO: check dir existence
 
@@ -267,10 +271,12 @@ def main():
 
         # on my installation lcg-ls does not have offset/count params
         # needed for srm access to dirs with >1000 files.
-        #command = ["lcg-ls", sampleList[s]["pathSE"]]
         
-        flist = getFileListSrmLS(sampleList[s]["pathSE"])
-        #flist = getFileListLcgLs(sampleList[s]["pathSE"])
+#command = ["lcg-ls", sampleList[s]["pathSE"]]
+        if options.usesrmls:
+            flist = getFileListSrmLS(sampleList[s]["pathSE"])
+        else:
+            flist = getFileListLcgLs(sampleList[s]["pathSE"])
         cnt = 0
         for srcFile in flist:
             fname = srcFile.split("/")[-1]
