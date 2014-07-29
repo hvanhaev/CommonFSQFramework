@@ -486,7 +486,9 @@ process.schedule.extend([process.pPF, process.pCalo])
 process.schedule.extend([process.tfMuonsP,])
 
 process.exampleTree = cms.EDAnalyzer("ExampleTreeProducer")
-process.mnXS = cms.EDAnalyzer("MNXSTreeProducer")
+process.mnXS = cms.EDAnalyzer("MNXSTreeProducer", 
+    minPT = cms.double(30)
+)
 process.infoHisto = cms.EDAnalyzer("SaveCountHistoInTreeFile")
 #process.initialSequence.remove(process.hltJet)
 process.pTreeProducers = cms.Path(process.initialSequence*process.infoHisto*process.exampleTree*process.mnXS)
@@ -640,7 +642,7 @@ if anaType == "JetTriggerEff":
 
 #ver = "V17TFFull"
 #ver = "V17TFPart"
-#ver = "V16TFFull"
+ver = "V16TFFull"
 #ver = "V16TFPart"
 process.load("CondCore.DBCommon.CondDBCommon_cfi")
 from CondCore.DBCommon.CondDBSetup_cfi import *
@@ -668,6 +670,8 @@ process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
 # '''
 
 
-
+process.schedule.remove(process.outpath)
+del process.outpath
+del process.out
 
 
