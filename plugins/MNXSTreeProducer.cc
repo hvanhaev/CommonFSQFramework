@@ -86,7 +86,7 @@ class MNXSTreeProducer : public edm::EDAnalyzer {
       PFJetIDSelectionFunctor pfJetID;
       JetIDSelectionFunctor caloJetID;
 
-
+      float  m_minPT;
       //virtual void beginRun(edm::Run const&, edm::EventSetup const&) override;
       //virtual void endRun(edm::Run const&, edm::EventSetup const&) override;
       //virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&) override;
@@ -110,6 +110,8 @@ MNXSTreeProducer::MNXSTreeProducer(const edm::ParameterSet& iConfig):
 pfJetID(PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE),
 caloJetID(JetIDSelectionFunctor::PURE09,  JetIDSelectionFunctor::LOOSE)
 {
+
+    m_minPT = iConfig.getParameter<double>("minPT");
 
     edm::Service<TFileService> tFileService;
     m_tree = tFileService->make<TTree>("data", "data");
@@ -314,7 +316,6 @@ MNXSTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
 
     std::map<std::string, edm::InputTag>::iterator it = m_todo.begin(), itEnd = m_todo.end() ;
-    float ptMin = 30;
 
     for (;it != itEnd; ++it){
         edm::Handle<pat::JetCollection> hJets;
@@ -348,14 +349,14 @@ MNXSTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
             // Check if reconstructed jet or his matched genJet are above thr
             bool isGood = false;
-            if (hJets->at(i).pt() > ptMin) isGood = true;
+            if (hJets->at(i).pt() > m_minPT) isGood = true;
             reco::Candidate::LorentzVector genP4;
             if (hJets->at(i).genJet()){
                 genP4 = hJets->at(i).genJet()->p4();
             }
-            if (genP4.pt() > ptMin) isGood = true;
+            if (genP4.pt() > m_minPT) isGood = true;
             reco::Candidate::LorentzVector smearedP4 = this->smear(hJets->at(i));
-            if (smearedP4.pt() > ptMin) isGood = true;
+            if (smearedP4.pt() > m_minPT) isGood = true;
 
             m_vectorBranches[it->first+"_top3"].push_back(hJets->at(i).p4());
             m_vectorBranches[it->first+"Smear_top3"].push_back(smearedP4);
@@ -427,7 +428,7 @@ MNXSTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         edm::Handle< std::vector<reco::GenJet> > hGJ;
         iEvent.getByLabel(edm::InputTag("ak5GenJets","","SIM"), hGJ);
         for (unsigned int i =0; i< hGJ->size();++i){
-            if (hGJ->at(i).pt() < ptMin) continue;
+            if (hGJ->at(i).pt() < m_minPT) continue;
             m_vectorBranches["genJets"].push_back(hGJ->at(i).p4());
 
         }
