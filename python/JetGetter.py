@@ -98,7 +98,11 @@ class JetGetter:
         pf.append("1.1 1.066 0.007 0.07 0.072") 
         pf.append("1.7 1.191 0.019 0.06 0.062")
         pf.append("2.3 1.096 0.030 0.08 0.085")
-        pf.append("5.0 1.166 0.050 0.19 0.199") 
+        pf.append("5.0 1.166 0.050 0.19 0.199")  #ORG!
+
+        #print "XXXX wrong JER"*50
+        #pf.append("2.8 1.166 0.050 0.19 0.199") # keep org till 2.8
+        #pf.append("5.0 1.288 0.127 0.155 0.153") # use factors from 2011
 
         pf11 = []
         pf11.append("0.5 1.052 0.012 0.062 0.061")
@@ -130,6 +134,16 @@ class JetGetter:
             print "JER factors:", etaMax, jer, jerUp, jerDown, "|", err, errUp, errDown
             self.JER.append( [etaMax, jer, jerUp, jerDown] )
 
+    def hackJER(self):
+        return
+        for j in self.JER:
+            j[2] = 1.5
+            j[3] = 1
+
+        print "JER overriden:"
+        print self.JER
+
+
     def setJecUncertainty(self, jecUncPath):
         self.JECunc = JetCorrectionUncertainty(jecUncPath)
 
@@ -158,6 +172,7 @@ class JetGetter:
         '''
         self.recoGenJets =  getattr(chain, self.jetcolGen)
         self.recoBaseJets =  getattr(chain, self.jetcolReco)
+        self.recoSmearedJets =  getattr(chain, self.jetcol)
         self.recoJetID =  getattr(chain, self.jetcolID)
 
     # TODO: cacheing
@@ -212,7 +227,10 @@ class JetGetter:
             recoJetNoSmear = self.recoBaseJets.at(self.cnt)
             if isCentral or isJEC:
                 jetSmeared =  self.getSmeared(recoJetNoSmear, genJet, "_central")
-
+                #r1 = self.recoSmearedJets.at(self.cnt).pt()/jetSmeared.pt()
+                #i1 = self.recoSmearedJets.at(self.cnt).eta()*jetSmeared.eta()
+                #i1 /= abs(i1)
+                #print "XXX", r1, i1
 
             # genJetCollection
             #    def __init__(self, p4, i, genJetCollection):
