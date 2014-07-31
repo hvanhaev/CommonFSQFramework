@@ -6,6 +6,9 @@
 <use name="SimDataFormats/PileupSummaryInfo"/>
 <use name="clhep"/>
 <use name="DataFormats/VertexReco"/>
+<use name="DataFormats/PatCandidates"/>
+<use name="JetMETCorrections/Objects"/>
+<use name="CondFormats/JetMETObjects"/>
 <export>
    <lib name="1"/>
 </export>
