@@ -283,11 +283,12 @@ def main():
                 def vary(x, v=v):
                     return x + "_" + v
 
-                cut = vary("tagPt") + " > " + str(minPt)
+                cut =  vary("tagPt") + " > " + str(minPt)
                 cut += " && " + vary("probePt") + " > " + str(minPt)
                 cut += " && abs(" + vary("probeEta") + ") >  " + str(etaMin)
                 cut += " && abs(" + vary("probeEta") + ") <  " + str(etaMax)
                 cut += " && " + vary("ptAve") + " > " + str(minPtAVG)
+                cut +=  " &&" +vary("veto1") + " < 0.3 "
                 #cut += " && " + vary("balance") + " > " + str(-1)
                 #cut += " && " + vary("balance") + " < " + str(1)
                 if options.cutExtra != None:
