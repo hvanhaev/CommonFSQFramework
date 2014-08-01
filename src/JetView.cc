@@ -33,6 +33,9 @@ namespace xx {
         reco::Candidate::LorentzVector p4Gen;
         int jetId;
     };
+    bool ptSort(const xx::TempJetHolder & p1, const xx::TempJetHolder & p2) {
+        return p1.p4.pt() > p2.p4.pt();
+    }
 
 }
 
@@ -45,10 +48,6 @@ caloJetID(JetIDSelectionFunctor::PURE09,  JetIDSelectionFunctor::LOOSE),
 m_jecUnc(0)
 
 {
-    registerVecP4("recoTracks", tree);
-    registerVecFloat("dz", tree);
-    registerVecFloat("dxy", tree);
-
     m_maxEta = iConfig.getParameter<double>("maxEta");
     m_minPt = iConfig.getParameter<double>("minPt");
     m_maxnum = iConfig.getParameter<double>("maxnum"); // save maxnum hardest jets
@@ -62,10 +61,19 @@ m_jecUnc(0)
     knownVars.insert("jerUp");
     knownVars.insert("jerDown");
     // TODO register branches
+    //registerVecP4("recoTracks", tree);
+    //registerVecFloat("dz", tree);
+    //registerVecFloat("dxy", tree);
+
+
+
     BOOST_FOREACH( std::string s, m_variations){
         if (knownVars.find(s)==knownVars.end()){
             throw "Variation not known "+s + "\n";
         }
+        registerVecP4("njets_"+s, tree);
+        registerVecP4("ngenjets_"+s, tree);
+        registerVecInt("njetid_"+s, tree);
     }
 
     std::vector<std::string> JERdesc = iConfig.getParameter<std::vector<std::string> >("jerFactors");
@@ -115,10 +123,12 @@ void JetView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSet
     // save indices of jets, that have non-nonsense JEC (no negative values)
     std::vector<int> goodJets;
     for (unsigned int i = 0; i<hJets->size(); ++i){
+        if ( std::abs(hJets->at(i).eta()) > m_maxEta) continue;
+        if ( hJets->at(i).pt() <  m_minPt) continue;
 
         std::vector<std::string> jecs = hJets->at(i).availableJECLevels(0);
-
         bool badJet = false;
+
         for (unsigned int aa = 0; aa < jecs.size(); ++aa){
             if (hJets->at(i).jecFactor(jecs[aa])<0) {
                 badJet = true;
@@ -129,7 +139,8 @@ void JetView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSet
         goodJets.push_back(i);
     }
 
-    BOOST_FOREACH( std::string s, m_variations){
+    BOOST_FOREACH( std::string variation, m_variations){
+        std::vector<xx::TempJetHolder> tj;
         BOOST_FOREACH(int i, goodJets){
             xx::TempJetHolder t;
             t.p4Gen = reco::Candidate::LorentzVector();
@@ -137,12 +148,21 @@ void JetView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSet
                t.p4Gen = hJets->at(i).genJet()->p4();
             }
             t.jetId = jetID(hJets->at(i), iEvent);
-
+            t.p4 = getMomentum(hJets->at(i), variation);
+            tj.push_back(t);
 
         }
+        std::sort(tj.begin(), tj.end(), xx::ptSort);
+        while (tj.size() > m_maxnum) tj.pop_back();
+        ///registerVecP4("newjets_"+s, tree);
+        ///registerVecP4("newgenjets_"+s, tree);
+        ///registerVecInt("newjetid_"+s, tree);
+        BOOST_FOREACH(xx::TempJetHolder t, tj){
+            addToP4Vec("newjets_"+variation, t.p4);
+            addToP4Vec("newgenjets_"+variation, t.p4Gen);
+            addToIVec("newjetid_"+variation, t.jetId);
+        }
     }
-
-
 }
 
 reco::Candidate::LorentzVector JetView::getMomentum(const pat::Jet & jet, std::string variation) {
