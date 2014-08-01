@@ -113,12 +113,12 @@ MNXSTreeProducer::MNXSTreeProducer(const edm::ParameterSet& iConfig):
 pfJetID(PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE),
 caloJetID(JetIDSelectionFunctor::PURE09,  JetIDSelectionFunctor::LOOSE)
 {
-    m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetView"), m_tree));
 
     m_minPT = iConfig.getParameter<double>("minPT");
 
     edm::Service<TFileService> tFileService;
     m_tree = tFileService->make<TTree>("data", "data");
+    m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetView"), m_tree));
 
     m_todo["pfJets"] = edm::InputTag("selectedPatJets");
     m_todo["caloJets"] = edm::InputTag("selectedPatJetsAK5Calo");
