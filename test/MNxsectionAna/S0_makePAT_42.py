@@ -487,7 +487,21 @@ process.schedule.extend([process.tfMuonsP,])
 
 process.exampleTree = cms.EDAnalyzer("ExampleTreeProducer")
 process.mnXS = cms.EDAnalyzer("MNXSTreeProducer", 
-    minPT = cms.double(30)
+    minPT = cms.double(30),
+    JetView  = cms.PSet(
+        maxEta = cms.double(4.9999),
+        minPt = cms.double(3),
+        maxnum = cms.int32(3),
+        input = cms.InputTag("selectedPatJets"),
+        variations= cms.vstring("", "jecUp", "jecDown", "jerUp", "jerDown"),
+        jerFactors = cms.vstring(  # PF10
+                "1.1 1.066 0.007 0.07 0.072",
+                "1.7 1.191 0.019 0.06 0.062",
+                "2.3 1.096 0.030 0.08 0.085",
+                "5.0 1.166 0.050 0.19 0.199"),
+    ),
+
+
 )
 process.infoHisto = cms.EDAnalyzer("SaveCountHistoInTreeFile")
 #process.initialSequence.remove(process.hltJet)
