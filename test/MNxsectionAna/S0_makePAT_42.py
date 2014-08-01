@@ -503,6 +503,31 @@ process.mnXS = cms.EDAnalyzer("MNXSTreeProducer",
 
 
 )
+'''
+        calo.append("1.1 1.088 0.007 0.07 0.075")
+        calo.append("1.7 1.139 0.019 0.08 0.084")
+        calo.append("2.3 1.082 0.030 0.14 0.139")
+        calo.append("5.0 1.065 0.042 0.23 0.235")
+
+        pf = []
+        pf.append("1.1 1.066 0.007 0.07 0.072")
+        pf.append("1.7 1.191 0.019 0.06 0.062")
+        pf.append("2.3 1.096 0.030 0.08 0.085")
+        pf.append("5.0 1.166 0.050 0.19 0.199")  #ORG!
+
+        #print "XXXX wrong JER"*50
+        #pf.append("2.8 1.166 0.050 0.19 0.199") # keep org till 2.8
+        #pf.append("5.0 1.288 0.127 0.155 0.153") # use factors from 2011
+
+        pf11 = []
+        pf11.append("0.5 1.052 0.012 0.062 0.061")
+        pf11.append("1.1 1.057 0.012 0.056 0.055")
+        pf11.append("1.7 1.096 0.017 0.063 0.062")
+        pf11.append("2.3 1.134 0.035 0.087 0.085")
+        pf11.append("5.0 1.288 0.127 0.155 0.153")
+'''
+
+
 process.infoHisto = cms.EDAnalyzer("SaveCountHistoInTreeFile")
 #process.initialSequence.remove(process.hltJet)
 process.pTreeProducers = cms.Path(process.initialSequence*process.infoHisto*process.exampleTree*process.mnXS)

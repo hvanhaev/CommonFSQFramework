@@ -44,7 +44,7 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
             self.var["probeEta"+t] = array('d', [0])
             self.var["ptAve"+t] = array('d', [0])
             self.var["balance"+t] = array('d', [0])
-            self.var["veto1"+t] = array('d', [0])
+            #//self.var["veto1"+t] = array('d', [0])
             self.var["veto2"+t] = array('d', [0])
 
         self.var["weight"] = array('d', [0])
@@ -72,19 +72,15 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
 
 
         self.jetGetter = JetGetter("PF")
-        self.top3collection = "pfJets_top3"
 
         if self.HLT2015TempWorkaround:
+            raise ""
             self.jetGetter.setJERScenario("PF11")
             self.jetGetter.jetcol = "pfJets"
             self.jetGetter.jetcolGen ="pfJets"
             self.jetGetter.jetcolReco = "pfJets"
             self.jetGetter.jetcolID = "pfJets"
 
-        if hasattr(self, "jetUncFile"):
-            self.jetGetter.setJecUncertainty(self.jetUncFile)
-
-        #self.jetGetter.hackJER()
 
         self.varE = {}
         sys.stdout.flush()
@@ -113,11 +109,8 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
         # reset is done after fill
         for v in self.varE:
             self.var[v][0] = self.varE[v]
-    
-
 
         self.jetGetter.newEvent(self.fChain)
-        # recoJets = getattr(self.fChain, self.recoJetCollection)
 
 
 
@@ -149,6 +142,8 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
                 #print pt, jet.eta()
 
                 pt = jet.pt()
+                #print "XXX", shift, dbgCnt, pt, jet.eta()
+                #dbgCnt += 1
 
                 if pt < self.ptMin: continue
                 eta = abs(jet.eta())
@@ -170,15 +165,6 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
                 # check veto:
                 ptAve = (probePT+tagPT)/2
 
-                veto1 = -1
-                top3Collection = getattr(self.fChain, self.top3collection)
-                if top3Collection.size() > 2:
-                    vetoCand = top3Collection.at(2)
-                    if abs(vetoCand.eta())<4.7:
-                        veto1 =  vetoCand.pt()/ptAve
-
-
-
                 veto2 = -1
                 for jet in self.jetGetter.get(shift):
                     if jet == tagJet or probeJet == jet: continue
@@ -192,7 +178,7 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
                 self.var["probeEta"+shift][0] = abs(probeJet.eta())
                 self.var["ptAve"+shift][0] = ptAve
                 self.var["balance"+shift][0] = (probePT-tagPT)/ptAve
-                self.var["veto1"+shift][0] = veto1
+                #self.var["veto1"+shift][0] = veto1
                 self.var["veto2"+shift][0] = veto2
                 fill = True
 
@@ -224,7 +210,7 @@ if __name__ == "__main__":
     treeName = "mnXS"
 
     # debug config:
-    '''
+    #'''
     sampleList=[]
     sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
     #sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
@@ -247,17 +233,11 @@ if __name__ == "__main__":
     slaveParams["etaMax"] = 4.7
 
 
-    #slaveParams["recoJetCollection"] = "pfJets"
-    slaveParams["recoJetCollection"] = "pfJetsSmear"
-    slaveParams["recoJetCollectionBaseReco"] = "pfJets"
-    slaveParams["recoJetCollectionGEN"] = "pfJets2Gen"
-    #slaveParams["recoJetCollection"] = "caloJets"
-    #slaveParams["recoJetCollection"] = "caloJetsSmear"
 
     #jetUncFile = "START42_V11_AK5PF_Uncertainty.txt"
-    jetUncFile = "START41_V0_AK5PF_Uncertainty.txt"
+    #jetUncFile = "START41_V0_AK5PF_Uncertainty.txt"
 
-    slaveParams["jetUncFile"] =  edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"+jetUncFile).fullPath()
+    #slaveParams["jetUncFile"] =  edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"+jetUncFile).fullPath()
     slaveParams["HLT2015TempWorkaround"] =  False
     if slaveParams["HLT2015TempWorkaround"]:
         slaveParams["doPtShiftsJER"] = False
