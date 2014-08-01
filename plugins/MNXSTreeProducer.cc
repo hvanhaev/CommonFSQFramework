@@ -48,6 +48,8 @@
 #include "PhysicsTools/SelectorUtils/interface/JetIDSelectionFunctor.h"
 #include <DataFormats/Math/interface/deltaR.h>
 
+#include "MNTriggerStudies/MNTriggerAna/interface/JetView.h"
+
 //
 // class declaration
 //
@@ -93,6 +95,7 @@ class MNXSTreeProducer : public edm::EDAnalyzer {
       //virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&) override;
 
       // ----------member data ---------------------------
+      std::vector<EventViewBase *> m_views;
 };
 
 //
@@ -110,6 +113,7 @@ MNXSTreeProducer::MNXSTreeProducer(const edm::ParameterSet& iConfig):
 pfJetID(PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE),
 caloJetID(JetIDSelectionFunctor::PURE09,  JetIDSelectionFunctor::LOOSE)
 {
+    m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetView"), m_tree));
 
     m_minPT = iConfig.getParameter<double>("minPT");
 
@@ -449,12 +453,9 @@ MNXSTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     }
         
 
-
-    
-    
-
-
-
+    for (unsigned int i = 0; i < m_views.size(); ++i){
+        m_views[i]->fill(iEvent, iSetup);
+    }
     m_tree->Fill();
 }
 
