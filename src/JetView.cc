@@ -50,12 +50,12 @@ m_jecUnc(0)
 {
     m_maxEta = iConfig.getParameter<double>("maxEta");
     m_minPt = iConfig.getParameter<double>("minPt");
-    m_maxnum = iConfig.getParameter<double>("maxnum"); // save maxnum hardest jets
+    m_maxnum = iConfig.getParameter<int>("maxnum"); // save maxnum hardest jets
 
     m_inputCol = iConfig.getParameter<edm::InputTag>("input");
-    m_variations = iConfig.getParameter<std::vector<std::string> >("variations"); // central, _jecUp/Down, _jerUp/Down
+    m_variations = iConfig.getParameter<std::vector<std::string> >("variations"); // "" (central), _jecUp/Down, _jerUp/Down
     std::set<std::string> knownVars;
-    knownVars.insert("central");
+    knownVars.insert(""); // central value (no variation)
     knownVars.insert("jecUp");
     knownVars.insert("jecDown");
     knownVars.insert("jerUp");
@@ -71,9 +71,10 @@ m_jecUnc(0)
         if (knownVars.find(s)==knownVars.end()){
             throw "Variation not known "+s + "\n";
         }
-        registerVecP4("njets_"+s, tree);
-        registerVecP4("ngenjets_"+s, tree);
-        registerVecInt("njetid_"+s, tree);
+        if (s != "") s = "_" + s;
+        registerVecP4("newjets"+s, tree);
+        registerVecP4("newgenjets"+s, tree);
+        registerVecInt("newjetid"+s, tree);
     }
 
     std::vector<std::string> JERdesc = iConfig.getParameter<std::vector<std::string> >("jerFactors");
@@ -154,13 +155,11 @@ void JetView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSet
         }
         std::sort(tj.begin(), tj.end(), xx::ptSort);
         while (tj.size() > m_maxnum) tj.pop_back();
-        ///registerVecP4("newjets_"+s, tree);
-        ///registerVecP4("newgenjets_"+s, tree);
-        ///registerVecInt("newjetid_"+s, tree);
         BOOST_FOREACH(xx::TempJetHolder t, tj){
-            addToP4Vec("newjets_"+variation, t.p4);
-            addToP4Vec("newgenjets_"+variation, t.p4Gen);
-            addToIVec("newjetid_"+variation, t.jetId);
+            if (variation != "") variation = "_" + variation;
+            addToP4Vec("newjets"+variation, t.p4);
+            addToP4Vec("newgenjets"+variation, t.p4Gen);
+            addToIVec("newjetid"+variation, t.jetId);
         }
     }
 }
@@ -171,13 +170,13 @@ reco::Candidate::LorentzVector JetView::getMomentum(const pat::Jet & jet, std::s
        gen  = jet.genJet()->p4();
     }
     // at this point jet momentum has JEC fully applied
-    if (variation == "central" or  variation.find("jer") != std::string::npos) {
+    if (variation == "" or  variation.find("jer") != std::string::npos) {
         return smear(gen, jet.p4(), variation);
     }
     else if (  variation.find("jec") != std::string::npos) {
         // Note: first apply JEC shift, than central JER shift
         reco::Candidate::LorentzVector jecShifted = shiftJEC(jet.p4(), variation);
-        return smear(gen, jecShifted, variation);
+        return smear(gen, jecShifted, ""); // here we want to have the central value of JER smear
     }
 
     throw "Variation not known: " + variation + "\n";
@@ -196,7 +195,7 @@ reco::Candidate::LorentzVector JetView::smear(const reco::Candidate::LorentzVect
     float factor = -1;
     for(unsigned int i = 0; i < m_JER.size(); ++i){
         if (eta < m_JER[i][0]){
-            if (variation == "central") factor = m_JER[i].at(1);
+            if (variation == "") factor = m_JER[i].at(1);
             else if (variation == "jerDown") factor = m_JER[i].at(2);
             else if (variation == "jerUp") factor = m_JER[i].at(3);
             else throw "Unexpected variation: "+ variation + "\n";
