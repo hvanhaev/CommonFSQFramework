@@ -155,8 +155,8 @@ void JetView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSet
         }
         std::sort(tj.begin(), tj.end(), xx::ptSort);
         while (tj.size() > m_maxnum) tj.pop_back();
+        if (variation != "") variation = "_" + variation;
         BOOST_FOREACH(xx::TempJetHolder t, tj){
-            if (variation != "") variation = "_" + variation;
             addToP4Vec("newjets"+variation, t.p4);
             addToP4Vec("newgenjets"+variation, t.p4Gen);
             addToIVec("newjetid"+variation, t.jetId);
