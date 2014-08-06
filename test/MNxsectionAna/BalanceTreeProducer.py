@@ -72,6 +72,7 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
 
 
         self.jetGetter = JetGetter("PF")
+        self.jetGetter.disableGenJet()
 
         if self.HLT2015TempWorkaround:
             raise ""
@@ -210,7 +211,7 @@ if __name__ == "__main__":
     treeName = "mnXS"
 
     # debug config:
-    #'''
+    '''
     sampleList=[]
     sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
     #sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")

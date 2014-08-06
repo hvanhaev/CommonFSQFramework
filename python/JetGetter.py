@@ -76,7 +76,11 @@ class JetGetter:
                             "_ptDown": "_jecDown", 
                             "_jerUp": "_jerUp", 
                             "_jerDown": "_jerDown"}
-        self.shiftsTODO = set()
+
+        self.disableGen = False
+
+    def disableGenJet(self, do=True):
+        self.disableGen = do
 
     def shiftsAvaliable(self):
         return self.knownShifts.keys()
@@ -94,12 +98,16 @@ class JetGetter:
         if shift not in self.data:
             # todo: choose what is actually read
             self.data.setdefault(shift, {}).setdefault("recojets", getattr(self.chain, self.jetcol+self.knownShifts[shift]))
-            self.data[shift].setdefault("genjets", getattr(self.chain, self.jetcolGen+self.knownShifts[shift]))
+            if not self.disableGen:
+                self.data[shift].setdefault("genjets", getattr(self.chain, self.jetcolGen+self.knownShifts[shift]))
             self.data[shift].setdefault("jetid", getattr(self.chain, self.jetcolID+self.knownShifts[shift]))
 
         while cnt < self.data[shift]["recojets"].size():
             jet = self.data[shift]["recojets"].at(cnt)
-            genjet =   self.data[shift]["genjets"].at(cnt)
+            if not self.disableGen:
+                genjet = self.data[shift]["genjets"].at(cnt)
+            else:
+                genjet = None
             id =   self.data[shift]["jetid"].at(cnt)
             yield Jet(jet, genjet, id, cnt)
             cnt += 1 # we could use a single cnt+=1 at the end, but this would be error prone
