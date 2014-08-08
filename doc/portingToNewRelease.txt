@@ -1,0 +1,5 @@
+1. Get config
+
+cp $CMSSW_RELEASE_BASE/src/PhysicsTools/PatAlgos/test/patTuple_addJets_cfg.py .
+
+2. comment out unneeded jet collections
