@@ -15,6 +15,7 @@
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 //#include "JetMETCorrections/Objects/interface/JetCorrector.h"
 #include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
+#include <DataFormats/Math/interface/deltaR.h>
 
 
 
@@ -43,6 +44,7 @@ namespace xx {
 
 
 JetView::JetView(const edm::ParameterSet& iConfig, TTree * tree):
+EventViewBase(iConfig, tree),
 pfJetID(PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE),
 caloJetID(JetIDSelectionFunctor::PURE09,  JetIDSelectionFunctor::LOOSE),
 m_jecUnc(0)
@@ -51,6 +53,9 @@ m_jecUnc(0)
     m_maxEta = iConfig.getParameter<double>("maxEta");
     m_minPt = iConfig.getParameter<double>("minPt");
     m_maxnum = iConfig.getParameter<int>("maxnum"); // save maxnum hardest jets
+
+    m_caloBase = iConfig.getParameter<edm::InputTag>("optionalCaloJets4ID");
+    m_caloBaseID = iConfig.getParameter<edm::InputTag>("optionalCaloID4ID");
 
     m_inputCol = iConfig.getParameter<edm::InputTag>("input");
     m_variations = iConfig.getParameter<std::vector<std::string> >("variations"); // "" (central), _jecUp/Down, _jerUp/Down
@@ -242,7 +247,36 @@ reco::Candidate::LorentzVector JetView::shiftJEC(const reco::Candidate::LorentzV
 int JetView::jetID(const pat::Jet & jet, const edm::Event& iEvent) {
     int ret = 1;
     if (jet.isCaloJet()) {
-        // TODO
+        // We are doing this in a wicked way, since having jetID and jetArea in calo jets is not possible at same time (4_2 series)
+        JetIDSelectionFunctor jetIDSelector( JetIDSelectionFunctor::PURE09, JetIDSelectionFunctor::LOOSE); //loose
+        pat::strbitset bset = jetIDSelector.getBitTemplate();
+        edm::Handle<edm::View< reco::CaloJet > > hJets;
+        edm::Handle<reco::JetIDValueMap> hJetIDMap;
+        //m_caloBase = iConfig.getParameter<edm::InputTag>("optionalCaloJets4ID");
+        //m_caloBaseID = iConfig.getParameter<edm::InputTag>("optionalCaloID4ID");
+        //iEvent.getByLabel(edm::InputTag("ak5CaloJets","","RECO"), hJets );
+        //iEvent.getByLabel( "ak5JetID", hJetIDMap );
+        iEvent.getByLabel(m_caloBase, hJets );
+        iEvent.getByLabel(m_caloBaseID, hJetIDMap );
+
+        bool passed = false;
+        float bestDR = 99;
+        for ( edm::View<reco::CaloJet>::const_iterator ibegin = hJets->begin(),
+                iend = hJets->end(), ijet = ibegin; ijet != iend; ++ijet )
+        {
+
+                float dr = reco::deltaR(ijet->p4(), jet.p4());
+                if (dr > 0.5 ) continue;
+                if (dr > bestDR) continue;
+                bestDR = dr;
+                unsigned int idx = ijet - ibegin;
+                edm::RefToBase<reco::CaloJet> jetRef = hJets->refAt(idx);
+                const reco::CaloJet *calojet = dynamic_cast<const reco::CaloJet *>(jetRef.get());
+                reco::JetID jetId = (*hJetIDMap)[ jetRef ];
+                bset.set(false);
+                passed = jetIDSelector(*calojet,jetId, bset);
+        }
+        if (!passed) ret = 0;
     } else if (jet.isPFJet()) {
         pat::strbitset bs = pfJetID.getBitTemplate(); 
         if (!pfJetID(jet, bs)) ret = 0;

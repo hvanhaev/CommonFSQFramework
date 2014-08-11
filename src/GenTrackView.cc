@@ -1,7 +1,9 @@
 #include "MNTriggerStudies/MNTriggerAna/interface/GenTrackView.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
-GenTrackView::GenTrackView(const edm::ParameterSet& iConfig, TTree * tree){
+GenTrackView::GenTrackView(const edm::ParameterSet& iConfig, TTree * tree):
+EventViewBase(iConfig,  tree)
+{
 
     // register branches
     registerVecP4("genTracks", tree);

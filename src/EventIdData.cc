@@ -2,7 +2,9 @@
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 
-EventIdData::EventIdData(const edm::ParameterSet& iConfig, TTree * tree){
+EventIdData::EventIdData(const edm::ParameterSet& iConfig, TTree * tree):
+EventViewBase(iConfig, tree)
+{
 
     registerInt("run", tree);
     registerInt("lumi", tree);
