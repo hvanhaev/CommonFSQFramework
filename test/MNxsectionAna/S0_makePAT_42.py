@@ -485,10 +485,20 @@ process.schedule.extend([process.pPF, process.pCalo])
 #process.schedule = cms.Schedule(process.pCalo, process.outpath)
 process.schedule.extend([process.tfMuonsP,])
 
+'''
+        //m_caloBase = iConfig.getParameter<edm::InputTag>("optionalCaloJets4ID");
+        //m_caloBaseID = iConfig.getParameter<edm::InputTag>("optionalCaloID4ID");
+        //iEvent.getByLabel(edm::InputTag("ak5CaloJets","","RECO"), hJets );
+        //iEvent.getByLabel( "ak5JetID", hJetIDMap );
+'''
+
 process.exampleTree = cms.EDAnalyzer("ExampleTreeProducer")
 process.mnXS = cms.EDAnalyzer("MNXSTreeProducer", 
     minPT = cms.double(30),
-    JetView  = cms.PSet(
+    JetViewPF  = cms.PSet(
+        optionalCaloJets4ID = cms.InputTag("ak5CaloJets","","RECO"),
+        optionalCaloID4ID  = cms.InputTag("ak5JetID"),
+        branchPrefix = cms.untracked.string("PF"),
         maxEta = cms.double(4.9999),
         minPt = cms.double(3),
         maxnum = cms.int32(3),
@@ -499,6 +509,23 @@ process.mnXS = cms.EDAnalyzer("MNXSTreeProducer",
                 "1.7 1.191 0.019 0.06 0.062",
                 "2.3 1.096 0.030 0.08 0.085",
                 "5.0 1.166 0.050 0.19 0.199"),
+    ),
+
+    JetViewCalo  = cms.PSet(
+        optionalCaloJets4ID = cms.InputTag("ak5CaloJets","","RECO"),
+        optionalCaloID4ID = cms.InputTag("ak5JetID"),
+        branchPrefix = cms.untracked.string("Calo"),
+        maxEta = cms.double(4.9999),
+        minPt = cms.double(3),
+        maxnum = cms.int32(3),
+        input = cms.InputTag("selectedPatJetsAK5Calo"),
+        variations= cms.vstring("", "jecUp", "jecDown", "jerUp", "jerDown"),
+        jerFactors = cms.vstring(  # Calo10
+            "1.1 1.088 0.007 0.07 0.075",
+            "1.7 1.139 0.019 0.08 0.084",
+            "2.3 1.082 0.030 0.14 0.139",
+            "5.0 1.065 0.042 0.23 0.235"
+        ),
     ),
 
 
@@ -681,8 +708,8 @@ if anaType == "JetTriggerEff":
 
 #ver = "V17TFFull"
 #ver = "V17TFPart"
-ver = "V16TFFull"
-#ver = "V16TFPart"
+#ver = "V16TFFull"
+ver = "V16TFPart"
 process.load("CondCore.DBCommon.CondDBCommon_cfi")
 from CondCore.DBCommon.CondDBSetup_cfi import *
 process.jec = cms.ESSource("PoolDBESSource",

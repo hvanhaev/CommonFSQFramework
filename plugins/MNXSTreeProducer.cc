@@ -118,7 +118,8 @@ caloJetID(JetIDSelectionFunctor::PURE09,  JetIDSelectionFunctor::LOOSE)
 
     edm::Service<TFileService> tFileService;
     m_tree = tFileService->make<TTree>("data", "data");
-    m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetView"), m_tree));
+    m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPF"), m_tree));
+    m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewCalo"), m_tree));
 
     m_todo["pfJets"] = edm::InputTag("selectedPatJets");
     m_todo["caloJets"] = edm::InputTag("selectedPatJetsAK5Calo");

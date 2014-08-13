@@ -35,6 +35,8 @@ class JetView: public EventViewBase{
       JetCorrectionUncertainty  * m_jecUnc;
       reco::Candidate::LorentzVector shiftJEC(const reco::Candidate::LorentzVector &rec,  std::string variation);
 
+      edm::InputTag m_caloBase;
+      edm::InputTag m_caloBaseID;
 
 
 
