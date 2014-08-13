@@ -56,6 +56,7 @@ m_jecUnc(0)
 
     m_caloBase = iConfig.getParameter<edm::InputTag>("optionalCaloJets4ID");
     m_caloBaseID = iConfig.getParameter<edm::InputTag>("optionalCaloID4ID");
+    m_disableJetID = iConfig.getParameter<bool>("disableJetID");
 
     m_inputCol = iConfig.getParameter<edm::InputTag>("input");
     m_variations = iConfig.getParameter<std::vector<std::string> >("variations"); // "" (central), _jecUp/Down, _jerUp/Down
@@ -245,6 +246,7 @@ reco::Candidate::LorentzVector JetView::shiftJEC(const reco::Candidate::LorentzV
 
 
 int JetView::jetID(const pat::Jet & jet, const edm::Event& iEvent) {
+    if (m_disableJetID) return 1;
     int ret = 1;
     if (jet.isCaloJet()) {
         // We are doing this in a wicked way, since having jetID and jetArea in calo jets is not possible at same time (4_2 series)

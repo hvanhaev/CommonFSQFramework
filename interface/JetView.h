@@ -37,6 +37,7 @@ class JetView: public EventViewBase{
 
       edm::InputTag m_caloBase;
       edm::InputTag m_caloBaseID;
+      bool m_disableJetID;
 
 
 
