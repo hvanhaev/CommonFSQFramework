@@ -40,6 +40,7 @@
 #include <DataFormats/PatCandidates/interface/TriggerEvent.h>
 
 #include "MNTriggerStudies/MNTriggerAna/interface/EventIdData.h"
+#include "MNTriggerStudies/MNTriggerAna/interface/JetView.h"
 
 //
 // class declaration
@@ -90,23 +91,15 @@ class MNTriggerAnaNew : public edm::EDAnalyzer {
 MNTriggerAnaNew::MNTriggerAnaNew(const edm::ParameterSet& iConfig)
 
 {
-
-
     edm::Service<TFileService> tFileService;
     m_tree = tFileService->make<TTree>("data", "data");
 
     m_views.push_back(new EventIdData(iConfig, m_tree));
-
+    m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPF"), m_tree));
+    m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPFAK4CHS"), m_tree));
+    ///m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewCalo"), m_tree));
 
     // use m_floatBranches for float values
-    m_floatBranches["leadJetPt"] = 0;
-    m_floatBranches["leadJetEta"] = 0;
-    m_floatBranches["subleadJetPt"] = 0;
-    m_floatBranches["subleadJetEta"] = 0;
-
-
-    // 
-    m_vectorBranches["pfJets"] = std::vector<reco::Candidate::LorentzVector>();
     m_vectorBranches["l1Jets"] = std::vector<reco::Candidate::LorentzVector>();
     //m_vectorBranches["hltJets"] = std::vector<reco::Candidate::LorentzVector>();
 
@@ -116,34 +109,13 @@ MNTriggerAnaNew::MNTriggerAnaNew(const edm::ParameterSet& iConfig)
     
     m_todoHltCollections["hltAK4PFJets"] = edm::InputTag("hltAK4PFJets", "", "TTT");
     m_todoHltCollections["hltAK4PFJetsCorrected"]  = edm::InputTag("hltAK4PFJetsCorrected", "", "TTT");
-
-
-    
-
-
-    /*
-    m_todoHltCollections["hltAntiKT5CaloJets"] = edm::InputTag("hltAntiKT5CaloJets", "", "PAT");
-    m_todoHltCollections["hltAntiKT5CaloJetsRegional"] = edm::InputTag("hltAntiKT5CaloJetsRegional", "", "PAT");
-    m_todoHltCollections["hltAntiKT5L2L3CorrCaloJetsL1FastJetPt60Eta2"] = edm::InputTag("hltAntiKT5L2L3CorrCaloJetsL1FastJetPt60Eta2", "", "PAT");
-    m_todoHltCollections["hltCaloJetCorrected"] = edm::InputTag("hltCaloJetCorrected", "", "PAT");
-    m_todoHltCollections["hltCaloJetCorrectedRegional"] = edm::InputTag("hltCaloJetCorrectedRegional", "", "PAT");
-    m_todoHltCollections["hltCaloJetCorrectedRegionalNoJetID"] = edm::InputTag("hltCaloJetCorrectedRegionalNoJetID", "", "PAT");
-    m_todoHltCollections["hltCaloJetL1FastJetCorrected"] = edm::InputTag("hltCaloJetL1FastJetCorrected", "", "PAT");
-    m_todoHltCollections["hltAK5PFJetL1FastL2L3CorrectedNoPU"] = edm::InputTag("hltAK5PFJetL1FastL2L3CorrectedNoPU", "", "PAT");
-    m_todoHltCollections["hltAntiKT5PFJets"] = edm::InputTag("hltAntiKT5PFJets", "", "PAT");
-    */
+    m_todoHltCollections["hltPFJetsCorrectedMatchedToL1"]  = edm::InputTag("hltPFJetsCorrectedMatchedToL1", "", "TTT");
 
 
     std::map<std::string, edm::InputTag>::iterator it = m_todoHltCollections.begin();
     for (;it != m_todoHltCollections.end(); ++it){
         m_vectorBranches[it->first] =  std::vector<reco::Candidate::LorentzVector>();
     }
-
-
-
-
-
-
 
     // integer branches auto registration
     {
@@ -231,54 +203,11 @@ MNTriggerAnaNew::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 {
     resetTrees();
     using namespace edm;
+    float minPT = 10;
 
 
     for (unsigned int i = 0; i < m_views.size(); ++i){
         m_views[i]->fill(iEvent, iSetup);
-    }
-
-    float minPT = 15; // TODO!
-
-
-
-    std::map<std::string, edm::InputTag>::iterator it = m_todoHltCollections.begin();
-    for (;it != m_todoHltCollections.end(); ++it){
-        edm::Handle< edm::View<reco::Candidate> > hHLTJets;
-        iEvent.getByLabel(it->second, hHLTJets);
-        for (unsigned int i = 0; i<hHLTJets->size(); ++i) {
-            if (hHLTJets->at(i).pt() <  minPT) continue;
-            m_vectorBranches[it->first].push_back(hHLTJets->at(i).p4());
-        }
-    }
-
-
-    edm::Handle<edm::View<pat::Jet> > hJets;
-    iEvent.getByLabel(edm::InputTag("selectedPatJets"), hJets);  // TODO/Fixme - inputTag from python cfg
-    for (unsigned int i = 0; i<hJets->size(); ++i) {
-        if (hJets->at(i).pt() <  minPT) continue;
-        m_vectorBranches["pfJets"].push_back(hJets->at(i).p4());
-
-        /*
-        edm::RefToBase<pat::Jet> jetRef = hJets->refAt(i);
-        edm::Ref<pat::TriggerObjectCollection > hltRefVec = (*trMatches)[jetRef];
-
-        reco::Candidate::LorentzVector hltp4;
-        if (hltRefVec.isNonnull()){
-            hltp4 = hltRefVec->p4();
-
-            std::cout << "Reference came from:" << hltRefVec->collection() << std::endl;
-        }
-
-        std::cout << "J: " <<  hJets->at(i).pt() << " " << hltp4.pt() << std::endl;
-        */
-
-
-        /*
-        std::cout   << "Jet:"  
-                    << " " <<  hJets->at(i).pt()  // by default gives you pt with JEC applied
-                    << " " <<  hJets->at(i).eta() // 
-                    << std::endl;
-        // */
     }
 
 
@@ -300,21 +229,19 @@ MNTriggerAnaNew::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
         }
     }
 
+    //std::cout << "---" << std::endl;
+    std::map<std::string, edm::InputTag>::iterator it = m_todoHltCollections.begin();
+    for (;it != m_todoHltCollections.end(); ++it){
+        edm::Handle< edm::View<reco::Candidate> > hHLTJets;
+        iEvent.getByLabel(it->second, hHLTJets);
+        for (unsigned int i = 0; i<hHLTJets->size(); ++i) {
+            if (hHLTJets->at(i).pt() <  minPT) continue;
+            m_vectorBranches[it->first].push_back(hHLTJets->at(i).p4());
+        }
+        //std::cout << hHLTJets->size() << " " << m_vectorBranches[it->first].size() << std::endl;
+    }   
 
 
-    // jets are pt ordered by default
-    // TODO: CHECKME - this was in 4_2, shouldnt change, but who knows...
-    int nJets =  hJets->size();
-    if (nJets>0){
-        m_floatBranches["leadJetPt"] = hJets->at(0).pt();
-        m_floatBranches["leadJetEta"] = hJets->at(0).eta();
-    }
-    if (nJets>1){
-        m_floatBranches["subleadJetPt"] = hJets->at(1).pt();
-        m_floatBranches["subleadJetEta"] = hJets->at(1).eta();
-    }
-
-    
     m_tree->Fill();
 
 }

@@ -38,7 +38,7 @@ addJetCollection(
    postfix   = postfixAK4PFCHS,
    labelName = labelAK4PFCHS,
    jetSource = cms.InputTag('ak4PFJetsCHS'),
-   jetCorrections = ('AK4PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'Type-2')
+   jetCorrections = ('AK5PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'Type-2')
    )
 process.out.outputCommands.append( 'drop *_selectedPatJets%s%s_caloTowers_*'%( labelAK4PFCHS, postfixAK4PFCHS ) )
 
@@ -129,7 +129,42 @@ process.source.fileNames = [
 import MNTriggerStudies.MNTriggerAna.customizePAT
 process = MNTriggerStudies.MNTriggerAna.customizePAT.customize(process)
 
-process.MNTriggerAnaNew = cms.EDAnalyzer("MNTriggerAnaNew")
+process.MNTriggerAnaNew = cms.EDAnalyzer("MNTriggerAnaNew",
+    JetViewPFAK4CHS  = cms.PSet(
+        disableJetID = cms.bool(True),
+        optionalCaloJets4ID = cms.InputTag("ak5CaloJets","","RECO"),
+        optionalCaloID4ID  = cms.InputTag("ak5JetID"),
+        branchPrefix = cms.untracked.string("PFAK4CHS"),
+        maxEta = cms.double(4.9999),
+        minPt = cms.double(3),
+        maxnum = cms.int32(3),
+        input = cms.InputTag("selectedPatJetsAK4PFCHSCopy"),
+        variations= cms.vstring("", "jecUp", "jecDown"),
+        jerFactors = cms.vstring(  # PF10
+                "1.1 1.066 0.007 0.07 0.072",
+                "1.7 1.191 0.019 0.06 0.062",
+                "2.3 1.096 0.030 0.08 0.085",
+                "5.0 1.166 0.050 0.19 0.199"),
+    ),
+
+
+    JetViewPF  = cms.PSet(
+        disableJetID = cms.bool(True),
+        optionalCaloJets4ID = cms.InputTag("ak5CaloJets","","RECO"),
+        optionalCaloID4ID  = cms.InputTag("ak5JetID"),
+        branchPrefix = cms.untracked.string("PF"),
+        maxEta = cms.double(4.9999),
+        minPt = cms.double(3),
+        maxnum = cms.int32(3),
+        input = cms.InputTag("selectedPatJets"),
+        variations= cms.vstring("", "jecUp", "jecDown"),
+        jerFactors = cms.vstring(  # PF10
+                "1.1 1.066 0.007 0.07 0.072",
+                "1.7 1.191 0.019 0.06 0.062",
+                "2.3 1.096 0.030 0.08 0.085",
+                "5.0 1.166 0.050 0.19 0.199"),
+    ),
+)
 process = MNTriggerStudies.MNTriggerAna.customizePAT.addTreeProducer(process, process.MNTriggerAnaNew)
 
 prefix='root://xrootd.ba.infn.it/'
@@ -144,6 +179,13 @@ process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring([primary]),
     bypassVersionCheck = cms.untracked.bool(True)
 )
+
+process.patJetsAK4PFCHSCopy.addGenJetMatch = cms.bool(False)
+process.patJetsAK4PFCHSCopy.embedGenJetMatch = cms.bool(False)
+process.patJetsAK4PFCHSCopy.addGenPartonMatch = cms.bool(False)
+process.patJetsAK4PFCHSCopy.embedGenPartonMatch = cms.bool(False)
+process.patJetsAK4PFCHSCopy.useLegacyJetMCFlavour = cms.bool(False)
+process.patJetsAK4PFCHSCopy.getJetMCFlavour = cms.bool(False)
 
 process.schedule.remove(process.outpath)
 del process.outpath
