@@ -81,6 +81,9 @@ class CMS_FWD_11_002(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExamplePro
         if hasattr(self, "jetUncFile"):
             self.jetGetter.setJecUncertainty(self.jetUncFile)
 
+        #self.jetGetter.hackJER()
+
+
     def analyze(self):
         # generator level plots
         if not self.isData:
@@ -189,9 +192,9 @@ if __name__ == "__main__":
 
     # debug config:
     #'''
-    sampleList = []
+    #sampleList = []
     #sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
-    sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
+    #sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
     #sampleList=  ["Jet-Run2010B-Apr21ReReco-v1"] 
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
     #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
