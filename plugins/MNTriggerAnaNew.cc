@@ -112,9 +112,16 @@ MNTriggerAnaNew::MNTriggerAnaNew(const edm::ParameterSet& iConfig)
 
     m_todoHltCollections["ak5GenJets"] = edm::InputTag("ak5GenJets", "", "SIM");
     //"hltAK5PFJetL1FastL2L3Corrected"   ""                "PAT"
-    m_todoHltCollections["hltAK5PFJetL1FastL2L3Corrected"] = edm::InputTag("hltAK5PFJetL1FastL2L3Corrected", "", "PAT");
+    //m_todoHltCollections["hltAK5PFJetL1FastL2L3Corrected"] = edm::InputTag("hltAK5PFJetL1FastL2L3Corrected", "", "PAT");
+    
+    m_todoHltCollections["hltAK4PFJets"] = edm::InputTag("hltAK4PFJets", "", "TTT");
+    m_todoHltCollections["hltAK4PFJetsCorrected"]  = edm::InputTag("hltAK4PFJetsCorrected", "", "TTT");
 
 
+    
+
+
+    /*
     m_todoHltCollections["hltAntiKT5CaloJets"] = edm::InputTag("hltAntiKT5CaloJets", "", "PAT");
     m_todoHltCollections["hltAntiKT5CaloJetsRegional"] = edm::InputTag("hltAntiKT5CaloJetsRegional", "", "PAT");
     m_todoHltCollections["hltAntiKT5L2L3CorrCaloJetsL1FastJetPt60Eta2"] = edm::InputTag("hltAntiKT5L2L3CorrCaloJetsL1FastJetPt60Eta2", "", "PAT");
@@ -124,6 +131,7 @@ MNTriggerAnaNew::MNTriggerAnaNew(const edm::ParameterSet& iConfig)
     m_todoHltCollections["hltCaloJetL1FastJetCorrected"] = edm::InputTag("hltCaloJetL1FastJetCorrected", "", "PAT");
     m_todoHltCollections["hltAK5PFJetL1FastL2L3CorrectedNoPU"] = edm::InputTag("hltAK5PFJetL1FastL2L3CorrectedNoPU", "", "PAT");
     m_todoHltCollections["hltAntiKT5PFJets"] = edm::InputTag("hltAntiKT5PFJets", "", "PAT");
+    */
 
 
     std::map<std::string, edm::InputTag>::iterator it = m_todoHltCollections.begin();
@@ -136,7 +144,6 @@ MNTriggerAnaNew::MNTriggerAnaNew(const edm::ParameterSet& iConfig)
 
 
 
-    m_vectorBranches["hltJetsFromTriggerEvent"] = std::vector<reco::Candidate::LorentzVector>();
 
     // integer branches auto registration
     {
@@ -245,19 +252,6 @@ MNTriggerAnaNew::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     }
 
 
-    edm::Handle< pat::TriggerEvent > hTrEvent;
-    iEvent.getByLabel(edm::InputTag("patTriggerEvent"), hTrEvent); // TODO
-
-    // dump data from trigger event for xcheck purposes (are we producing HLTjets properly?)
-    pat::TriggerObjectRefVector jetObjects = hTrEvent->objects(trigger::TriggerJet );
-    for ( pat::TriggerObjectRefVector::const_iterator iRef = jetObjects.begin(); iRef != jetObjects.end(); ++iRef ) {
-        //std::cout << ( *iRef )->collection() << std::endl;
-        if (( *iRef )->collection() != "hltAK5PFJetL1FastL2L3Corrected::HLT") continue; // TODO
-        if (( *iRef )->pt() <  minPT) continue;
-        m_vectorBranches["hltJetsFromTriggerEvent"].push_back(( *iRef )->p4());
-    }
-
-    //const pat::TriggerObjectMatch * trMatches = hTrEvent->triggerObjectMatchResult("triggerMatchPF"); 
     edm::Handle<edm::View<pat::Jet> > hJets;
     iEvent.getByLabel(edm::InputTag("selectedPatJets"), hJets);  // TODO/Fixme - inputTag from python cfg
     for (unsigned int i = 0; i<hJets->size(); ++i) {
