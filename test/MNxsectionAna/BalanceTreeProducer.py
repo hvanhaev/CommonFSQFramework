@@ -75,13 +75,9 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
         self.jetGetter.disableGenJet()
 
         if self.HLT2015TempWorkaround:
-            raise ""
-            self.jetGetter.setJERScenario("PF11")
-            self.jetGetter.jetcol = "pfJets"
-            self.jetGetter.jetcolGen ="pfJets"
-            self.jetGetter.jetcolReco = "pfJets"
-            self.jetGetter.jetcolID = "pfJets"
-
+            self.jetGetter = JetGetter("PFAK4CHS")
+            #self.jetGetter = JetGetter("PF")
+            self.jetGetter.disableGenJet()
 
         self.varE = {}
         sys.stdout.flush()
@@ -96,6 +92,9 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
 
     def setExternalVar(self, name, val):
         self.varE[name] = val
+
+    def genWeight(self):
+        return self.fChain.genWeight
 
     def analyze(self):
         if not self.HLT2015TempWorkaround and self.fChain.ngoodVTX == 0: return
@@ -119,10 +118,13 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
         for shift in self.todoShifts:
             weight = self.normFactor 
             if not self.isData and not self.HLT2015TempWorkaround:
-                weight *= self.fChain.genWeight # keep inside shift iter
+                weight *= self.genWeight() # keep inside shift iter
                 truePU = self.fChain.puTrueNumInteractions
                 puWeight =  self.lumiWeighters["_jet15_central"].weight(truePU)
                 weight *= puWeight
+            elif self.HLT2015TempWorkaround:
+                weight *= self.genWeight()
+
 
             self.var["weight"][0] = weight
 
@@ -235,10 +237,7 @@ if __name__ == "__main__":
 
 
 
-    #jetUncFile = "START42_V11_AK5PF_Uncertainty.txt"
-    #jetUncFile = "START41_V0_AK5PF_Uncertainty.txt"
 
-    #slaveParams["jetUncFile"] =  edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"+jetUncFile).fullPath()
     slaveParams["HLT2015TempWorkaround"] =  False
     if slaveParams["HLT2015TempWorkaround"]:
         slaveParams["doPtShiftsJER"] = False

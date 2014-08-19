@@ -60,9 +60,13 @@ class JetGetter:
 
         if jType == "PF":
             # idea store gen-rec as float
-            self.jetcol = "newjets"
-            self.jetcolID = "newjetid"
-            self.jetcolGen ="newgenjets"
+            self.jetcol = "PFnewjets"
+            self.jetcolID = "PFnewjetid"
+            self.jetcolGen ="PFnewgenjets"
+        elif jType == "PFAK4CHS":
+            self.jetcol = "PFAK4CHSnewjets"
+            self.jetcolID = "PFAK4CHSnewjetid"
+            self.jetcolGen ="PFAK4CHSnewgenjets"
         elif jType == "Calo":
             raise Exception("Jet collection not known "+jType)
             self.setJERScenario("Calo10")
