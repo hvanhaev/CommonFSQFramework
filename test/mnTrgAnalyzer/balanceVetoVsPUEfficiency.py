@@ -37,6 +37,8 @@ def main():
     if options.minPTAve:
         minPTAve = options.minPTAve
     else:
+
+        print "Example usage: ./balanceVetoVsPUEfficiency.py -a 30 -l 'Average p_{T} of di-jet system  > 30 GeV' "
         raise Exception("You must specify ptAve of reco jets!")
 
 
@@ -231,7 +233,7 @@ def main():
                 dsReduced = ds[t].reduce(cutBase)
                 dsReducedWithVeto = ds[t].reduce(cutWithVeto)
                 #print "Reduce...done"
-                histN = ROOT.TH1F("nom", "nom;num PU;3rd jet veto efficiency", 12, -0.5, 11.1)
+                histN = ROOT.TH1F("nom", "nom;PUNumInteractions for bx=0;3rd jet veto efficiency", 12, -0.5, 11.1)
                 histD = ROOT.TH1F("denom", "denom", 12, -0.5, 11.1)
 
                 puVar = "PUNumInteractions"
