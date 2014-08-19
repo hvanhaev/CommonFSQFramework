@@ -141,11 +141,23 @@ process.MNTriggerAnaNew = cms.EDAnalyzer("MNTriggerAnaNew",
         input = cms.InputTag("selectedPatJetsAK4PFCHSCopy"),
         variations= cms.vstring("", "jecUp", "jecDown"),
         jerFactors = cms.vstring(  # PF10
-                "1.1 1.066 0.007 0.07 0.072",
-                "1.7 1.191 0.019 0.06 0.062",
-                "2.3 1.096 0.030 0.08 0.085",
-                "5.0 1.166 0.050 0.19 0.199"),
+                "5.5 1 0.007 0.07 0.072"),
     ),
+
+    JetViewPFAK5CHS  = cms.PSet(
+        disableJetID = cms.bool(True),
+        optionalCaloJets4ID = cms.InputTag("ak5CaloJets","","RECO"),
+        optionalCaloID4ID  = cms.InputTag("ak5JetID"),
+        branchPrefix = cms.untracked.string("PFAK5CHS"),
+        maxEta = cms.double(4.9999),
+        minPt = cms.double(3),
+        maxnum = cms.int32(3),
+        input = cms.InputTag("selectedPatJetsAK5PFCHSCopy"),
+        variations= cms.vstring("", "jecUp", "jecDown"),
+        jerFactors = cms.vstring(  # PF10
+                "5.5 1 0.007 0.07 0.072"),
+    ),
+
 
 
     JetViewPF  = cms.PSet(
@@ -159,10 +171,7 @@ process.MNTriggerAnaNew = cms.EDAnalyzer("MNTriggerAnaNew",
         input = cms.InputTag("selectedPatJets"),
         variations= cms.vstring("", "jecUp", "jecDown"),
         jerFactors = cms.vstring(  # PF10
-                "1.1 1.066 0.007 0.07 0.072",
-                "1.7 1.191 0.019 0.06 0.062",
-                "2.3 1.096 0.030 0.08 0.085",
-                "5.0 1.166 0.050 0.19 0.199"),
+                "5.5 1 0.007 0.07 0.072"),
     ),
 )
 process = MNTriggerStudies.MNTriggerAna.customizePAT.addTreeProducer(process, process.MNTriggerAnaNew)
@@ -173,6 +182,8 @@ sec2=prefix+"/store/mc/Spring14dr/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/AODS
 primary='file:/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/20140812_HLTJets/db6fe0c1c3daf8225c4ac7289ea45cd0/outputFULL_3_1_4FA.root'
 
 primary= "file:/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/20140813_HLTJets/db6fe0c1c3daf8225c4ac7289ea45cd0/outputFULL_11_1_WVC.root"
+primary = "file:/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/20140813C_HLTJets/1914e7f200d7a3952c1631dd40280690/outputFULL_17_1_UZk.root"
+
 
 process.source = cms.Source("PoolSource",
 #    secondaryFileNames = cms.untracked.vstring([sec1, sec2]),

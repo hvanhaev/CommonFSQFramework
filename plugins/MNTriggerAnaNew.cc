@@ -97,6 +97,7 @@ MNTriggerAnaNew::MNTriggerAnaNew(const edm::ParameterSet& iConfig)
     m_views.push_back(new EventIdData(iConfig, m_tree));
     m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPF"), m_tree));
     m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPFAK4CHS"), m_tree));
+    m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPFAK5CHS"), m_tree));
     ///m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewCalo"), m_tree));
 
     // use m_floatBranches for float values
