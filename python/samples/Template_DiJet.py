@@ -29,7 +29,8 @@ skimEfficiencyMethod="getSkimEff"
 MyVariablesAllEvents="DiJetAnalysis.DiJetAna.ana.BaseVariables"
 '''
 # /scratch/scratch0/tfruboes/2013.05.DiJetNewGit/CMSSW_4_2_8_patch7/src/DiJetAnalysis/DiJetAna/python/samples
-dsFile="MNTriggerStudies/MNTriggerAna/python/samples/dsBase.txt"
+#dsFile="MNTriggerStudies/MNTriggerAna/python/samples/dsBase.txt"
+dsFile="MNTriggerStudies/MNTriggerAna/python/samples/ds70TriggerStudies.txt"
 
 # define the util decorator. Functions marked with this wont turn into ds attribute
 def util(func):
@@ -155,6 +156,7 @@ def XS(ds):
     # Date: 2014-05-07-13-53 1604.0 1.0 1.0
     s["DYToEE_M-50_Tune4C_13TeV-pythia8"] = 1604.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00025
 
+    s["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8"] = 2429000000 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/JME-Fall13-00001
 
     dsName = name(ds)
     if dsName in s:

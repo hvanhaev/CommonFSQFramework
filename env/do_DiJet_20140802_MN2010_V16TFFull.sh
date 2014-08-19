@@ -1,0 +1,1 @@
+export SmallXAnaVersion="MNTriggerStudies.MNTriggerAna.samples.Samples_DiJet_20140802_MN2010_V16TFFull"

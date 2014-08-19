@@ -5,7 +5,9 @@
 
 
 
-RecoTrackView::RecoTrackView(const edm::ParameterSet& iConfig, TTree * tree){
+RecoTrackView::RecoTrackView(const edm::ParameterSet& iConfig, TTree * tree):
+EventViewBase(iConfig,  tree)
+{
     registerVecP4("recoTracks", tree);
     registerVecFloat("dz", tree);
     registerVecFloat("dxy", tree);

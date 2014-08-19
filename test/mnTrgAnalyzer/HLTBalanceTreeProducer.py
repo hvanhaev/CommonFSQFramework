@@ -26,6 +26,29 @@ class HLTBalanceTreeProducer(BalanceTreeProducer.BalanceTreeProducer):
     def init(self):
         BalanceTreeProducer.BalanceTreeProducer.init(self)
         self.addExternalVar(["hltPtAve"])
+        self.addExternalVar(["hltPtCen"])
+        self.addExternalVar(["hltPtFwd"])
+        self.addExternalVar(["PUNumInteractions"])
+        self.addExternalVar(["puTrueNumInteractions"])
+
+
+        # for the PU file run
+        # utils/GetFlatPUDist.py
+        puFile = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/PUhists.root").fullPath()
+
+        self.newlumiWeighters = {}
+        self.newlumiWeighters["flat010toPU1"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU1/pileup")
+        self.newlumiWeighters["flat010toPU2"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU2/pileup")
+        self.newlumiWeighters["flat010toPU3"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU3/pileup")
+        self.newlumiWeighters["flat010toPU4"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU4/pileup")
+        self.newlumiWeighters["flat010toPU5"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU5/pileup")
+        self.newlumiWeighters["flat010toPU10"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU10/pileup")
+        self.newlumiWeighters["flat2050toPU20"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU20/pileup")
+        self.newlumiWeighters["flat2050toPU25"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU25/pileup")
+        self.newlumiWeighters["flat2050toPU30"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU30/pileup")
+        self.addExternalVar(self.newlumiWeighters.keys())
+
+
 
     #    print "XX2!"
         #self.balanceProd =  BalanceTreeProducer()
@@ -36,24 +59,42 @@ class HLTBalanceTreeProducer(BalanceTreeProducer.BalanceTreeProducer):
         # hltAK5PFJetL1FastL2L3Corrected
         #setattr(self.fChain, "ngoodVTX", 2) # TODO: fChain proxy ?!?
 
-        hltJets = self.fChain.hltAK5PFJetL1FastL2L3Corrected
+        hltJets = self.fChain.hltAK4PFJetsCorrected
         probe = None
         tag = None
 
         for j in hltJets:
             pt = j.pt()
+            if pt < 10.: continue
             eta = abs(j.eta())
             tagCand = eta < 1.4
-            probeCand = eta > 2.8 and eta < 5.2
+            probeCand = eta > 2.7 and eta < 5.2
 
             if probeCand and (probe == None or probe.pt() < pt): probe = j
             if tagCand and (tag == None or tag.pt() < pt): tag = j
 
+        avePT = 0 # this are all HLT level values!
+        tagPT = 0 
+        probePT = 0
+        
         if probe != None and tag!=None  and probe != tag:
-            ptAve = (tag.pt() + probe.pt())/2.
-            if ptAve > 10.:
-                self.setExternalVar("hltPtAve", ptAve)
-                BalanceTreeProducer.BalanceTreeProducer.analyze(self)
+            avePT = (tag.pt() + probe.pt())/2.
+            tagPT = tag.pt()
+            probePT = probe.pt()
+
+        self.setExternalVar("hltPtAve", avePT)
+        self.setExternalVar("hltPtCen", tagPT)
+        self.setExternalVar("hltPtFwd", probePT)
+        self.setExternalVar("PUNumInteractions", self.fChain.PUNumInteractions)
+        self.setExternalVar("puTrueNumInteractions", self.fChain.puTrueNumInteractions)
+        pu = self.fChain.PUNumInteractions
+        genW = BalanceTreeProducer.BalanceTreeProducer.genWeight(self)
+        for l in self.newlumiWeighters:
+            w = self.newlumiWeighters[l].weight(pu)
+            self.setExternalVar(l, w*genW)
+
+
+        BalanceTreeProducer.BalanceTreeProducer.analyze(self)
 
     def finalize(self):
         print "Finalize HLTBala:"
@@ -81,12 +122,6 @@ if __name__ == "__main__":
     #slaveParams["recoJetCollection"] = "caloJets"
     #slaveParams["recoJetCollection"] = "caloJetsSmear"
 
-    # TODO: correct JEC uncertainty
-    #jetUncFile = "START42_V11_AK5PF_Uncertainty.txt"
-    jetUncFile = "START41_V0_AK5PF_Uncertainty.txt"
-
-
-    slaveParams["jetUncFile"] =  edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"+jetUncFile).fullPath()
     slaveParams["HLT2015TempWorkaround"] =  True
     slaveParams["doPtShiftsJER"] = False
     slaveParams["doPtShiftsJEC"] = False
@@ -97,13 +132,14 @@ if __name__ == "__main__":
     nWorkers = 1
     maxFilesMC = 12
     #'''
-    #maxFilesMC = 12
+    #maxFilesMC = 1
+    #nWorkers=1
     #treeName = "mnTriggerAna"
     slaveParams["ptMin"] = 20
     slaveParams["etaMax"] = 5
 
     out = "treeDiJetBalance.root"
-    HLTBalanceTreeProducer().runAll(treeName="mnTriggerAna",
+    HLTBalanceTreeProducer().runAll(treeName="MNTriggerAnaNew",
                            slaveParameters=slaveParams,
                            sampleList=sampleList,
                            maxFilesMC = maxFilesMC,

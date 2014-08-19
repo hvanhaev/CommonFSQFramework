@@ -109,7 +109,20 @@ def main():
     parser.add_option("-o", "--outdir", action="store", type="string",  dest="outdir" )
     parser.add_option("-c", "--cutExtra", action="store", type="string",  dest="cutExtra" )
     parser.add_option("-e", "--etaTable", action="store", type="int",  dest="etaTable" )
+    parser.add_option("-a", "--minPTAvg", action="store", type="float",  dest="minPTAve" )
+    parser.add_option("-w", "--weight", action="store", type="string",  dest="weight" )
     (options, args) = parser.parse_args()
+
+    weight = "weight"
+    if options.weight:
+        weight = options.weight
+
+    if options.minPTAve:
+        minPTAve = options.minPTAve
+    else:
+        raise Exception("You must specify ptAve of reco jets!")
+
+
 
     if options.infile:
         infile = options.infile
@@ -131,6 +144,8 @@ def main():
     etaProbeFwdWide = [4.701]
     etaProbeFwdDense = [4.401, 4.701]
     etaProbeFwdDense5 = [4.401, 4.701, 5.001]
+
+    etaProbeHFCoarse  = [2.801, 3.301, 3.801, 4.201, 4.999]
     if options.etaTable:
         if options.etaTable == 1:
             #etaRanges.extend(etaProbeCEN)
@@ -141,6 +156,8 @@ def main():
             etaRanges.extend(etaProbeCEN)
             etaRanges.extend(etaProbeHF)
             etaRanges.extend(etaProbeFwdDense5)
+        elif options.etaTable == 3:
+            etaRanges.extend(etaProbeHFCoarse)
         else:
             raise Exception("Eta tab not known "+str(options.etaTable))
     else:   # no option or option == 0
@@ -241,7 +258,7 @@ def main():
         #importCMD = RooFit.Import(tree)
         #cutCMD = RooFit.Cut(preselectionString)
         print "  create dataset..."
-        ds[t] = ROOT.RooDataSet(t, t, tree, observables, "", "weight")
+        ds[t] = ROOT.RooDataSet(t, t, tree, observables, "weight < 10", weight)
         print "        ...done"
 
         print "Dataset:", t, ds[t].numEntries()
@@ -255,8 +272,7 @@ def main():
     #etaRanges.extend([1.401, 1.701, 2.001, 2.322, 2.411, 2.601, 2.801, 3.001, 3.201, 3.501, 3.801, 4.101, 4.701])
     #etaRanges.extend([2.801, 3.001, 3.201, 3.501, 3.801, 4.101, 4.401, 4.701, 5.001])
     #etaRanges.extend([4.101, 4.701])
-    minPtAVG = 25
-    minPt = 20
+    minPt = 10
 
     curPath = ROOT.gDirectory.GetPath()
     of = ROOT.TFile(odir+"balanceHistos.root","RECREATE")
@@ -283,15 +299,16 @@ def main():
                 def vary(x, v=v):
                     return x + "_" + v
 
-                cut = vary("tagPt") + " > " + str(minPt)
+                cut =  vary("tagPt") + " > " + str(minPt)
                 cut += " && " + vary("probePt") + " > " + str(minPt)
                 cut += " && abs(" + vary("probeEta") + ") >  " + str(etaMin)
                 cut += " && abs(" + vary("probeEta") + ") <  " + str(etaMax)
-                cut += " && " + vary("ptAve") + " > " + str(minPtAVG)
+                cut += " && " + vary("ptAve") + " > " + str(minPTAve)
+                cut +=  " &&" +vary("veto2") + " <0.2 "
                 #cut += " && " + vary("balance") + " > " + str(-1)
                 #cut += " && " + vary("balance") + " < " + str(1)
                 if options.cutExtra != None:
-                    cut += options.cutExtra
+                    cut += " && " +  options.cutExtra
 
 
                 print cut
@@ -311,7 +328,7 @@ def main():
                 inputMap["ptProbeJetVar"] = vars[t][vary("probePt")]
                 inputMap["etaMin"] = etaMin
                 inputMap["etaMax"] = etaMax
-                inputMap["minPtAVG"] = minPtAVG
+                inputMap["minPtAVG"] = minPTAve
                 inputMap["iEta"] = iEta # xcheck only
                 inputMap["cut"] = cut
 
@@ -386,6 +403,7 @@ if __name__ == "__main__":
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     AutoLibraryLoader.enable()
     main()
+    print "Note: events with generator weight > 10 are ommited"
     print "./drawBalance.py  -i ~/tmp/balance/balanceHistos.root"
 
 
