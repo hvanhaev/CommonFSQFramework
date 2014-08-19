@@ -141,6 +141,14 @@ git commit
 git read-tree -mu HEAD
 
 ############################################################################### 
+##
+## Track remote branch
+##
+################################################################################ 
+
+git checkout -t -b MNTriggerStudies my-cmssw/MNTriggerStudies
+
+############################################################################### 
 #
 # Check if base pat file was modified in release
 #
