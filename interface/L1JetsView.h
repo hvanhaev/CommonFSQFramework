@@ -9,6 +9,7 @@ class L1JetsView: public EventViewBase{
 
     private:
       virtual void fillSpecific(const edm::Event&, const edm::EventSetup&);
+      std::vector<edm::InputTag > m_todo;
 
 
 
