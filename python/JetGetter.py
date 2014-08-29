@@ -67,6 +67,10 @@ class JetGetter:
             self.jetcol = "PFAK4CHSnewjets"
             self.jetcolID = "PFAK4CHSnewjetid"
             self.jetcolGen ="PFAK4CHSnewgenjets"
+        elif jType == "PFAK5CHS":
+            self.jetcol = "PFAK5CHSnewjets"
+            self.jetcolID = "PFAK5CHSnewjetid"
+            self.jetcolGen ="PFAK5CHSnewgenjets"
         elif jType == "Calo":
             raise Exception("Jet collection not known "+jType)
             self.setJERScenario("Calo10")
