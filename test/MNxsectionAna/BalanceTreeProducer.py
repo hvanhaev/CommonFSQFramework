@@ -77,9 +77,9 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
         self.jetGetter.disableGenJet()
 
         if self.HLT2015TempWorkaround:
-            #self.jetGetter = JetGetter("PFAK4CHS")
+            self.jetGetter = JetGetter("PFAK4CHS")
             #self.jetGetter = JetGetter("PFAK5CHS")
-            self.jetGetter = JetGetter("PF")
+            #self.jetGetter = JetGetter("PF")
             self.jetGetter.disableGenJet()
 
         self.varE = {}
