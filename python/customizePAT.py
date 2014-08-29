@@ -13,10 +13,13 @@ def addTreeProducer(process, prod):
 
 # TODO: remove jobs output
 def customize(process):
-    process.out.outputCommands  = [ 'drop *' ]
-    process.options.wantSummary = False   ##  (to suppress the long output at the end of the job)
-    process.MessageLogger.cerr.FwkReport.reportEvery = 50
-    process.out.fileName = 'mnTrgAna_PAT.root'
+    if hasattr(process, "out"):
+        process.out.outputCommands  = [ 'drop *' ]
+        process.out.fileName = 'mnTrgAna_PAT.root'
+    if hasattr(process, "options"):
+        process.options.wantSummary = False   ##  (to suppress the long output at the end of the job)
+    if hasattr(process, "MessageLogger"):
+        process.MessageLogger.cerr.FwkReport.reportEvery = 50
     process.TFileService = cms.Service("TFileService", fileName = cms.string("trees.root") )
 
     process.infoHisto = cms.EDAnalyzer("SaveCountHistoInTreeFile")
@@ -49,7 +52,8 @@ def customize(process):
     process.pUtil = cms.Path(process.XS)
     process.schedule.append(process.pUtil)
     process.schedule.append(process.pTreeProducers)
-    process.schedule.append(process.outpath)
+    if hasattr(process, "outpath"):
+        process.schedule.append(process.outpath)
 
     import os
     if "TMFSampleName" not in os.environ:
