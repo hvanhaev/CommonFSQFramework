@@ -41,6 +41,9 @@ class FitThread(multiprocessing.Process):
         #rangeLow = meanVal - sigma*1.5
         #rangeHigh = meanVal + sigma*1.5
 
+        rangeLow = -1.7
+        rangeHigh = 1.7
+
         mean2 = RooRealVar("mean","mean of gaussian", 0, -1.5, 1.5)
         sigma2 = RooRealVar("sigma","width of gaussian", .1, 0, 1)
         gauss2 = RooGaussian("gauss","gaussian PDF",myVar, mean2, sigma2)
@@ -50,6 +53,7 @@ class FitThread(multiprocessing.Process):
             If you want the errors to reflect the precision you would be able to obtain with an unweighted dataset
                with 'sum-of-weights' events, choose kFALSE.'''
         gauss2.fitTo(dsReduced, ROOT.RooFit.Range(rangeLow, rangeHigh), \
+                     #ROOT.RooFit.PrintLevel(-1), ROOT.RooFit.SumW2Error(False)) # this exludes -1 point ("no jet matched point")
                      ROOT.RooFit.PrintLevel(-1), ROOT.RooFit.SumW2Error(True)) # this exludes -1 point ("no jet matched point")
 
         balanceVariable = "diJet balance"
@@ -97,6 +101,7 @@ class FitThread(multiprocessing.Process):
         fitResult["meanErr"] = mean2.getError()
         fitResult["gaussWidth"] = sigma2.getVal()
         fitResult["gaussWidthErr"] = sigma2.getError()
+        fitResult["sumEntries"] = dsReduced.sumEntries() # return sum of weights
         self.queue.put(fitResult)
 
 
@@ -258,7 +263,8 @@ def main():
         #importCMD = RooFit.Import(tree)
         #cutCMD = RooFit.Cut(preselectionString)
         print "  create dataset..."
-        ds[t] = ROOT.RooDataSet(t, t, tree, observables, "weight < 10", weight)
+        #ds[t] = ROOT.RooDataSet(t, t, tree, observables, "weight < 10", weight)
+        ds[t] = ROOT.RooDataSet(t, t, tree, observables,  weight)
         print "        ...done"
 
         print "Dataset:", t, ds[t].numEntries()
@@ -361,6 +367,8 @@ def main():
             #print etaArray
             hist = ROOT.TH1F(histName, histName, len(etaArray)-1, etaArray)
             hist.Sumw2()
+            histEffName = "num_"+histName
+            histEff = ROOT.TH1F(histEffName, histEffName, len(etaArray)-1, etaArray)
             for i in xrange(len(results)):
                 res = results[i]
                 iEta = res["iEta"]
@@ -373,7 +381,9 @@ def main():
                     raise Exception("Problem with binning")
                 hist.SetBinContent(bin, res["mean"])
                 hist.SetBinError(bin, res["meanErr"])
+                histEff.SetBinContent(bin, res["sumEntries"])
             outputHistos[t].WriteTObject(hist,histName)
+            outputHistos[t].WriteTObject(histEff, histEffName)
 
 
         # all variations done
@@ -403,7 +413,7 @@ if __name__ == "__main__":
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     AutoLibraryLoader.enable()
     main()
-    print "Note: events with generator weight > 10 are ommited"
+    #print "Note: events with generator weight > 10 are ommited"
     print "./drawBalance.py  -i ~/tmp/balance/balanceHistos.root"
 
 
