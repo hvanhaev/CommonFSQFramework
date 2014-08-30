@@ -16,6 +16,7 @@ from array import *
 # you have to run this file from directory where it is saved
 
 import MNTriggerStudies.MNTriggerAna.ExampleProofReader 
+import MNTriggerStudies.MNTriggerAna.Style
 
 class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
     def init(self):
@@ -35,18 +36,24 @@ class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader
 
         todo = []
         todo.append( ("L1SingleJet", 49.5, 101.5) )
-        todo.append( ("L1DoubleJetFB", 29.5, 61.5) )
+        #todo.append( ("L1SingleJet", 49.5, 61.5) )
+        todo.append( ("L1DoubleJetCF", 29.5, 71.5) )
         for w in self.newlumiWeighters:
             for t in todo:
                 name = t[0]+"_"+w
                 binL = t[1]
                 binH = t[2]
                 nbins = binH - binL
-                self.histos[name] = ROOT.TH1D(name, name, int(nbins), binL, binH)
+                pu=w.split("PU")[1]
+                yLabel = t[0]+ "@PU="+pu + " rate [Hz]"
+                self.histos[name] = ROOT.TH1D(name, name+";Threshold [GeV];"+yLabel, int(nbins), binL, binH)
+                self.histos[name].SetMarkerSize(0.5)
+                self.histos[name].SetMarkerStyle(20)
                 self.histos[name].Sumw2()
                 self.GetOutputList().Add(self.histos[name])
                 nameDenom = name+"Denom"
                 self.histoDenoms[nameDenom] = ROOT.TH1D(nameDenom, nameDenom, 1, -0.5, 0.5)
+                self.histoDenoms[nameDenom].Sumw2()
                 self.GetOutputList().Add(self.histoDenoms[nameDenom])
 
 
@@ -78,7 +85,7 @@ class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader
             if etaI > 2.5 and hardestL1Forwad < ptI:
                 hardestL1Forwad = ptI
 
-        doubleJetFBSeedMaxThr = min(hardestL1Central, hardestL1Forwad)
+        doubleJetCFSeedMaxThr = min(hardestL1Central, hardestL1Forwad)
 
         pu = self.fChain.PUNumInteractions
 
@@ -87,8 +94,8 @@ class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader
             weight = self.newlumiWeighters[w].weight(pu)
             self.fillRate(self.histos["L1SingleJet_"+w], hardestL1, weight)
             self.histoDenoms["L1SingleJet_"+w+"Denom"].Fill(0, weight)
-            self.fillRate(self.histos["L1DoubleJetFB_"+w], doubleJetFBSeedMaxThr, weight)
-            self.histoDenoms["L1DoubleJetFB_"+w+"Denom"].Fill(0, weight)
+            self.fillRate(self.histos["L1DoubleJetCF_"+w], doubleJetCFSeedMaxThr, weight)
+            self.histoDenoms["L1DoubleJetCF_"+w+"Denom"].Fill(0, weight)
 
     def finalize(self):
         #print "Finalize:"
@@ -108,6 +115,7 @@ class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader
         filledBunches = 2662.
 
         factor = float(lhcFreq)*filledBunches/totalBunches
+        avaliableHistos = []
         for h in histos:
             if "Denom" in h: continue
             #raise "HERE"
@@ -115,6 +123,70 @@ class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader
             denom = histos[h+"Denom"].GetBinContent(1)
             #print "DDD", denom
             histos[h].Scale(factor/denom)
+            avaliableHistos.append(h)
+
+        # L1SingleJet_flat2050toPU50
+        puPoints = {}
+        for h in avaliableHistos:
+            if "PU" not in h: continue
+            pu = int(h.split("_")[1].split("PU")[1])
+            puPoints[pu] = h.split("_")[1]
+
+        del avaliableHistos
+
+        binL = min(puPoints.keys())-1.5
+        binH = max(puPoints.keys())+1.5
+        nbins = int(binH-binL)
+
+
+        #'''  l1 jet scale:  12 16 20 24 28 32.0 36.0 40.0 44.0 48.0 52.0 56.0 60.0 64.0 68.0 72.0 76.0 80.0 84.0 88.0 92.0    '''
+        todo = []
+        todo.append( ("L1SingleJet", 52 ) ) # (seed name, threshold)
+        todo.append( ("L1SingleJet", 68 ) ) # (seed name, threshold)
+        todo.append( ("L1SingleJet", 92 ) ) # (seed name, threshold)
+        #'''
+        todo.append( ("L1DoubleJetCF", 32 ) ) # (seed name, threshold)
+        todo.append( ("L1DoubleJetCF", 36 ) ) # (seed name, threshold)
+        todo.append( ("L1DoubleJetCF", 40 ) ) # (seed name, threshold)
+        todo.append( ("L1DoubleJetCF", 44 ) ) # (seed name, threshold)
+        todo.append( ("L1DoubleJetCF", 48 ) ) # (seed name, threshold)
+        todo.append( ("L1DoubleJetCF", 52 ) ) # (seed name, threshold)
+        todo.append( ("L1DoubleJetCF", 68 ) ) # (seed name, threshold)
+        #'''
+        for t in todo:
+            seed = t[0]
+            thr =  t[1]
+            histoname = "rateVsPU_"+seed+str(thr)
+            yLabel = seed+str(thr) + " rate [Hz]"
+            hist = ROOT.TH1F(histoname, histoname+";PU;" + yLabel, nbins, binL, binH)
+            hist.SetMarkerSize(0.5)
+            hist.SetMarkerStyle(20)
+            hist.Sumw2()
+            for pu in puPoints:
+                h = seed + "_"+  puPoints[pu]
+                #binNumberForThisThrForThisPU = histos[h].GetBin(thr)
+                binNumberForThisThrForThisPU = histos[h].FindBin(thr)
+                #print "AAAA reading histo=", h, "bin=", binNumberForThisThrForThisPU, "thr=", thr
+                rate = histos[h].GetBinContent(binNumberForThisThrForThisPU)
+                rateErr = histos[h].GetBinError(binNumberForThisThrForThisPU)
+                targetBin = hist.FindBin(pu)
+                hist.SetBinContent(targetBin, rate)
+                hist.SetBinError(targetBin,   rateErr)
+                #print "XXXX", targetBin, pu, rate, rateErr
+            self.GetOutputList().Add(hist)
+
+        olist =  self.GetOutputList()
+        MNTriggerStudies.MNTriggerAna.Style.setStyle()
+        for o in olist:
+            if not "TH1" in o.ClassName(): continue
+            if "Denom" in o.GetName(): continue
+            c1 = ROOT.TCanvas()
+            c1.SetLeftMargin(0.2)
+            fname = "~/tmp/" + o.GetName() + ".png"
+            o.Draw("e1 p")
+            o.GetYaxis().SetTitleOffset(2)
+            c1.Print(fname)
+
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
@@ -126,8 +198,8 @@ if __name__ == "__main__":
     nWorkers = None
 
     # '''
-    maxFilesMC = 1
-    nWorkers = 1
+    #maxFilesMC = 1
+    #nWorkers = 1
     # '''
     #maxFilesMC = 32
 
