@@ -184,7 +184,11 @@ class ExampleProofReader( ROOT.TPySelector ):
         self.finalize()
 
     def finalize(self):
-        print "Please implement finalize function."
+        print "finalize function called from base class. You may want to implement this."
+
+    def finalizeWhenMerged(self):
+        print "finalizeWhenMerged function called from base class. You may want to implement this."
+
 
     def getNormalizationFactor(self):
         if self.isData:
@@ -193,6 +197,8 @@ class ExampleProofReader( ROOT.TPySelector ):
             return self.normalizationFactor
 
     def Terminate( self ): # executed once on client
+        self.finalizeWhenMerged()
+
         #print 'py: terminating' 
         olist =  self.GetOutputList()
         of = ROOT.TFile(self.outFile, "UPDATE") # TODO - take dir name from Central file
