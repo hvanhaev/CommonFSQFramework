@@ -49,8 +49,10 @@ class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader
         nbins = hist.GetNbinsX()
         getBinCenter = hist.GetXaxis().GetBinCenter
         for i in xrange(1,nbins+1):
-            binCenter = getBinCenter(i)
-            if binCenter <= int(maxThr):
+            binCenter = int(getBinCenter(i))
+
+            # As always "<=" is a tricky thing...
+            if binCenter < maxThr or abs(binCenter-maxThr) < 0.1:
                 hist.Fill(binCenter, weight)
             else:
                 break
@@ -63,6 +65,7 @@ class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader
             if hardestL1 < ptI:
                 hardestL1 = ptI
         pu = self.fChain.PUNumInteractions
+
         #print hardestL1, int(hardestL1)
         for w in self.newlumiWeighters:
             weight = self.newlumiWeighters[w].weight(pu)
