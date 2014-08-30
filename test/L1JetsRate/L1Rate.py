@@ -32,17 +32,22 @@ class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader
  
         self.histos = {}
         self.histoDenoms = {}
+
+        todo = []
+        todo.append( ("L1SingleJet", 49.5, 101.5) )
+        todo.append( ("L1DoubleJetFB", 29.5, 61.5) )
         for w in self.newlumiWeighters:
-            name = "L1SingleJet_"+w
-            binL = 49.5
-            binH = 101.5
-            nbins = binH - binL
-            self.histos[name] = ROOT.TH1D(name, name, int(nbins), binL, binH)
-            self.histos[name].Sumw2()
-            self.GetOutputList().Add(self.histos[name])
-            nameDenom = name+"Denom"
-            self.histoDenoms[nameDenom] = ROOT.TH1D(nameDenom, nameDenom, 1, -0.5, 0.5)
-            self.GetOutputList().Add(self.histoDenoms[nameDenom])
+            for t in todo:
+                name = t[0]+"_"+w
+                binL = t[1]
+                binH = t[2]
+                nbins = binH - binL
+                self.histos[name] = ROOT.TH1D(name, name, int(nbins), binL, binH)
+                self.histos[name].Sumw2()
+                self.GetOutputList().Add(self.histos[name])
+                nameDenom = name+"Denom"
+                self.histoDenoms[nameDenom] = ROOT.TH1D(nameDenom, nameDenom, 1, -0.5, 0.5)
+                self.GetOutputList().Add(self.histoDenoms[nameDenom])
 
 
     def fillRate(self, hist, maxThr, weight):
@@ -59,11 +64,22 @@ class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader
 
     def analyze(self):
         hardestL1 = -1
+        hardestL1Central = -1
+        hardestL1Forwad  = -1
+
         for i in xrange(self.fChain.L1Jets.size()):
             jetI = self.fChain.L1Jets.at(i)
             ptI = jetI.pt()
             if hardestL1 < ptI:
                 hardestL1 = ptI
+            etaI = abs(jetI.eta())
+            if etaI < 1.7 and hardestL1Central < ptI:
+                hardestL1Central = ptI
+            if etaI > 2.5 and hardestL1Forwad < ptI:
+                hardestL1Forwad = ptI
+
+        doubleJetFBSeedMaxThr = min(hardestL1Central, hardestL1Forwad)
+
         pu = self.fChain.PUNumInteractions
 
         #print hardestL1, int(hardestL1)
@@ -71,6 +87,8 @@ class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader
             weight = self.newlumiWeighters[w].weight(pu)
             self.fillRate(self.histos["L1SingleJet_"+w], hardestL1, weight)
             self.histoDenoms["L1SingleJet_"+w+"Denom"].Fill(0, weight)
+            self.fillRate(self.histos["L1DoubleJetFB_"+w], doubleJetFBSeedMaxThr, weight)
+            self.histoDenoms["L1DoubleJetFB_"+w+"Denom"].Fill(0, weight)
 
     def finalize(self):
         #print "Finalize:"
