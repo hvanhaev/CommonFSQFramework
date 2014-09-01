@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import sys,os,re
+import sys,os,re,imp
 
 import ROOT
 ROOT.gROOT.SetBatch(True)
@@ -8,6 +8,20 @@ from ROOT import *
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 AutoLibraryLoader.enable()
 
+if "SmallXAnaDefFile" not in os.environ:
+    print "Please set SmallXAnaDefFile environment variable:"
+    print "export SmallXAnaDefFile=FullPathToFile"
+    raise Exception("Whooops! SmallXAnaDefFile env var not defined")
+
+anaDefFile = os.environ["SmallXAnaDefFile"]
+mod_dir, filename = os.path.split(anaDefFile)
+mod, ext = os.path.splitext(filename)
+f, filename, desc = imp.find_module(mod, [mod_dir])
+mod = imp.load_module(mod, f, filename, desc)
+
+localBasePathPAT = mod.PATbasePATH
+localBasePathTrees = mod.TTreeBasePATH
+localROOTPrefix = mod.ROOTPrefix
 
 import MNTriggerStudies.MNTriggerAna.Util
 
@@ -31,7 +45,7 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
         if "pathTrees" not in sampleList[s]:
             if not quiet: print tab, "path to trees not found! Blame the skim-responsible-guy."
         else:
-            #if not quiet: print tab, "path to trees:",sampleList[s]["pathTrees"]
+            if not quiet: print tab, "path to trees:",sampleList[s]["pathTrees"]
             if not quiet: print tab, "path to trees taken from 'sampleList[s][\"pathTrees\"]' variable"
 
             fileCnt = 0
@@ -47,7 +61,9 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                     if not f.startswith("trees_"): continue
                     if not f.endswith(".root"): continue
                     fname = dirpath.replace("//","/") + f   # somehow root doesnt like // at the begining
-                    rootFile = ROOT.TFile(fname,"r")
+		    fname = localROOTPrefix+fname
+		    print fname
+		    rootFile = ROOT.TFile.Open(fname,"r")
                     infoHisto = rootFile.Get("infoHisto/cntHisto")
                     if type(infoHisto) != ROOT.TH1D:
                         if not quiet: print "Problem reading info histo from", fname
