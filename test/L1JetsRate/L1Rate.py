@@ -20,6 +20,7 @@ import MNTriggerStudies.MNTriggerAna.Style
 
 class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
     def init(self):
+        # run MNTriggerAna/test/mnTrgAnalyzer/utils/GetFlatPUDist.py
         puFile = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/PUhists.root").fullPath()
 
         self.newlumiWeighters = {}
