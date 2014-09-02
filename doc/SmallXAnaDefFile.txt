@@ -1,0 +1,30 @@
+######################################################################
+This file provide info on how to setup your SmallXAnaDefFile.
+Please note the recently (IX 2014) introduced ROOTPrefix parameter  
+######################################################################
+# Accessing/storing files on local filesystem (use proper paths)
+#  Note: paths below are working in DESY NAF without copyAnaData
+PATbasePATH="/pnfs/desy.de/cms/tier2/"
+TTreeBasePATH="/pnfs/desy.de/cms/tier2/"
+ROOTPrefix=""
+######################################################################
+# Accessing files via xrootd (see
+# https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookXrootdService )
+#
+#
+#   Note: valid proxy needed!
+#       voms-proxy-init --voms cms 
+#
+#   Note2: choose your redirector from the ones below 
+#
+PATbasePATH=""
+TTreeBasePATH=""
+ROOTPrefix="root://xrootd.unl.edu/" # USA
+ROOTPrefix="root://xrootd.ba.infn.it/" # Europe+Asia
+ROOTPrefix="root://cms-xrd-global.cern.ch/" # Global, not tested yet
+######################################################################
+# Accessing files via dcache (e.g. Brussels)
+#
+PATbasePATH="/pnfs/iihe/cms/"
+TTreeBasePATH="/pnfs/iihe/cms/"
+ROOTPrefix="dcache:"
