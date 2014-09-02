@@ -11,6 +11,11 @@ EventViewBase(iConfig,  tree)
     registerVecP4("recoTracks", tree);
     registerVecFloat("dz", tree);
     registerVecFloat("dxy", tree);
+    registerVecInt(  "algo", tree);
+    registerVecInt(  "nhits", tree);
+    registerVecInt(  "charge", tree);
+    registerVecFloat(  "chi2n", tree);
+    registerVecFloat(  "pterr", tree);
 
     m_maxEta = iConfig.getParameter<double>("maxEta");
     m_minPt = iConfig.getParameter<double>("minPt");
@@ -80,6 +85,10 @@ void RecoTrackView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup
         addToP4Vec("recoTracks", reco::Candidate::LorentzVector(px,py,pz,E));
         addToFVec("dxy", dxy);
         addToFVec("dz", dz);
+        addToIVec("algo", hIn->at(i).algo() );
+        addToIVec("nhits", hIn->at(i).numberOfValidHits() );
+        addToFVec("chi2n", hIn->at(i).normalizedChi2() );
+        addToFVec("pterr", hIn->at(i).ptError() );
         tmf::TestTrackData t;
         t.dxy = dxy;
         t.dz = dz;
