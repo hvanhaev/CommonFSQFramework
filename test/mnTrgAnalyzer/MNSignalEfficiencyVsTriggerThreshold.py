@@ -17,6 +17,7 @@ from array import *
 
 import MNTriggerStudies.MNTriggerAna.ExampleProofReader 
 import BaseTrigger
+from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
 
 class MNSignalEfficiencyVsTriggerThreshold(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
 
@@ -77,9 +78,18 @@ class MNSignalEfficiencyVsTriggerThreshold(MNTriggerStudies.MNTriggerAna.Example
         return ret
 
     def init(self):
+        puFile = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/PUhists.root").fullPath()
+
+        self.newlumiWeighters = {}
+        self.newlumiWeighters["flat010toPU1"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU1/pileup")
+        self.newlumiWeighters["flat010toPU5"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU5/pileup")
+        self.newlumiWeighters["flat010toPU10"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU10/pileup")
+
+
+
         topologies = {}
-        f = "3    to 4.7"
-        b = "-4.7 to -3"
+        f = "3    to 5.2"
+        b = "-5.2 to -3"
         c = " -3 to 3"
         topologies["FB"] =  f + "&" + b 
         #topologies["FB"] +=  "|" + f + "&" + f # allow ff or bb combinations
@@ -113,17 +123,33 @@ class MNSignalEfficiencyVsTriggerThreshold(MNTriggerStudies.MNTriggerAna.Example
                 self.effHistos[h][3] = ROOT.TH1F(name, name, 50, -0.5, 49.5)
                 self.effHistos[h][3].Sumw2()
                 self.GetOutputList().Add(self.effHistos[h][3])
+
+        #self.jetGetter = JetGetter("PF")
+        self.jetGetter = JetGetter("PFAK4CHS")
+        self.jetGetter.disableGenJet()
+
                             
     def analyze(self):
-        weight = 1. # calculate your event weight here
+        pu = self.fChain.PUNumInteractions
+        weight = self.newlumiWeighters["flat010toPU5"].weight(pu)*self.fChain.genWeight
 
-        pfJetsMomenta = self.fChain.pfJets # TODO: configrable
+        '''
+        pfJetsMomenta = self.fChain.PFAK4CHSnewjets # TODO: configrable
         jetsAbovePtThr = []
         for i in xrange(pfJetsMomenta.size()):
             jet = pfJetsMomenta.at(i)
             if jet.pt() < self.recoJetPtThreshold: continue
             jetsAbovePtThr.append(jet)
             #print jet.pt(), jet.eta()
+        #'''
+        #'''
+        jetsAbovePtThr = []
+        self.jetGetter.newEvent(self.fChain)
+        #for shift in self.todoShifts:
+        for jet in self.jetGetter.get("_central"):
+            if jet.pt() < self.recoJetPtThreshold: continue
+            jetsAbovePtThr.append(jet)
+        #'''
 
         topologies =  self.getTopologies(jetsAbovePtThr)
         for h in self.effHistos:
@@ -176,20 +202,22 @@ if __name__ == "__main__":
     # '''
     #maxFilesMC = 32
 
-
-
     slaveParams = {}
     slaveParams["recoJetPtThreshold"] = 35
 
     # select hltCollection here (see plugins/MNTriggerAna.cc to learn whats avaliable):
-    slaveParams["hltCollection"] = "hltAK5PFJetL1FastL2L3Corrected"
+    #slaveParams["hltCollection"] = "hltAK5PFJetL1FastL2L3Corrected"
+    slaveParams["hltCollection"] = "hltAK4PFJetsCorrected"
+    #slaveParams["hltCollection"] = "hltPFJetsCorrectedMatchedToL1"
+
     slaveParams["l1Collection"] = "l1Jets"
 
     # note - remove maxFiles parameter in order to run on all files
-    MNSignalEfficiencyVsTriggerThreshold.runAll(treeName="mnTriggerAna", 
+    MNSignalEfficiencyVsTriggerThreshold.runAll(treeName="MNTriggerAnaNew", 
                                slaveParameters=slaveParams,
                                sampleList=sampleList,
                                maxFilesMC = maxFilesMC,
                                nWorkers=nWorkers,
                                outFile = "RecoSignalVsHLTEfficiency.root" )
                                 
+    print "Next step: ./drawMNTrgEfficiencyPlots.py"
