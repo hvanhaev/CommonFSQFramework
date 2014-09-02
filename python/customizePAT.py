@@ -48,7 +48,8 @@ def customize(process):
 
 
     process.pUtil = cms.Path(process.XS)
-    process.schedule = cms.Schedule()
+    if not hasattr(process, "schedule"):
+       process.schedule = cms.Schedule()
     process.pUtil = cms.Path(process.XS)
     process.schedule.append(process.pUtil)
     process.schedule.append(process.pTreeProducers)
