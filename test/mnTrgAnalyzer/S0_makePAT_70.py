@@ -121,6 +121,7 @@ process.out.fileName = 'pat.root'
 process.GlobalTag.globaltag = "POSTLS170_V6::All"
 f= "0012A88B-D4EB-E311-9B1E-0025905A6094.root"
 f = '/nfs/dust/cms/user/fruboest/2014.07.CSA14/data/66211A89-3DF8-E311-A6CB-02163E00E9CC.root'
+f = './HLTObjectsProduction/outputFULL.root'
 process.source.fileNames = [
      'file:'+f
 ]
@@ -206,11 +207,13 @@ primary = "file:/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_Tune4
 
 primary="file:/nfs/dust/cms/user/fruboest/2014.09.TestL1Stage1/CMSSW_7_1_5/src/ProduceHLTAndL1/outputFULL.root"
 
+'''
 process.source = cms.Source("PoolSource",
 #    secondaryFileNames = cms.untracked.vstring([sec1, sec2]),
     fileNames = cms.untracked.vstring([primary]),
     bypassVersionCheck = cms.untracked.bool(True)
 )
+'''
 
 process.patJetsAK4PFCHSCopy.addGenJetMatch = cms.bool(False)
 process.patJetsAK4PFCHSCopy.embedGenJetMatch = cms.bool(False)
