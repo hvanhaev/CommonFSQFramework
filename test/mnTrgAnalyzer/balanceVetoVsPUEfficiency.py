@@ -195,7 +195,7 @@ def main():
     #etaRanges.extend([1.401, 1.701, 2.001, 2.322, 2.411, 2.601, 2.801, 3.001, 3.201, 3.501, 3.801, 4.101, 4.701])
     #etaRanges.extend([2.801, 3.001, 3.201, 3.501, 3.801, 4.101, 4.401, 4.701, 5.001])
     #etaRanges.extend([4.101, 4.701])
-    minPt = 10
+    minPt = 20
 
     curPath = ROOT.gDirectory.GetPath()
     of = ROOT.TFile(odir+"balanceHistos.root","RECREATE")
@@ -226,6 +226,7 @@ def main():
                 cutBase += " && abs(" + vary("probeEta") + ") >  " + str(etaMin)
                 cutBase += " && abs(" + vary("probeEta") + ") <  " + str(etaMax)
                 cutBase += " && " + vary("ptAve") + " > " + str(minPTAve)
+                #cutBase += " && weight < 10 "
 
                 cutWithVeto = cutBase + " && "+vary("veto2") + " <0.2 "
 
@@ -233,8 +234,10 @@ def main():
                 dsReduced = ds[t].reduce(cutBase)
                 dsReducedWithVeto = ds[t].reduce(cutWithVeto)
                 #print "Reduce...done"
-                histN = ROOT.TH1F("nom", "nom;PUNumInteractions for bx=0;3rd jet veto efficiency", 12, -0.5, 11.1)
-                histD = ROOT.TH1F("denom", "denom", 12, -0.5, 11.1)
+                #histN = ROOT.TH1F("nom", "nom;PUNumInteractions for bx=0;3rd jet veto efficiency", 12, -0.5, 11.1)
+                #histD = ROOT.TH1F("denom", "denom", 12, -0.5, 11.1)
+                histN = ROOT.TH1F("nom", "nom;PUNumInteractions for bx=0;3rd jet veto efficiency", 31, 19.5, 50.5)
+                histD = ROOT.TH1F("denom", "denom",  31, 19.5, 50.5)
 
                 puVar = "PUNumInteractions"
                 #puVar = "puTrueNumInteractions"
@@ -249,7 +252,9 @@ def main():
                     leg.SetFillColor(0)
                     leg.Draw("SAME")
 
-                name = ("~/tmp/balancePU/"+str(etaMin) + "_" + str(etaMax)).replace(".","_")+".png"
+                odir = ("~/tmp/balancePU_"+str(minPTAve)+"/").replace(".","_")
+                os.system("mkdir -p " + odir)
+                name = (odir+str(etaMin) + "_" + str(etaMax)).replace(".","_")+".png"
                 c.Print(name)
 
 

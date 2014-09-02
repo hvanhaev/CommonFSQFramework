@@ -20,6 +20,8 @@ from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
 
 class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
     def init(self):
+
+        print "Params:", self.etaMax, self.ptMin
         self.normFactor = self.getNormalizationFactor()
         self.dphi = ROOT.Math.VectorUtil.DeltaPhi
 
@@ -76,6 +78,7 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
 
         if self.HLT2015TempWorkaround:
             self.jetGetter = JetGetter("PFAK4CHS")
+            #self.jetGetter = JetGetter("PFAK5CHS")
             #self.jetGetter = JetGetter("PF")
             self.jetGetter.disableGenJet()
 
@@ -94,6 +97,7 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
         self.varE[name] = val
 
     def genWeight(self):
+        #print "ASDFASD", self.fChain.genWeight
         return self.fChain.genWeight
 
     def analyze(self):
@@ -172,7 +176,7 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
                 for jet in self.jetGetter.get(shift):
                     if jet == tagJet or probeJet == jet: continue
                     eta = abs(jet.eta())
-                    if eta > 4.7: continue
+                    if eta > self.etaMax: continue
                     veto2 =  jet.pt()/ptAve
 
                 self.var["tagPt"+shift][0] = tagPT 
@@ -236,16 +240,6 @@ if __name__ == "__main__":
     slaveParams["etaMax"] = 4.7
 
 
-
-
-    slaveParams["HLT2015TempWorkaround"] =  False
-    if slaveParams["HLT2015TempWorkaround"]:
-        slaveParams["doPtShiftsJER"] = False
-        slaveParams["doPtShiftsJEC"] = False
-        sampleList=["QCD_Pt-300to470_Tune4C_13TeV_pythia8"]
-        maxFilesMC = 1
-        #nWorkers = 1
-        treeName = "mnTriggerAna"
 
     BalanceTreeProducer.runAll(treeName=treeName,
                                slaveParameters=slaveParams,
