@@ -173,6 +173,26 @@ process.MNTriggerAnaNew = cms.EDAnalyzer("MNTriggerAnaNew",
         jerFactors = cms.vstring(  # PF10
                 "5.5 1 0.007 0.07 0.072"),
     ),
+
+
+    L1JetsView  = cms.PSet(
+        branchPrefix = cms.untracked.string("old"),
+        src =  cms.VInputTag(cms.InputTag("l1extraParticles","Central"),
+                cms.InputTag("l1extraParticles","Forward"),
+                cms.InputTag("l1extraParticles","Tau")
+        ),
+    ),
+
+    L1JetsViewStage1  = cms.PSet(
+        branchPrefix = cms.untracked.string("stage1"),
+        src =  cms.VInputTag(cms.InputTag("l1ExtraReEmul","Central"),
+                cms.InputTag("l1ExtraReEmul","Forward")
+        ),
+    ),
+
+
+
+
 )
 process = MNTriggerStudies.MNTriggerAna.customizePAT.addTreeProducer(process, process.MNTriggerAnaNew)
 
@@ -184,6 +204,7 @@ primary='file:/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_Tune4C_
 primary= "file:/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/20140813_HLTJets/db6fe0c1c3daf8225c4ac7289ea45cd0/outputFULL_11_1_WVC.root"
 primary = "file:/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/20140813C_HLTJets/1914e7f200d7a3952c1631dd40280690/outputFULL_17_1_UZk.root"
 
+primary="file:/nfs/dust/cms/user/fruboest/2014.09.TestL1Stage1/CMSSW_7_1_5/src/ProduceHLTAndL1/outputFULL.root"
 
 process.source = cms.Source("PoolSource",
 #    secondaryFileNames = cms.untracked.vstring([sec1, sec2]),
@@ -201,5 +222,74 @@ process.patJetsAK4PFCHSCopy.getJetMCFlavour = cms.bool(False)
 process.schedule.remove(process.outpath)
 del process.outpath
 del process.out
+
+boolToFalse = ["addJetCharge",  "embedGenJetMatch", "addAssociatedTracks", "addBTagInfo", "addDiscriminators"]
+boolToFalse.extend(["addGenPartonMatch", "embedGenPartonMatch", "useLegacyJetMCFlavour", "getJetMCFlavour", "addGenJetMatch"])
+for m in process.__dict__:
+    mod = getattr(process, m)
+    for t in boolToFalse:
+        if hasattr(mod, t):
+            setattr(mod, t, cms.bool(False))
+
+
+'''
+todo = ["selectedPatJetsAK5PFCHSCopy", "selectedPatJetsAK4PFCHSCopy", "selectedPatJets"]
+todoDict = {}
+outsideThisProcess = set()
+
+
+cnt = 0
+
+while cnt < len(todo):
+    s = todo[cnt]
+    cnt += 1
+    if not hasattr(process, s):
+        #print "Found", s, todoDict[s]
+        outsideThisProcess.add(s)
+    else:
+        source = getattr(process, s)
+        for p in source.__dict__:
+            param = getattr(source,p)
+            if type(param)==cms.InputTag:
+                todo.append(param.getModuleLabel())
+                todoDict[param.getModuleLabel()]=param
+                #print param, type(param), type(param)==cms.InputTag
+                #print param.getModuleLabel()
+                #print dir(param)
+
+for s in outsideThisProcess:
+    #print s#, todoDict[s]
+    print "'keep *_"+s+"_*_*',"
+
+
+'''
+
+
+
+'''
+process.source.dropDescendantsOfDroppedBranches = cms.untracked.bool(False)
+process.source.inputCommands = cms.untracked.vstring(["drop *"])
+process.source.inputCommands.extend([
+#['keep *_generalTracks_*_*',
+'keep *_offlinePrimaryVertices_*_*',
+'keep *_generator_*_*',
+'keep *_ak5JetID_*_*',
+'keep *_ak5CaloJets_*_*',
+'keep *_ak5GenJets_*_*',
+'keep *_ak4PFJetsCHS_*_*',
+'keep *_genParticles_*_*',
+'keep *_ak5PFJetsCHS_*_*',
+'keep *_hltAK4PFJets_*_*',
+'keep *_hltAK4PFJetsCorrected_*_*',
+'keep *_hltPFJetsCorrectedMatchedToL1_*_*',
+'keep *_addPileupInfo_*_*',
+'keep *_fixedGridRhoFastjetAll*_*_*',
+'keep l1extraL1JetParticles_*_*_*'
+#'keep *__*_*',
+])
+#'''
+
+
+
 
 
