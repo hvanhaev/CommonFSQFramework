@@ -20,7 +20,8 @@ def fit(todo, recoAVG, PUweight, cutBase):
         command += " -a "  + str(recoAVG)
         command += " -o " + fitResultsDir
         command += " -w " + PUweight
-        command += " -c '" + cutBase.replace("XXX", str(t)) + "'"
+        if t > 0:
+            command += " -c '" + cutBase.replace("XXX", str(t)) + "'"
         #command += " -c '" + cutBase + "'"
         os.system(command)
 
@@ -140,6 +141,8 @@ def main():
     #todo[30] = ([-1, 1, 20, 25, 30, 35], "hltPtAve  > XXX && hltPtCen > XXX/2 && hltPtFwd > XXX/2")
     #todo[40] = ([-1, 1, 30, 35, 40, 45], "hltPtAve  > XXX && hltPtCen > XXX/2 && hltPtFwd > XXX/2")
     baseHLT = "hltPtAve  > XXX && hltPtCen > XXX/2 && hltPtFwd > XXX/2"
+    baseHLTWithMatch = "hltPtAve  > XXX  && hltL1MatchPtCen > XXX/2 && hltL1MatchPtFwd > XXX/2"
+
     baseL1 = "l1SingleJetCentral > XXX"
     l1CenFwd = "l1SingleJetCentral > XXX && l1SingleJetForward > XXX"
     l1Fwd = "l1SingleJetForward > XXX"
@@ -150,24 +153,41 @@ def main():
     #  L1_SingleJet68 5000
     #  L1_SingleJet92 700
     #  L1_SingleJet128 150
-
     #'''
-    todo["A_HLT_60"] = ([-1, 1, 51, 67, 91], baseHLT, 60)
-    todo["A_HLT_80"] = ([-1, 1, 50, 55, 60, 70], baseHLT, 80)
-    todo["A_HLT_120"] = ([-1, 1, 80, 90, 100, 110], baseHLT, 120)
+    ###########################################################################
+    #
+    # Note: -1 value has a special meaning - no extra cut at all!
+    #
+    ###########################################################################
+
+    todo["A_HLT_60_baseHLT"] = ([-1, 45, 50, 55, 60], baseHLT, 60)
+    todo["A_HLT_60_baseHLTwithL1Matching"] = ([-1, 45, 50, 55, 60], baseHLT + " && "+ baseHLTWithMatch, 60)
+    todo["A_HLT_60_baseHLTwithL1MatchingWithL1Seed"] = ([-1,  45, 50, 55, 60], baseHLT + " && "+ baseHLTWithMatch + "&&" + l1CenFwd.replace("XXX", "35") , 60)
+
+    todo["A_HLT_80_baseHLT"] = ([-1, 45, 50, 55, 60], baseHLT, 60)
+    todo["A_HLT_80_baseHLTwithL1Matching"] = ([-1, 45, 50, 55, 60], baseHLT + " && "+ baseHLTWithMatch, 60)
+    todo["A_HLT_80_baseHLTwithL1MatchingWithL1Seed"] = ([-1,  45, 50, 55, 60], baseHLT + " && "+ baseHLTWithMatch + "&&" + l1CenFwd.replace("XXX", "35") , 60)
+
+
+
+    #todo["A_HLT_80"] = ([-1, 1, 50, 55, 60, 70], baseHLT, 80)
+    #todo["A_HLT_120"] = ([-1, 1, 80, 90, 100, 110], baseHLT, 120)
     #'''
 
     # single jet L1 seeds
-    #'''
+    '''
     todo["A_L1SingleCurrentMenu_60"] = ([-1, 1, 51, 67], baseL1, 60)
     todo["A_L1SingleCurrentMenu_80"] = ([-1, 1, 51, 67], baseL1, 80)
     todo["A_L1SingleCurrentMenu_120"] = ([-1, 1, 51, 67, 91], baseL1, 120)
     # '''
-    todo["A_L1_doubleJSeed_50"] = ([-1, 1, 23, 27, 31], l1CenFwd, 50) #
-    todo["B_L1_doubleJSeed_50"] = ([-1, 1, 35, 39, 43], l1CenFwd, 50) # 
+    #todo["A_L1_doubleJSeed_50"] = ([-1, 1, 23, 27, 31], l1CenFwd, 50) #
+    #todo["B_L1_doubleJSeed_50"] = ([-1, 1, 35, 39, 43], l1CenFwd, 50) # 
 
-    todo["A_L1_doubleJSeed_60"] = ([-1, 1, 35, 39, 43], l1CenFwd, 60) # 
-    todo["B_L1_doubleJSeed_60"] = ([-1, 1, 47, 51, 55], l1CenFwd, 60) # 
+    #todo["A_L1_doubleJSeed_60"] = ([-1, 1, 35, 39, 43], l1CenFwd, 60) # 
+    #todo["B_L1_doubleJSeed_60"] = ([-1, 1, 47, 51, 55], l1CenFwd, 60) # 
+
+
+    #todo["A_total_60"] = ([-1, 1, 47, 51, 55], l1CenFwd.replace(XXX, "35") + " && ", 60)
 
     #    cutBase = "hltPtAve  > 30 && hltPtCen > 15 && hltPtFwd > 15"  
     for t in todo:
