@@ -1,6 +1,22 @@
 ######################################################################
 This file provide info on how to setup your SmallXAnaDefFile.
-Please note the recently (IX 2014) introduced ROOTPrefix parameter  
+* Please note the recently (IX 2014) introduced ROOTPrefix parameter *
+
+ A SmallXAnaDefFile is a file with info on how to access tree files 
+  within the common framwork. After setuping the file (see all supported
+  access methods below) you should tell the frameork where to find it.
+  This is done via shell environment variable, in my case:
+
+# for bash shell:
+export SmallXAnaDefFile=/afs/desy.de/user/f/fruboest/MyAnalysis.py 
+# for tcsh shell
+setenv SmallXAnaDefFile /afs/desy.de/user/f/fruboest/MyAnalysis.py 
+
+ Please note that you have to use whole path (using "~" for home 
+  directory is not supported). Above command is needed once per shell
+  session.
+######################################################################
+######################################################################
 ######################################################################
 # Accessing/storing files on local filesystem (use proper paths)
 #  Note: paths below are working in DESY NAF without copyAnaData
@@ -8,9 +24,10 @@ PATbasePATH="/pnfs/desy.de/cms/tier2/"
 TTreeBasePATH="/pnfs/desy.de/cms/tier2/"
 ROOTPrefix=""
 ######################################################################
+######################################################################
+######################################################################
 # Accessing files via xrootd (see
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookXrootdService )
-#
 #
 #   Note: valid proxy needed!
 #       voms-proxy-init --voms cms 
@@ -23,7 +40,9 @@ ROOTPrefix="root://xrootd.unl.edu/" # USA
 ROOTPrefix="root://xrootd.ba.infn.it/" # Europe+Asia
 ROOTPrefix="root://cms-xrd-global.cern.ch/" # Global, not tested yet
 ######################################################################
-# Accessing files via dcache (e.g. Brussels)
+######################################################################
+######################################################################
+# Accessing files via dcache (e.g. in Brussels)
 #
 PATbasePATH="/pnfs/iihe/cms/"
 TTreeBasePATH="/pnfs/iihe/cms/"
