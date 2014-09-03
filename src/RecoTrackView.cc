@@ -10,9 +10,17 @@ EventViewBase(iConfig,  tree)
 {
     registerVecP4("recoTracks", tree);
     registerVecFloat("dz", tree);
-    registerVecFloat("dxy", tree);
+    registerVecFloat("d0", tree);
+    registerVecFloat("dzErr", tree);
+    registerVecFloat("d0Err", tree);
+    registerVecFloat("vx", tree);
+    registerVecFloat("vy", tree);
+    registerVecFloat("vz", tree);
+
+    registerVecInt(  "highpurity", tree);
     registerVecInt(  "algo", tree);
-    registerVecInt(  "nhits", tree);
+    registerVecInt(  "nvhits", tree);
+    registerVecInt(  "nlhits", tree);
     registerVecInt(  "charge", tree);
     registerVecFloat(  "chi2n", tree);
     registerVecFloat(  "pterr", tree);
@@ -83,10 +91,23 @@ void RecoTrackView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup
 
         // Note: all fills (below) should be done consistently after all cuts are applied
         addToP4Vec("recoTracks", reco::Candidate::LorentzVector(px,py,pz,E));
-        addToFVec("dxy", dxy);
-        addToFVec("dz", dz);
+        //addToFVec("dxy", dxy);
+        //addToFVec("dz", dz);
+        addToFVec("dz", hIn->at(i).dz());
+        addToFVec("dzErr", hIn->at(i).dzError());
+        addToFVec("d0", hIn->at(i).d0());
+        addToFVec("d0Err", hIn->at(i).d0Error());
+
+        addToFVec("vx", hIn->at(i).vx());
+        addToFVec("vy", hIn->at(i).vy());
+        addToFVec("vz", hIn->at(i).vz());
+
+        int highpurity = 1;
+        if (!hIn->at(i).quality(reco::TrackBase::highPurity)) highpurity = 0;
+        addToIVec("highpurity", highpurity);
         addToIVec("algo", hIn->at(i).algo() );
-        addToIVec("nhits", hIn->at(i).numberOfValidHits() );
+        addToIVec("nvhits", hIn->at(i).numberOfValidHits() );
+        addToIVec("nlhits", hIn->at(i).numberOfLostHits() );
         addToFVec("chi2n", hIn->at(i).normalizedChi2() );
         addToFVec("pterr", hIn->at(i).ptError() );
         tmf::TestTrackData t;
