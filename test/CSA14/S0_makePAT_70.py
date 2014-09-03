@@ -119,17 +119,25 @@ process = MNTriggerStudies.MNTriggerAna.customizePAT.addTreeProducer(process, pr
 process.tracksTree = cms.EDAnalyzer("TracksTreeProducer",
     EventData = cms.PSet(),
     GenTrackView = cms.PSet(
+        branchPrefix = cms.untracked.string("genTracks"),
         maxEta = cms.double(5.), 
         charge = cms.int32(1), 
         minPt = cms.double(0.5),
         genTracks = cms.InputTag("genParticles")
     ),
     RecoTrackView  = cms.PSet(
+        branchPrefix = cms.untracked.string("recoTracks"),
         maxEta = cms.double(5.),
         maxDZ  = cms.double(0.2),
         minPt = cms.double(0.5),
         tracks = cms.InputTag("generalTracks")
     ),
+
+    VerticesView = = cms.PSet(
+        branchPrefix = cms.untracked.string("vtx"),
+        src  = cms.InputTag("offlinePrimaryVertices")
+    )
+
 
 
 
