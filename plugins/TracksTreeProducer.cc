@@ -42,6 +42,7 @@
 #include "MNTriggerStudies/MNTriggerAna/interface/EventIdData.h"
 #include "MNTriggerStudies/MNTriggerAna/interface/GenTrackView.h"
 #include "MNTriggerStudies/MNTriggerAna/interface/RecoTrackView.h"
+#include "MNTriggerStudies/MNTriggerAna/interface/VerticesView.h"
 
 //
 // class declaration
@@ -90,6 +91,7 @@ TracksTreeProducer::TracksTreeProducer(const edm::ParameterSet& iConfig)
     m_views.push_back(new EventIdData(iConfig.getParameter< edm::ParameterSet >("EventData"), m_tree));
     m_views.push_back(new GenTrackView(iConfig.getParameter< edm::ParameterSet >("GenTrackView"), m_tree));
     m_views.push_back(new RecoTrackView(iConfig.getParameter< edm::ParameterSet >("RecoTrackView"), m_tree));
+    m_views.push_back(new VerticesView(iConfig.getParameter< edm::ParameterSet >("VerticesView"), m_tree));
 }
 
 TracksTreeProducer::~TracksTreeProducer() {}
