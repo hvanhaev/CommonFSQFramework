@@ -96,5 +96,16 @@ def customize(process):
    
     return process
 
+def removeEdmOutput(process):
+    if hasattr(process, "outpath"):
+        if hasattr(process, "schedule"):
+            process.schedule.remove(process.outpath)
+        del process.outpath
+
+    # TODO: identify output modules and path that own them
+    if hasattr(process, "out"):
+        del process.out
+
+    return process
 
 
