@@ -1,4 +1,4 @@
-anaType="Tracks"
+anaType="CSA14_Tracks"
 
 # root path needs proper XXX
 preamble='''
@@ -57,7 +57,7 @@ def crabJobs(ds):
     if "QCD_Pt-15to3000" in dsName and "_V17B-v2" in ds:
         return 1950 
 
-    return 470
+    return 100
 
 def numEvents(ds):
     return -1
@@ -120,7 +120,7 @@ def getLumi(ds, trg):
 
     xsMinbias = 78420000000.0
     nEventsMinBiasFakeDataSample = 9582912.0
-    s["minbias"]["data_MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8"] = xsMinbias/nEventsMinBiasFakeDataSample # pb
+    s["minbias"]["data_MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8"] = nEventsMinBiasFakeDataSample/xsMinbias # pb
     # xs=78420000000.0
     # 9582912 events 
     #if "MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8" in ds:
