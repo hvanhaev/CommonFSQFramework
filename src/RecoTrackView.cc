@@ -8,7 +8,7 @@
 RecoTrackView::RecoTrackView(const edm::ParameterSet& iConfig, TTree * tree):
 EventViewBase(iConfig,  tree)
 {
-    registerVecP4("recoTracks", tree);
+    registerVecP4("p4", tree);
     registerVecFloat("dz", tree);
     registerVecFloat("d0", tree);
     registerVecFloat("dzErr", tree);
@@ -17,17 +17,17 @@ EventViewBase(iConfig,  tree)
     registerVecFloat("vy", tree);
     registerVecFloat("vz", tree);
 
-    registerVecInt(  "highpurity", tree);
+    registerVecInt(  "highPurity", tree);
     registerVecInt(  "algo", tree);
-    registerVecInt(  "nvhits", tree);
-    registerVecInt(  "nlhits", tree);
+    registerVecInt(  "nValidHits", tree);
+    registerVecInt(  "nLostHits", tree);
     registerVecInt(  "charge", tree);
     registerVecFloat(  "chi2n", tree);
-    registerVecFloat(  "pterr", tree);
+    registerVecFloat(  "ptErr", tree);
 
     m_maxEta = iConfig.getParameter<double>("maxEta");
     m_minPt = iConfig.getParameter<double>("minPt");
-    m_maxDZ = iConfig.getParameter<double>("maxDZ");
+    //m_maxDZ = iConfig.getParameter<double>("maxDZ");
 
 
     m_inputCol = iConfig.getParameter<edm::InputTag>("tracks");
@@ -90,7 +90,7 @@ void RecoTrackView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup
         double E = px*px + py*py + pz*pz;
 
         // Note: all fills (below) should be done consistently after all cuts are applied
-        addToP4Vec("recoTracks", reco::Candidate::LorentzVector(px,py,pz,E));
+        addToP4Vec("p4", reco::Candidate::LorentzVector(px,py,pz,E));
         //addToFVec("dxy", dxy);
         //addToFVec("dz", dz);
         addToFVec("dz", hIn->at(i).dz());
@@ -104,12 +104,12 @@ void RecoTrackView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup
 
         int highpurity = 1;
         if (!hIn->at(i).quality(reco::TrackBase::highPurity)) highpurity = 0;
-        addToIVec("highpurity", highpurity);
+        addToIVec("highPurity", highpurity);
         addToIVec("algo", hIn->at(i).algo() );
-        addToIVec("nvhits", hIn->at(i).numberOfValidHits() );
-        addToIVec("nlhits", hIn->at(i).numberOfLostHits() );
+        addToIVec("nValidHits", hIn->at(i).numberOfValidHits() );
+        addToIVec("nLostHits", hIn->at(i).numberOfLostHits() );
         addToFVec("chi2n", hIn->at(i).normalizedChi2() );
-        addToFVec("pterr", hIn->at(i).ptError() );
+        addToFVec("ptErr", hIn->at(i).ptError() );
         tmf::TestTrackData t;
         t.dxy = dxy;
         t.dz = dz;
