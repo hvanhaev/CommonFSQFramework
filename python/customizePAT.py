@@ -47,8 +47,9 @@ def customize(process):
 
 
 
+    import types
     process.pUtil = cms.Path(process.XS)
-    if not hasattr(process, "schedule"):
+    if not hasattr(process, "schedule") or type(process.schedule) == types.NoneType:
        process.schedule = cms.Schedule()
     process.pUtil = cms.Path(process.XS)
     process.schedule.append(process.pUtil)
