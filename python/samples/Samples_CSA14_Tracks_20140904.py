@@ -20,10 +20,13 @@ sam["MinBias_TuneMonash13_13TeV-pythia8"]["isData"]=False
 sam["MinBias_TuneMonash13_13TeV-pythia8"]["weightPuOnly"]='RooFormulaVar("weight","weight", "xsOverEvents*puWeightJet15V4", RooArgList(v["puWeightJet15V4"]["RooVar"]))'
 sam["MinBias_TuneMonash13_13TeV-pythia8"]["weightJet15Inverse"]='RooFormulaVar("weight","weight", "xsOverEvents*puWeightJet15V4", RooArgList(v["puWeightJet15V4"]["RooVar"]))'
 sam["MinBias_TuneMonash13_13TeV-pythia8"]["crabJobs"]=100
+sam["MinBias_TuneMonash13_13TeV-pythia8"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/MinBias_TuneMonash13_13TeV-pythia8/CSA14_Tracks_20140904_MinBias_TuneMonash13_13TeV-pythia8/ce99b2fff0a57bc79c58825d6feb5485/'
 sam["MinBias_TuneMonash13_13TeV-pythia8"]["weightNoPu"]='RooFormulaVar("weight","weight", "xsOverEvents", RooArgList())'
 sam["MinBias_TuneMonash13_13TeV-pythia8"]["json"]=''
 sam["MinBias_TuneMonash13_13TeV-pythia8"]["lumiMinBias"]='crashMeMC'
+sam["MinBias_TuneMonash13_13TeV-pythia8"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/MinBias_TuneMonash13_13TeV-pythia8/CSA14_Tracks_20140904_MinBias_TuneMonash13_13TeV-pythia8/ce99b2fff0a57bc79c58825d6feb5485//'
 sam["MinBias_TuneMonash13_13TeV-pythia8"]["XS"]=78000000000.0
+sam["MinBias_TuneMonash13_13TeV-pythia8"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/MinBias_TuneMonash13_13TeV-pythia8/CSA14_Tracks_20140904_MinBias_TuneMonash13_13TeV-pythia8/ce99b2fff0a57bc79c58825d6feb5485//'
 sam["MinBias_TuneMonash13_13TeV-pythia8"]["DS"]='/MinBias_TuneMonash13_13TeV-pythia8/Spring14dr-castor_NoPileUp_POSTLS170_V6-v1/AODSIM'
 
 sam["data_MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8"]={}
@@ -34,9 +37,12 @@ sam["data_MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8"]["name"]='data_MinBias_Tun
 sam["data_MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8"]["isData"]=True
 sam["data_MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8"]["weightJet15Inverse"]='RooFormulaVar("weight","weight", "invtrgWeightJet15RawTF2", RooArgList(v["invtrgWeightJet15RawTF2"]["RooVar"]))'
 sam["data_MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8"]["crabJobs"]=100
+sam["data_MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8/CSA14_Tracks_20140904_data_MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8/10d69293f074c558320145be33733f4f/'
+sam["data_MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8/CSA14_Tracks_20140904_data_MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8/10d69293f074c558320145be33733f4f//'
 sam["data_MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8"]["json"]=''
 sam["data_MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8"]["lumiMinBias"]=0.00012219984697781178
 sam["data_MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8"]["XS"]=-1
+sam["data_MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8/CSA14_Tracks_20140904_data_MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8/10d69293f074c558320145be33733f4f//'
 sam["data_MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8"]["DS"]='/MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8/Spring14dr-castor_NoPileUp_POSTLS170_V6-v1/AODSIM'
 
 def icm(sam):
