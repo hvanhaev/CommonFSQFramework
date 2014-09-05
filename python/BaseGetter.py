@@ -4,12 +4,13 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
 class Entry:
-    def __init__(self, chain, branchPrefix, variation, variationToNames, index):
+    def __init__(self, chain, branchPrefix, variation, variationToNames, branchStore, index):
         self.chain = chain
         self.branchPrefix = branchPrefix
         self.variation = variation
         self.variationToNames = variationToNames
         self.index = index
+        self.branchStore = branchStore
 
     # TODO: add "_" as a separator
     def __getattr__(self, name):
@@ -22,8 +23,11 @@ class Entry:
         #if not hasattr(self.chain, branchName): # what is cost of this call??
         #    branchName = self.branchPrefix + name 
         # this seems to be more expensive
+        if branchName  not in self.branchStore:
+            self.branchStore[branchName] = getattr(self.chain, branchName)
 
-        return getattr(self.chain, branchName).at(self.index)
+        return self.branchStore[branchName].at(self.index)
+        #return getattr(self.chain, branchName).at(self.index)
 
     # FIXME: entries from two different events can be equal
     def __eq__(self, other):
@@ -47,7 +51,7 @@ class BaseGetter:
         self.variationToNames = {}
 
     def newEvent(self, chain):
-        #self.data = {} # Note: this way we enforce user to call this method (note, that self.data is not present in init)
+        self.branchStore = {}
         self.chain = chain
 
     def getSize(self):
@@ -61,11 +65,8 @@ class BaseGetter:
         if variation == "_central":
             variation = ""
 
-        # FIXME!
-        variation = "" # temporarly disable shifts
-
         index = 0
         size = self.getSize() # XXX
         while index < size:
-            yield Entry(self.chain, self.branchPrefix, variation, self.variationToNames, index)
+            yield Entry(self.chain, self.branchPrefix, variation, self.variationToNames, self.branchStore, index)
             index += 1
