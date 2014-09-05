@@ -113,6 +113,8 @@ if __name__ == "__main__":
 
     # another possibility to process bit faster: process only part of MC
     maxFilesMC = 12
+    #maxFilesData = 12
+    #nWorkers = 12
 
     # only processin part of data will lead to wrong normalization of the data histograms
     # - since lumi values are not automatically updated to reflect the fact that only
