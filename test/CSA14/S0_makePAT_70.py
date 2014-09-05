@@ -129,6 +129,7 @@ process.tracksTree = cms.EDAnalyzer("TracksTreeProducer",
         branchPrefix = cms.untracked.string("recoTracks"),
         maxEta = cms.double(5.),
         #maxDZ  = cms.double(0.2),
+        maxDZ  = cms.double(999),
         minPt = cms.double(-1),
         tracks = cms.InputTag("generalTracks")
     ),
