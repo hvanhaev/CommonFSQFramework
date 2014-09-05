@@ -26,6 +26,9 @@ class CSA14_dndeta(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
         weight = 1 # 
         # weight = self.fChain.genWeight to obtain gen level weight. For min bias datasets we are using for CSA14 always eq to 1
 
+        # direct access to branch to compare efficiency as when getter is used:
+        #for i in xrange(self.fChain.recoTracksrecoTracks.size()):
+        #    trackp4 = self.fChain.recoTracksrecoTracks.at(i)
         self.tracks.newEvent(self.fChain)
         for track in self.tracks.get():
             trackp4 = track.recoTracks # note : in next skim this will become: trackp4 = track.p4
@@ -33,9 +36,15 @@ class CSA14_dndeta(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
             pt =    trackp4.pt()
             self.hist["pt"].Fill(pt, weight) # always use weight when filling
             self.hist["eta"].Fill(eta, weight) # always use weight when filling
+            
+
 
         return 1
 
+    # note: this is executed on the slave (ie output will appear in logs),
+    #       - before merging the histograms. Here we should apply the histogram 
+    #         normalization factor (since this depend on how many events were processed
+    #         by given slave)
     def finalize(self):
         print "Finalize:"
         normFactor = self.getNormalizationFactor()
@@ -43,6 +52,22 @@ class CSA14_dndeta(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
         print "  applying norm",  normFactor
         for h in self.hist:
             self.hist[h].Scale(normFactor)
+
+    # this is executed once at the master after merging the histograms from slaves
+    # (note: all histograms registered via self.GetOutputList().Add above are merged)
+    def finalizeWhenMerged(self):
+        #olist =  self.GetOutputList() # rebuild the histos list
+        #histos = {}
+        #for o in olist:
+        #    if not "TH1" in o.ClassName(): continue
+        #    histos[o.GetName()]=o
+
+        #
+        # you can save further histograms to the output file by calling:
+        #self.GetOutputList().Add(myNewHisto)
+        #
+        pass
+
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
