@@ -107,6 +107,7 @@ MNTriggerAnaNew::MNTriggerAnaNew(const edm::ParameterSet& iConfig)
     m_vectorBranches["l1Jets"] = std::vector<reco::Candidate::LorentzVector>();
     //m_vectorBranches["hltJets"] = std::vector<reco::Candidate::LorentzVector>();
 
+    //* XXX
     m_todoHltCollections["ak5GenJets"] = edm::InputTag("ak5GenJets", "", "SIM");
     //"hltAK5PFJetL1FastL2L3Corrected"   ""                "PAT"
     //m_todoHltCollections["hltAK5PFJetL1FastL2L3Corrected"] = edm::InputTag("hltAK5PFJetL1FastL2L3Corrected", "", "PAT");
@@ -114,6 +115,7 @@ MNTriggerAnaNew::MNTriggerAnaNew(const edm::ParameterSet& iConfig)
     m_todoHltCollections["hltAK4PFJets"] = edm::InputTag("hltAK4PFJets", "", "TTT");
     m_todoHltCollections["hltAK4PFJetsCorrected"]  = edm::InputTag("hltAK4PFJetsCorrected", "", "TTT");
     m_todoHltCollections["hltPFJetsCorrectedMatchedToL1"]  = edm::InputTag("hltPFJetsCorrectedMatchedToL1", "", "TTT");
+    //*/
 
 
     std::map<std::string, edm::InputTag>::iterator it = m_todoHltCollections.begin();

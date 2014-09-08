@@ -138,13 +138,12 @@ def main():
 
     todo = {}
 
-    #todo[30] = ([-1, 1, 20, 25, 30, 35], "hltPtAve  > XXX && hltPtCen > XXX/2 && hltPtFwd > XXX/2")
-    #todo[40] = ([-1, 1, 30, 35, 40, 45], "hltPtAve  > XXX && hltPtCen > XXX/2 && hltPtFwd > XXX/2")
     baseHLT = "hltPtAve  > XXX && hltPtCen > XXX/2 && hltPtFwd > XXX/2"
     baseHLTWithMatch = "hltPtAve  > XXX  && hltL1MatchPtCen > XXX/2 && hltL1MatchPtFwd > XXX/2"
 
     baseL1 = "l1SingleJetCentral > XXX"
-    l1CenFwd = "l1SingleJetCentral > XXX && l1SingleJetForward > XXX"
+    #l1CenFwd = "l1SingleJetCentral > XXX && l1SingleJetForward > XXX"
+    l1CenFwd = "s1l1SingleJetCentral > XXX && s1l1SingleJetForward > XXX"
     l1Fwd = "l1SingleJetForward > XXX"
 
 
@@ -160,6 +159,9 @@ def main():
     #
     ###########################################################################
 
+
+
+    '''
     todo["A_HLT_60_baseHLT"] = ([-1, 45, 50, 55, 60], baseHLT, 60)
     todo["A_HLT_60_baseHLTwithL1Matching"] = ([-1, 45, 50, 55, 60], baseHLT + " && "+ baseHLTWithMatch, 60)
     todo["A_HLT_60_baseHLTwithL1MatchingWithL1Seed"] = ([-1,  45, 50, 55, 60], baseHLT + " && "+ baseHLTWithMatch + "&&" + l1CenFwd.replace("XXX", "35") , 60)
@@ -167,6 +169,7 @@ def main():
     todo["A_HLT_80_baseHLT"] = ([-1, 45, 50, 55, 60], baseHLT, 60)
     todo["A_HLT_80_baseHLTwithL1Matching"] = ([-1, 45, 50, 55, 60], baseHLT + " && "+ baseHLTWithMatch, 60)
     todo["A_HLT_80_baseHLTwithL1MatchingWithL1Seed"] = ([-1,  45, 50, 55, 60], baseHLT + " && "+ baseHLTWithMatch + "&&" + l1CenFwd.replace("XXX", "35") , 60)
+    '''
 
 
 
@@ -183,8 +186,10 @@ def main():
     #todo["A_L1_doubleJSeed_50"] = ([-1, 1, 23, 27, 31], l1CenFwd, 50) #
     #todo["B_L1_doubleJSeed_50"] = ([-1, 1, 35, 39, 43], l1CenFwd, 50) # 
 
-    #todo["A_L1_doubleJSeed_60"] = ([-1, 1, 35, 39, 43], l1CenFwd, 60) # 
-    #todo["B_L1_doubleJSeed_60"] = ([-1, 1, 47, 51, 55], l1CenFwd, 60) # 
+    todo["A_L1_doubleJSeed_60"] = ([-1, 1, 35, 39, 43], l1CenFwd, 60) # 
+    todo["B_L1_doubleJSeed_60"] = ([-1, 1, 47, 51, 55], l1CenFwd, 60) # 
+    # s1DoubleJetCFDphi20
+    #todo["A_reco60_L1Dphi"] = ([-1, 17, 20, 24, 27, 31], "s1DoubleJetCFDphiXXX > 35", 60)
 
 
     #todo["A_total_60"] = ([-1, 1, 47, 51, 55], l1CenFwd.replace(XXX, "35") + " && ", 60)

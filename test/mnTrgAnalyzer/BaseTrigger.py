@@ -1,10 +1,11 @@
 class TriggerObjectsGetter:
-    def __init__(self, chain, collection):
+    def __init__(self, chain, collection, minPT=None):
         self.run = -1
         self.ev = -1
         self.trgMomenta = None
         self.chain = chain
         self.collection = collection
+        self.minPT = minPT
 
     def get(self):
         newEvent = False
@@ -21,7 +22,7 @@ class TriggerObjectsGetter:
         jets = getattr(self.chain, self.collection)
         self.trgMomenta = []
         for j in jets:
-            if j.pt() < 15: continue
+            if self.minPT != None and j.pt() < self.minPT: continue
             self.trgMomenta.append(j)
         
         self.trgMomenta = sorted(self.trgMomenta, reverse = True, key = lambda j: j.pt())
@@ -122,3 +123,14 @@ class SingleJetTrigger(BaseTrigger):
         if len(hltJets) > 0:
             return hltJets[0].pt()
         return 0
+
+
+
+class SingleForwardJetTrigger(BaseTrigger):
+    def getMaxThreshold(self):
+        hltJets = self.objectsGetter.get()
+        for j in hltJets:
+            if abs(j.eta() ) < 2.5: continue
+            return j.pt()
+        return 0
+
