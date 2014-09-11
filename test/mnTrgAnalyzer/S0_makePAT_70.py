@@ -191,6 +191,14 @@ process.MNTriggerAnaNew = cms.EDAnalyzer("MNTriggerAnaNew",
     ),
 
 
+    TriggerResultsView =  cms.PSet(
+        branchPrefix = cms.untracked.string("triggerResults"),
+        process = cms.string("TTT"), # usually HLT
+        triggers = cms.vstring("HLT_DiPFJetAve60_CentralForward_v1", "HLT_DiPFJetAve60_CentralForward*", "viaClass"),
+        viaClass = cms.vstring("HLT_DiPFJetAve60_CentralForward_v1")
+
+    ),
+
 
 
 )
@@ -205,6 +213,8 @@ primary= "file:/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_Tune4C
 primary = "file:/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/20140813C_HLTJets/1914e7f200d7a3952c1631dd40280690/outputFULL_17_1_UZk.root"
 
 primary="file:/nfs/dust/cms/user/fruboest/2014.09.TestL1Stage1/CMSSW_7_1_5/src/ProduceHLTAndL1/outputFULL.root"
+primary="file:/nfs/dust/cms/user/fruboest/2014.09.TestL1Stage1/CMSSW_7_1_5/src/MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/HLTObjectsProduction_testMyPath/outputFULL.root"
+
 
 process.source = cms.Source("PoolSource",
 #    secondaryFileNames = cms.untracked.vstring([sec1, sec2]),

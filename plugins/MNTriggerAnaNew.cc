@@ -43,6 +43,7 @@
 #include "MNTriggerStudies/MNTriggerAna/interface/JetView.h"
 
 #include "MNTriggerStudies/MNTriggerAna/interface/L1JetsView.h"
+#include "MNTriggerStudies/MNTriggerAna/interface/TriggerResultsView.h"
 //
 // class declaration
 //
@@ -101,6 +102,7 @@ MNTriggerAnaNew::MNTriggerAnaNew(const edm::ParameterSet& iConfig)
     m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPFAK5CHS"), m_tree));
     m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsView"), m_tree));
     m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewStage1"), m_tree));
+    m_views.push_back(new TriggerResultsView(iConfig.getParameter< edm::ParameterSet >("TriggerResultsView"), m_tree));
     ///m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewCalo"), m_tree));
 
     // use m_floatBranches for float values
