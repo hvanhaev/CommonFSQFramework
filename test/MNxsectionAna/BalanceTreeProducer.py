@@ -98,7 +98,7 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
 
     def genWeight(self):
         #print "ASDFASD", self.fChain.genWeight
-        return self.fChain.genWeight
+        return self.fChain.genWeight*self.normFactor
 
     def analyze(self):
         if not self.HLT2015TempWorkaround and self.fChain.ngoodVTX == 0: return
@@ -116,23 +116,16 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
 
         self.jetGetter.newEvent(self.fChain)
 
+        weight = self.genWeight()
+        if not self.isData and not self.HLT2015TempWorkaround:
+            truePU = self.fChain.puTrueNumInteractions
+            puWeight =  self.lumiWeighters["_jet15_central"].weight(truePU)
+            weight *= puWeight
 
+        self.var["weight"][0] = weight
 
         fill = False
         for shift in self.todoShifts:
-            weight = self.normFactor 
-            if not self.isData and not self.HLT2015TempWorkaround:
-                weight *= self.genWeight() # keep inside shift iter
-                truePU = self.fChain.puTrueNumInteractions
-                puWeight =  self.lumiWeighters["_jet15_central"].weight(truePU)
-                weight *= puWeight
-            elif self.HLT2015TempWorkaround:
-                weight *= self.genWeight()
-
-
-            self.var["weight"][0] = weight
-
-
             tagJet = None
             probeJet = None
             probePT = None
