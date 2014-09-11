@@ -159,6 +159,15 @@ def XS(ds):
 
     s["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8"] = 2429000000 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/JME-Fall13-00001
 
+    s["QCD_Pt-10to15_fwdJet_Tune4C_13TeV_pythia8"] = 564600000.0 # filt=0.075 https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00003
+    s["QCD_Pt-15to30_fwdJet_Tune4C_13TeV_pythia8"] = 550302000.0 # filt=0.246 https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00004
+    s["QCD_Pt-30to50_fwdJet_Tune4C_13TeV_pythia8"] = 65892000.0 # filt=0.408 https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00005
+    s["QCD_Pt-50to80_fwdJet_Tune4C_13TeV_pythia8"] = 8932440.0 # filt=0.404 https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00006
+    s["QCD_Pt-80to120_fwdJet_Tune4C_13TeV_pythia8"] = 1146688.0 # filt=0.368 https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00007
+    s["QCD_Pt-120to170_fwdJet_Tune4C_13TeV_pythia8"] = 166766.6 # filt=0.343 https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00008
+    s["QCD_Pt-170toInf_fwdJet_Tune4C_13TeV_pythia8"] = 43444.8 # filt=0.336 https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00009
+
+
     dsName = name(ds)
     if dsName in s:
         return s[dsName]
