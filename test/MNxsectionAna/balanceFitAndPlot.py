@@ -69,6 +69,7 @@ class FitThread(multiprocessing.Process):
         ptProbeJetVar = inputMap["ptProbeJetVar"]
         meanPT = dsReduced.mean(ptProbeJetVar)
         sigmaPT = dsReduced.sigma(ptProbeJetVar)
+        meanPU = dsReduced.mean(inputMap["PU"])
 
         etaMin = inputMap["etaMin"]
         etaMax = inputMap["etaMax"]
@@ -81,6 +82,7 @@ class FitThread(multiprocessing.Process):
         box.AddText("\sigma(p^{probe}_{T})=%10.2f" % sigmaPT )
         box.AddText(str(etaMin) + " < |#eta_{probe}| < "+str(etaMax))
         box.AddText("p_{T}^{ave} > "+str(minPtAVG))
+        box.AddText("PU mean=%10.2f"% meanPU)
         #box.AddText("probe jet p_{T} > "+str(minPtAVG))
 
         frame.addObject(box)
@@ -121,6 +123,7 @@ def main():
     weight = "weight"
     if options.weight:
         weight = options.weight
+
 
     if options.minPTAve:
         minPTAve = options.minPTAve
@@ -262,9 +265,9 @@ def main():
             observables.add(roovar)
         #importCMD = RooFit.Import(tree)
         #cutCMD = RooFit.Cut(preselectionString)
-        print "  create dataset..."
-        #ds[t] = ROOT.RooDataSet(t, t, tree, observables, "weight < 10", weight)
-        ds[t] = ROOT.RooDataSet(t, t, tree, observables,  weight)
+        print "  create dataset...", weight
+        ds[t] = ROOT.RooDataSet(t, t, tree, observables, "weight < 100", weight)
+        #ds[t] = ROOT.RooDataSet(t, t, tree, observables,  "", weight)
         print "        ...done"
 
         print "Dataset:", t, ds[t].numEntries()
@@ -337,6 +340,7 @@ def main():
                 inputMap["minPtAVG"] = minPTAve
                 inputMap["iEta"] = iEta # xcheck only
                 inputMap["cut"] = cut
+                inputMap["PU"] = vars[t]["PUNumInteractions"]
 
 
                 thr = FitThread(inputMap)
@@ -413,7 +417,7 @@ if __name__ == "__main__":
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     AutoLibraryLoader.enable()
     main()
-    #print "Note: events with generator weight > 10 are ommited"
+    print "Note: events with generator weight > 100 are ommited"
     print "./drawBalance.py  -i ~/tmp/balance/balanceHistos.root"
 
 
