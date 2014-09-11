@@ -62,6 +62,8 @@ if __name__ == "__main__":
         doAndSave(of, "PU"+str(i), i, None)
     for i in [20, 25, 30, 35, 40, 45, 50]:
         doAndSave(of, "PU"+str(i), i, None)
+    for i in [15, 18, 19, 21, 22]:
+        doAndSave(of, "PU"+str(i), i, None)
          
    
 

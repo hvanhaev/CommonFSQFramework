@@ -125,6 +125,11 @@ process.source.fileNames = [
      'file:'+f
 ]
 
+#switchOnTrigger(process, 'patTrigger', 'patTriggerEvent', 'patDefaultSequence', triggerProcess, 'out')
+from PhysicsTools.PatAlgos.tools.trigTools import *
+switchOnTrigger( process, hltProcess="TTT" )
+
+
 
 import MNTriggerStudies.MNTriggerAna.customizePAT
 process = MNTriggerStudies.MNTriggerAna.customizePAT.customize(process)
@@ -290,5 +295,6 @@ process.source.inputCommands.extend([
 
 
 print "Warning - stage 1 and HLT disabled!"
+
 
 

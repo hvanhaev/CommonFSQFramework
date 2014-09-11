@@ -203,6 +203,29 @@ def main():
     outputHistos["data_jet15"] = of.mkdir("data_jet15")
     outputHistos["MC_jet15"] = of.mkdir("MC_jet15")
     ROOT.gDirectory.cd(curPath)
+
+    '''
+    print "Summing!"
+    dsBare = ds
+    ds = {}
+    ds["sum"] = None
+    for d in dsBare:
+        if ds["sum"] == None:
+            ds["sum"] = dsBare[d]
+        else:
+            ds["sum"].Append(dsBare[d])
+        print "After", d, "entries: ", ds["sum"].sumEntries()
+
+    varsOld = vars
+    vars = {}
+    varsFlat = ds["sum"].get()
+    for v in vars:
+        print v.GetName()
+
+    sys.exit()
+    print "Sum done"
+    '''
+
     
     for t in ds:
         for v in variations:
@@ -236,26 +259,37 @@ def main():
                 #print "Reduce...done"
                 #histN = ROOT.TH1F("nom", "nom;PUNumInteractions for bx=0;3rd jet veto efficiency", 12, -0.5, 11.1)
                 #histD = ROOT.TH1F("denom", "denom", 12, -0.5, 11.1)
-                histN = ROOT.TH1F("nom", "nom;PUNumInteractions for bx=0;3rd jet veto efficiency", 31, 19.5, 50.5)
-                histD = ROOT.TH1F("denom", "denom",  31, 19.5, 50.5)
+                #histN = ROOT.TH1F("nom", "nom;PUNumInteractions for bx=0;3rd jet veto efficiency", 31, 19.5, 50.5)
+                #histD = ROOT.TH1F("denom", "denom",  31, 19.5, 50.5)
+
+                binL = 13.5
+                binH = 26.5
+                nbins = int(binH - binL)
+                histN = ROOT.TH1F("nom", "nom;PUNumInteractions for bx=0;3rd jet veto efficiency", nbins, binL, binH)
+                histD = ROOT.TH1F("denom", "denom",  nbins, binL, binH)
 
                 puVar = "PUNumInteractions"
                 #puVar = "puTrueNumInteractions"
                 histN = dsReducedWithVeto.fillHistogram(histN, ROOT.RooArgList(vars[t][puVar]))
                 histD = dsReduced.fillHistogram(histD, ROOT.RooArgList(vars[t][puVar]))
                 histN.Divide(histD)
-                c = ROOT.TCanvas() 
-                histN.Draw()
-                if label:
-                    leg = ROOT.TLegend(0.2, 0.95, 1, 1)
-                    leg.SetHeader(label)
-                    leg.SetFillColor(0)
-                    leg.Draw("SAME")
 
-                odir = ("~/tmp/balancePU_"+str(minPTAve)+"/").replace(".","_")
-                os.system("mkdir -p " + odir)
-                name = (odir+str(etaMin) + "_" + str(etaMax)).replace(".","_")+".png"
-                c.Print(name)
+		todo = {}
+		todo["eff"] = histN
+		todo["stat"] = histD
+                c = ROOT.TCanvas() 
+		for t in todo:
+			todo[t].Draw()
+			if label:
+			    leg = ROOT.TLegend(0.2, 0.95, 1, 1)
+			    leg.SetHeader(label)
+			    leg.SetFillColor(0)
+			    leg.Draw("SAME")
+
+			odir = ("~/tmp/vetoEffVsPU_"+str(minPTAve)+"/").replace(".","_")
+			os.system("mkdir -p " + odir)
+			name = (odir+t+"_"+str(etaMin) + "_" + str(etaMax)).replace(".","_")+".png"
+			c.Print(name)
 
 
 

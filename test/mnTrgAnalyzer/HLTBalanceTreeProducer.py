@@ -53,15 +53,30 @@ class HLTBalanceTreeProducer(BalanceTreeProducer.BalanceTreeProducer):
         puFile = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/PUhists.root").fullPath()
 
         self.newlumiWeighters = {}
+        #'''
+        self.newlumiWeighters["flat010toflat010"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "Flat0to10/pileup")
         self.newlumiWeighters["flat010toPU1"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU1/pileup")
-        self.newlumiWeighters["flat010toPU2"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU2/pileup")
-        self.newlumiWeighters["flat010toPU3"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU3/pileup")
-        self.newlumiWeighters["flat010toPU4"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU4/pileup")
+        #self.newlumiWeighters["flat010toPU2"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU2/pileup")
+        #self.newlumiWeighters["flat010toPU3"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU3/pileup")
+        #self.newlumiWeighters["flat010toPU4"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU4/pileup")
         self.newlumiWeighters["flat010toPU5"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU5/pileup")
         self.newlumiWeighters["flat010toPU10"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU10/pileup")
+        #'''
+        '''
         self.newlumiWeighters["flat2050toPU20"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU20/pileup")
         self.newlumiWeighters["flat2050toPU25"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU25/pileup")
         self.newlumiWeighters["flat2050toPU30"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU30/pileup")
+        #'''
+
+        '''
+        self.newlumiWeighters["PU20to15"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU15/pileup")
+        self.newlumiWeighters["PU20to18"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU18/pileup")
+        self.newlumiWeighters["PU20to19"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU19/pileup")
+        self.newlumiWeighters["PU20to21"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU21/pileup")
+        self.newlumiWeighters["PU20to22"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU22/pileup")
+        self.newlumiWeighters["PU20to20"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU20/pileup")
+        self.newlumiWeighters["PU20to25"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU25/pileup")
+        #'''
         self.addExternalVar(self.newlumiWeighters.keys())
 
     #deltaPHI: 0.0 0.349 0.698 1.047 1.396 1.745 2.094 2.443 2.792 3.141
@@ -95,6 +110,22 @@ class HLTBalanceTreeProducer(BalanceTreeProducer.BalanceTreeProducer):
 
         return (tag, probe)
 
+    def analyzeDumb(self):
+    #def analyze(self):
+        self.setExternalVar("PUNumInteractions", self.fChain.PUNumInteractions)
+        self.setExternalVar("puTrueNumInteractions", self.fChain.puTrueNumInteractions)
+
+        pu = self.fChain.PUNumInteractions
+        genW = BalanceTreeProducer.BalanceTreeProducer.genWeight(self)
+        for l in self.newlumiWeighters:
+            w = self.newlumiWeighters[l].weight(pu)
+            #print pu, l, w, genW
+            self.setExternalVar(l, w*genW)
+
+        BalanceTreeProducer.BalanceTreeProducer.analyze(self)
+
+
+    #def analyzeGood(self):
     def analyze(self):
         tag, probe = self.getHLTTagProbe(self.fChain.hltAK4PFJetsCorrected)
         tagL1match, probeL1match = self.getHLTTagProbe(self.fChain.hltPFJetsCorrectedMatchedToL1)

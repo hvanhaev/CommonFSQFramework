@@ -6,20 +6,20 @@ ROOT.gROOT.SetBatch(True)
 
 import MNTriggerStudies.MNTriggerAna.Style
 
-outDir = "~/tmp/balanceHLT_TodoXXX_recoAVGYYY/"
+outDir = "~/tmp/balanceHLT_TodoXXX_recoAVGYYY_ZZZ/"
 infile = "treeDiJetBalance.root"
 
 
-def fit(todo, recoAVG, PUweight, cutBase):
+def fit(todo, recoAVG, weight, cutBase):
 
     for t in todo:
-        fitResultsDir = outDir.replace("XXX",str(t)).replace("YYY", str(recoAVG))
+        fitResultsDir = outDir.replace("XXX",str(t)).replace("YYY", str(recoAVG)).replace("ZZZ", weight)
         command  = "./balanceFitAndPlot.py"
         command += " -i " + infile
         command += " -e 3 " 
         command += " -a "  + str(recoAVG)
         command += " -o " + fitResultsDir
-        command += " -w " + PUweight
+        command += " -w " + weight
         if t > 0:
             command += " -c '" + cutBase.replace("XXX", str(t)) + "'"
         #command += " -c '" + cutBase + "'"
@@ -27,7 +27,7 @@ def fit(todo, recoAVG, PUweight, cutBase):
 
 
 
-def plot(todo, ptAveReco, plotName, plotType):
+def plot(todo, ptAveReco, weight, plotName, plotType):
     knownTypes = ["balance", "eff"]
     if plotType not in knownTypes:
         raise Exception("Plot type "+plotType+" not known")
@@ -35,7 +35,7 @@ def plot(todo, ptAveReco, plotName, plotType):
 
     histoMap = {}
     for t in todo:
-        fitResultsDir = outDir.replace("XXX",str(t)).replace("YYY", str(ptAveReco))
+        fitResultsDir = outDir.replace("XXX",str(t)).replace("YYY", str(ptAveReco)).replace("ZZZ", weight)
         histoFile = fitResultsDir+"/balanceHistos.root"
         rootfile = ROOT.TFile(histoFile, "read")
         lst = rootfile.GetListOfKeys()
@@ -131,10 +131,6 @@ def plot(todo, ptAveReco, plotName, plotType):
 
 def main():
     MNTriggerStudies.MNTriggerAna.Style.setStyle()
-    PUWeight = "weight"
-    #PUWeight = "flat010toPU10"
-    #PUWeight = "flat010toPU1"
-    #PUWeight = "flat010toPU5"
 
     todo = {}
 
@@ -189,21 +185,38 @@ def main():
     todo["A_L1_doubleJSeed_60"] = ([-1, 1, 35, 39, 43], l1CenFwd, 60) # 
     todo["B_L1_doubleJSeed_60"] = ([-1, 1, 47, 51, 55], l1CenFwd, 60) # 
     # s1DoubleJetCFDphi20
-    #todo["A_reco60_L1Dphi"] = ([-1, 17, 20, 24, 27, 31], "s1DoubleJetCFDphiXXX > 35", 60)
+    todo["A_reco60_L1Dphi"] = ([-1, 17, 20, 24, 27, 31], "s1DoubleJetCFDphiXXX > 35", 60)
 
 
     #todo["A_total_60"] = ([-1, 1, 47, 51, 55], l1CenFwd.replace(XXX, "35") + " && ", 60)
 
     #    cutBase = "hltPtAve  > 30 && hltPtCen > 15 && hltPtFwd > 15"  
-    for t in todo:
-        label = t
-        ptAvesHLT = todo[t][0]
-        cutBase = todo[t][1]
-        ptAveReco = todo[t][2]
-        fit(ptAvesHLT, ptAveReco, PUWeight, cutBase)
-        plotName = "ptThreshods_"+label+"_"+ PUWeight +".png"
-        plot(ptAvesHLT, ptAveReco, plotName, "balance")
-        plot(ptAvesHLT, ptAveReco, plotName, "eff")
+    #weight = "weight"
+    #weight = "flat010toPU10" # note: PU weights contain genW by default
+    #weight = "flat010toPU1"
+    #weight = "flat010toPU5"
+    #todo["A_noTrg_60"] = ([-1, 1 ], "1==1", 60)
+    #todo["A_noTrg_80"] = ([-1, 1 ], "1==1", 80)
+    #todo["A_noTrg_100"] = ([-1, 1 ], "1==1", 100)
+    #todo["A_noTrg_120"] = ([-1, 1 ], "1==1", 120)
+    #weights = ["PU20to20", "PU20to15", "PU20to18", "PU20to19", "PU20to21", "PU20to22", "PU20to25"]
+    #weights = ["PU20to20", "PU20to15", "PU20to18", "PU20to22", "PU20to25"]
+    #weights = ["PU20to20", "PU20to15"]
+
+    #weights = ["flat010toflat010", "flat010toPU1", "flat010toPU5", "flat010toPU10"]
+    weights = ["flat010toflat010",]
+
+
+    for weight in weights:
+        for t in todo:
+            label = t
+            ptAvesHLT = todo[t][0]
+            cutBase = todo[t][1]
+            ptAveReco = todo[t][2]
+            fit(ptAvesHLT, ptAveReco, weight, cutBase)
+            plotName = "ptThreshods_"+label+"_"+ weight +".png"
+            plot(ptAvesHLT, ptAveReco, weight, plotName, "balance")
+            plot(ptAvesHLT, ptAveReco, weight, plotName, "eff")
 
 
 if __name__ == "__main__":
