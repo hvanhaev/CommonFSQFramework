@@ -116,6 +116,10 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                     print tab, "maxfiles limit reached"
                     break # we dont need more
 
+                del infoHisto
+                rootFile.Close()
+                del rootFile
+
         if not quiet: print tab, "number of tree files:", len(fileList)
         if not quiet: print tab, "events processed in skim:", evCnt # in agreement with crab xml output
         if not quiet: print tab, "list of files for this ds saved in 'fileList' variable "
