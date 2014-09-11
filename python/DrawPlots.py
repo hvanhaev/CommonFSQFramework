@@ -76,9 +76,11 @@ class DrawPlots():
 
     def getTarget(self, histoName, sampleName): # override
         raise Exception("")
-        
+     
+    # should I scale data histogram by the lumi value?
     def applyScale(self, histoName, sampleName): # override
-        pass
+        return True
+
     def setGlobalStyle(self):  # override
         pass
     def decorate(self, canvas, dataHisto, MCStack, errBand): # override
@@ -270,7 +272,7 @@ class DrawPlots():
                     if targetData != None:
                         if centralName not in finalMap[targetData]:
                             print "#"*30
-                            print " Cannot find (expected) histo:", centralName
+                            print " Cannot find (expected) histo:", centralName, ". Availabel: ", finalMap[targetData].keys()
                             print "#"*30
                             continue
                         hData =  finalMap[targetData][centralName]

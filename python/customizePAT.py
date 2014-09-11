@@ -47,8 +47,10 @@ def customize(process):
 
 
 
+    import types
     process.pUtil = cms.Path(process.XS)
-    process.schedule = cms.Schedule()
+    if not hasattr(process, "schedule") or type(process.schedule) == types.NoneType:
+       process.schedule = cms.Schedule()
     process.pUtil = cms.Path(process.XS)
     process.schedule.append(process.pUtil)
     process.schedule.append(process.pTreeProducers)
@@ -94,5 +96,16 @@ def customize(process):
    
     return process
 
+def removeEdmOutput(process):
+    if hasattr(process, "outpath"):
+        if hasattr(process, "schedule"):
+            process.schedule.remove(process.outpath)
+        del process.outpath
+
+    # TODO: identify output modules and path that own them
+    if hasattr(process, "out"):
+        del process.out
+
+    return process
 
 

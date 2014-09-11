@@ -16,6 +16,21 @@ from array import array
 from optparse import OptionParser
 
 class DrawCSA14Plots(DrawPlots):
+    def setup(self):
+        self.triggersToSamples = {}
+        self.triggersToSamples["minbias"] = ["data_MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8"]
+        #self.triggersToSamples["zerobias"] = ["data_MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8"]
+    # The purpose of the self.triggersToSamples should be clear if you look how it was used for MN analysis
+    # on 2010 data:
+    #    triggersToSamples["jet15"] = ["Jet-Run2010B-Apr21ReReco-v1", "JetMETTau-Run2010A-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1"]
+    #    triggersToSamples["dj15fb"] = ["METFwd-Run2010B-Apr21ReReco-v1", "JetMETTau-Run2010A-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1"]
+    #
+    # first entry is for histograms filled when HLT_Jet15 trigger fired. This trigger was 
+    #   used in dataset in Jet-Run2010B-Apr21ReReco-v1 (and not in METFwd)
+    # Second entry is for histograms filled when HLT_DoubleJet15_ForwardBackward5 trigger fired. 
+    #  This trigger was METFwd dataset (and not in Jet-Run2010B-Apr21ReReco-v1)
+
+ 
     def getLumi(self, target, samples): # override
         if "data_" not in target:
             raise Exception("getLumi called for "+ target )
@@ -25,21 +40,19 @@ class DrawCSA14Plots(DrawPlots):
             raise Exception("Cannot extract trigger name from " + target)
 
         trg = spl[-1]
-        triggersToSamples = {} # TODO make accessible from self
-        triggersToSamples["B"] = ["data_MinBias_TuneA2MB_13TeV_pythia8"]
-
-        if trg not in triggersToSamples.keys():
+        if trg not in self.triggersToSamples.keys():
             raise Exception("Dont know how to get lumi for "+ trg + ". Known triggers are " + " ".join(triggersToSamples.keys()))
 
         triggerToKey = {}
-        triggerToKey["B"] = "lumiMinBias"
+        triggerToKey["minbias"] = "lumiMinBias"
+        #triggerToKey["zerobias"] = "lumiMinBias"
 
         sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
         #print "-----"
         lumi = 0.
         for s in samples:
             #print s
-            if s in triggersToSamples[trg]:
+            if s in self.triggersToSamples[trg]:
                 lumiKeyName = triggerToKey[trg]
                 lumi += sampleList[s][lumiKeyName]
                 #print " lumi->",lumi
@@ -47,7 +60,7 @@ class DrawCSA14Plots(DrawPlots):
         return lumi
 
     def getTarget(self, histoName, sampleName): # override
-        ''' target naming convention:
+        ''' target (histogram) naming convention:
                 - name should consist of two parts separated by underscore
 
                 - part after underscore should contain your trigger label
@@ -69,16 +82,12 @@ class DrawCSA14Plots(DrawPlots):
         if not isData:
             retName = "MC_" + triggerName
         else:
-            triggersToSamples = {} # TODO make accessible from self
-            # CSA14 todo : rename data sample name just to data
-            triggersToSamples["B"] = ["data_MinBias_TuneA2MB_13TeV_pythia8"]
-            if sampleName in triggersToSamples[triggerName]:
+            if sampleName in self.triggersToSamples[triggerName]:
                 retName = "data_" + triggerName
 
         return retName
 
     def applyScale(self, histoName, sampleName): # override
-        if histoName.startswith("balance"): return False
         return True
 
     def setGlobalStyle(self):  # override
@@ -137,7 +146,7 @@ if __name__ == "__main__":
     parser.add_option("-o", "--outdir", action="store", type="string",  dest="outdir" )
     (options, args) = parser.parse_args()
 
-    infile = "plotsCSA14_UEAna.root"
+    infile = "plotsCSA14_dndeta.root"
     if options.infile:
         infile = options.infile
 
@@ -147,6 +156,6 @@ if __name__ == "__main__":
     else:
         d = DrawCSA14Plots(infile)
 
-
+    d.setup()
     d.draw()
 

@@ -1,4 +1,4 @@
-anaType="Tracks"
+anaType="CSA14_Tracks"
 
 # root path needs proper XXX
 preamble='''
@@ -9,7 +9,8 @@ skimEfficiencyMethod="getSkimEff"
 MyVariablesAllEvents="DiJetAnalysis.DiJetAna.ana.BaseVariables"
 '''
 
-dsFile="MNTriggerStudies/MNTriggerAna/python/samples/ds_csa14.txt"
+#dsFile="MNTriggerStudies/MNTriggerAna/python/samples/ds_csa14.txt"
+dsFile="MNTriggerStudies/MNTriggerAna/python/samples/ds_csa14_lowpu.txt"
 
 # define the util decorator. Functions marked with this wont turn into ds attribute
 def util(func):
@@ -33,7 +34,9 @@ def name(ds):
 
 def isData(ds):
     realData = False
-    if "MinBias_TuneA2MB_13TeV_pythia8" in ds:         # XXX CSA14 TODO - when we have our datasets
+    # xs=78420000000.0
+    # 9582912 events 
+    if "MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8" in ds:
         realData = True
     return realData
 
@@ -54,7 +57,7 @@ def crabJobs(ds):
     if "QCD_Pt-15to3000" in dsName and "_V17B-v2" in ds:
         return 1950 
 
-    return 470
+    return 100
 
 def numEvents(ds):
     return -1
@@ -92,7 +95,7 @@ def XS(ds):
 
     # Give all XS in pb
     s = {}
-    s["MinBias_TuneZ2star_13TeV_pythia6"] = 78E9
+    s["MinBias_TuneMonash13_13TeV-pythia8"] = 78E9
 
 
     dsName = name(ds)
@@ -114,12 +117,18 @@ def getLumi(ds, trg):
 
     s = {}
     s.setdefault("minbias", {})
-    s["minbias"]["data_MinBias_TuneA2MB_13TeV_pythia8"] =  1 # in pb
+
+    xsMinbias = 78420000000.0
+    nEventsMinBiasFakeDataSample = 9582912.0
+    s["minbias"]["data_MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8"] = nEventsMinBiasFakeDataSample/xsMinbias # pb
+    # xs=78420000000.0
+    # 9582912 events 
+    #if "MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8" in ds:
 
 
     dsName = name(ds)
     if dsName in s[trg]:
-        return s[trg][dsName]
+        return float(s[trg][dsName])
 
     print "Problem with lumi!", ds
     return "crashMe"
