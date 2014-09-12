@@ -13,6 +13,49 @@ try:
 except:
     from xml.etree.ElementTree import ElementTree 
 
+def getSEDirsCrab2(anaVersion, name):
+    crabDirName = anaVersion+"_"+name # crab dir naming from runCrabJobs.py
+    crabResDir = crabDirName + "/res/"
+    SEDirs = set()
+    for  r,d,f in os.walk(crabResDir):
+        for file in f:
+            if not file.endswith(".xml"): continue
+            if not file.startswith("crab_fjr_"): continue
+            if "Submission_" in r: continue
+            crabFjr = r+"/"+file
+            fp = open(crabFjr,"r")
+            try:
+                et = ElementTree()
+            except:
+                et = ElementTree
+            mydoc = et.parse(fp)
+            pfnDir=None
+            for e in mydoc.findall('./File/PFN'):
+                if pfnDir != None:
+                    print "Allready have a pfn in", crabFjr
+                else:
+                    pfnDir = e.text.strip()
+                
+                #print pfnDir
+            for e in mydoc.findall('./AnalysisFile/PFN'):
+                #print type(e)
+                #print dir(e)
+                #print e.tag, e.attrib
+                #print  "XXXX", e.text.strip()
+                if pfnDir != None:
+                    print "Allready have a pfn in", crabFjr
+                else:
+                    pfnDir = e.attrib["Value"]
+            if pfnDir:
+                fileName = pfnDir.split("/")[-1]
+                pfnDir = pfnDir.replace(fileName,"")
+                SEDirs.add(pfnDir)
+
+            if len(SEDirs) > 0: # makes consistency checks above useless, but it;s to long to parse all xml files
+                break
+
+    return SEDirs
+
 
 def main(sam):
     file=open( edm.FileInPath(dsFile).fullPath())
@@ -40,47 +83,7 @@ def main(sam):
         #crabDirName = "DiJet_20140214_METFwd-Run2010B-Apr21ReReco-v1"
         #print "Warning - devel name of crab dir"
         #  name=anaVersion+"_"+s
-        crabDirName = anaVersion+"_"+name # crab dir naming from runCrabJobs.py
-        crabResDir = crabDirName + "/res/"
-
-        SEDirs = set()
-        for  r,d,f in os.walk(crabResDir):
-            for file in f:
-                if not file.endswith(".xml"): continue
-                if not file.startswith("crab_fjr_"): continue
-                if "Submission_" in r: continue
-                crabFjr = r+"/"+file
-                fp = open(crabFjr,"r")
-                try:
-                    et = ElementTree()
-                except:
-                    et = ElementTree
-                mydoc = et.parse(fp)
-                pfnDir=None
-                for e in mydoc.findall('./File/PFN'):
-                    if pfnDir != None:
-                        print "Allready have a pfn in", crabFjr
-                    else:
-                        pfnDir = e.text.strip()
-                    
-                    #print pfnDir
-                for e in mydoc.findall('./AnalysisFile/PFN'):
-                    #print type(e)
-                    #print dir(e)
-                    #print e.tag, e.attrib
-                    #print  "XXXX", e.text.strip()
-                    if pfnDir != None:
-                        print "Allready have a pfn in", crabFjr
-                    else:
-                        pfnDir = e.attrib["Value"]
-                if pfnDir:
-                    fileName = pfnDir.split("/")[-1]
-                    pfnDir = pfnDir.replace(fileName,"")
-                    SEDirs.add(pfnDir)
-
-                if len(SEDirs) > 0: # makes consistency checks above useless, but it;s to long to parse all xml files
-                    break
-
+        SEDirs = getSEDirsCrab2(anaVersion, name)
         SEDir = None
         if len(SEDirs)!=1: 
             print "Problem determining SE dir for", name, "- candidates are: ", SEDirs
