@@ -21,7 +21,7 @@ config.Data.dbsUrl = "phys03"
 
 
 config.Data.publication = True
-config.Data.publishDbsUrl = 'phys03'
+#config.Data.publishDbsUrl = 'phys03'
 config.Data.publishDataName = 'CRAB3_tutorial_MC_analysis_test1'
 
 config.section_("Site")
