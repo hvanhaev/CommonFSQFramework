@@ -4,14 +4,8 @@ from optparse import OptionParser
 import subprocess
 
 # TODO: voms-proxy-init --voms cms --valid 168:00
-
-try:
-    ver=subprocess.check_output(["crab", "--version"])#,, "v3"
-except OSError:
-    print "Seems crab3 environment is not defined. Exiting."
-    sys.exit()
-
-if "v3" not in ver:
+import MNTriggerStudies.MNTriggerAna.Util
+if MNTriggerStudies.MNTriggerAna.Util.getCrabVersion() != 3:
     print "This is a crab3 utility. You are trying to use it with crab2. Exiting."
     sys.exit()
 

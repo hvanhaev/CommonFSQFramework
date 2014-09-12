@@ -30,8 +30,8 @@ MyVariablesAllEvents="DiJetAnalysis.DiJetAna.ana.BaseVariables"
 '''
 # /scratch/scratch0/tfruboes/2013.05.DiJetNewGit/CMSSW_4_2_8_patch7/src/DiJetAnalysis/DiJetAna/python/samples
 #dsFile="MNTriggerStudies/MNTriggerAna/python/samples/dsBase.txt"
-#dsFile="MNTriggerStudies/MNTriggerAna/python/samples/ds70TriggerStudies.txt"
-dsFile="MNTriggerStudies/MNTriggerAna/python/samples/dsFwdQCD70PU20.txt"
+dsFile="MNTriggerStudies/MNTriggerAna/python/samples/ds70TriggerStudies.txt"
+#dsFile="MNTriggerStudies/MNTriggerAna/python/samples/dsFwdQCD70PU20.txt"
 
 # define the util decorator. Functions marked with this wont turn into ds attribute
 def util(func):
