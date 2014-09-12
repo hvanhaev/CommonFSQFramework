@@ -111,6 +111,7 @@ for s in sampleListTodo:
     for l in cfg:
         line = l.strip()
         #if "pset=" not in line: continue
+        if len(line) > 0 and line[0] == "#": continue
         if "config.JobType.psetName"  not in line: continue
         cfgName = line.split("=")[-1].replace("'","").replace('"',"").strip()
 
@@ -118,6 +119,9 @@ for s in sampleListTodo:
   if not cfgName:
     print "Unable to determine cfg name from crab.cfg!"
   else:
-    fOut = targetPath + "/" + cfgName
-    shutil.copy(cfgName, fOut)
+    if not os.path.isfile(cfgName):
+        print "Warning: cannot determine the pset. Tried:", cfgName
+    else:
+        fOut = targetPath + "/" + cfgName
+        shutil.copy(cfgName, fOut)
   sys.exit()  
