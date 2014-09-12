@@ -1,4 +1,17 @@
-import os
+import os, sys,subprocess
+
+def getCrabVersion():
+    try:
+        ver=subprocess.check_output(["crab", "--version"])#,, "v3"
+    except OSError:
+        raise Exeption("Seems that crab environment is not defined. Exit... stage left")
+
+    ret = 2
+    if "v3" in ver:
+        ret = 3 
+
+    return ret
+
 
 def getVariant():
     if  "SmallXAnaVersion" not in  os.environ:
