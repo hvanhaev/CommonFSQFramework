@@ -2,6 +2,8 @@
 import sys,os,re,shutil
 from optparse import OptionParser
 
+# TODO: voms-proxy-init --voms cms --valid 168:00
+
 import ROOT
 ROOT.gROOT.SetBatch(True)
 
