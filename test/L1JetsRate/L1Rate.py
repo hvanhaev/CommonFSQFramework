@@ -39,12 +39,17 @@ class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader
         todo.append( ("L1SingleJet", 49.5, 101.5) )
         #todo.append( ("L1SingleJet", 49.5, 61.5) )
         todo.append( ("L1DoubleJetCF", 29.5, 71.5) )
+        #todo.append( ("L1DoubleJet35CFDphi", 1.99, 3.15) )
+        todo.append( ("L1DoubleJet35CFDphi", -0.01, 3.15) )
         for w in self.newlumiWeighters:
             for t in todo:
                 name = t[0]+"_"+w
                 binL = t[1]
                 binH = t[2]
                 nbins = binH - binL
+                if t[0] == "L1DoubleJet35CFDphi": 
+                    nbins = 30
+
                 pu=w.split("PU")[1]
                 yLabel = t[0]+ "@PU="+pu + " rate [Hz]"
                 self.histos[name] = ROOT.TH1D(name, name+";Threshold [GeV];"+yLabel, int(nbins), binL, binH)
@@ -62,7 +67,8 @@ class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader
         nbins = hist.GetNbinsX()
         getBinCenter = hist.GetXaxis().GetBinCenter
         for i in xrange(1,nbins+1):
-            binCenter = int(getBinCenter(i))
+            #binCenter = int(getBinCenter(i))
+            binCenter = getBinCenter(i)
 
             # As always "<=" is a tricky thing...
             if binCenter < maxThr or abs(binCenter-maxThr) < 0.1:
@@ -70,13 +76,34 @@ class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader
             else:
                 break
 
+
+    #  0.0 0.34906578064 0.698131561279 1.04719740549 1.39626330534 1.74532920519 2.09439510107 2.44346088568 2.79252672195 3.14159256617
+    def getBestMaxSeparation(self, jets, ptThr):
+        bestDphi = -1
+        for i in xrange(jets.size()):
+            iJet = jets.at(i)
+            if iJet.pt() < ptThr: continue
+            if abs(iJet.eta()) > 1.7: continue
+            for j in xrange(i+1, jets.size()):
+                jJet = jets.at(j)
+                if jJet.pt() < ptThr: continue
+                if abs(jJet.eta()) < 2.5: continue
+                dphi = abs(ROOT.Math.VectorUtil.DeltaPhi(iJet, jJet))
+                if bestDphi < dphi: bestDphi = dphi
+        return bestDphi
+
+
     def analyze(self):
         hardestL1 = -1
         hardestL1Central = -1
         hardestL1Forwad  = -1
 
-        for i in xrange(self.fChain.L1Jets.size()):
-            jetI = self.fChain.L1Jets.at(i)
+        #l1jets = getattr(self.fChain, "stage1L1Jets")
+        #l1jets = getattr(self.fChain, "L1Jets")
+        l1jets = getattr(self.fChain, self.l1col)
+
+        for i in xrange(l1jets.size()):
+            jetI = l1jets.at(i)
             ptI = jetI.pt()
             if hardestL1 < ptI:
                 hardestL1 = ptI
@@ -90,6 +117,9 @@ class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader
 
         pu = self.fChain.PUNumInteractions
 
+        dphiMax = self.getBestMaxSeparation(l1jets, 35)
+        #print "TTTT", dphiMax
+
         #print hardestL1, int(hardestL1)
         for w in self.newlumiWeighters:
             weight = self.newlumiWeighters[w].weight(pu)
@@ -97,6 +127,9 @@ class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader
             self.histoDenoms["L1SingleJet_"+w+"Denom"].Fill(0, weight)
             self.fillRate(self.histos["L1DoubleJetCF_"+w], doubleJetCFSeedMaxThr, weight)
             self.histoDenoms["L1DoubleJetCF_"+w+"Denom"].Fill(0, weight)
+
+            self.fillRate(self.histos["L1DoubleJet35CFDphi_"+w], dphiMax, weight)
+            self.histoDenoms["L1DoubleJet35CFDphi_"+w+"Denom"].Fill(0, weight)
 
     def finalize(self):
         #print "Finalize:"
@@ -153,11 +186,13 @@ class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader
         todo.append( ("L1DoubleJetCF", 48 ) ) # (seed name, threshold)
         todo.append( ("L1DoubleJetCF", 52 ) ) # (seed name, threshold)
         todo.append( ("L1DoubleJetCF", 68 ) ) # (seed name, threshold)
+        todo.append( ("L1DoubleJet35CFDphi", 2.7 ) ) # (seed name, threshold)
+        
         #'''
         for t in todo:
             seed = t[0]
             thr =  t[1]
-            histoname = "rateVsPU_"+seed+str(thr)
+            histoname = "rateVsPU_"+seed+str(thr).replace(".","_")
             yLabel = seed+str(thr) + " rate [Hz]"
             hist = ROOT.TH1F(histoname, histoname+";PU;" + yLabel, nbins, binL, binH)
             hist.SetMarkerSize(0.5)
@@ -204,13 +239,13 @@ if __name__ == "__main__":
     # '''
     #maxFilesMC = 32
 
-    slaveParams = {}
-
+    slaveParams = {"l1col": "stage1L1Jets" }
+    #slaveParams = {"l1col": "oldL1Jets" }
     # select hltCollection here (see plugins/MNTriggerAna.cc to learn whats avaliable):
 
     # note - remove maxFiles parameter in order to run on all files
     L1Rate.runAll(treeName="L1JetsRateAna",
-                               #slaveParameters=slaveParams,
+                               slaveParameters=slaveParams,
                                #sampleList=sampleList,
                                maxFilesMC = maxFilesMC,
                                nWorkers=nWorkers,
