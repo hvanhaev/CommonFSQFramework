@@ -5,4 +5,6 @@
 # pu 0...10
 #/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/fruboes-20140815_HLTJetsPu0to10_1M-1914e7f200d7a3952c1631dd40280690/USER
 # pu 0...10, new L1
-/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/fruboes-20140902_HLTJetsPu0to10_withL1Stage1-dc64037346fa4f0c87471d40dfb5e9cf/USER
+#/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/fruboes-20140902_HLTJetsPu0to10_withL1Stage1-dc64037346fa4f0c87471d40dfb5e9cf/USER
+# pu 0...10, with trigger decision
+/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/fruboes-20140911_HLTJetsPu0to10_withL1Stage1_TRGJECMN-cdce4465565d0fe93d53b358060cc01e/USER

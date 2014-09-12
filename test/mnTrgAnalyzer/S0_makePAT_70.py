@@ -197,9 +197,24 @@ process.MNTriggerAnaNew = cms.EDAnalyzer("MNTriggerAnaNew",
     ),
 
 
-
-
+    TriggerResultsView =  cms.PSet(
+        branchPrefix = cms.untracked.string("trg"),
+        process = cms.string("TTT"), # usually HLT
+        #triggers = cms.vstring("HLT_DiPFJetAve60_CentralForward_v1", "HLT_DiPFJetAve60_CentralForward*", "viaClass"),
+        triggers = cms.vstring("ptAve60CenFwd", "ptAve80CenFwd", "diPFJet20CntrFwdEta3", "diPFJet20rFwdBckwEta2", \
+                               "diPFJet20rFwdBckwEta3", "FwdPFJet20Eta2", "FwdPFJet20Eta3", "PFJet20"),
+        ptAve60CenFwd = cms.vstring("HLT_DiPFJetAve60_CentralForward_v1"),
+        ptAve80CenFwd = cms.vstring("HLT_DiPFJetAve80_CentralForward_v1"),
+        diPFJet20CntrFwdEta3 = cms.vstring("HLT_DiPFJet20_CntrFwdEta3_v1"),
+        diPFJet20rFwdBckwEta2 = cms.vstring("HLT_DiPFJet20_FwdBckwEta2_v1"),
+        diPFJet20rFwdBckwEta3 = cms.vstring("HLT_DiPFJet20_FwdBckwEta3_v1"),
+        FwdPFJet20Eta2 = cms.vstring("HLT_FwdPFJet20_Eta2_v1"),
+        FwdPFJet20Eta3 = cms.vstring("HLT_FwdPFJet20_Eta3_v1"),
+        PFJet20 = cms.vstring("HLT_PFJet20_v1")
+    ),
 )
+
+
 process = MNTriggerStudies.MNTriggerAna.customizePAT.addTreeProducer(process, process.MNTriggerAnaNew)
 
 prefix='root://xrootd.ba.infn.it/'
@@ -212,6 +227,8 @@ primary = "file:/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_Tune4
 
 primary="file:/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/20140902_HLTJetsPu0to10_withL1Stage1/dc64037346fa4f0c87471d40dfb5e9cf/outputFULL_99_1_Py7.root"
 primary="file:/nfs/dust/cms/user/fruboest/2014.09.TestL1Stage1/CMSSW_7_1_5/src/ProduceHLTAndL1/outputFULL.root"
+primary="file:/nfs/dust/cms/user/fruboest/2014.09.TestL1Stage1/CMSSW_7_1_5/src/MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/HLTObjectsProduction_testMyPath/outputFULL.root"
+
 
 #'''
 process.source = cms.Source("PoolSource",
