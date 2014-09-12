@@ -213,13 +213,13 @@ primary = "file:/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_Tune4
 primary="file:/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/20140902_HLTJetsPu0to10_withL1Stage1/dc64037346fa4f0c87471d40dfb5e9cf/outputFULL_99_1_Py7.root"
 primary="file:/nfs/dust/cms/user/fruboest/2014.09.TestL1Stage1/CMSSW_7_1_5/src/ProduceHLTAndL1/outputFULL.root"
 
-'''
+#'''
 process.source = cms.Source("PoolSource",
 #    secondaryFileNames = cms.untracked.vstring([sec1, sec2]),
     fileNames = cms.untracked.vstring([primary]),
     bypassVersionCheck = cms.untracked.bool(True)
 )
-'''
+#'''
 
 process.patJetsAK4PFCHSCopy.addGenJetMatch = cms.bool(False)
 process.patJetsAK4PFCHSCopy.embedGenJetMatch = cms.bool(False)
