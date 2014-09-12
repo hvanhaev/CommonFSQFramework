@@ -1,17 +1,38 @@
 #! /usr/bin/env python
 
-import os, sys
+import os, sys, subprocess
 
 import ROOT
 ROOT.gROOT.SetBatch(True)
 from ROOT import *
 
 import pprint
+import MNTriggerStudies.MNTriggerAna.Util
 
 try:
     from elementtree import ElementTree
 except:
     from xml.etree.ElementTree import ElementTree 
+
+def getSEDirsCrab3(anaVersion, name):
+    # from runCrab3Jobs.py:
+    # pycfgextra.append("config.General.workArea='"+anaVersion+"'")
+    # pycfgextra.append("config.General.requestName='"+name+"'")
+    for taskDir in os.listdir(anaVersion):
+        if name in taskDir: break
+    else:
+        raise Exception("Cannot find crab3 dir for "+anaVersion+" "+ name)
+
+    taskDir = os.path.join(anaVersion, taskDir)
+    output = subprocess.check_output(["crab", "getoutput", "--dump", taskDir])
+    SEDirs = set()
+    for l in output.splitlines():
+        filename = l.split("/")[-1]
+        if not filename.startswith("trees_"): continue
+        if not filename.endswith(".root"): continue
+        SEDirs.add(l.replace(filename,""))
+
+    return SEDirs
 
 def getSEDirsCrab2(anaVersion, name):
     crabDirName = anaVersion+"_"+name # crab dir naming from runCrabJobs.py
@@ -80,10 +101,14 @@ def main(sam):
             if value != None:
                 sam[name][f] = value
 
-        #crabDirName = "DiJet_20140214_METFwd-Run2010B-Apr21ReReco-v1"
-        #print "Warning - devel name of crab dir"
-        #  name=anaVersion+"_"+s
-        SEDirs = getSEDirsCrab2(anaVersion, name)
+        crabVersion = MNTriggerStudies.MNTriggerAna.Util.getCrabVersion()
+        if crabVersion == 2:
+            SEDirs = getSEDirsCrab2(anaVersion, name)
+        elif crabVersion == 3:
+            SEDirs = getSEDirsCrab3(anaVersion, name)
+        else:
+            raise Exception("Unexpected crab version: "+str(crabVersion))
+
         SEDir = None
         if len(SEDirs)!=1: 
             print "Problem determining SE dir for", name, "- candidates are: ", SEDirs
