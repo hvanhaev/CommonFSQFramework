@@ -33,6 +33,15 @@ class HLTBalanceTreeProducer(BalanceTreeProducer.BalanceTreeProducer):
         self.addExternalVar(["l1DoubleJet"])
         self.addExternalVar(["l1SingleJetCentral"])
         self.addExternalVar(["l1SingleJetForward"])
+        self.addExternalVar(["s1l1SingleJetCentral"])
+        self.addExternalVar(["s1l1SingleJetForward"])
+
+
+        self.addExternalVar(["s1DoubleJetCFDphi31"])
+        self.addExternalVar(["s1DoubleJetCFDphi27"])
+        self.addExternalVar(["s1DoubleJetCFDphi24"])
+        self.addExternalVar(["s1DoubleJetCFDphi20"])
+        self.addExternalVar(["s1DoubleJetCFDphi17"])
 
 
         self.addExternalVar(["PUNumInteractions"])
@@ -44,22 +53,46 @@ class HLTBalanceTreeProducer(BalanceTreeProducer.BalanceTreeProducer):
         puFile = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/PUhists.root").fullPath()
 
         self.newlumiWeighters = {}
+        #'''
+        self.newlumiWeighters["flat010toflat010"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "Flat0to10/pileup")
         self.newlumiWeighters["flat010toPU1"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU1/pileup")
-        self.newlumiWeighters["flat010toPU2"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU2/pileup")
-        self.newlumiWeighters["flat010toPU3"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU3/pileup")
-        self.newlumiWeighters["flat010toPU4"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU4/pileup")
+        #self.newlumiWeighters["flat010toPU2"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU2/pileup")
+        #self.newlumiWeighters["flat010toPU3"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU3/pileup")
+        #self.newlumiWeighters["flat010toPU4"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU4/pileup")
         self.newlumiWeighters["flat010toPU5"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU5/pileup")
         self.newlumiWeighters["flat010toPU10"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU10/pileup")
+        #'''
+        '''
         self.newlumiWeighters["flat2050toPU20"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU20/pileup")
         self.newlumiWeighters["flat2050toPU25"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU25/pileup")
         self.newlumiWeighters["flat2050toPU30"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU30/pileup")
+        #'''
+
+        '''
+        self.newlumiWeighters["PU20to15"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU15/pileup")
+        self.newlumiWeighters["PU20to18"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU18/pileup")
+        self.newlumiWeighters["PU20to19"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU19/pileup")
+        self.newlumiWeighters["PU20to21"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU21/pileup")
+        self.newlumiWeighters["PU20to22"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU22/pileup")
+        self.newlumiWeighters["PU20to20"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU20/pileup")
+        self.newlumiWeighters["PU20to25"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU25/pileup")
+        #'''
         self.addExternalVar(self.newlumiWeighters.keys())
 
-
-
-    #    print "XX2!"
-        #self.balanceProd =  BalanceTreeProducer()
-        #self.GetOutputList().Add(self.tree)
+    #deltaPHI: 0.0 0.349 0.698 1.047 1.396 1.745 2.094 2.443 2.792 3.141
+    def getBestL1PairWithPhiSeparation(self, jets, dphiTHR):
+        bestThr = 0
+        for i in xrange(jets.size()):
+            iJet = jets.at(i)
+            if abs(iJet.eta()) > 1.7: continue
+            for j in xrange(0, jets.size()):
+                jJet = jets.at(j)
+                if abs(jJet.eta()) < 2.5: continue
+                dphi = abs(ROOT.Math.VectorUtil.DeltaPhi(iJet, jJet))
+                if dphi < dphiTHR: continue
+                minPT = min(iJet.pt(), jJet.pt())
+                if minPT > bestThr: bestThr = minPT
+        return bestThr
 
     def getHLTTagProbe(self, hltJets):
         probe = None
@@ -77,6 +110,22 @@ class HLTBalanceTreeProducer(BalanceTreeProducer.BalanceTreeProducer):
 
         return (tag, probe)
 
+    def analyzeDumb(self):
+    #def analyze(self):
+        self.setExternalVar("PUNumInteractions", self.fChain.PUNumInteractions)
+        self.setExternalVar("puTrueNumInteractions", self.fChain.puTrueNumInteractions)
+
+        pu = self.fChain.PUNumInteractions
+        genW = BalanceTreeProducer.BalanceTreeProducer.genWeight(self)
+        for l in self.newlumiWeighters:
+            w = self.newlumiWeighters[l].weight(pu)
+            #print pu, l, w, genW
+            self.setExternalVar(l, w*genW)
+
+        BalanceTreeProducer.BalanceTreeProducer.analyze(self)
+
+
+    #def analyzeGood(self):
     def analyze(self):
         tag, probe = self.getHLTTagProbe(self.fChain.hltAK4PFJetsCorrected)
         tagL1match, probeL1match = self.getHLTTagProbe(self.fChain.hltPFJetsCorrectedMatchedToL1)
@@ -111,31 +160,53 @@ class HLTBalanceTreeProducer(BalanceTreeProducer.BalanceTreeProducer):
         self.setExternalVar("PUNumInteractions", self.fChain.PUNumInteractions)
         self.setExternalVar("puTrueNumInteractions", self.fChain.puTrueNumInteractions)
 
+
         l1Jets = self.fChain.l1Jets
+        s1l1Jets = self.fChain.stage1L1Jets
         #print "XX"
-        pts = []
-        hardestL1Central = 0
-        hardestL1Forwad  = 0
+        todo = {}
+        todo["old"] = l1Jets
+        todo["stage1"] = s1l1Jets
 
-        # eta l1 scale:  -0.174 -0.5215 -0.8695 -1.218 -1.566 -1.956 -2.586 -3.25 -3.75 -4.25 -4.75
-        for j in l1Jets:
-            pts.append(j.pt())
-            if abs(j.eta()) < 1.7 and hardestL1Central < j.pt():
-                hardestL1Central = j.pt()
-            if abs(j.eta()) > 2.5 and hardestL1Forwad < j.pt():
-                hardestL1Forwad = j.pt()
+        #  0.0 0.34906578064 0.698131561279 1.04719740549 1.39626330534 1.74532920519 2.09439510107 2.44346088568 2.79252672195 3.14159256617
+        self.setExternalVar("s1DoubleJetCFDphi31", self.getBestL1PairWithPhiSeparation(s1l1Jets, 3.1))
+        self.setExternalVar("s1DoubleJetCFDphi27", self.getBestL1PairWithPhiSeparation(s1l1Jets, 2.7))
+        self.setExternalVar("s1DoubleJetCFDphi24", self.getBestL1PairWithPhiSeparation(s1l1Jets, 2.4))
+        self.setExternalVar("s1DoubleJetCFDphi20", self.getBestL1PairWithPhiSeparation(s1l1Jets, 2.0))
+        self.setExternalVar("s1DoubleJetCFDphi17", self.getBestL1PairWithPhiSeparation(s1l1Jets, 1.7))
 
-        top2 = sorted(pts)[-2:]
-        doubleJetLowestThr = 1000
-        if len(top2) == 2:
-            doubleJetLowestThr = top2[0]
 
-        #print "A", pts
-        #print "B", top2
-        #print "C", doubleJetLowestThr
-        self.setExternalVar("l1DoubleJet", doubleJetLowestThr)
-        self.setExternalVar("l1SingleJetCentral", hardestL1Central)
-        self.setExternalVar("l1SingleJetForward", hardestL1Forwad)
+        for t in todo:
+            pts = []
+            hardestL1Central = 0
+            hardestL1Forwad  = 0
+
+            # eta l1 scale:  -0.174 -0.5215 -0.8695 -1.218 -1.566 -1.956 -2.586 -3.25 -3.75 -4.25 -4.75
+            for j in todo[t]:
+                #print "PPP", j.phi()
+                pts.append(j.pt())
+                if abs(j.eta()) < 1.7 and hardestL1Central < j.pt():
+                    hardestL1Central = j.pt()
+                if abs(j.eta()) > 2.5 and hardestL1Forwad < j.pt():
+                    hardestL1Forwad = j.pt()
+
+            top2 = sorted(pts)[-2:]
+            doubleJetLowestThr = 1000
+            if len(top2) == 2:
+                doubleJetLowestThr = top2[0]
+
+            #print "A", pts
+            #print "B", top2
+            #print "C", doubleJetLowestThr
+            if t == "old":
+                self.setExternalVar("l1DoubleJet", doubleJetLowestThr)
+                self.setExternalVar("l1SingleJetCentral", hardestL1Central)
+                self.setExternalVar("l1SingleJetForward", hardestL1Forwad)
+            elif t == "stage1":
+                self.setExternalVar("s1l1SingleJetCentral", hardestL1Central)
+                self.setExternalVar("s1l1SingleJetForward", hardestL1Forwad)
+            else:
+                raise Exception("thats surprising!")
 
         pu = self.fChain.PUNumInteractions
         genW = BalanceTreeProducer.BalanceTreeProducer.genWeight(self)

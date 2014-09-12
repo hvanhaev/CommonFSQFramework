@@ -6,7 +6,7 @@ EventViewBase(iConfig,  tree)
 {
 
     // register branches
-    registerVecP4("genTracks", tree);
+    registerVecP4("p4", tree);
     registerVecInt("charge", tree);
     registerVecInt("pdg", tree);
     registerVecInt("status", tree);
@@ -47,7 +47,7 @@ void GenTrackView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup&
         }
         if (hIn->at(i).pt() < m_minPt ) continue;
         if (std::abs(hIn->at(i).eta()) > m_maxEta ) continue;
-        addToP4Vec("genTracks", hIn->at(i).p4());
+        addToP4Vec("p4", hIn->at(i).p4());
         addToIVec("charge", hIn->at(i).charge());
         addToIVec("pdg", hIn->at(i).pdgId());
         addToIVec("status", hIn->at(i).status());

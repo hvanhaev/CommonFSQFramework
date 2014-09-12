@@ -108,19 +108,26 @@ class MNSignalEfficiencyVsTriggerThreshold(MNTriggerStudies.MNTriggerAna.Example
         #self.fbTrigger = BaseTrigger.DoubldForwardTrigger(getter)
         self.atLeastOneCentral = BaseTrigger.DoubleJetWithAtLeastOneCentralJetTrigger(getter)
         self.L1SingleJetSeed = BaseTrigger.SingleJetTrigger(getterL1)
+        #self.L1SingleJetForwardSeed = BaseTrigger.SingleForwardJetTrigger(getterL1)
 
         self.effHistos = {} # histoName:       [topologyName,trigger, effNom, effDenom]
         self.effHistos["FB_HLT"] = ["FB", self.fbTrigger,       None, None]
         self.effHistos["FB_L1"] = ["FB",  self.L1SingleJetSeed, None, None]
         self.effHistos["atLeastOneCentral_HLT"] = ["atLeastOneCentral",  self.atLeastOneCentral, None, None]
         self.effHistos["atLeastOneCentral_L1"] = ["atLeastOneCentral",  self.L1SingleJetSeed, None, None]
+        binL = -0.5
+        binH = 49.5
+        #binL = 39.5
+        #binH = 69.5
+        nbins = int(binH-binL)
+
         for h in self.effHistos:
                 name = h+"_nom"
-                self.effHistos[h][2] = ROOT.TH1F(name, name, 50, -0.5, 49.5)
+                self.effHistos[h][2] = ROOT.TH1F(name, name, nbins, binL, binH)
                 self.effHistos[h][2].Sumw2()
                 self.GetOutputList().Add(self.effHistos[h][2])
                 name = h+"_denom"
-                self.effHistos[h][3] = ROOT.TH1F(name, name, 50, -0.5, 49.5)
+                self.effHistos[h][3] = ROOT.TH1F(name, name, nbins, binL, binH)
                 self.effHistos[h][3].Sumw2()
                 self.GetOutputList().Add(self.effHistos[h][3])
 
@@ -210,7 +217,9 @@ if __name__ == "__main__":
     slaveParams["hltCollection"] = "hltAK4PFJetsCorrected"
     #slaveParams["hltCollection"] = "hltPFJetsCorrectedMatchedToL1"
 
-    slaveParams["l1Collection"] = "l1Jets"
+    #slaveParams["l1Collection"] = "oldL1Jets"
+    slaveParams["l1Collection"] = "stage1L1Jets"
+
 
     # note - remove maxFiles parameter in order to run on all files
     MNSignalEfficiencyVsTriggerThreshold.runAll(treeName="MNTriggerAnaNew", 

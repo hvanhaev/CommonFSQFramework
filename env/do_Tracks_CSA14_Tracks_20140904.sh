@@ -1,0 +1,2 @@
+export SmallXAnaVersion="MNTriggerStudies.MNTriggerAna.samples.Samples_CSA14_Tracks_20140904"
+

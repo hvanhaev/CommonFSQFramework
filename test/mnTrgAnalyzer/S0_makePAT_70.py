@@ -126,6 +126,11 @@ process.source.fileNames = [
      'file:'+f
 ]
 
+#switchOnTrigger(process, 'patTrigger', 'patTriggerEvent', 'patDefaultSequence', triggerProcess, 'out')
+from PhysicsTools.PatAlgos.tools.trigTools import *
+switchOnTrigger( process, hltProcess="TTT" )
+
+
 
 import MNTriggerStudies.MNTriggerAna.customizePAT
 process = MNTriggerStudies.MNTriggerAna.customizePAT.customize(process)
@@ -205,6 +210,7 @@ primary='file:/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_Tune4C_
 primary= "file:/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/20140813_HLTJets/db6fe0c1c3daf8225c4ac7289ea45cd0/outputFULL_11_1_WVC.root"
 primary = "file:/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/20140813C_HLTJets/1914e7f200d7a3952c1631dd40280690/outputFULL_17_1_UZk.root"
 
+primary="file:/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/20140902_HLTJetsPu0to10_withL1Stage1/dc64037346fa4f0c87471d40dfb5e9cf/outputFULL_99_1_Py7.root"
 primary="file:/nfs/dust/cms/user/fruboest/2014.09.TestL1Stage1/CMSSW_7_1_5/src/ProduceHLTAndL1/outputFULL.root"
 
 '''
@@ -293,6 +299,7 @@ process.source.inputCommands.extend([
 #'''
 
 
+print "Warning - stage 1 and HLT disabled!"
 
 
 
