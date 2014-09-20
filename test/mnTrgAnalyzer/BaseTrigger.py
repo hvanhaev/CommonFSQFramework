@@ -1,13 +1,17 @@
+import ROOT
+
 class TriggerObjectsGetter:
-    def __init__(self, chain, collection, minPT=None):
+    def __init__(self, chain, collection, minPT=None, maxDR=0.8):
         self.run = -1
         self.ev = -1
-        self.trgMomenta = None
+        self.trgMomenta = {}
         self.chain = chain
         self.collection = collection
         self.minPT = minPT
+        self.dr = ROOT.Math.VectorUtil.DeltaR
+        self.maxDR = maxDR
 
-    def get(self):
+    def get(self, matchingObjects = None):
         newEvent = False
         ev = self.chain.event
         run = self.chain.run
@@ -15,18 +19,34 @@ class TriggerObjectsGetter:
             self.ev = ev
             self.run = run
             newEvent = True
+        if newEvent:
+            self.trgMomenta = {}
 
-        if not newEvent:
-            return self.trgMomenta
+        idnum = id(matchingObjects) 
+        if  idnum in self.trgMomenta:
+            return self.trgMomenta[idnum]
 
+        self.trgMomenta[idnum] = []
         jets = getattr(self.chain, self.collection)
-        self.trgMomenta = []
         for j in jets:
             if self.minPT != None and j.pt() < self.minPT: continue
-            self.trgMomenta.append(j)
+            isOK = True
+            if matchingObjects != None:
+                for m in matchingObjects:
+                    dr = self.dr(m, j)
+                    if dr > self.maxDR: continue
+                    #print "XXX match", dr, m.eta(), m.phi(), j.eta(), j.phi()
+                    break 
+                else: # executed only if we dont hit break line above
+                    isOK = False
+
+            if isOK:
+                self.trgMomenta[idnum].append(j)
+            #else:
+            #    print "XXX no match"
         
-        self.trgMomenta = sorted(self.trgMomenta, reverse = True, key = lambda j: j.pt())
-        return self.trgMomenta
+        self.trgMomenta[idnum] = sorted(self.trgMomenta[idnum], reverse = True, key = lambda j: j.pt())
+        return self.trgMomenta[idnum]
 
 class BaseTrigger:
     def __init__(self, objectsGetter):
@@ -39,11 +59,11 @@ class BaseTrigger:
 
     #def getDecision(self, threshold):
         
-    def getMaxThreshold(self):
+    def getMaxThreshold(self, topologyFullfillyingObjects = None):
         return 0
 
 class ForwardBackwardTrigger(BaseTrigger):
-    def getMaxThreshold(self):
+    def getMaxThreshold(self, topologyFullfillyingObjects = None):
         hltJets = self.objectsGetter.get()
         bestF, bestB = (None, None)
         for j in hltJets:
@@ -64,7 +84,7 @@ class ForwardBackwardTrigger(BaseTrigger):
 
 
 class DoubldForwardTrigger(BaseTrigger):
-    def getMaxThreshold(self):
+    def getMaxThreshold(self, topologyFullfillyingObjects = None):
         hltJets = self.objectsGetter.get()
         pts = []
         for j in hltJets:
@@ -79,7 +99,7 @@ class DoubldForwardTrigger(BaseTrigger):
 
 
 class DoubleJetWithAtLeastOneCentralJetTrigger(BaseTrigger):
-    def getMaxThreshold(self):
+    def getMaxThreshold(self, topologyFullfillyingObjects = None):
         hltJets = self.objectsGetter.get()
         jetsF = []
         jetsC = []
@@ -100,7 +120,7 @@ class DoubleJetWithAtLeastOneCentralJetTrigger(BaseTrigger):
         return min(pt1, pt2)
 
 class PTAveForHFJecTrigger(BaseTrigger):
-    def getMaxThreshold(self):
+    def getMaxThreshold(self, topologyFullfillyingObjects = None):
         hltJets = self.objectsGetter.get()
         tag, probe = (None, None) 
         for j in hltJets:
@@ -118,7 +138,7 @@ class PTAveForHFJecTrigger(BaseTrigger):
 
 
 class SingleJetTrigger(BaseTrigger):
-    def getMaxThreshold(self):
+    def getMaxThreshold(self, topologyFullfillyingObjects = None):
         hltJets = self.objectsGetter.get()
         if len(hltJets) > 0:
             return hltJets[0].pt()
@@ -127,10 +147,107 @@ class SingleJetTrigger(BaseTrigger):
 
 
 class SingleForwardJetTrigger(BaseTrigger):
-    def getMaxThreshold(self):
-        hltJets = self.objectsGetter.get()
+    def __init__(self, getter, etaLim = 2.5):
+        BaseTrigger.__init__(self, getter)
+        self.etaLim  = etaLim
+
+    def getMaxThreshold(self, topologyFullfillyingObjects = None):
+        if topologyFullfillyingObjects != None and len(topologyFullfillyingObjects) != 1:
+            raise Exception("Expected 1 good object, got " + str(len(topologyFullfillyingObjects)))
+
+        hltJets = self.objectsGetter.get(topologyFullfillyingObjects)
         for j in hltJets:
-            if abs(j.eta() ) < 2.5: continue
+            if abs(j.eta() ) < self.etaLim: continue
             return j.pt()
         return 0
+
+
+
+class SingleCentralJetTrigger(BaseTrigger):
+    def __init__(self, getter, etaLim = 3.5):
+        BaseTrigger.__init__(self, getter)
+        self.etaLim  = etaLim
+    def getMaxThreshold(self, topologyFullfillyingObjects = None):
+        if topologyFullfillyingObjects != None and len(topologyFullfillyingObjects) != 1:
+            raise Exception("Expected 1 good object, got " + str(len(topologyFullfillyingObjects)))
+        hltJets = self.objectsGetter.get(topologyFullfillyingObjects)
+        #print "----"
+        for j in hltJets:
+            #print j.eta(), j.pt(), self.etaLim
+            #print "XXX", j.eta()
+            if abs(j.eta() ) > self.etaLim: 
+                #print "   skip"
+                continue
+            return j.pt()
+        return 0
+
+
+class PTAveProperTrigger(BaseTrigger):
+    def getMaxThreshold(self, topologyFullfillyingObjects = None):
+        hltJets = self.objectsGetter.get()
+        tag = None
+        probe = None
+        for j in hltJets:
+            if j.pt() < 10: continue
+            eta = abs(j.eta())
+            if eta < 1.4: 
+                if tag == None or tag.pt() < j.pt():
+                    tag = j
+            elif eta > 2.7:
+                if probe == None or probe.pt() < j.pt():
+                    probe = j
+
+        if tag == None or probe == None:
+            return 0
+
+        pt1 = tag.pt()
+        pt2 = probe.pt()
+        ave = (pt1+pt2)/2.
+        if pt1 < ave/2:
+            ave = 2*pt1
+        if pt2 < ave/2:
+            ave = 2*pt2
+
+        return ave
+
+
+class PTAveMessedTrigger(BaseTrigger):
+    def getMaxThreshold(self, topologyFullfillyingObjects = None):
+        hltJets = self.objectsGetter.get()
+        tag = None
+        probe = None
+
+        bestPTS = []
+        for j in hltJets:
+            if j.pt() < 10: continue
+            eta = abs(j.eta())
+            good = False
+            if eta < 1.4: 
+                good = True
+                if tag == None or tag.pt() < j.pt():
+                    tag = j
+            elif eta > 2.7:
+                good = True
+                if probe == None or probe.pt() < j.pt():
+                    probe = j
+
+            if good: bestPTS.append(j.pt())
+
+        if tag == None or probe == None:
+            return 0
+
+        bestPTS = sorted(bestPTS, reverse=True)
+        ave = (bestPTS[0]+bestPTS[1])/2
+
+        pt1 = tag.pt()
+        pt2 = probe.pt()
+        if pt1 < ave/2:
+            ave = 2*pt1
+        if pt2 < ave/2:
+            ave = 2*pt2
+
+        return ave
+
+
+
 
