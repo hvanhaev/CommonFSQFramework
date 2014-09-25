@@ -208,7 +208,37 @@ class ExampleProofReader( ROOT.TPySelector ):
         else:
             return self.normalizationFactor
 
+    def checkUnderOverFlow(self):
+        print "Checking for possible under - and overflow problems in your histograms..."
+        olist = self.GetOutputList()
+        problems = False
+        for o in olist:
+            if not "TH1" in o.ClassName(): continue
+            if o.GetBinContent(o.GetNbinsX()+1) != 0:
+                print "!!WARNING!! histogram ", o.GetName(), " has overflow ==> fraction of events in overflow bin: ", (o.GetBinContent(o.GetNbinsX()+1)/o.Integral())*100, " %"
+                problems = True
+            if o.GetBinContent(0) != 0:
+                print "!!WARNING!! histogram ", o.GetName(), " has underflow ==> fraction of events in underflow bin: ", (o.GetBinContent(0)/o.Integral())*100, " %"
+                problems = True
+
+        if not problems: print "everything is fine!"
+
     def Terminate( self ): # executed once on client
+
+        try:
+            self.checkUnderOverFlow()
+        except:
+            print ""
+            print ""
+            print "Exception catched in checkUnderOverFlow function. Traceback:"
+            print ""
+            traceback.print_exc(file=sys.stdout)
+            print ""
+            print ""
+            print ""
+            sys.stdout.flush()
+            raise Exception("Whooopps!")
+
         try:
             self.finalizeWhenMerged()
         except:
