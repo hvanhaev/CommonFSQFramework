@@ -30,53 +30,51 @@ def main():
     weight = "flat2050toPU20"
     #weight = "weight"
 
-    cutSignalHLTPTAve = "hltPtAve > XXX && hltPtCen > XXX/2 && hltPtFwd > XXX/2"
+    cutSignalHLTPTAve = "hltPtAve > YYY && hltPtCen > YYY/2 && hltPtFwd > YYY/2"
     cutToOptimizeCalo = "hltCaloPtAve > YYY && hltCaloPtCen > YYY/2 && hltCaloPtFwd > YYY/2"
     cutToOptimizeCaloSingle = "hltCaloPtCen > YYY || hltCaloPtFwd > YYY"
     cutToOptimizeL1 = " s1l1SingleJetAny > YYY"
     todo = {}
 
+
     '''
-    todo["calo30"] = (30, [x for x in xrange(0,31,2)], cutSignalHLTPTAve, cutToOptimizeCalo)
-    todo["calo60"] = (60, [x for x in xrange(30,61,2)], cutSignalHLTPTAve, cutToOptimizeCalo)
-    todo["calo80"] = (80, [x for x in xrange(40,81,2)], cutSignalHLTPTAve, cutToOptimizeCalo)
-    todo["calo100"] = (100, [x for x in xrange(50,101,5)], cutSignalHLTPTAve, cutToOptimizeCalo)
-    todo["calo160"] = (160, [x for x in xrange(80,161,5)], cutSignalHLTPTAve, cutToOptimizeCalo)
-    todo["calo220"] = (220, [x for x in xrange(110,221,10)], cutSignalHLTPTAve, cutToOptimizeCalo)
-    todo["calo300"] = (300, [x for x in xrange(150,301,10)], cutSignalHLTPTAve, cutToOptimizeCalo)
-    #'''
+    todo["calo30"] = (30, [x for x in xrange(0,31,2)], cutSignalHLTPTAve, cutToOptimizeCalo, 0.75)
+    todo["calo60"] = (60, [x for x in xrange(0,61,2)], cutSignalHLTPTAve, cutToOptimizeCalo, 0.75)
+    todo["calo80"] = (80, [x for x in xrange(0,81,2)], cutSignalHLTPTAve, cutToOptimizeCalo, 0.75)
+    todo["calo100"] = (100, [x for x in xrange(0,101,5)], cutSignalHLTPTAve, cutToOptimizeCalo, 0.75)
+    todo["calo160"] = (160, [x for x in xrange(0,161,5)], cutSignalHLTPTAve, cutToOptimizeCalo, 0.75)
+    todo["calo220"] = (220, [x for x in xrange(0,221,10)], cutSignalHLTPTAve, cutToOptimizeCalo, 0.75)
+    todo["calo300"] = (300, [x for x in xrange(0,301,10)], cutSignalHLTPTAve, cutToOptimizeCalo, 0.75)
 
+    todo["caloSingle30"] = (30, [x for x in xrange(0,31,2)], cutSignalHLTPTAve, cutToOptimizeCaloSingle, 0.75)
+    todo["caloSingle60"] = (60, [x for x in xrange(0,61,2)], cutSignalHLTPTAve, cutToOptimizeCaloSingle, 0.75)
+    todo["caloSingle80"] = (80, [x for x in xrange(0,81,2)], cutSignalHLTPTAve, cutToOptimizeCaloSingle, 0.75)
+    todo["caloSingle100"] = (100, [x for x in xrange(0,101,5)], cutSignalHLTPTAve, cutToOptimizeCaloSingle, 0.75)
+    todo["caloSingle160"] = (160, [x for x in xrange(0,161,5)], cutSignalHLTPTAve, cutToOptimizeCaloSingle, 0.75)
+    todo["caloSingle220"] = (220, [x for x in xrange(0,221,10)], cutSignalHLTPTAve, cutToOptimizeCaloSingle, 0.75)
+    todo["caloSingle300"] = (300, [x for x in xrange(0,301,10)], cutSignalHLTPTAve, cutToOptimizeCaloSingle, 0.75)
 
-    todo["calo30"] = (30, [x for x in xrange(0,31,2)], cutSignalHLTPTAve, cutToOptimizeCalo)
-    todo["calo60"] = (60, [x for x in xrange(0,61,2)], cutSignalHLTPTAve, cutToOptimizeCalo)
-    todo["calo80"] = (80, [x for x in xrange(0,81,2)], cutSignalHLTPTAve, cutToOptimizeCalo)
-    todo["calo100"] = (100, [x for x in xrange(0,101,5)], cutSignalHLTPTAve, cutToOptimizeCalo)
-    todo["calo160"] = (160, [x for x in xrange(0,161,5)], cutSignalHLTPTAve, cutToOptimizeCalo)
-    todo["calo220"] = (220, [x for x in xrange(0,221,10)], cutSignalHLTPTAve, cutToOptimizeCalo)
-    todo["calo300"] = (300, [x for x in xrange(0,301,10)], cutSignalHLTPTAve, cutToOptimizeCalo)
+    todo["30l1"] =   (30, [x for x in xrange(1,29,1)], cutSignalHLTPTAve, cutToOptimizeL1, 0.75)
+    todo["60l1"] = (60, [x for x in xrange(21,61,1)],   cutSignalHLTPTAve, cutToOptimizeL1, 0.75)
+    todo["80l1"] = (80, [x for x in xrange(41,81,1)],   cutSignalHLTPTAve, cutToOptimizeL1, 0.75)
+    todo["100l1"] = (100, [x for x in xrange(53,101,1)],   cutSignalHLTPTAve, cutToOptimizeL1, 0.75)
+    todo["160l1"] = (160, [x for x in xrange(81,161,1)],   cutSignalHLTPTAve, cutToOptimizeL1, 0.75)
+    todo["220l1"] = (220, [x for x in xrange(113,221,1)],   cutSignalHLTPTAve, cutToOptimizeL1, 0.75)
+    todo["300l1"] = (300, [x for x in xrange(153,301,1)],   cutSignalHLTPTAve, cutToOptimizeL1, 0.75)
+    # '''
 
-
-    todo["caloSingle30"] = (30, [x for x in xrange(0,31,2)], cutSignalHLTPTAve, cutToOptimizeCaloSingle)
-    todo["caloSingle60"] = (60, [x for x in xrange(0,61,2)], cutSignalHLTPTAve, cutToOptimizeCaloSingle)
-    todo["caloSingle80"] = (80, [x for x in xrange(0,81,2)], cutSignalHLTPTAve, cutToOptimizeCaloSingle)
-    todo["caloSingle100"] = (100, [x for x in xrange(0,101,5)], cutSignalHLTPTAve, cutToOptimizeCaloSingle)
-    todo["caloSingle160"] = (160, [x for x in xrange(0,161,5)], cutSignalHLTPTAve, cutToOptimizeCaloSingle)
-    todo["caloSingle220"] = (220, [x for x in xrange(0,221,10)], cutSignalHLTPTAve, cutToOptimizeCaloSingle)
-    todo["caloSingle300"] = (300, [x for x in xrange(0,301,10)], cutSignalHLTPTAve, cutToOptimizeCaloSingle)
-
-
-
-    todo["30l1"] =   (30, [x for x in xrange(1,29,1)], cutSignalHLTPTAve, cutToOptimizeL1)
-    todo["60l1"] = (60, [x for x in xrange(21,61,1)],   cutSignalHLTPTAve, cutToOptimizeL1)
-    todo["80l1"] = (80, [x for x in xrange(41,81,1)],   cutSignalHLTPTAve, cutToOptimizeL1)
-    todo["100l1"] = (100, [x for x in xrange(53,101,1)],   cutSignalHLTPTAve, cutToOptimizeL1)
-    todo["160l1"] = (160, [x for x in xrange(81,161,1)],   cutSignalHLTPTAve, cutToOptimizeL1)
-    todo["220l1"] = (220, [x for x in xrange(113,221,1)],   cutSignalHLTPTAve, cutToOptimizeL1)
-    todo["300l1"] = (300, [x for x in xrange(153,301,1)],   cutSignalHLTPTAve, cutToOptimizeL1)
     #todo["80l1"] = (60, [x for x in xrange(31,81,4)],   cutSignalHLTPTAve, cutToOptimizeL1)
-    todo["singleCen60l1"] = (60, [x for x in xrange(0, 60, 1)],   "hltPtCen > XXX" , "s1l1SingleJetCentral > YYY")
-    todo["singleFwd60l1"] = (60, [x for x in xrange(0, 60, 1)],   "hltPtFwd > XXX" , "s1l1SingleJetForward > YYY")
+    #todo["singleCen60l1"] = (60, [x for x in xrange(0, 60, 1)],   "hltPtCen > YYY" , "s1l1SingleJetCentral > YYY", 0.75)
+    #todo["singleFwd60l1"] = (60, [x for x in xrange(0, 60, 1)],   "hltPtFwd > YYY" , "s1l1SingleJetForward > YYY", 0.75)
 
+
+    #'''
+    todo["caloDiscAgainstSingleJet36"] = (36, [x for x in xrange(0, 60, 1)], cutToOptimizeL1 , cutToOptimizeCaloSingle, 0)
+    todo["caloDiscAgainstSingleJet52"] = (52, [x for x in xrange(0, 80, 1)], cutToOptimizeL1 , cutToOptimizeCaloSingle, 0)
+    todo["caloDiscAgainstSingleJet68"] = (68, [x for x in xrange(0, 100, 1)], cutToOptimizeL1 , cutToOptimizeCaloSingle, 0)
+    todo["caloDiscAgainstSingleJet128"] = (128, [x for x in xrange(0, 128, 1)], cutToOptimizeL1 , cutToOptimizeCaloSingle, 0)
+    todo["caloDiscAgainstSingleJet176"] = (176, [x for x in xrange(0, 176, 1)], cutToOptimizeL1 , cutToOptimizeCaloSingle, 0)
+    #'''
 
     
     (options, args) = parser.parse_args()
@@ -172,7 +170,7 @@ def main():
         print "  min/max"
         for b in tree.GetListOfBranches():
             name =  b.GetName()
-            #print "XXX", name
+            #print "YYY", name
             if name != "weight":
                 spl = name.split("_")
                 if len(spl) > 1:
@@ -218,7 +216,9 @@ def main():
             pointsToTest = todo[signalPointName][1]
             cutToOptimize = todo[signalPointName][3]
 
-            signalCut = cutSignal.replace("XXX", str(signalPoint))
+            plotMinimum = todo[signalPointName][4]
+
+            signalCut = cutSignal.replace("YYY", str(signalPoint))
             dsSignal = ds[t].reduce(signalCut)
             numSignal =  dsSignal.sumEntries()
             print "-"*10
@@ -229,19 +229,19 @@ def main():
             yVals = []
             for candidatePoint in pointsToTest:
                 candidateCut = cutToOptimize.replace("YYY",str(candidatePoint))
-                dsAfterCandCut = dsSignal.reduce(candidateCut)
-                numAfterCandCut = dsAfterCandCut.sumEntries()
+                numAfterCandCut = dsSignal.sumEntries(candidateCut)
                 eff = float(numAfterCandCut)/numSignal
                 print "  cp:",candidatePoint, eff
                 xVals.append(candidatePoint)
                 yVals.append(eff)
 
+            del dsSignal
 
             xArray = array('d', xVals)
             yArray = array('d', yVals)
             gr = ROOT.TGraph(len(xArray), xArray, yArray)
             gr.GetHistogram().SetMaximum(1.02)          
-            gr.GetHistogram().SetMinimum(0.75)          
+            gr.GetHistogram().SetMinimum(plotMinimum)          
             gr.GetXaxis().SetTitle("threshold")
             gr.GetYaxis().SetTitle("efficiency")
             oname = odir + "/" + signalPointName + ".png"
