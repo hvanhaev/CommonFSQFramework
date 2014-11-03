@@ -97,11 +97,14 @@ MNTriggerAnaNew::MNTriggerAnaNew(const edm::ParameterSet& iConfig)
     m_tree = tFileService->make<TTree>("data", "data");
 
     m_views.push_back(new EventIdData(iConfig, m_tree));
+    m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewCalo"), m_tree));
     m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPF"), m_tree));
     m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPFAK4CHS"), m_tree));
     m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPFAK5CHS"), m_tree));
     m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsView"), m_tree));
     m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewStage1"), m_tree));
+    m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewStage1Tau"), m_tree));
+    m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewStage1All"), m_tree));
     m_views.push_back(new TriggerResultsView(iConfig.getParameter< edm::ParameterSet >("TriggerResultsView"), m_tree));
     ///m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewCalo"), m_tree));
 
@@ -111,12 +114,19 @@ MNTriggerAnaNew::MNTriggerAnaNew(const edm::ParameterSet& iConfig)
 
     //* XXX
     m_todoHltCollections["ak5GenJets"] = edm::InputTag("ak5GenJets", "", "SIM");
+    m_todoHltCollections["ak4GenJets"] = edm::InputTag("ak4GenJets", "", "TTT");
     //"hltAK5PFJetL1FastL2L3Corrected"   ""                "PAT"
     //m_todoHltCollections["hltAK5PFJetL1FastL2L3Corrected"] = edm::InputTag("hltAK5PFJetL1FastL2L3Corrected", "", "PAT");
     
     m_todoHltCollections["hltAK4PFJets"] = edm::InputTag("hltAK4PFJets", "", "TTT");
     m_todoHltCollections["hltAK4PFJetsCorrected"]  = edm::InputTag("hltAK4PFJetsCorrected", "", "TTT");
-    m_todoHltCollections["hltPFJetsCorrectedMatchedToL1"]  = edm::InputTag("hltPFJetsCorrectedMatchedToL1", "", "TTT");
+    m_todoHltCollections["hltAK5PFJets"] = edm::InputTag("hltAK5PFJets", "", "TTT");
+    m_todoHltCollections["hltAK5PFJetsCorrected"]  = edm::InputTag("hltAK5PFJetsCorrected", "", "TTT");
+    m_todoHltCollections["hltAK4CaloJetsCorrected"]  = edm::InputTag("hltAK4CaloJetsCorrected", "", "TTT");
+    m_todoHltCollections["hltAK4CaloJetsCorrectedIDPassed"]  = edm::InputTag("hltAK4CaloJetsCorrectedIDPassed", "", "TTT");
+
+
+    //#m_todoHltCollections["hltPFJetsCorrectedMatchedToL1"]  = edm::InputTag("hltPFJetsCorrectedMatchedToL1", "", "TTT");
     //*/
 
 
@@ -211,7 +221,7 @@ MNTriggerAnaNew::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 {
     resetTrees();
     using namespace edm;
-    float minPT = 10;
+    float minPT = 5;
 
 
     for (unsigned int i = 0; i < m_views.size(); ++i){
