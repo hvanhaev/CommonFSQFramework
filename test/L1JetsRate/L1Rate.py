@@ -24,19 +24,19 @@ class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader
         puFile = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/PUhists.root").fullPath()
 
         self.newlumiWeighters = {}
-        #self.newlumiWeighters["flat2050toPU15"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU15/pileup")
-        #self.newlumiWeighters["flat2050toPU20"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU20/pileup")
-        #self.newlumiWeighters["flat2050toPU25"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU25/pileup")
-        #self.newlumiWeighters["flat2050toPU30"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU30/pileup")
+        self.newlumiWeighters["flat2050toPU15"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU15/pileup")
+        self.newlumiWeighters["flat2050toPU20"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU20/pileup")
+        self.newlumiWeighters["flat2050toPU25"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU25/pileup")
+        self.newlumiWeighters["flat2050toPU30"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU30/pileup")
 
         #self.newlumiWeighters["flat2050toPU35"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU35/pileup")
         #self.newlumiWeighters["flat2050toPU40"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU40/pileup")
         #self.newlumiWeighters["flat2050toPU45"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU45/pileup")
         #self.newlumiWeighters["flat2050toPU50"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU50/pileup")
 
-        self.newlumiWeighters["PU20toPU20"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU20/pileup")
-        self.newlumiWeighters["PU20toPU15"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU15/pileup")
-        self.newlumiWeighters["PU20toPU25"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU25/pileup")
+        #self.newlumiWeighters["PU20toPU20"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU20/pileup")
+        #self.newlumiWeighters["PU20toPU15"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU15/pileup")
+        #self.newlumiWeighters["PU20toPU25"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU25/pileup")
  
         self.histos = {}
         self.histoDenoms = {}
@@ -277,14 +277,14 @@ if __name__ == "__main__":
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     AutoLibraryLoader.enable()
 
-    #sampleList = ["Neutrino_Pt-2to20_gun"] # run through all
-    sampleList =  ["Neutrino_Pt-2to20_gun_162"]
+    sampleList = ["Neutrino_Pt-2to20_gun"] # run through all
+    #sampleList =  ["Neutrino_Pt-2to20_gun_162"]
     maxFilesMC = None
     nWorkers = None
 
     # '''
-    maxFilesMC = 1
-    nWorkers = 1
+    #maxFilesMC = 1
+    #nWorkers = 1
     # '''
     #maxFilesMC = 32
 
