@@ -103,8 +103,8 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                 maxFiles = maxFilesMC
             fileCnt = 0
             for fname in fileListUnvalidated:
-                print tab, "Veryfying file "+str(fileCnt+1)+"/"+str(len(fileListUnvalidated)), "via xrootd"
-                print tab, "  ", fname
+                #print tab, "Veryfying file "+str(fileCnt+1)+"/"+str(len(fileListUnvalidated)), "via xrootd"
+                #print tab, "  ", fname
                 if isXrootdAccess:
                     #sys.stdout.write('%s\r' % "Veryfying file "+str(fileCnt)+"/"+str(len(fileListUnvalidated)))
                     print tab, "Veryfying file "+str(fileCnt+1)+"/"+str(len(fileListUnvalidated)), "via xrootd"
