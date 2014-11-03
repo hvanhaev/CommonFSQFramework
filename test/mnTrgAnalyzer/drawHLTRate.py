@@ -76,7 +76,7 @@ def main():
     totalBunches = 3564
     #collidingBunches = 1380 # the highest value from 2012
     collidingBunches = 2*1380 # take the highest value from 2012, mul x2 (50ns - > 25 ns)
-    avgPU = 25
+    avgPU = 20
     #avgPU = 1
     minBiasXS = 78.42 * 1E9 # pb
     #minBiasXS = 69.3 * 1E9 # pb // 8 TeV
@@ -91,26 +91,36 @@ def main():
 
     print "Inst lumi", rateScaleFactor, "(pb^-1 * s^-1)"
 
+    doXSInsteadOfRate = True
+    doXSInsteadOfRate = False
+
+
 
     c1 = ROOT.TCanvas()
     for t in finalMap:
-        fname = "~/"+t+".png"
+        fname = "~/tmp/"+t+".png"
 
         rate = finalMap[t]
-        fname = "~/"+t+"_rate.png"
-        rate.Scale(rateScaleFactor)
+        fname = "~/tmp/"+t+"_rate.png"
+        if not doXSInsteadOfRate:
+            rate.Scale(rateScaleFactor)
 
         rate.Draw()
         rate.GetYaxis().SetTitleOffset(2)
         if "ptAveHFJEC" in t:
             rate.GetXaxis().SetTitle("p_{T}^{ave min HLT}")
         elif "test" in t or "singleJet" in t:
-            rate.GetXaxis().SetTitle("trigger threshold [GeV]")
+            rate.GetXaxis().SetTitle("threshold [GeV]")
             rate.GetXaxis().SetRangeUser(300, 400)
         else:
-            rate.GetXaxis().SetTitle("trigger threshold [GeV]")
-            rate.GetXaxis().SetRangeUser(15, 50)
-        rate.GetYaxis().SetTitle("rate  [Hz]")
+            rate.GetXaxis().SetTitle("threshold [GeV]")
+            #rate.GetXaxis().SetRangeUser(15, 50)
+
+
+        if doXSInsteadOfRate:
+            rate.GetYaxis().SetTitle("xs  [pb-1]")  
+        else:
+            rate.GetYaxis().SetTitle("rate  [Hz]")
         
 
         c1.Print(fname)
