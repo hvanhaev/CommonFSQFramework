@@ -54,7 +54,9 @@ def main():
     todo["caloSingle220"] = (220, [x for x in xrange(0,221,10)], cutSignalHLTPTAve, cutToOptimizeCaloSingle, 0.75)
     todo["caloSingle300"] = (300, [x for x in xrange(0,301,10)], cutSignalHLTPTAve, cutToOptimizeCaloSingle, 0.75)
 
-    todo["30l1"] =   (30, [x for x in xrange(1,29,1)], cutSignalHLTPTAve, cutToOptimizeL1, 0.75)
+    # '''    
+    #todo["30l1"] =   (30, [x for x in xrange(1,29,1)], cutSignalHLTPTAve, cutToOptimizeL1, 0.5)
+    '''
     todo["60l1"] = (60, [x for x in xrange(21,61,1)],   cutSignalHLTPTAve, cutToOptimizeL1, 0.75)
     todo["80l1"] = (80, [x for x in xrange(41,81,1)],   cutSignalHLTPTAve, cutToOptimizeL1, 0.75)
     todo["100l1"] = (100, [x for x in xrange(53,101,1)],   cutSignalHLTPTAve, cutToOptimizeL1, 0.75)
@@ -68,12 +70,20 @@ def main():
     #todo["singleFwd60l1"] = (60, [x for x in xrange(0, 60, 1)],   "hltPtFwd > YYY" , "s1l1SingleJetForward > YYY", 0.75)
 
 
-    #'''
+    todo["caloDiscAgainstSingleJet16"] = (16, [x for x in xrange(0, 30, 1)], cutToOptimizeL1 , cutToOptimizeCaloSingle, 0)
+    '''
     todo["caloDiscAgainstSingleJet36"] = (36, [x for x in xrange(0, 60, 1)], cutToOptimizeL1 , cutToOptimizeCaloSingle, 0)
     todo["caloDiscAgainstSingleJet52"] = (52, [x for x in xrange(0, 80, 1)], cutToOptimizeL1 , cutToOptimizeCaloSingle, 0)
     todo["caloDiscAgainstSingleJet68"] = (68, [x for x in xrange(0, 100, 1)], cutToOptimizeL1 , cutToOptimizeCaloSingle, 0)
     todo["caloDiscAgainstSingleJet128"] = (128, [x for x in xrange(0, 128, 1)], cutToOptimizeL1 , cutToOptimizeCaloSingle, 0)
     todo["caloDiscAgainstSingleJet176"] = (176, [x for x in xrange(0, 176, 1)], cutToOptimizeL1 , cutToOptimizeCaloSingle, 0)
+    #'''
+
+    '''
+    pythonImp = "s1l1SingleJetAny > 35 && hltAveFromPython > 60 && hltCaloPreselection > 40"
+    hltImp = "trgptAve60CenFwd > 0.5"
+    todo["verifyHLT60Imp"] = (0, [0], pythonImp, hltImp, 0)
+    todo["verifyHLT60Inverse"] = (0, [0], hltImp, pythonImp, 0)
     #'''
 
     

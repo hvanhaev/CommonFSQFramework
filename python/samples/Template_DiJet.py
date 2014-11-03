@@ -47,10 +47,16 @@ def name(ds):
     split=ds.split("/") 
     if len(split) == 0: return None
 
+    # /Neutrino_Pt-2to20_gun/fruboes-20141023_NuGun162_HLTJetsPu20_720-2f37f2cc398b18482efdc56e9384d725/USER
+
+
     if isData(ds):
         ret = split[1] + "-" + split[2]
     else:
-        ret = split[1]
+        if "NuGun162" in ds:
+            ret = split[1]+"_162"
+        else:
+            ret = split[1]
     return ret
 
 def isData(ds):
@@ -112,6 +118,8 @@ def XS(ds):
         return -1
 
     s = {}
+    s["Neutrino_Pt-2to20_gun"] = -1
+    s["Neutrino_Pt-2to20_gun_162"] = -1
     s["QCD_Pt_15to30_TuneZ2star_HFshowerLibrary_7TeV_pythia6"]   = 8.1591283E8
 
 

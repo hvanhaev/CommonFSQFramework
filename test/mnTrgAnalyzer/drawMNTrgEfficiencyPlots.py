@@ -7,10 +7,18 @@ from ROOT import *
 import os,re,sys,math
 import MNTriggerStudies.MNTriggerAna.Style
 
+from optparse import OptionParser
 def main():
     MNTriggerStudies.MNTriggerAna.Style.setStyle()
+    parser = OptionParser()
+    (options, args) = parser.parse_args()
+    if len(args) == 0:
+        print "Provide threshold"
+        sys.exit(0)
 
-    infile = "RecoSignalVsHLTEfficiency.root"
+
+    thr = int(args[0])
+    infile = "RecoSignalVsHLTEfficiency_"+str(thr)+".root"
 
     f = ROOT.TFile(infile, "r")
     lst = f.GetListOfKeys()
@@ -67,7 +75,7 @@ def main():
 
     c1 = ROOT.TCanvas()
     for t in todo:
-        fname = "~/"+t+".png"
+        fname = "~/tmp/"+str(thr)+"_"+t+".png"
         nom = finalMap[t + "_nom"]
         denom = finalMap[t + "_denom"]
 
@@ -76,6 +84,7 @@ def main():
         nom.GetYaxis().SetTitle("signal efficiency")
         nom.Draw()
         nom.SetMaximum(1.03)
+        nom.SetMinimum(0)
         nom.GetYaxis().SetTitleOffset(2)
         c1.Print(fname)
 

@@ -7,4 +7,32 @@
 # pu 0...10, new L1
 #/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/fruboes-20140902_HLTJetsPu0to10_withL1Stage1-dc64037346fa4f0c87471d40dfb5e9cf/USER
 # pu 0...10, with trigger decision
-/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/fruboes-20140911_HLTJetsPu0to10_withL1Stage1_TRGJECMN-cdce4465565d0fe93d53b358060cc01e/USER
+#/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/fruboes-20140911_HLTJetsPu0to10_withL1Stage1_TRGJECMN-cdce4465565d0fe93d53b358060cc01e/USER
+# pu 0...10, with trigger decision on pt ave and stage1 - 72 produced
+# /users/fruboes/718/201409TestStage1With72pre6/V2
+#   -- based on /dev/CMSSW_7_1_2/GRun/V15
+#/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/fruboes-20140918_HLTJetsPu0to10_withL1Stage1_TRGJECMN_72pre6A-22e6fbeb4962d1fd2d06350795e9100e/USER
+# highPU MC, same config as above
+#/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/fruboes-20140919_HLTJetsPu20to50_withL1Stage1_TRGJECMN_72pre6A-22e6fbeb4962d1fd2d06350795e9100e/USER
+# same highPU MC, done with 715 and git cms-merge-topic --unsafe cms-l1t-offline:HATs_Tutorial_v4
+#/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/fruboes-20140919_HLTJetsPu20to50_withL1Stage1_715hats-cdce4465565d0fe93d53b358060cc01e/USER
+#/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/fruboes-20140922_HLTJetsPu0to10_withL1Stage1_DoubleJetForJEC_V11-b3c03eb47a5c46d2008da87b7ecfa441/USER
+# low pu, including paths done with new pt ave filter
+#/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/fruboes-20140923_HLTJetsPu0to10_DoubleJetForJEC_wNewFilter_V14-9d4068c588719a9f2404836b826c3367/USER
+#low pu. new filter, redone for performanve
+#/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/fruboes-20140923_HLTJetsPu0to10_DoubleJetForJEC_wNewFilterV2_V14-9d4068c588719a9f2404836b826c3367/USER
+# Final filter. Proper PF/Calo corrections!
+#/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/fruboes-20140925_HLTJetsPu0to10_DoubleJetForJEC_wNewFilterV3_V14-758e8ca2e420cb30650ecd081a8c0ee3/USER
+## production with 72pre6 - calo, pf hltak5, genJetsak4
+#/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/fruboes-20140926_HLTJetsPu0to10_72_712GRunV15-db0adf4a11584916fd76cf486ad0cbeb/USER
+#/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/fruboes-20140926_HLTJetsPu20to50_72_712GRunV15-db0adf4a11584916fd76cf486ad0cbeb/USER
+#
+# done with old L1 trigger:
+#/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/fruboes-20141020_HLTJetsPu20to50_720pre8-ab4d935ec80dcf1194b09139dbb3a385/USER
+#/Neutrino_Pt-2to20_gun/fruboes-20141020_NuGun_HLTJetsPu20to50_720pre8-ab4d935ec80dcf1194b09139dbb3a385/USER
+#
+# proper stage1 trigger:
+#/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/fruboes-20141023_QCD_HLTJetsPu20to50_720-5bf11c64ebfcb1bed227f4f3ad2897d4/USER
+/Neutrino_Pt-2to20_gun/fruboes-20141023_NuGun_HLTJetsPu20to50_720-5bf11c64ebfcb1bed227f4f3ad2897d4/USER
+/Neutrino_Pt-2to20_gun/fruboes-20141023_NuGun162_HLTJetsPu20_720-2f37f2cc398b18482efdc56e9384d725/USER
+/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/fruboes-20141023_QCDnewHFJecTRG_HLTJetsPu20to50_720-3a89b834271012cd860a1a9609fca634/USER
