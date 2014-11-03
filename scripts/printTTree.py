@@ -30,7 +30,7 @@ def main():
     filename = treeFilesAndNormalizations[sample]["files"][0]
 
     
-    rootfile = ROOT.TFile(filename, "read")
+    rootfile = ROOT.TFile.Open(filename, "read")
 
     todo = [(rootfile, 0), ]
     for t in todo:
