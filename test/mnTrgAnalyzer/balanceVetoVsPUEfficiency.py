@@ -86,6 +86,7 @@ def main():
 
 
     etaRanges = [2.801, 4.999]
+    #etaRanges = [3.139, 5.191]
     
     sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
 
@@ -234,8 +235,6 @@ def main():
                 continue
 
 
-            myThreads = []
-            results = []
             for iEta in xrange(1, len(etaRanges)):
                 etaMin = etaRanges[iEta-1]
                 etaMax = etaRanges[iEta]
@@ -251,7 +250,7 @@ def main():
                 cutBase += " && " + vary("ptAve") + " > " + str(minPTAve)
                 #cutBase += " && weight < 10 "
 
-                cutWithVeto = cutBase + " && "+vary("veto2") + " <0.2 "
+                cutWithVeto = cutBase + " && "+vary("veto2") + " < 0.2 "
 
 
                 dsReduced = ds[t].reduce(cutBase)
@@ -272,14 +271,21 @@ def main():
                 #puVar = "puTrueNumInteractions"
                 histN = dsReducedWithVeto.fillHistogram(histN, ROOT.RooArgList(vars[t][puVar]))
                 histD = dsReduced.fillHistogram(histD, ROOT.RooArgList(vars[t][puVar]))
+                
+                print "Total before cut:", dsReduced.sumEntries()
+                print "Total after  cut:", dsReducedWithVeto.sumEntries()
+
+
                 histN.Divide(histD)
 
 		todo = {}
 		todo["eff"] = histN
-		todo["stat"] = histD
-                c = ROOT.TCanvas() 
-		for t in todo:
+		#todo["stat"] = histD
+        c = ROOT.TCanvas() 
+        for t in todo:
 			todo[t].Draw()
+			todo[t].SetMinimum(0.)
+			todo[t].SetMaximum(1.02)
 			if label:
 			    leg = ROOT.TLegend(0.2, 0.95, 1, 1)
 			    leg.SetHeader(label)
