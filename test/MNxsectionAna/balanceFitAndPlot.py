@@ -41,8 +41,10 @@ class FitThread(multiprocessing.Process):
         #rangeLow = meanVal - sigma*1.5
         #rangeHigh = meanVal + sigma*1.5
 
-        rangeLow = -1.7
-        rangeHigh = 1.7
+        #rangeLow = -1.7
+        #rangeHigh = 1.7
+        rangeLow = -0.5
+        rangeHigh = 0.5
 
         mean2 = RooRealVar("mean","mean of gaussian", 0, -1.5, 1.5)
         sigma2 = RooRealVar("sigma","width of gaussian", .1, 0, 1)
