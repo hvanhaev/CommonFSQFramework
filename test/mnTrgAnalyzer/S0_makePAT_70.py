@@ -18,6 +18,10 @@ addMETCollection(process, labelName='patMETTC', metSource='tcMet')
 from PhysicsTools.PatAlgos.tools.jetTools import addJetCollection
 from PhysicsTools.PatAlgos.tools.jetTools import switchJetCollection
 
+#runOn62 = True
+runOn62 = False
+
+
 ## uncomment the following lines to add ak5PFJetsCHS to your PAT output
 labelAK5PFCHS = 'AK5PFCHS'
 postfixAK5PFCHS = 'Copy'
@@ -26,21 +30,23 @@ addJetCollection(
    postfix   = postfixAK5PFCHS,
    labelName = labelAK5PFCHS,
    jetSource = cms.InputTag('ak5PFJetsCHS'),
-   jetCorrections = ('AK5PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'Type-2')
+   jetCorrections = ('AK5PFchsOwca', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'Type-2')
    )
 process.out.outputCommands.append( 'drop *_selectedPatJets%s%s_caloTowers_*'%( labelAK5PFCHS, postfixAK5PFCHS ) )
 
+
+if not runOn62:
 # ak4PFJetsCHS
-labelAK4PFCHS = 'AK4PFCHS'
-postfixAK4PFCHS = 'Copy'
-addJetCollection(
-   process,
-   postfix   = postfixAK4PFCHS,
-   labelName = labelAK4PFCHS,
-   jetSource = cms.InputTag('ak4PFJetsCHS'),
-   jetCorrections = ('AK4PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'Type-2')
-   )
-process.out.outputCommands.append( 'drop *_selectedPatJets%s%s_caloTowers_*'%( labelAK4PFCHS, postfixAK4PFCHS ) )
+    labelAK4PFCHS = 'AK4PFCHS'
+    postfixAK4PFCHS = 'Copy'
+    addJetCollection(
+       process,
+       postfix   = postfixAK4PFCHS,
+       labelName = labelAK4PFCHS,
+       jetSource = cms.InputTag('ak4PFJetsCHS'),
+       jetCorrections = ('AK4PFchsOwca', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'Type-2')
+       )
+    process.out.outputCommands.append( 'drop *_selectedPatJets%s%s_caloTowers_*'%( labelAK4PFCHS, postfixAK4PFCHS ) )
 
 
 
@@ -50,7 +56,7 @@ addJetCollection(
    process,
    labelName = labelAK5PF,
    jetSource = cms.InputTag('ak5PFJets'),
-   jetCorrections = ('AK5PF', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'Type-1'),
+   jetCorrections = ('AK5PFOwca', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'Type-1'),
    btagDiscriminators = [
        'jetBProbabilityBJetTags'
      , 'jetProbabilityBJetTags'
@@ -73,7 +79,7 @@ addJetCollection(
    algo = 'CA8',
    rParam = 0.8,
    genJetCollection = cms.InputTag('ak8GenJets'),
-   jetCorrections = ('AK5PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'None'), # FIXME: Use proper JECs, as soon as available
+   jetCorrections = ('AK5PFchsOwca', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'None'), # FIXME: Use proper JECs, as soon as available
    btagDiscriminators = [
        'combinedSecondaryVertexBJetTags'
      ],
@@ -234,9 +240,9 @@ process.MNTriggerAnaNew = cms.EDAnalyzer("MNTriggerAnaNew",
         #triggers = cms.vstring("HLT_DiPFJetAve60_CentralForward_v1", "HLT_DiPFJetAve60_CentralForward*", "viaClass"),
         #triggers = cms.vstring("ptAve60CenFwd", "ptAve80CenFwd", "diPFJet20CntrFwdEta3", "diPFJet20rFwdBckwEta2", \
         #                       "diPFJet20rFwdBckwEta3", "FwdPFJet20Eta2", "FwdPFJet20Eta3", "PFJet20"),
-        triggers = cms.vstring(),
+        triggers = cms.vstring("ptAve60CenFwd"),
         #triggers = cms.vstring("ptAve60CenFwd", "ptAve80CenFwd", "ptAve100CenFwd","ptAve160CenFwd",  "newAve60", "newAve80"),
-        ptAve60CenFwd = cms.vstring("HLT_DiPFJetAve60_CentralForward_v1"),
+        ptAve60CenFwd = cms.vstring("HLT_DiPFJetAve60_HFJEC"),
         ptAve80CenFwd = cms.vstring("HLT_DiPFJetAve80_CentralForward_v1"),
         ptAve100CenFwd = cms.vstring("HLT_DiPFJetAve100_CentralForward_v1"),
         ptAve160CenFwd = cms.vstring("HLT_DiPFJetAve160_CentralForward_v1"),
@@ -302,6 +308,12 @@ primary = 'file:/nfs/dust/cms/user/fruboest/2014.09.L1Stage1With72/CMSSW_7_2_0_p
 primary = 'file:/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/20141020_HLTJetsPu20to50_720pre8/ab4d935ec80dcf1194b09139dbb3a385/outputFULL_10_1_GMu.root'
 
 
+primary = 'file:/nfs/dust/cms/user/fruboest/2014.10.720HLTJec/CMSSW_7_2_0/src/outputFULL.root'
+primart = 'file:/pnfs/desy.de/cms/tier2/store/user/fruboes/Neutrino_Pt-2to20_gun/20141023_NuGun_HLTJetsPu20to50_720/5bf11c64ebfcb1bed227f4f3ad2897d4/outputFULL_150_1_78Y.root'
+primary = "file:/pnfs/desy.de/cms/tier2//store/user/fruboes/Neutrino_Pt-2to20_gun/20141023_NuGun162_HLTJetsPu20_720/2f37f2cc398b18482efdc56e9384d725/outputFULL_1200_1_Wxg.root"
+
+primary = "file:/nfs/dust/cms/user/fruboest/2014.10.720HLTJec/CMSSW_7_2_0/src/outputFULL.root"
+
 process.source = cms.Source("PoolSource",
 #    secondaryFileNames = cms.untracked.vstring([sec1, sec2]),
     fileNames = cms.untracked.vstring([primary]),
@@ -309,12 +321,15 @@ process.source = cms.Source("PoolSource",
 )
 #'''
 
-process.patJetsAK4PFCHSCopy.addGenJetMatch = cms.bool(False)
-process.patJetsAK4PFCHSCopy.embedGenJetMatch = cms.bool(False)
-process.patJetsAK4PFCHSCopy.addGenPartonMatch = cms.bool(False)
-process.patJetsAK4PFCHSCopy.embedGenPartonMatch = cms.bool(False)
-process.patJetsAK4PFCHSCopy.useLegacyJetMCFlavour = cms.bool(False)
-process.patJetsAK4PFCHSCopy.getJetMCFlavour = cms.bool(False)
+
+
+if not runOn62:
+    process.patJetsAK4PFCHSCopy.addGenJetMatch = cms.bool(False)
+    process.patJetsAK4PFCHSCopy.embedGenJetMatch = cms.bool(False)
+    process.patJetsAK4PFCHSCopy.addGenPartonMatch = cms.bool(False)
+    process.patJetsAK4PFCHSCopy.embedGenPartonMatch = cms.bool(False)
+    process.patJetsAK4PFCHSCopy.useLegacyJetMCFlavour = cms.bool(False)
+    process.patJetsAK4PFCHSCopy.getJetMCFlavour = cms.bool(False)
 
 process.schedule.remove(process.outpath)
 del process.outpath
@@ -400,7 +415,7 @@ process.jec = cms.ESSource("PoolDBESSource",
       cms.PSet(
             record = cms.string('JetCorrectionsRecord'),
             tag    = cms.string('JetCorrectorParametersCollection_'+ver+'_AK5PF'),
-            label  = cms.untracked.string('AK5PF')
+            label  = cms.untracked.string('AK5PFOwca')
             ),
 #      cms.PSet(
 #            record = cms.string('JetCorrectionsRecord'),
@@ -410,12 +425,12 @@ process.jec = cms.ESSource("PoolDBESSource",
       cms.PSet(
             record = cms.string('JetCorrectionsRecord'),
             tag    = cms.string('JetCorrectorParametersCollection_'+ver+'_AK5PFchs'),
-            label  = cms.untracked.string('AK5PFchs')
+            label  = cms.untracked.string('AK5PFchsOwca')
             ),
       cms.PSet(
             record = cms.string('JetCorrectionsRecord'),
             tag    = cms.string('JetCorrectorParametersCollection_'+ver+'_AK4PFchs'),
-            label  = cms.untracked.string('AK4PFchs')
+            label  = cms.untracked.string('AK4PFchsOwca')
             ),
       ),
       connect = cms.string('sqlite:CSA14_V4_MC.db')
