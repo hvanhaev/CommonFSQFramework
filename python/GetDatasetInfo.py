@@ -9,7 +9,7 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 AutoLibraryLoader.enable()
 import MNTriggerStudies.MNTriggerAna.Util
 
-def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet = False):
+def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet = False, samplesToProcess = None):
 
     # TODO: SmallXAnaDefFile access function in Util
     if "SmallXAnaDefFile" not in os.environ:
@@ -34,6 +34,14 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
     localAccess = not isXrootdAccess
 
     sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
+    if samplesToProcess != None:
+        newList = {}
+        for s in samplesToProcess:
+            if s not in sampleList:
+                raise Exception("Requested sample "+s+ " not known")
+            newList[s]=sampleList[s]
+        sampleList = newList
+
     anaVersion=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("anaVersion")
 
     if not quiet: print "if not quiet: printing info for: ",  anaVersion
@@ -95,6 +103,8 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                 maxFiles = maxFilesMC
             fileCnt = 0
             for fname in fileListUnvalidated:
+                print tab, "Veryfying file "+str(fileCnt+1)+"/"+str(len(fileListUnvalidated)), "via xrootd"
+                print tab, "  ", fname
                 if isXrootdAccess:
                     #sys.stdout.write('%s\r' % "Veryfying file "+str(fileCnt)+"/"+str(len(fileListUnvalidated)))
                     print tab, "Veryfying file "+str(fileCnt+1)+"/"+str(len(fileListUnvalidated)), "via xrootd"
@@ -102,7 +112,7 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                 rootFile = ROOT.TFile.Open(fname,"r")
                 infoHisto = rootFile.Get("infoHisto/cntHisto")
                 if type(infoHisto) != ROOT.TH1D:
-                    if not quiet: print "\nProblem reading info histo from", fname
+                    print "\nProblem reading info histo from", fname
                     continue
 
                 if infoHisto.GetXaxis().GetBinLabel(3)!="evCnt":
@@ -117,7 +127,7 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                     break # we dont need more
 
                 del infoHisto
-                rootFile.Close()
+                #rootFile.Close()
                 del rootFile
 
         if not quiet: print tab, "number of tree files:", len(fileList)
@@ -135,6 +145,7 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
     return ret
 
 if __name__ == "__main__":
-    getTreeFilesAndNormalizations(maxFilesMC = 10, maxFilesData = 10)
+    #getTreeFilesAndNormalizations(maxFilesMC = -10, maxFilesData = -10)
+    getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = -10)
 
 
