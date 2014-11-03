@@ -28,7 +28,7 @@ def fit(todo, recoAVG, weight, cutBase):
 
 
 def plot(todo, ptAveReco, weight, plotName, plotType):
-    knownTypes = ["balance", "eff"]
+    knownTypes = ["balance", "eff", "num"]
     if plotType not in knownTypes:
         raise Exception("Plot type "+plotType+" not known")
 
@@ -47,7 +47,7 @@ def plot(todo, ptAveReco, weight, plotName, plotType):
             dir = l.ReadObj()
             if plotType == "balance":
                 histo = dir.Get("balance_central_jet15").Clone()
-            elif plotType == "eff":
+            elif plotType == "eff" or plotType == "num":
                 histo = dir.Get("num_balance_central_jet15").Clone()
             histo.SetDirectory(0)
             cnt += 1
@@ -67,11 +67,12 @@ def plot(todo, ptAveReco, weight, plotName, plotType):
     if plotType == "balance":
         hFrame = canvas.DrawFrame(2.8, -0.3, 5.2, 0.1)
         hFrame.GetYaxis().SetTitle("balance")
+        hFrame.GetXaxis().SetTitle("#eta_{probe}")
     elif plotType == "eff":
         hFrame = canvas.DrawFrame(2.8, 0, 5.2, 1.05)
         hFrame.GetYaxis().SetTitle("efficiency")
+        hFrame.GetXaxis().SetTitle("#eta_{probe}")
 
-    hFrame.GetXaxis().SetTitle("#eta_{probe}")
 
     markerCnt = 20
 
@@ -100,6 +101,7 @@ def plot(todo, ptAveReco, weight, plotName, plotType):
         denom = histoMap[-1]
         del histoMap[-1]
 
+    wasDraw = False
     for t in sorted(histoMap.keys()):
         if plotType == "eff":
             histoMap[t].Divide(denom)
@@ -111,7 +113,16 @@ def plot(todo, ptAveReco, weight, plotName, plotType):
         axe = histoMap[t].GetXaxis()
         histoMap[t].GetXaxis().Set(axe.GetNbins(), axe.GetXmin()+xshift, axe.GetXmax()+xshift )
         xshift+=0.03
-        histoMap[t].Draw("e1 p same")
+        if plotType == "num":
+            if wasDraw:
+                histoMap[t].Draw("same e1 p")
+            else:
+                histoMap[t].Draw("e1 p")
+                wasDraw = True
+            histoMap[t].GetYaxis().SetTitle("numEvents")
+            histoMap[t].GetXaxis().SetTitle("#eta_{probe}")
+        else:
+            histoMap[t].Draw("e1 p same")
         color = colors[cnt]
         cnt +=1
         histoMap[t].SetMarkerColor(color)
@@ -135,7 +146,11 @@ def main():
     todo = {}
 
     baseHLT = "hltPtAve  > XXX && hltPtCen > XXX/2 && hltPtFwd > XXX/2"
+    baseHLTCalo = "hltCaloPtAve  > XXX/2 && hltPtCen > XXX/4 && hltPtFwd > XXX/4"
     baseHLTWithMatch = "hltPtAve  > XXX  && hltL1MatchPtCen > XXX/2 && hltL1MatchPtFwd > XXX/2"
+    # 60, 80
+    hltFromConfDB = "trgptAveXXXCenFwd > 0.5"
+
 
     baseL1 = "l1SingleJetCentral > XXX"
     #l1CenFwd = "l1SingleJetCentral > XXX && l1SingleJetForward > XXX"
@@ -168,8 +183,25 @@ def main():
     '''
 
 
+    #for ptGen in xrange(80,141, 10):
+    #    name = "A_HLT_"+str(ptGen)
+    #    todo[name] = ([-1,60, 80,120], baseHLT, ptGen)
+    #    nameCalo = "A_HLTWCalo_"+str(ptGen)
+    #    todo[nameCalo] = ([-1,60, 80,120], baseHLT + "&&" + baseHLTCalo , ptGen)
+
+
+    for ptGen in xrange(30, 81, 10):
+        name = "A_HLT_"+str(ptGen)
+        todo[name] = ([-1, 30, 45, 60 ], baseHLT, ptGen)
+        nameCalo = "A_HLTWCalo_"+str(ptGen)
+        #todo[nameCalo] = ([-1,60, 80,120], baseHLT + "&&" + baseHLTCalo , ptGen)
+        todo[nameCalo] = ([-1,30, 45, 60], baseHLT + "&&" + baseHLTCalo , ptGen)
+
 
     #todo["A_HLT_80"] = ([-1, 1, 50, 55, 60, 70], baseHLT, 80)
+    #todo["A_HLTfromConfdb_80"] = ([-1, 60, 80], hltFromConfDB, 80)
+    #todo["A_HLT_100"] = ([-1, 1, 70, 80, 90, 100], baseHLT, 100)
+    #todo["A_HLTfromConfdb_100"] = ([-1, 60, 80], hltFromConfDB, 100)
     #todo["A_HLT_120"] = ([-1, 1, 80, 90, 100, 110], baseHLT, 120)
     #'''
 
@@ -182,10 +214,10 @@ def main():
     #todo["A_L1_doubleJSeed_50"] = ([-1, 1, 23, 27, 31], l1CenFwd, 50) #
     #todo["B_L1_doubleJSeed_50"] = ([-1, 1, 35, 39, 43], l1CenFwd, 50) # 
 
-    todo["A_L1_doubleJSeed_60"] = ([-1, 1, 35, 39, 43], l1CenFwd, 60) # 
-    todo["B_L1_doubleJSeed_60"] = ([-1, 1, 47, 51, 55], l1CenFwd, 60) # 
+    # todo["A_L1_doubleJSeed_60"] = ([-1, 1, 35, 39, 43], l1CenFwd, 60) # 
+    # todo["B_L1_doubleJSeed_60"] = ([-1, 1, 47, 51, 55], l1CenFwd, 60) # 
     # s1DoubleJetCFDphi20
-    todo["A_reco60_L1Dphi"] = ([-1, 17, 20, 24, 27, 31], "s1DoubleJetCFDphiXXX > 35", 60)
+    #todo["A_reco60_L1Dphi"] = ([-1, 17, 20, 24, 27, 31], "s1DoubleJetCFDphiXXX > 35", 60)
 
 
     #todo["A_total_60"] = ([-1, 1, 47, 51, 55], l1CenFwd.replace(XXX, "35") + " && ", 60)
@@ -217,6 +249,7 @@ def main():
             plotName = "ptThreshods_"+label+"_"+ weight +".png"
             plot(ptAvesHLT, ptAveReco, weight, plotName, "balance")
             plot(ptAvesHLT, ptAveReco, weight, plotName, "eff")
+            plot(ptAvesHLT, ptAveReco, weight, plotName, "num")
 
 
 if __name__ == "__main__":
