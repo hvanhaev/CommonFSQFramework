@@ -18,6 +18,30 @@ from array import *
 import MNTriggerStudies.MNTriggerAna.ExampleProofReader 
 from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
 
+class Proxy():
+    def __init__(self, obj):
+        self.obj = obj
+
+    def p4(self):
+        return self.obj
+
+    def __getattr__(self, name):
+        return getattr(self.obj, name)
+
+class GenJetProxy():
+    def newEvent(self, chain):
+        self.chain = chain
+
+    def get(self, shift):
+        jets = self.chain.ak4GenJets
+        size = jets.size()
+        index = 0
+        while index < size:
+            yield Proxy(jets.at(index))
+            index += 1
+
+
+
 class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
     def init(self):
 
@@ -73,13 +97,15 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
         self.lumiWeighters["_dj15fb_puDown"] = edm.LumiReWeighting(jet15FileV2, puFiles["dj15_0_95"], "MC", "pileup")
 
 
-        self.jetGetter = JetGetter("PF")
-        self.jetGetter.disableGenJet()
 
         if self.HLT2015TempWorkaround:
             self.jetGetter = JetGetter("PFAK4CHS")
             #self.jetGetter = JetGetter("PFAK5CHS")
             #self.jetGetter = JetGetter("PF")
+            self.jetGetter.disableGenJet()
+            #self.jetGetter = GenJetProxy()
+        else:
+            self.jetGetter = JetGetter("PFAK5")
             self.jetGetter.disableGenJet()
 
         self.varE = {}
@@ -91,7 +117,19 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
             self.var[name] = array('d', [0])
             self.tree.Branch(name, self.var[name], name+"/D")
 
-            
+    def setExternals(self):
+        for v in self.varE:
+            self.var[v][0] = self.varE[v]
+    def fill(self):
+            self.tree.Fill()
+    def resetExternals(self):
+        for v in self.varE: 
+            self.varE[v] = 0
+
+    def fillGenWeight(self):
+        weight = self.genWeight()
+        self.var["weight"][0] = weight
+
 
     def setExternalVar(self, name, val):
         self.varE[name] = val
@@ -111,8 +149,7 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
             self.var[v][0] = 0
 
         # reset is done after fill
-        for v in self.varE:
-            self.var[v][0] = self.varE[v]
+        self.setExternals()
 
         self.jetGetter.newEvent(self.fChain)
 
@@ -185,9 +222,9 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
    
         # at least one variation ok.
         if fill:
-            self.tree.Fill()
-            for v in self.varE: # reset external variables
-                self.varE[v] = 0
+            self.fill()
+
+        self.resetExternals()
 
         return 1
 
