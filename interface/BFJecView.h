@@ -15,6 +15,11 @@ class BFJecView: public EventViewBase{
       std::vector<edm::InputTag> m_rhos;
 
 
+      float m_minPT ;
+      float m_minPTGen ;
+      float m_maxEta; 
+
+
 
 };
 #endif

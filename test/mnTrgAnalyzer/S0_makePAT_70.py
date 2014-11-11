@@ -139,6 +139,30 @@ process = MNTriggerStudies.MNTriggerAna.customizePAT.customize(process)
 stage1extralabel = "hltL1extraParticles"
 #stage1extralabel = "l1ExtraReEmul"
 
+process.BFJecTreeProducer = cms.EDAnalyzer("BFJecTreeProducer",
+    BFJecView =  cms.PSet(
+        minPT = cms.double(0),
+        minPTGen = cms.double(15),
+        maxEta = cms.double(5.2),
+        todoJets = cms.vstring("pfAK4CHS", "hltAK4PFJets", "hltAK4PFJetsCorrected"),
+        pfAK4CHS = cms.VInputTag(cms.InputTag("ak4PFJetsCHS", "", "RECO"), cms.InputTag( "ak4GenJets", "", "TTT"), cms.InputTag("fixedGridRhoFastjetAll", "", "RECO")),
+        hltAK4PFJets = cms.VInputTag(cms.InputTag("hltAK4PFJets","", "TTT", ), cms.InputTag( "ak4GenJets", "", "TTT"), cms.InputTag("hltFixedGridRhoFastjetAll", "", "TTT")), 
+        hltAK4PFJetsCorrected = cms.VInputTag(cms.InputTag("hltAK4PFJetsCorrected","", "TTT", ),  cms.InputTag( "ak4GenJets", "", "TTT"), cms.InputTag("")),
+    ),
+)
+
+process.BFJecTreeProducerHighPT = cms.EDAnalyzer("BFJecTreeProducer",
+    BFJecView =  cms.PSet(
+        minPT = cms.double(0),
+        minPTGen = cms.double(30),
+        maxEta = cms.double(5.2),
+        todoJets = cms.vstring("pfAK4CHS", "hltAK4PFJets", "hltAK4PFJetsCorrected"),
+        pfAK4CHS = cms.VInputTag(cms.InputTag("ak4PFJetsCHS", "", "RECO"), cms.InputTag( "ak4GenJets", "", "TTT"), cms.InputTag("fixedGridRhoFastjetAll", "", "RECO")),
+        hltAK4PFJets = cms.VInputTag(cms.InputTag("hltAK4PFJets","", "TTT", ), cms.InputTag( "ak4GenJets", "", "TTT"), cms.InputTag("hltFixedGridRhoFastjetAll", "", "TTT")),
+        hltAK4PFJetsCorrected = cms.VInputTag(cms.InputTag("hltAK4PFJetsCorrected","", "TTT", ),  cms.InputTag( "ak4GenJets", "", "TTT"), cms.InputTag("")),
+    )
+)
+
 process.MNTriggerAnaNew = cms.EDAnalyzer("MNTriggerAnaNew",
     JetViewPFAK4CHS  = cms.PSet(
         disableJetID = cms.bool(True),
@@ -240,7 +264,8 @@ process.MNTriggerAnaNew = cms.EDAnalyzer("MNTriggerAnaNew",
         #triggers = cms.vstring("HLT_DiPFJetAve60_CentralForward_v1", "HLT_DiPFJetAve60_CentralForward*", "viaClass"),
         #triggers = cms.vstring("ptAve60CenFwd", "ptAve80CenFwd", "diPFJet20CntrFwdEta3", "diPFJet20rFwdBckwEta2", \
         #                       "diPFJet20rFwdBckwEta3", "FwdPFJet20Eta2", "FwdPFJet20Eta3", "PFJet20"),
-        triggers = cms.vstring("ptAve60CenFwd"),
+        triggers = cms.vstring(),
+        #triggers = cms.vstring("ptAve60CenFwd"),
         #triggers = cms.vstring("ptAve60CenFwd", "ptAve80CenFwd", "ptAve100CenFwd","ptAve160CenFwd",  "newAve60", "newAve80"),
         ptAve60CenFwd = cms.vstring("HLT_DiPFJetAve60_HFJEC"),
         ptAve80CenFwd = cms.vstring("HLT_DiPFJetAve80_CentralForward_v1"),
@@ -283,6 +308,8 @@ process.MNTriggerAnaNew = cms.EDAnalyzer("MNTriggerAnaNew",
 
 
 process = MNTriggerStudies.MNTriggerAna.customizePAT.addTreeProducer(process, process.MNTriggerAnaNew)
+process = MNTriggerStudies.MNTriggerAna.customizePAT.addTreeProducer(process, process.BFJecTreeProducer)
+process = MNTriggerStudies.MNTriggerAna.customizePAT.addTreeProducer(process, process.BFJecTreeProducerHighPT)
 
 prefix='root://xrootd.ba.infn.it/'
 sec1=prefix+"/store/mc/Spring14dr/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/AODSIM/Flat20to50_POSTLS170_V5-v1/00000/9480AA58-E3DD-E311-8FE3-002590D0AFEC.root"
@@ -313,6 +340,7 @@ primart = 'file:/pnfs/desy.de/cms/tier2/store/user/fruboes/Neutrino_Pt-2to20_gun
 primary = "file:/pnfs/desy.de/cms/tier2//store/user/fruboes/Neutrino_Pt-2to20_gun/20141023_NuGun162_HLTJetsPu20_720/2f37f2cc398b18482efdc56e9384d725/outputFULL_1200_1_Wxg.root"
 
 primary = "file:/nfs/dust/cms/user/fruboest/2014.10.720HLTJec/CMSSW_7_2_0/src/outputFULL.root"
+primary = "file:/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/20141023V2_QCD_HLTJetsPu20to50_720/3a89b834271012cd860a1a9609fca634/outputFULL_1_1_RMc.root"
 
 process.source = cms.Source("PoolSource",
 #    secondaryFileNames = cms.untracked.vstring([sec1, sec2]),
