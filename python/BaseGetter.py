@@ -57,6 +57,9 @@ class BaseGetter:
     def getSize(self):
         raise Exception("Please implement getSize method in your derived getter")
 
+    def __len__(self):
+        return int(self.getSize())
+
     # TODO: cacheing
     def get(self, variation=""):
         if variation not in self.knownVariations:   # variation of a different kind, e.g. from PU
