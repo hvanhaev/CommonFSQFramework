@@ -25,10 +25,13 @@ class JECExperiments(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExamplePro
         self.hist["pt"] =  ROOT.TH1F("pt",   "pt",  100, -0.5, 99.5)
         self.hist["ptGen"] =  ROOT.TH1F("ptGen",   "ptGen",  100, -0.5, 99.5)
         self.hist["rho"] =  ROOT.TH1F("rho",   "rho",  100, -0.5, 99.5)
+        self.hist["area"] =  ROOT.TH1F("area",   "area",  100, 0, 1)
         self.hist["eta"] =  ROOT.TH1F("eta",   "eta",  100, -5.5, 5.5)
         self.hist["bestdr"] =  ROOT.TH1F("bestdr",   "bestdr",  100, 0, 2)
         self.hist["ptGenVsPtRec"] = ROOT.TH2F("ptGenVsPtRec", "ptGenVsPtRec", 100, 0, 100, 100, 0, 100)
         self.hist["ptGenVsPtRecPR"] = ROOT.TProfile("ptGenVsPtRecPR", "ptGenVsPtRecPR", 100, 0, 1000, 0, 1000)
+        self.hist["deltaPtGenRecVsRho"] = ROOT.TProfile("deltaPtGenRecVsRho", "deltaPtGenRecVsRho", 100, 0, 100)
+        self.hist["deltaPtGenRecVsRhoArea"] = ROOT.TProfile("deltaPtGenRecVsRhoArea", "deltaPtGenRecVsRhoArea", 100, 0, 100)
     
         self.hist["response"] =  ROOT.TH1F("response",   "response",  100, 0, 2)
         self.hist["responseVsGenPT"] = ROOT.TProfile("responseVsGenPT", "responseVsGenPT", 100, 0, 100, 0, 10)
@@ -49,19 +52,32 @@ class JECExperiments(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExamplePro
             self.GetOutputList().Add(self.hist[h])
 
     def analyze(self):
-        rho =  getattr(self.fChain, self.jetBranch+"rho")
-        if rho < 28 or rho > 32: return
-
         weight =  self.fChain.genWeight
+        rho =  getattr(self.fChain, self.jetBranch+"rho")
+        self.hist["rho"].Fill(rho, weight)
+        #if  rho < 38: return
+        #if  rho > 32 or rho < 28: return
+
         self.jets.newEvent(self.fChain)
         PU = self.fChain.PUNumInteractions 
 
+       # self.hist["deltaPtGenRecVsRho"] = ROOT.TProfile("deltaPtGenRecVsRho", "deltaPtGenRecVsRho", 100, 0, 100, 0, 1000)
+       # self.hist["deltaPtGenRecVsRhoArea"] = ROOT.TProfile("deltaPtGenRecVsRhoArea", "deltaPtGenRecVsRhoArea", 100, 0, 100, 0, 1000)
+
+
         if self.jets:
-            # rank jets by pt
+            # rank jets by pt & apply selection criteria (one step)
+            ''' # for studies at given rho point
             jselect = lambda j: 1 if abs(j.eta) < 0.2 \
                             and j.pt > 40  \
                             and j.bestdr < 0.25 \
                             else 0
+            '''
+            jselect = lambda j: 1 if abs(j.eta) < 0.2 \
+                            and j.pt > 150 and j.pt < 160  \
+                            and j.bestdr < 0.25 \
+                            else 0
+
 
             rankAndSelect = lambda j: j.ptGen*jselect(j)
             #hardestJet = max(self.jets.get(""), key = rankAndSelect)
@@ -70,11 +86,17 @@ class JECExperiments(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExamplePro
                 pt = jet.pt
                 eta = jet.eta
                 ptGen = jet.ptGen
+                area = jet.area
+                deltaPT  = pt - ptGen
+                self.hist["deltaPtGenRecVsRho"].Fill(rho, deltaPT, weight)
+                self.hist["deltaPtGenRecVsRhoArea"].Fill(rho, deltaPT*area, weight)
+
+
                 self.hist["pt"].Fill(pt, weight)
                 self.hist["ptGen"].Fill(ptGen, weight)
+                self.hist["area"].Fill(area, weight)
                 self.hist["bestdr"].Fill(jet.bestdr, weight)
                 self.hist["eta"].Fill(eta, weight)
-                self.hist["rho"].Fill(rho, weight)
 
                 self.hist["ptGenVsPtRec"].Fill(pt, ptGen, weight)
                 self.hist["ptGenVsPtRecPR"].Fill(pt, ptGen, weight)
@@ -111,8 +133,8 @@ if __name__ == "__main__":
     #sampleList = []
     #sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
     #maxFilesData = 1
-    #maxFilesMC = 1
-    #nWorkers = 1
+    maxFilesMC = 1
+    nWorkers = 1
 
 
     slaveParams = {}
