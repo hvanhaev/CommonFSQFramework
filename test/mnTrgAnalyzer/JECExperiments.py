@@ -17,8 +17,8 @@ from array import *
 class JECExperiments(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
     def init( self):
         #self.jetBranch = "hltAK4PFJetsCorrected"
-        #self.jetBranch = "hltAK4PFJets"
-        self.jetBranch = "pfAK4CHS"
+        self.jetBranch = "hltAK4PFJets"
+        #self.jetBranch = "pfAK4CHS"
         self.jets = GenericGetter(self.jetBranch, "eta") 
 
         self.hist = {}
@@ -47,6 +47,25 @@ class JECExperiments(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExamplePro
             rho
         '''
 
+        self.trees = {}
+        self.trees["fit"] = ROOT.TTree("dataFit", "dataFit")
+        self.GetOutputList().Add(self.trees["fit"])
+        self.trees["val"] = ROOT.TTree("dataVal", "dataVal")
+        self.GetOutputList().Add(self.trees["val"])
+
+        self.var = {}
+        self.var["weight"] = array('d', [0])
+        self.var["ptRaw"] = array('d', [0])
+        self.var["ptGen"] = array('d', [0])
+        self.var["eta"] = array('d', [0])
+        self.var["rho"] = array('d', [0])
+        self.var["area"] = array('d', [0])
+        for v in self.var:
+            self.trees["fit"].Branch(v, self.var[v], v+"/D")
+            self.trees["val"].Branch(v, self.var[v], v+"/D")
+
+
+
         for h in self.hist:
             self.hist[h].Sumw2()
             self.GetOutputList().Add(self.hist[h])
@@ -54,6 +73,7 @@ class JECExperiments(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExamplePro
     def analyze(self):
         weight =  self.fChain.genWeight
         rho =  getattr(self.fChain, self.jetBranch+"rho")
+        ev = self.fChain.event
         self.hist["rho"].Fill(rho, weight)
         #if  rho < 38: return
         #if  rho > 32 or rho < 28: return
@@ -74,7 +94,7 @@ class JECExperiments(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExamplePro
                             else 0
             '''
             jselect = lambda j: 1 if abs(j.eta) < 0.2 \
-                            and j.pt > 150 and j.pt < 160  \
+                            and j.pt > 40 \
                             and j.bestdr < 0.25 \
                             else 0
 
@@ -106,6 +126,18 @@ class JECExperiments(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExamplePro
                 self.hist["responseVsGenPT"].Fill(ptGen, r, weight) 
                 self.hist["responseVsEta"].Fill(eta, r, weight)
                 self.hist["responseVsPU"].Fill(PU, r, weight)
+
+                self.var["weight"][0]=weight
+                self.var["ptRaw"][0]=pt
+                self.var["ptGen"][0]=ptGen
+                self.var["eta"][0]=eta
+                self.var["rho"][0]=rho
+                self.var["area"][0]=area
+
+                if ev % 2 == 0:
+                    self.trees["fit"].Fill()
+                else:
+                    self.trees["val"].Fill()
 
         return
 
