@@ -214,11 +214,15 @@ class ExampleProofReader( ROOT.TPySelector ):
         problems = False
         for o in olist:
             if not "TH1" in o.ClassName(): continue
+            grandeTotale =  o.GetBinContent(o.GetNbinsX()+1)+ o.GetBinContent(0)+o.Integral()
+            if grandeTotale == 0: continue
             if o.GetBinContent(o.GetNbinsX()+1) != 0:
-                print "!!WARNING!! histogram ", o.GetName(), " has overflow ==> fraction of events in overflow bin: ", (o.GetBinContent(o.GetNbinsX()+1)/o.Integral())*100, " %"
+                print "!!WARNING!! histogram", o.GetName(), "has overflow ==> fraction of events in overflow bin:", \
+                    (o.GetBinContent(o.GetNbinsX()+1)/grandeTotale)*100, "%"
                 problems = True
             if o.GetBinContent(0) != 0:
-                print "!!WARNING!! histogram ", o.GetName(), " has underflow ==> fraction of events in underflow bin: ", (o.GetBinContent(0)/o.Integral())*100, " %"
+                print "!!WARNING!! histogram", o.GetName(), "has underflow ==> fraction of events in underflow bin:", \
+                    (o.GetBinContent(0)/grandeTotale)*100, "%"
                 problems = True
 
         if not problems: print "everything is fine!"
