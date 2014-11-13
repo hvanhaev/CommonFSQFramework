@@ -8,6 +8,9 @@ from ROOT import *
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 AutoLibraryLoader.enable()
 import MNTriggerStudies.MNTriggerAna.Util
+import time
+from multiprocessing import Process, Queue
+
 
 def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet = False, samplesToProcess = None):
 
@@ -102,33 +105,75 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
             if not sampleList[s]["isData"]:
                 maxFiles = maxFilesMC
             fileCnt = 0
+            threads = {}
+            goodFiles = 0
+            print "Total number of files in sample:", len(fileListUnvalidated)
+            print "Validating",
+            maxThreads= 12
+            if maxFiles != None:
+                maxThreads  = min(maxThreads, maxFiles/2+1)
+
             for fname in fileListUnvalidated:
-                #print tab, "Veryfying file "+str(fileCnt+1)+"/"+str(len(fileListUnvalidated)), "via xrootd"
-                #print tab, "  ", fname
-                if isXrootdAccess:
-                    #sys.stdout.write('%s\r' % "Veryfying file "+str(fileCnt)+"/"+str(len(fileListUnvalidated)))
-                    print tab, "Veryfying file "+str(fileCnt+1)+"/"+str(len(fileListUnvalidated)), "via xrootd"
-                    #print fname
-                rootFile = ROOT.TFile.Open(fname,"r")
-                infoHisto = rootFile.Get("infoHisto/cntHisto")
-                if type(infoHisto) != ROOT.TH1D:
-                    print "\nProblem reading info histo from", fname
-                    continue
+                if maxFiles != None and goodFiles >= maxFiles:
+                    break
+                fileCnt += 1
+                print fileCnt,
+                def validate(fname, q):
+                    rootFile = ROOT.TFile.Open(fname,"r")
+                    infoHisto = rootFile.Get("infoHisto/cntHisto")
+                    ret = -1
+                    if type(infoHisto) != ROOT.TH1D:
+                        print "\nProblem reading info histo from", fname
+                    elif infoHisto.GetXaxis().GetBinLabel(3)!="evCnt":
+                        if not quiet: print "\nProblem - evCnt bin expected at position 3. Got",  infoHisto.getBinLabel(3)
+                    else:
+                        ret =  int(infoHisto.GetBinContent(3))
+                    del infoHisto
+                    rootFile.Close()
+                    del rootFile
+                    return q.put(ret)
 
-                if infoHisto.GetXaxis().GetBinLabel(3)!="evCnt":
-                    if not quiet: print "\nProblem - evCnt bin expected at position 3. Got",  infoHisto.getBinLabel(3)
-                    continue
+                q = Queue()               
+                thr = Process(target=validate, args=(fname, q))
+                thr.start()
+                threads[fname] = [thr, q, None]
 
-                fileList.append(fname)
-                evCnt += int(infoHisto.GetBinContent(3))
+                while True:
+                    waitingOrRunning = 0 
+                    goodFiles = 0
+                    for t in threads:
+                        #if not threads[t][0].ident or  threads[t][0].is_alive():
+                        if threads[t][0].exitcode == None:
+                            waitingOrRunning+=1
+                        else:
+                            if threads[t][2] == None:
+                                threads[t][0].join()
+                                threads[t][2] = threads[t][1].get()
+                            if threads[t][2] > 0:
+                                goodFiles+=1
+
+                    if waitingOrRunning > maxThreads:
+                        time.sleep(1)
+                    else:
+                        break
+
+            print "" # EOL
+            fileCnt = 0
+            for t in threads:
+                if threads[t][2]==None:
+                    threads[t][0].join()
+                    threads[t][2] = threads[t][1].get()
+                result = threads[t][2] 
+                if result <= 0:
+                    print "Problematic file", t
+                    continue
+                fileList.append(t)
+                evCnt += result
                 fileCnt += 1
                 if maxFiles != None and fileCnt >= maxFiles:
-                    print tab, "maxfiles limit reached"
-                    break # we dont need more
+                    print tab, "will process", fileCnt, "files"
+                    break
 
-                del infoHisto
-                #rootFile.Close()
-                del rootFile
 
         if not quiet: print tab, "number of tree files:", len(fileList)
         if not quiet: print tab, "events processed in skim:", evCnt # in agreement with crab xml output
@@ -145,7 +190,7 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
     return ret
 
 if __name__ == "__main__":
-    #getTreeFilesAndNormalizations(maxFilesMC = -10, maxFilesData = -10)
-    getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = -10)
+    getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None)
+    #getTreeFilesAndNormalizations(maxFilesMC = 10, maxFilesData = -10)
 
 
