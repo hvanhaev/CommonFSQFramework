@@ -163,56 +163,47 @@ def main():
     #print vars["MC_jet15"].keys()
     # ['ptRaw', 'weight', 'ptGen', 'area', 'eta', 'rho']
     
+    of = open("bfj.txt","w")
+
+    ROOT.gROOT.ProcessLine(".L fit.cxx+")
     # http://root.cern.ch/root/html/tutorials/roofit/rf609_xychi2fit.C.html
+
+    etas = [-0.2, 0.2]
+
     for t in ds:
         if t == "data_jet15": continue
+        for i in xrange(len(etas)-1):
+            etaL = etas[i]
+            etaH = etas[i+1]
+            print "Limiting range..."
+            dsReduced = ds[t].reduce("ptRaw > 15 && ptRaw < 1000 && eta >"+str(etaL)+" && eta <"+str(etaH))
+            print "              ...done", ds[t].numEntries(), "->", dsReduced.numEntries()
 
-        print "Limiting range..."
-        dsReduced = ds[t].reduce("ptRaw > 30 && ptRaw < 1000")
-        print "              ...done", ds[t].numEntries(), "->", dsReduced.numEntries()
-        pt = vars[t]["ptRaw"]
-        ptGen = vars[t]["ptGen"]
-        a = RooRealVar("a","a",0.0,-100,100) 
-        b = RooRealVar("b","b",0.0,-100,100) 
+            pt = vars[t]["ptRaw"]
+            ptGen = vars[t]["ptGen"]
+            a = RooRealVar("a","a",0.0,-100,100) 
+            b = RooRealVar("b","b",0.0,-100,100) 
+            #f= ROOT.getTF(pt, RooArgList(a,b))
+            #rho = vars[t]["rho"]
+            rho = vars[t]["rhoarea"]
+            pu = RooRealVar("pu","pu",0.0,-100,100) 
+            f= ROOT.getTF2d(pt, rho, RooArgList(a,b, pu))
+            #frame = pt.frame(RooFit.Title("Chi^2 fit of function set of (X#pmdX,Y#pmdY) values")) 
+            #dsReduced.plotOnXY(frame, RooFit.YVar(ptGen))
+            f.chi2FitTo(dsReduced, RooFit.YVar(ptGen))
+            #f.plotOn(frame)
+            #c = ROOT.TCanvas() 
+            #frame.Draw()
+            #c.Print("~/tmp/test.png")
 
-        #func = RooFit.RooPolyVar f("f","f", pt, RooFit.RooArgList(b,a, RooFit.RooConst(1))) 
-        f = RooPolyVar("f","f", pt, RooArgList(a,b))
-        frame = pt.frame(RooFit.Title("Chi^2 fit of function set of (X#pmdX,Y#pmdY) values")) 
-        #dsReduced.plotOnXY(frame, RooFit.YVar(ptGen))
-
-        f.chi2FitTo(dsReduced, RooFit.YVar(ptGen))
-        f.plotOn(frame)
-  
-        c = ROOT.TCanvas() 
-        frame.Draw()
-        c.Print("~/tmp/test.png")
-
-        pass
-        '''
-		#todo["stat"] = histD
-        c = ROOT.TCanvas() 
-        for t in todo:
-			todo[t].Draw()
-			todo[t].SetMinimum(0.)
-			todo[t].SetMaximum(1.02)
-			if label:
-			    leg = ROOT.TLegend(0.2, 0.95, 1, 1)
-			    leg.SetHeader(label)
-			    leg.SetFillColor(0)
-			    leg.Draw("SAME")
-
-			odir = ("~/tmp/vetoEffVsPU_"+str(minPTAve)+"/").replace(".","_")
-			os.system("mkdir -p " + odir)
-			name = (odir+t+"_"+str(etaMin) + "_" + str(etaMax)).replace(".","_")+".png"
-			c.Print(name)
-        '''
-
+        of.write(" ".join(map(str, ["BFJ", etaL, etaH, a.getVal(), b.getVal(), pu.getVal(), "|", a.getError(), b.getError(), pu.getError()] )))
 
 
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
     ROOT.gSystem.Load("libFWCoreFWLite.so")
+    ROOT.gSystem.Load( "libRooFit" )
     AutoLibraryLoader.enable()
     MNTriggerStudies.MNTriggerAna.Style.setStyle()
     main()
