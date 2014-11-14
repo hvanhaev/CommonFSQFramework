@@ -28,8 +28,8 @@ def main():
     parser.add_option("-l", "--label", action="store", type="string",  dest="label" )
 
     #weight = "flat2050toPU20"
-    #weight = "weight"
-    weight = ""
+    weight = "weight"
+    #weight = ""
 
 
    
@@ -186,8 +186,16 @@ def main():
             #f= ROOT.getTF(pt, RooArgList(a,b))
             #rho = vars[t]["rho"]
             rho = vars[t]["rhoarea"]
-            pu = RooRealVar("pu","pu",0.0,-100,100) 
-            f= ROOT.getTF2d(pt, rho, RooArgList(a,b, pu))
+            pu1 = RooRealVar("pu1","pu1",1.0,-100,100) 
+            #f= ROOT.getTF2d(pt, rho, RooArgList(a,b, pu1))
+            pu2 = RooRealVar("pu2","pu2",1.0,-100,100) 
+            #f= ROOT.getTF2d_PUptdependend(pt, rho, RooArgList(a,b, pu1, pu2))
+            pu3 = RooRealVar("pu3","pu3",1.0,-100,100) 
+            pu4 = RooRealVar("pu4","pu4",1.0,-100,100) 
+            pu5 = RooRealVar("pu5","pu5",-1.0,-100,100) 
+            pu6 = RooRealVar("pu6","pu6",1.0,-100,100) 
+            f= ROOT.getTF2d_PUptlinearCorrected(pt, rho, RooArgList(a,b, pu1, pu2, pu3, pu4, pu5, pu6))
+
             #frame = pt.frame(RooFit.Title("Chi^2 fit of function set of (X#pmdX,Y#pmdY) values")) 
             #dsReduced.plotOnXY(frame, RooFit.YVar(ptGen))
             f.chi2FitTo(dsReduced, RooFit.YVar(ptGen))
@@ -196,7 +204,9 @@ def main():
             #frame.Draw()
             #c.Print("~/tmp/test.png")
 
-        of.write(" ".join(map(str, ["BFJ", etaL, etaH, a.getVal(), b.getVal(), pu.getVal(), "|", a.getError(), b.getError(), pu.getError()] )))
+        of.write(" ".join(map(str, ["BFJ", etaL, etaH, a.getVal(), b.getVal(), pu1.getVal(), pu2.getVal(), \
+                                    pu3.getVal(), pu4.getVal(), pu5.getVal(), pu6.getVal(), \
+                                    "|", a.getError(), b.getError(), pu1.getError(), pu2.getError()] )))
 
 
 

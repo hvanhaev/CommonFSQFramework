@@ -141,8 +141,8 @@ stage1extralabel = "hltL1extraParticles"
 
 process.BFJecTreeProducer = cms.EDAnalyzer("BFJecTreeProducer",
     BFJecView =  cms.PSet(
-        minPT = cms.double(0),
-        minPTGen = cms.double(15),
+        minPT = cms.double(15),
+        minPTGen = cms.double(0),
         maxEta = cms.double(5.2),
         todoJets = cms.vstring("pfAK4CHS", "hltAK4PFJets", "hltAK4PFJetsCorrected"),
         pfAK4CHS = cms.VInputTag(cms.InputTag("ak4PFJetsCHS", "", "RECO"), cms.InputTag( "ak4GenJets", "", "TTT"), cms.InputTag("fixedGridRhoFastjetAll", "", "RECO")),
@@ -153,8 +153,8 @@ process.BFJecTreeProducer = cms.EDAnalyzer("BFJecTreeProducer",
 
 process.BFJecTreeProducerHighPT = cms.EDAnalyzer("BFJecTreeProducer",
     BFJecView =  cms.PSet(
-        minPT = cms.double(0),
-        minPTGen = cms.double(30),
+        minPT = cms.double(30),
+        minPTGen = cms.double(0),
         maxEta = cms.double(5.2),
         todoJets = cms.vstring("pfAK4CHS", "hltAK4PFJets", "hltAK4PFJetsCorrected"),
         pfAK4CHS = cms.VInputTag(cms.InputTag("ak4PFJetsCHS", "", "RECO"), cms.InputTag( "ak4GenJets", "", "TTT"), cms.InputTag("fixedGridRhoFastjetAll", "", "RECO")),
