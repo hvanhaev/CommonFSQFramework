@@ -117,7 +117,11 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                 if maxFiles != None and goodFiles >= maxFiles:
                     break
                 fileCnt += 1
-                print fileCnt,
+                if (fileCnt%50 == 0):
+                    sys.stdout.write(str(int(100.*fileCnt/len(fileListUnvalidated)))+"%")
+                else:
+                    sys.stdout.write('.')
+
                 def validate(fname, q):
                     rootFile = ROOT.TFile.Open(fname,"r")
                     infoHisto = rootFile.Get("infoHisto/cntHisto")
