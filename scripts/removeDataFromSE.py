@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 import sys, os, imp, subprocess
 from optparse import OptionParser
+import random, time
 
 parser = OptionParser()
 (options, args) = parser.parse_args()
@@ -17,6 +18,29 @@ f, filename, desc = imp.find_module(mod, [mod_dir])
 mod = imp.load_module(mod, f, filename, desc)
 
 samples = mod.sam.keys()
+print "Going to remove:"
+print ""
+for s in samples:
+    print "   ", s
+print ""
+print "defined in", sampleFile
+a=random.randint(1, 10)
+b=random.randint(1, 10)
+print "Type result of", a, "+", b, " <enter> to continue. ",
+try:
+    choice = int(raw_input().lower())
+except:
+    print "Wrong answer, exiting"
+    sys.exit()
+
+if choice != a+b:
+    print "Wrong answer, exiting"
+    sys.exit()
+
+print "10s sleep..."
+time.sleep(10)
+
+
 for s in samples:
     if "pathSE" not in mod.sam[s]:
         print "Warning: sample",s,"has no SE path set"
@@ -25,11 +49,28 @@ for s in samples:
     #print s, path
     p = subprocess.Popen(["lcg-ls", path], stdout=subprocess.PIPE)
     data = p.communicate()[0].split("\n")
+
+    total=float(len(data))
+    cnt = 0
+    print ""
+    print "Doing", s
     for d in data:
         fname = d.split("/")[-1]
         if not fname:
-            print "Cannot extract file name from line: |"+d+"|"
-            continue
+            if len(fname)!=0:
+                print "\nCannot extract file name from line: |"+d+"|"
+                continue
 
         fullname = path + "/" +fname
+        subprocess.call(["srmrm", fullname])
+        cnt += 1
+        if cnt % 20 == 0:
+            sys.stdout.write(str(int(100*cnt/total))+"%")
+        else:
+            sys.stdout.write(".")
+        sys.stdout.flush()
+
+    print ""
+
+
 
