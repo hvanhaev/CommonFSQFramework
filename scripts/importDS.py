@@ -86,6 +86,10 @@ def main(sam):
             continue
 
         ds=line.rstrip()
+        if len(ds) == 0:
+            print "Warning - empty line in ds file. Skipping"
+            continue
+
         isData = fun["isData"](ds)
 
         name = fun["name"](ds)
