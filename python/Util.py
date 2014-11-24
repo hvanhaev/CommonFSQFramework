@@ -1,8 +1,13 @@
-import os, sys,subprocess
+import os, sys, subprocess
 
 def getCrabVersion():
     try:
-        ver=subprocess.check_output(["crab", "--version"])#,, "v3"
+        #ver=subprocess.check_output(["crab", "--version"])#,, "v3"
+        # python 2.6 compat
+        p = subprocess.Popen(["crab", "--version"], stdout=subprocess.PIPE)
+        ver = p.communicate()[0]
+
+
     except OSError:
         raise Exeption("Seems that crab environment is not defined. Exit... stage left")
 
