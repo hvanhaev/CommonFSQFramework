@@ -105,7 +105,8 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
             self.jetGetter.disableGenJet()
             #self.jetGetter = GenJetProxy()
         else:
-            self.jetGetter = JetGetter("PFAK5")
+            #self.jetGetter = JetGetter("PFAK5")
+            self.jetGetter = JetGetter("PFlegacy")
             self.jetGetter.disableGenJet()
 
         self.varE = {}
@@ -247,16 +248,17 @@ if __name__ == "__main__":
     treeName = "mnXS"
 
     # debug config:
-    '''
+    #'''
     sampleList=[]
-    sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
+    #sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
+    sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
     #sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
     #sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
     #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
-    maxFilesData = 1
-    maxFilesMC = 1
-    nWorkers = 1
+    #maxFilesData = 1
+    #maxFilesMC = 1
+    nWorkers = 16
     #'''
 
     slaveParams = {}
@@ -268,6 +270,7 @@ if __name__ == "__main__":
 
     slaveParams["ptMin"] = 35
     slaveParams["etaMax"] = 4.7
+    slaveParams["HLT2015TempWorkaround"] = False
 
 
 

@@ -41,10 +41,10 @@ class FitThread(multiprocessing.Process):
         #rangeLow = meanVal - sigma*1.5
         #rangeHigh = meanVal + sigma*1.5
 
-        #rangeLow = -1.7
-        #rangeHigh = 1.7
-        rangeLow = -0.5
-        rangeHigh = 0.5
+        rangeLow = -1.7
+        rangeHigh = 1.7
+        #rangeLow = -0.5
+        #rangeHigh = 0.5
 
         mean2 = RooRealVar("mean","mean of gaussian", 0, -1.5, 1.5)
         sigma2 = RooRealVar("sigma","width of gaussian", .1, 0, 1)
@@ -71,7 +71,7 @@ class FitThread(multiprocessing.Process):
         ptProbeJetVar = inputMap["ptProbeJetVar"]
         meanPT = dsReduced.mean(ptProbeJetVar)
         sigmaPT = dsReduced.sigma(ptProbeJetVar)
-        meanPU = dsReduced.mean(inputMap["PU"])
+        #meanPU = dsReduced.mean(inputMap["PU"])
 
         etaMin = inputMap["etaMin"]
         etaMax = inputMap["etaMax"]
@@ -84,7 +84,7 @@ class FitThread(multiprocessing.Process):
         box.AddText("\sigma(p^{probe}_{T})=%10.2f" % sigmaPT )
         box.AddText(str(etaMin) + " < |#eta_{probe}| < "+str(etaMax))
         box.AddText("p_{T}^{ave} > "+str(minPtAVG))
-        box.AddText("PU mean=%10.2f"% meanPU)
+        #box.AddText("PU mean=%10.2f"% meanPU)
         #box.AddText("probe jet p_{T} > "+str(minPtAVG))
 
         frame.addObject(box)
@@ -268,8 +268,8 @@ def main():
         #importCMD = RooFit.Import(tree)
         #cutCMD = RooFit.Cut(preselectionString)
         print "  create dataset...", weight
-        ds[t] = ROOT.RooDataSet(t, t, tree, observables, "weight < 100", weight)
-        #ds[t] = ROOT.RooDataSet(t, t, tree, observables,  "", weight)
+        #ds[t] = ROOT.RooDataSet(t, t, tree, observables, "weight < 100", weight)
+        ds[t] = ROOT.RooDataSet(t, t, tree, observables,  "", weight)
         print "        ...done"
 
         print "Dataset:", t, ds[t].numEntries()
@@ -342,7 +342,7 @@ def main():
                 inputMap["minPtAVG"] = minPTAve
                 inputMap["iEta"] = iEta # xcheck only
                 inputMap["cut"] = cut
-                inputMap["PU"] = vars[t]["PUNumInteractions"]
+                #inputMap["PU"] = vars[t]["PUNumInteractions"]
 
 
                 thr = FitThread(inputMap)

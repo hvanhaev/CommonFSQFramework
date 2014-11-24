@@ -35,7 +35,9 @@ else:
     print "JEC set to:", ver
 
     if ver == None:
-        raise Exception("Cannot determine JECset to use")
+        ver = "V16TFPart"
+        print "Setting JEC to", ver
+        #raise Exception("Cannot determine JECset to use")
 
     XS = sampleList[s]["XS"]
     process.GlobalTag.globaltag = sampleList[s]["GT"]
@@ -69,8 +71,8 @@ else:
 enableTur = True
 is2011Balance = False
 #anaType="ZMuMu"
-anaType="DiJet"
-#anaType="DiJetBalance"
+#anaType="DiJet"
+anaType="DiJetBalance"
 #anaType = "JetTriggerEff"
 
 
@@ -80,7 +82,7 @@ if anaType == "ZMuMu":
     minJets = 0
     minDiMuons = 1
 elif anaType == "DiJetBalance":
-    minJetPT = 27
+    minJetPT = 20
     minJets =  2
     minDiMuons = 0
 elif anaType == "DiJet":
@@ -157,9 +159,9 @@ else:
 
 #f = "/scratch/scratch0/data/store/mc/Summer12/DYToMuMu_M-20_TuneZ2Star_HFshowerLibrary_7TeV_pythia6/AODSIM/LowPU2010_DR42_PU_S0_START42_V17B-v1/10000/0A78309F-AF5B-E211-B615-003048FFCB8C.root"
 
-
+f='/store/mc/Summer12/QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/AODSIM/LowPU2010_DR42_BS2011_PU_S0_START42_V17B-v1/00000/0009003F-D407-E411-BCF0-002590A8882A.root'
 process.source.fileNames = [
-     'file:'+f
+     f
 ]
 
 
@@ -414,10 +416,13 @@ process.pPF = cms.Path(     process.initialSequence
                           * process.countTFJets
                           * process.finalCntrPF    )
 
+
+'''
 process.pCalo = cms.Path (   process.initialSequence
                            * process.selectedTFCaloJets 
                            * process.countTFCaloJets
                            * process.finalCntrCalo )
+'''
 
 
 
@@ -481,7 +486,8 @@ if anaType == "JetTriggerEff":
 # HLT_Mu11
 # HLT_Mu9
 
-process.schedule.extend([process.pPF, process.pCalo])
+process.schedule.extend([process.pPF])
+#process.schedule.extend([process.pPF, process.pCalo])
 #process.schedule = cms.Schedule(process.pCalo, process.outpath)
 process.schedule.extend([process.tfMuonsP,])
 
@@ -496,9 +502,10 @@ process.exampleTree = cms.EDAnalyzer("ExampleTreeProducer")
 process.mnXS = cms.EDAnalyzer("MNXSTreeProducer", 
     minPT = cms.double(30),
     JetViewPF  = cms.PSet(
+        disableJetID = cms.bool(False),
         optionalCaloJets4ID = cms.InputTag("ak5CaloJets","","RECO"),
         optionalCaloID4ID  = cms.InputTag("ak5JetID"),
-        branchPrefix = cms.untracked.string("PF"),
+        branchPrefix = cms.untracked.string("PFAK5"),
         maxEta = cms.double(4.9999),
         minPt = cms.double(3),
         maxnum = cms.int32(3),
@@ -512,6 +519,7 @@ process.mnXS = cms.EDAnalyzer("MNXSTreeProducer",
     ),
 
     JetViewCalo  = cms.PSet(
+        disableJetID = cms.bool(False),
         optionalCaloJets4ID = cms.InputTag("ak5CaloJets","","RECO"),
         optionalCaloID4ID = cms.InputTag("ak5JetID"),
         branchPrefix = cms.untracked.string("Calo"),
@@ -574,7 +582,8 @@ if anaType == "ZMuMu":
         )
 elif anaType == "DiJet" or anaType == "DiJetBalance":
     process.out.SelectEvents = cms.untracked.PSet(
-            SelectEvents = cms.vstring('pPF', 'pCalo')
+        #    SelectEvents = cms.vstring('pPF', 'pCalo')
+            SelectEvents = cms.vstring('pPF')
         )
 
 

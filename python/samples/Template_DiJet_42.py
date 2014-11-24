@@ -114,6 +114,9 @@ def XS(ds):
     s = {}
 
     s["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"] = 2.213E10
+    s["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"] = 16953200000.  # 30% difference wrt pythia. Note different pt Range!
+
+
 
 
     dsName = name(ds)
