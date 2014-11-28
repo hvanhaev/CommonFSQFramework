@@ -153,7 +153,54 @@ sam["JetMETTau-Run2010A-Apr21ReReco-v1-JEC16Full"]["pathTrees"]='/XXXTMFTTree/st
 sam["JetMETTau-Run2010A-Apr21ReReco-v1-JEC16Full"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/JetMETTau/DiJet_20141118_MN2010_JetMETTau-Run2010A-Apr21ReReco-v1-JEC16Full/39dbed0eff6f23c261ef61260ad17bc8//'
 sam["JetMETTau-Run2010A-Apr21ReReco-v1-JEC16Full"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/JetMETTau/DiJet_20141118_MN2010_JetMETTau-Run2010A-Apr21ReReco-v1-JEC16Full/39dbed0eff6f23c261ef61260ad17bc8/'
 
-runOnFull = True
+
+
+sam["Jet-Run2010B-Apr21ReReco-v1-V16TFPartV2"]={}
+sam["Jet-Run2010B-Apr21ReReco-v1-V16TFPartV2"]["sgeJobs"]=50
+sam["Jet-Run2010B-Apr21ReReco-v1-V16TFPartV2"]["crabJobs"]=115
+sam["Jet-Run2010B-Apr21ReReco-v1-V16TFPartV2"]["GT"]='GR_R_42_V19::All'
+sam["Jet-Run2010B-Apr21ReReco-v1-V16TFPartV2"]["name"]='Jet-Run2010B-Apr21ReReco-v1'
+sam["Jet-Run2010B-Apr21ReReco-v1-V16TFPartV2"]["isData"]=True
+sam["Jet-Run2010B-Apr21ReReco-v1-V16TFPartV2"]["weightJet15Inverse"]='RooFormulaVar("weight","weight", "invtrgWeightJet15RawTF2", RooArgList(v["invtrgWeightJet15RawTF2"]["RooVar"]))'
+sam["Jet-Run2010B-Apr21ReReco-v1-V16TFPartV2"]["numEvents"]=-1
+sam["Jet-Run2010B-Apr21ReReco-v1-V16TFPartV2"]["lumiJet15"]=0.0033470000000000001
+sam["Jet-Run2010B-Apr21ReReco-v1-V16TFPartV2"]["json"]='MNTriggerStudies/MNTriggerAna/lumi/Cert_136033-149442_7TeV_Apr21ReReco_Collisions10_JSON_v2.txt'
+sam["Jet-Run2010B-Apr21ReReco-v1-V16TFPartV2"]["lumiDiJet15FB"]='crashMe'
+sam["Jet-Run2010B-Apr21ReReco-v1-V16TFPartV2"]["XS"]=-1
+sam["Jet-Run2010B-Apr21ReReco-v1-V16TFPartV2"]["DS"]='/Jet/Run2010B-Apr21ReReco-v1/AOD'
+
+sam["JetMET-Run2010A-Apr21ReReco-v1-V16TFPartV2"]={}
+sam["JetMET-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["sgeJobs"]=50
+sam["JetMET-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["crabJobs"]=115
+sam["JetMET-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["GT"]='GR_R_42_V19::All'
+sam["JetMET-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["name"]='JetMET-Run2010A-Apr21ReReco-v1'
+sam["JetMET-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["isData"]=True
+sam["JetMET-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["weightJet15Inverse"]='RooFormulaVar("weight","weight", "invtrgWeightJet15RawTF2", RooArgList(v["invtrgWeightJet15RawTF2"]["RooVar"]))'
+sam["JetMET-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["numEvents"]=-1
+sam["JetMET-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["lumiJet15"]=0.0095250000000000005
+sam["JetMET-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["json"]='MNTriggerStudies/MNTriggerAna/lumi/Cert_136033-149442_7TeV_Apr21ReReco_Collisions10_JSON_v2.txt'
+sam["JetMET-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["lumiDiJet15FB"]=2.8380000000000001
+sam["JetMET-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["XS"]=-1
+sam["JetMET-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["DS"]='/JetMET/Run2010A-Apr21ReReco-v1/AOD'
+
+sam["JetMETTau-Run2010A-Apr21ReReco-v1-V16TFPartV2"]={}
+sam["JetMETTau-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["sgeJobs"]=50
+sam["JetMETTau-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["crabJobs"]=115
+sam["JetMETTau-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["GT"]='GR_R_42_V19::All'
+sam["JetMETTau-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["name"]='JetMETTau-Run2010A-Apr21ReReco-v1'
+sam["JetMETTau-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["isData"]=True
+sam["JetMETTau-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["weightJet15Inverse"]='RooFormulaVar("weight","weight", "invtrgWeightJet15RawTF2", RooArgList(v["invtrgWeightJet15RawTF2"]["RooVar"]))'
+sam["JetMETTau-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["numEvents"]=-1
+sam["JetMETTau-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["lumiJet15"]=0.013781
+sam["JetMETTau-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["json"]='MNTriggerStudies/MNTriggerAna/lumi/Cert_136033-149442_7TeV_Apr21ReReco_Collisions10_JSON_v2.txt'
+sam["JetMETTau-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["lumiDiJet15FB"]=0.28277400000000003
+sam["JetMETTau-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["XS"]=-1
+sam["JetMETTau-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["DS"]='/JetMETTau/Run2010A-Apr21ReReco-v1/AOD'
+
+
+'''
+#runOnFull = True
+runOnFull = False
 samOrg = sam
 sam = {}
 for s in samOrg:
@@ -163,8 +210,8 @@ for s in samOrg:
 
     if cp:
         newName = s.replace("-JEC16Full", "")
-        sam[s] = samOrg[s]
-
+        sam[newName] = samOrg[s]
+'''
 
 
 
