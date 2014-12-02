@@ -42,6 +42,9 @@ EventViewBase(iConfig,  tree)
 void TriggerResultsView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSetup){
 
     edm::TriggerResultsByName trbn = iEvent.triggerResultsByName(m_process);
+    // TODO error message?
+    if (!trbn.isValid()) return;
+
     const std::vector< std::string > names = trbn.triggerNames(); 
     //for (unsigned int i = 0; i<names.size(); ++i){
     //    std::cout << names.at(i) << std::endl;
