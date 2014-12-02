@@ -27,6 +27,11 @@ def getVariant():
     variant = os.environ["SmallXAnaVersion"]
     return variant
 
+def getFullPathToAnaDefinitionFile():
+    variant = getVariant()
+    command = "import "+variant+" as tmpxxx"
+    exec command
+    return tmpxxx.__file__
 
 def getAnaDefinition(varname, toGlobal=False):
     variant = getVariant()

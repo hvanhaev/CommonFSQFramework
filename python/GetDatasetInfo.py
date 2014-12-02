@@ -11,8 +11,9 @@ import MNTriggerStudies.MNTriggerAna.Util
 import time
 from multiprocessing import Process, Queue
 
+import pickle
 
-def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet = False, samplesToProcess = None):
+def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet = False, samplesToProcess = None, usePickle=False):
 
     # TODO: SmallXAnaDefFile access function in Util
     if "SmallXAnaDefFile" not in os.environ:
@@ -36,6 +37,8 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
     isXrootdAccess = "xrootd" in localROOTPrefix
     localAccess = not isXrootdAccess
 
+    samplesFileDir = os.path.dirname(MNTriggerStudies.MNTriggerAna.Util.getFullPathToAnaDefinitionFile())+"/"
+
     sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
     if samplesToProcess != None:
         newList = {}
@@ -47,12 +50,14 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
 
     anaVersion=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("anaVersion")
 
-    if not quiet: print "if not quiet: printing info for: ",  anaVersion
+    if not quiet: print "printing info for: ",  anaVersion
 
     ret = {}
     tab = "     "
     for s in sampleList:
         ret[s] = {}
+        pickleName = samplesFileDir+"cache_"+anaVersion+"_"+s+".pkl"
+        fromPickle = False
         if not quiet: print "#"*120
         if not quiet: print "Found sample:", s
         if not quiet: print tab,"dataset:",sampleList[s]["DS"]
@@ -63,9 +68,6 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
             # TODO: should this be in localAccess part?
             if not quiet: print tab, "path to trees not found! Blame the skim-responsible-guy."
         else:
-
-            # local access start
-
             fileListUnvalidated = []
             if localAccess:
                 if not quiet: print tab, "path to trees:",sampleList[s]["pathTrees"]
@@ -108,6 +110,21 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
             threads = {}
             goodFiles = 0
             print "Total number of files in sample:", len(fileListUnvalidated)
+            if maxFiles == None and usePickle: 
+                if os.path.isfile(pickleName):
+                    pkl_file = open(pickleName, 'rb')
+                    pickledData = pickle.load(pkl_file)
+                    if set(pickledData["files"])!=set(fileListUnvalidated):
+                        print "File list from pickled file and unvalidated list of files different"
+                        print "Broken (?) pickle file", pickleName
+                    else:
+                        print "Cached data from", pickleName
+                        fileListUnvalidated = []  # Q&D - disable validation. 
+                        fileList = pickledData["files"]
+                        evCnt =  pickledData["evCnt"]
+                        fromPickle = True
+
+
             print "Validating",
             maxThreads= 12
             if maxFiles != None:
@@ -168,15 +185,28 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                     threads[t][0].join()
                     threads[t][2] = threads[t][1].get()
                 result = threads[t][2] 
-                if result <= 0:
+                if result < 0:
                     print "Problematic file", t
                     continue
+                elif result == 0:
+                    print "Warning: 0 ev file", t
+
                 fileList.append(t)
                 evCnt += result
                 fileCnt += 1
                 if maxFiles != None and fileCnt >= maxFiles:
                     print tab, "will process", fileCnt, "files"
                     break
+
+
+        if not fromPickle and  maxFiles == None and usePickle: 
+            toPickle = {}
+            toPickle["files"] = fileList
+            toPickle["evCnt"] = evCnt
+            # pickleName
+            outputPickle = open(pickleName, 'wb')
+            pickle.dump(toPickle, outputPickle)
+            outputPickle.close()
 
 
         if not quiet: print tab, "number of tree files:", len(fileList)
@@ -194,7 +224,7 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
     return ret
 
 if __name__ == "__main__":
-    getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None)
+    getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, usePickle=True)
     #getTreeFilesAndNormalizations(maxFilesMC = 10, maxFilesData = -10)
 
 
