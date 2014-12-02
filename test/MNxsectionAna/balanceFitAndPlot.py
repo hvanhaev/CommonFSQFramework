@@ -268,8 +268,11 @@ def main():
         #importCMD = RooFit.Import(tree)
         #cutCMD = RooFit.Cut(preselectionString)
         print "  create dataset...", weight
-        #ds[t] = ROOT.RooDataSet(t, t, tree, observables, "weight < 100", weight)
-        ds[t] = ROOT.RooDataSet(t, t, tree, observables,  "", weight)
+        if "data_" in t:
+            ds[t] = ROOT.RooDataSet(t, t, tree, observables)
+        else:
+            #ds[t] = ROOT.RooDataSet(t, t, tree, observables, "weight < 100", weight)
+            ds[t] = ROOT.RooDataSet(t, t, tree, observables,  "", weight)
         print "        ...done"
 
         print "Dataset:", t, ds[t].numEntries()

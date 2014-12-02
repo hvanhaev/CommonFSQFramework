@@ -46,8 +46,10 @@ def name(ds):
     if len(split) == 0: return None
 
     if isData(ds):
+        #ret = split[1] + "-" + split[2]+"-V16TFPartV2"
         ret = split[1] + "-" + split[2]
     else:
+        #ret = split[1]+"-V16TFPartV2"
         ret = split[1]
     return ret
 

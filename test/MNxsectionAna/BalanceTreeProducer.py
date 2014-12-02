@@ -17,6 +17,7 @@ from array import *
 # you have to run this file from directory where it is saved
 import MNTriggerStudies.MNTriggerAna.ExampleProofReader 
 from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
+#import cProfile
 
 class Proxy():
     def __init__(self, obj):
@@ -44,6 +45,7 @@ class GenJetProxy():
 
 class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
     def init(self):
+        #self.pr = cProfile.Profile()
 
         print "Params:", self.etaMax, self.ptMin
         self.normFactor = self.getNormalizationFactor()
@@ -139,6 +141,16 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
         #print "ASDFASD", self.fChain.genWeight
         return self.fChain.genWeight*self.normFactor
 
+    '''
+    # stuff for code profiling
+    def analyze(self):
+        self.pr.enable()
+        self.analyzeTT()
+        self.pr.disable()
+    '''
+
+
+    #def analyzeTT(self):
     def analyze(self):
         if not self.HLT2015TempWorkaround and self.fChain.ngoodVTX == 0: return
 
@@ -202,6 +214,8 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
                 
                 # check veto:
                 ptAve = (probePT+tagPT)/2
+                if ptAve < 25: continue
+
 
                 veto2 = -1
                 for jet in self.jetGetter.get(shift):
@@ -231,6 +245,12 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
 
     def finalize(self):
         print "Finalize:"
+        #print 'py: slave terminating AAZAZ'
+        #dname = "/nfs/dust/cms/user/fruboest/2014.11.MN2010/CMSSW_4_2_8_lowpupatch1/src/MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"
+        #profName = dname + "stats"
+        #self.pr.dump_stats(profName)
+
+
         #normFactor = self.getNormalizationFactor()
         #print "  applying norm", normFactor
         #for h in self.hist:
@@ -244,21 +264,30 @@ if __name__ == "__main__":
     sampleList = None
     maxFilesMC = None
     maxFilesData = None
-    nWorkers = None # Use all
+    nWorkers = 20
     treeName = "mnXS"
+
+    sampleList = []
+    #'''
+    sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
+    sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
+    sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
+    #'''
+    sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
+    # '''
 
     # debug config:
     #'''
-    sampleList=[]
+    #sampleList=["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]
     #sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
-    sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
+    #sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
     #sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
     #sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
     #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
     #maxFilesData = 1
     #maxFilesMC = 1
-    nWorkers = 16
+    #nWorkers = 1
     #'''
 
     slaveParams = {}
@@ -268,7 +297,7 @@ if __name__ == "__main__":
     #slaveParams["doPtShiftsJER"] = False
     slaveParams["doPtShiftsJER"] = True
 
-    slaveParams["ptMin"] = 35
+    slaveParams["ptMin"] = 15
     slaveParams["etaMax"] = 4.7
     slaveParams["HLT2015TempWorkaround"] = False
 
@@ -279,6 +308,7 @@ if __name__ == "__main__":
                                sampleList=sampleList,
                                maxFilesMC = maxFilesMC,
                                maxFilesData = maxFilesData,
-                               nWorkers=nWorkers,
+                               nWorkers=nWorkers, 
+                               usePickle = True,
                                outFile = "treeDiJetBalance.root" )
 

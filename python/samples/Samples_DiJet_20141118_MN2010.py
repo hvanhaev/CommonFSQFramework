@@ -198,20 +198,44 @@ sam["JetMETTau-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["XS"]=-1
 sam["JetMETTau-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["DS"]='/JetMETTau/Run2010A-Apr21ReReco-v1/AOD'
 
 
-'''
-#runOnFull = True
-runOnFull = False
+sam["Jet-Run2010B-Apr21ReReco-v1-V16TFPartV2"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/Jet/DiJet_20141118_MN2010_Jet-Run2010B-Apr21ReReco-v1-V16TFPartV2/9e683e6bb14029aff8e86a85149cf327//'
+sam["Jet-Run2010B-Apr21ReReco-v1-V16TFPartV2"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/Jet/DiJet_20141118_MN2010_Jet-Run2010B-Apr21ReReco-v1-V16TFPartV2/9e683e6bb14029aff8e86a85149cf327//'
+sam["Jet-Run2010B-Apr21ReReco-v1-V16TFPartV2"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/Jet/DiJet_20141118_MN2010_Jet-Run2010B-Apr21ReReco-v1-V16TFPartV2/9e683e6bb14029aff8e86a85149cf327/'
+sam["JetMET-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/JetMET/DiJet_20141118_MN2010_JetMET-Run2010A-Apr21ReReco-v1-V16TFPartV2/9e683e6bb14029aff8e86a85149cf327//'
+sam["JetMET-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/JetMET/DiJet_20141118_MN2010_JetMET-Run2010A-Apr21ReReco-v1-V16TFPartV2/9e683e6bb14029aff8e86a85149cf327//'
+sam["JetMET-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/JetMET/DiJet_20141118_MN2010_JetMET-Run2010A-Apr21ReReco-v1-V16TFPartV2/9e683e6bb14029aff8e86a85149cf327/'
+sam["JetMETTau-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/JetMETTau/DiJet_20141118_MN2010_JetMETTau-Run2010A-Apr21ReReco-v1-V16TFPartV2/9e683e6bb14029aff8e86a85149cf327//'
+sam["JetMETTau-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/JetMETTau/DiJet_20141118_MN2010_JetMETTau-Run2010A-Apr21ReReco-v1-V16TFPartV2/9e683e6bb14029aff8e86a85149cf327//'
+sam["JetMETTau-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/JetMETTau/DiJet_20141118_MN2010_JetMETTau-Run2010A-Apr21ReReco-v1-V16TFPartV2/9e683e6bb14029aff8e86a85149cf327/'
+
+
+#'''
+knownExtraTags = ["-JEC16Full", "-V16TFPartV2"]
+extraTag = "-JEC16Full"
+extraTag = "-V16TFPartV2"
+extraTag = ""
+
 samOrg = sam
 sam = {}
 for s in samOrg:
     cp = True
-    if "QCD" not in s and runOnFull != ("-JEC16Full" in s):
-        cp = False
+    if "QCD" not in s:
+        if extraTag:
+            if extraTag not in s:
+                cp = False
+        else:
+            for k in knownExtraTags:
+                if k in s:
+                    cp = False
 
+    print cp, s
     if cp:
-        newName = s.replace("-JEC16Full", "")
+        newName = s
+        if extraTag:
+            newName = newName.replace(extraTag, "")
         sam[newName] = samOrg[s]
-'''
+print sam.keys()
+#'''
 
 
 
