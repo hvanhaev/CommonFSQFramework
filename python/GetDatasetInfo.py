@@ -12,7 +12,7 @@ import time
 from multiprocessing import Process, Queue
 
 import pickle
-
+import distutils.spawn
 def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet = False, samplesToProcess = None, usePickle=False):
 
     # TODO: SmallXAnaDefFile access function in Util
@@ -36,6 +36,10 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
     localROOTPrefix = mod.ROOTPrefix
     isXrootdAccess = "xrootd" in localROOTPrefix
     localAccess = not isXrootdAccess
+    if isXrootdAccess:
+        if not  distutils.spawn.find_executable("lcg-ls"):
+            raise Exception("Cannot find lcg-ls executable. Check your grid environment!")
+
 
     samplesFileDir = os.path.dirname(MNTriggerStudies.MNTriggerAna.Util.getFullPathToAnaDefinitionFile())+"/"
 
