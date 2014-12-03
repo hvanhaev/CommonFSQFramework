@@ -17,6 +17,7 @@ from array import *
 # you have to run this file from directory where it is saved
 import MNTriggerStudies.MNTriggerAna.ExampleProofReader 
 from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
+from  MNTriggerStudies.MNTriggerAna.BetterJetGetter import BetterJetGetter
 #import cProfile
 
 class Proxy():
@@ -58,8 +59,10 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
         self.todoShifts = ["_central"]
 
         if not self.isData and self.doPtShiftsJEC:
-            self.todoShifts.append("_ptUp")
-            self.todoShifts.append("_ptDown")
+            #self.todoShifts.append("_ptUp")
+            #self.todoShifts.append("_ptDown")
+            self.todoShifts.append("_jecUp")
+            self.todoShifts.append("_jecDown")
 
         if not self.isData and self.doPtShiftsJER:
             self.todoShifts.append("_jerUp")
@@ -111,6 +114,8 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
             self.jetGetter = JetGetter("PFlegacy")
             self.jetGetter.disableGenJet()
 
+        self.jetGetter = BetterJetGetter("PFAK5") 
+
         self.varE = {}
         sys.stdout.flush()
 
@@ -152,7 +157,9 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
 
     #def analyzeTT(self):
     def analyze(self):
-        if not self.HLT2015TempWorkaround and self.fChain.ngoodVTX == 0: return
+        if not self.HLT2015TempWorkaround:
+            if self.fChain.ngoodVTX == 0: return
+            #if self.fChain.HBHENoiseFilterResult == 0: return
 
         if self.isData:
             if self.fChain.jet15 < 0.5:
@@ -190,6 +197,7 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
                 #dbgCnt+=1
                 #print shift, dbgCnt,"|", jet.pt(), jet.eta(), "|", dbgJet.pt(), dbgJet.eta()
                 #print pt, jet.eta()
+                #print jet.eta(), jet.pt(), jet.phi()
 
                 pt = jet.pt()
                 #print "XXX", shift, dbgCnt, pt, jet.eta()
