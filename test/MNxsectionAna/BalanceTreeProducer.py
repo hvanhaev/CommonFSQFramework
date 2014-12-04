@@ -152,14 +152,13 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
         self.pr.enable()
         self.analyzeTT()
         self.pr.disable()
-    '''
-
-
-    #def analyzeTT(self):
+    def analyzeTT(self):
+        '''
     def analyze(self):
+        # '''
         if not self.HLT2015TempWorkaround:
             if self.fChain.ngoodVTX == 0: return
-            #if self.fChain.HBHENoiseFilterResult == 0: return
+            if self.fChain.HBHENoiseFilterResult == 0: return
 
         if self.isData:
             if self.fChain.jet15 < 0.5:
@@ -190,6 +189,7 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
 
 
             #dbgCnt = 0
+            #for jet in self.jetGetter.get(shift):
             for jet in self.jetGetter.get(shift):
             #for i in xrange(0, recoJets.size()):
             #    jet = recoJets.at(i)
@@ -208,7 +208,7 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
                 if eta > self.etaMax: continue
 
                 if not self.HLT2015TempWorkaround:
-                    if not jet.looseId(): continue
+                    if not jet.jetid(): continue
                 if eta < 1.4:
                     tagJet = jet
                     tagPT = pt
@@ -217,7 +217,7 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
                     probePT = pt
 
             if tagJet != None and probeJet != None:
-                dphi = self.dphi(tagJet.p4(), probeJet.p4())
+                dphi = abs(self.dphi(tagJet.p4(), probeJet.p4()))
                 if dphi < 2.7: continue
                 
                 # check veto:
@@ -226,6 +226,7 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
 
 
                 veto2 = -1
+                #for jet in self.jetGetter.get(shift):
                 for jet in self.jetGetter.get(shift):
                     if jet == tagJet or probeJet == jet: continue
                     eta = abs(jet.eta())
@@ -253,11 +254,10 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
 
     def finalize(self):
         print "Finalize:"
-        #print 'py: slave terminating AAZAZ'
-        #dname = "/nfs/dust/cms/user/fruboest/2014.11.MN2010/CMSSW_4_2_8_lowpupatch1/src/MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"
-        #profName = dname + "stats"
-        #self.pr.dump_stats(profName)
-
+        if hasattr(self, "pr"):
+            dname = "/nfs/dust/cms/user/fruboest/2014.11.MN2010/CMSSW_4_2_8_lowpupatch1/src/MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"
+            profName = dname + "stats"
+            self.pr.dump_stats(profName)
 
         #normFactor = self.getNormalizationFactor()
         #print "  applying norm", normFactor
