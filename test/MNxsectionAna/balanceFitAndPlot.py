@@ -318,7 +318,7 @@ def main():
                 cut += " && abs(" + vary("probeEta") + ") >  " + str(etaMin)
                 cut += " && abs(" + vary("probeEta") + ") <  " + str(etaMax)
                 cut += " && " + vary("ptAve") + " > " + str(minPTAve)
-                cut +=  " &&" +vary("veto2") + " <0.2 "
+                cut +=  " &&" +vary("veto2") + " <0.3 "
                 #cut += " && " + vary("balance") + " > " + str(-1)
                 #cut += " && " + vary("balance") + " < " + str(1)
                 if options.cutExtra != None:

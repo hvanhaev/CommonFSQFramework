@@ -724,8 +724,8 @@ if anaType == "JetTriggerEff":
 #ver = "V17TFFull"
 #ver = "V17TFPart"
 #ver = "V16TFFull"
-#ver = "V16TFPart"
-ver = "V16TFPartV2"
+ver = "V16TFPart"
+#ver = "V16TFPartV2"
 
 process.load("CondCore.DBCommon.CondDBCommon_cfi")
 from CondCore.DBCommon.CondDBSetup_cfi import *

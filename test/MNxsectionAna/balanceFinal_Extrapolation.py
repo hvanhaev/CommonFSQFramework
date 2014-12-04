@@ -57,8 +57,8 @@ def getExtrapolation(v02, v03, histDir):
 def main():
     #v02 = "~/tmp/balance_v02_pt30/balanceHistos.root"
     #v03 = "~/tmp/balance_v03_pt30/balanceHistos.root"
-    v02 = "~/tmp/balance_pt15_ave30_v02_partV1/balanceHistos.root"
-    v03 = "~/tmp/balance_pt15_ave30_v03_partV1/balanceHistos.root"
+    v02 = "~/tmp/balance_pt15_ave30_v02/balanceHistos.root"
+    v03 = "~/tmp/balance_pt15_ave30_v03/balanceHistos.root"
 
     dataExtr = getExtrapolation(v02,v03, "data_jet15")
     MCExtr = getExtrapolation(v02,v03, "MC_jet15")
