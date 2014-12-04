@@ -10,9 +10,13 @@ class Entry:
         self.variation = variation
         self.index = index
         self.branchStore = branchStore
+        self.cache = {}
 
     # TODO: add "_" as a separator
     def __getattr__(self, name):
+        if name in self.cache:
+            return self.cache[name]
+
         branchName = self.branchPrefix + name + self.variation
         # we could do following, instead of using self.variationToNames:
         #if not hasattr(self.chain, branchName): # what is cost of this call??
@@ -21,7 +25,10 @@ class Entry:
         if branchName  not in self.branchStore:
             self.branchStore[branchName] = getattr(self.chain, branchName)
 
-        return self.branchStore[branchName].at(self.index)
+        #return self.branchStore[branchName].at(self.index)
+        ret = self.branchStore[branchName].at(self.index)
+        self.cache[name] = ret
+        return ret
         #return getattr(self.chain, branchName).at(self.index)
 
     # FIXME: entries from two different events can be equal
