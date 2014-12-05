@@ -20,7 +20,7 @@ import cProfile
 
 
 import MNTriggerStudies.MNTriggerAna.ExampleProofReader
-from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
+from  MNTriggerStudies.MNTriggerAna.BetterJetGetter import BetterJetGetter
 
 #import DiJetBalancePlugin
 
@@ -33,8 +33,8 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
 
         self.todoShifts = ["_central"]
         if not self.isData and self.doPtShiftsJEC:
-            self.todoShifts.append("_ptUp")
-            self.todoShifts.append("_ptDown")
+            self.todoShifts.append("_jecUp")
+            self.todoShifts.append("_jecDown")
 
         if not self.isData and self.doPtShiftsJER:
             self.todoShifts.append("_jerUp")
@@ -78,28 +78,13 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
         self.lumiWeighters["_dj15fb_puUp"] = edm.LumiReWeighting(jet15FileV2, puFiles["dj15_1_05"], "MC", "pileup")
         self.lumiWeighters["_dj15fb_puDown"] = edm.LumiReWeighting(jet15FileV2, puFiles["dj15_0_95"], "MC", "pileup")
 
-        self.jetGetter = JetGetter("PF")
-        if hasattr(self, "jetUncFile"):
-            self.jetGetter.setJecUncertainty(self.jetUncFile)
+        #self.jetGetter = JetGetter("PF")
+        #if hasattr(self, "jetUncFile"):
+        #    self.jetGetter.setJecUncertainty(self.jetUncFile)
 
-    '''
-    # stuff for code profiling
-    def analyze(self):
-        self.pr.enable()
-        self.analyzeTT()
-        self.pr.disable()
+        self.jetGetter = BetterJetGetter("PFAK5") 
 
 
-    def SlaveTerminate( self ):
-        print 'py: slave terminating AAZAZ'
-        dname = "/scratch/scratch0/tfruboes/2014.05.NewFWAnd4_2/CMSSW_4_2_8_patch7/src/MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/stats/"
-        profName = dname + "stats"
-        self.pr.dump_stats(profName)
-    # '''
-        
-
-
-    #def analyzeTT(self):
     def analyze(self):
         if self.fChain.ngoodVTX == 0: return
         self.jetGetter.newEvent(self.fChain)
@@ -117,6 +102,7 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
             mostBkgJetPt = None
             for jet in self.jetGetter.get(shift):
                 #if jetID.at(i) < 0.5: continue
+                if not jet.jetid(): continue
                 eta =  jet.eta()
                 if abs(eta) > 4.7: continue
 
@@ -195,7 +181,7 @@ if __name__ == "__main__":
     sampleList = None
     maxFilesMC = None
     maxFilesData = None
-    nWorkers = None # Use all
+    nWorkers = 15 
 
     # debug config:
     '''
@@ -204,11 +190,10 @@ if __name__ == "__main__":
     #sampleList=  ["Jet-Run2010B-Apr21ReReco-v1"] 
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
     #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
-    maxFilesMC = 1
-    maxFilesData = 2
-    #maxFilesMC = 12
-    nWorkers = 1
     # '''
+    #maxFilesMC = 2
+    #maxFilesData = 2
+    #nWorkers = 2
     #maxFilesMC = 16
     #nWorkers = 12
 
@@ -222,10 +207,6 @@ if __name__ == "__main__":
 
     #slaveParams["jetID"] = "pfJets_jetID" # TODO
 
-    #jetUncFile = "START42_V11_AK5PF_Uncertainty.txt"
-    jetUncFile = "START41_V0_AK5PF_Uncertainty.txt"
-
-    slaveParams["jetUncFile"] =  edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"+jetUncFile).fullPath()
 
     MNxsAnalyzer.runAll(treeName="mnXS",
                                slaveParameters=slaveParams,
@@ -233,6 +214,7 @@ if __name__ == "__main__":
                                maxFilesMC = maxFilesMC,
                                maxFilesData = maxFilesData,
                                nWorkers=nWorkers,
+                               usePickle = True,
                                outFile = "plotsMNxs.root" )
 
 
