@@ -38,9 +38,12 @@ sam["Jet-Run2010B-Apr21ReReco-v1"]["isData"]=True
 sam["Jet-Run2010B-Apr21ReReco-v1"]["weightJet15Inverse"]='RooFormulaVar("weight","weight", "invtrgWeightJet15RawTF2", RooArgList(v["invtrgWeightJet15RawTF2"]["RooVar"]))'
 sam["Jet-Run2010B-Apr21ReReco-v1"]["numEvents"]=-1
 sam["Jet-Run2010B-Apr21ReReco-v1"]["lumiJet15"]=0.0033470000000000001
+sam["Jet-Run2010B-Apr21ReReco-v1"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/Jet/DiJet_20141202_MN2010_V16PartV1_Jet-Run2010B-Apr21ReReco-v1/9cf590952a45e1f0a36f214fc20f558a//'
 sam["Jet-Run2010B-Apr21ReReco-v1"]["json"]='MNTriggerStudies/MNTriggerAna/lumi/Cert_136033-149442_7TeV_Apr21ReReco_Collisions10_JSON_v2.txt'
 sam["Jet-Run2010B-Apr21ReReco-v1"]["lumiDiJet15FB"]='crashMe'
 sam["Jet-Run2010B-Apr21ReReco-v1"]["XS"]=-1
+sam["Jet-Run2010B-Apr21ReReco-v1"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/Jet/DiJet_20141202_MN2010_V16PartV1_Jet-Run2010B-Apr21ReReco-v1/9cf590952a45e1f0a36f214fc20f558a//'
+sam["Jet-Run2010B-Apr21ReReco-v1"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/Jet/DiJet_20141202_MN2010_V16PartV1_Jet-Run2010B-Apr21ReReco-v1/9cf590952a45e1f0a36f214fc20f558a/'
 sam["Jet-Run2010B-Apr21ReReco-v1"]["DS"]='/Jet/Run2010B-Apr21ReReco-v1/AOD'
 
 sam["JetMET-Run2010A-Apr21ReReco-v1"]={}
@@ -52,9 +55,12 @@ sam["JetMET-Run2010A-Apr21ReReco-v1"]["isData"]=True
 sam["JetMET-Run2010A-Apr21ReReco-v1"]["weightJet15Inverse"]='RooFormulaVar("weight","weight", "invtrgWeightJet15RawTF2", RooArgList(v["invtrgWeightJet15RawTF2"]["RooVar"]))'
 sam["JetMET-Run2010A-Apr21ReReco-v1"]["numEvents"]=-1
 sam["JetMET-Run2010A-Apr21ReReco-v1"]["lumiJet15"]=0.0095250000000000005
+sam["JetMET-Run2010A-Apr21ReReco-v1"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/JetMET/DiJet_20141202_MN2010_V16PartV1_JetMET-Run2010A-Apr21ReReco-v1/9cf590952a45e1f0a36f214fc20f558a//'
 sam["JetMET-Run2010A-Apr21ReReco-v1"]["json"]='MNTriggerStudies/MNTriggerAna/lumi/Cert_136033-149442_7TeV_Apr21ReReco_Collisions10_JSON_v2.txt'
 sam["JetMET-Run2010A-Apr21ReReco-v1"]["lumiDiJet15FB"]=2.8380000000000001
 sam["JetMET-Run2010A-Apr21ReReco-v1"]["XS"]=-1
+sam["JetMET-Run2010A-Apr21ReReco-v1"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/JetMET/DiJet_20141202_MN2010_V16PartV1_JetMET-Run2010A-Apr21ReReco-v1/9cf590952a45e1f0a36f214fc20f558a//'
+sam["JetMET-Run2010A-Apr21ReReco-v1"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/JetMET/DiJet_20141202_MN2010_V16PartV1_JetMET-Run2010A-Apr21ReReco-v1/9cf590952a45e1f0a36f214fc20f558a/'
 sam["JetMET-Run2010A-Apr21ReReco-v1"]["DS"]='/JetMET/Run2010A-Apr21ReReco-v1/AOD'
 
 sam["JetMETTau-Run2010A-Apr21ReReco-v1"]={}
@@ -66,9 +72,12 @@ sam["JetMETTau-Run2010A-Apr21ReReco-v1"]["isData"]=True
 sam["JetMETTau-Run2010A-Apr21ReReco-v1"]["weightJet15Inverse"]='RooFormulaVar("weight","weight", "invtrgWeightJet15RawTF2", RooArgList(v["invtrgWeightJet15RawTF2"]["RooVar"]))'
 sam["JetMETTau-Run2010A-Apr21ReReco-v1"]["numEvents"]=-1
 sam["JetMETTau-Run2010A-Apr21ReReco-v1"]["lumiJet15"]=0.013781
+sam["JetMETTau-Run2010A-Apr21ReReco-v1"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/JetMETTau/DiJet_20141202_MN2010_V16PartV1_JetMETTau-Run2010A-Apr21ReReco-v1/9cf590952a45e1f0a36f214fc20f558a//'
 sam["JetMETTau-Run2010A-Apr21ReReco-v1"]["json"]='MNTriggerStudies/MNTriggerAna/lumi/Cert_136033-149442_7TeV_Apr21ReReco_Collisions10_JSON_v2.txt'
 sam["JetMETTau-Run2010A-Apr21ReReco-v1"]["lumiDiJet15FB"]=0.28277400000000003
 sam["JetMETTau-Run2010A-Apr21ReReco-v1"]["XS"]=-1
+sam["JetMETTau-Run2010A-Apr21ReReco-v1"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/JetMETTau/DiJet_20141202_MN2010_V16PartV1_JetMETTau-Run2010A-Apr21ReReco-v1/9cf590952a45e1f0a36f214fc20f558a//'
+sam["JetMETTau-Run2010A-Apr21ReReco-v1"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/JetMETTau/DiJet_20141202_MN2010_V16PartV1_JetMETTau-Run2010A-Apr21ReReco-v1/9cf590952a45e1f0a36f214fc20f558a/'
 sam["JetMETTau-Run2010A-Apr21ReReco-v1"]["DS"]='/JetMETTau/Run2010A-Apr21ReReco-v1/AOD'
 
 sam["METFwd-Run2010B-Apr21ReReco-v1"]={}
@@ -80,11 +89,33 @@ sam["METFwd-Run2010B-Apr21ReReco-v1"]["isData"]=True
 sam["METFwd-Run2010B-Apr21ReReco-v1"]["weightJet15Inverse"]='RooFormulaVar("weight","weight", "invtrgWeightJet15RawTF2", RooArgList(v["invtrgWeightJet15RawTF2"]["RooVar"]))'
 sam["METFwd-Run2010B-Apr21ReReco-v1"]["numEvents"]=-1
 sam["METFwd-Run2010B-Apr21ReReco-v1"]["lumiJet15"]='crashMe'
+sam["METFwd-Run2010B-Apr21ReReco-v1"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/METFwd/DiJet_20141202_MN2010_V16PartV1_METFwd-Run2010B-Apr21ReReco-v1/9cf590952a45e1f0a36f214fc20f558a//'
 sam["METFwd-Run2010B-Apr21ReReco-v1"]["json"]='MNTriggerStudies/MNTriggerAna/lumi/Cert_136033-149442_7TeV_Apr21ReReco_Collisions10_JSON_v2.txt'
 sam["METFwd-Run2010B-Apr21ReReco-v1"]["lumiDiJet15FB"]=2.2403189999999999
 sam["METFwd-Run2010B-Apr21ReReco-v1"]["XS"]=-1
+sam["METFwd-Run2010B-Apr21ReReco-v1"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/METFwd/DiJet_20141202_MN2010_V16PartV1_METFwd-Run2010B-Apr21ReReco-v1/9cf590952a45e1f0a36f214fc20f558a//'
+sam["METFwd-Run2010B-Apr21ReReco-v1"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/METFwd/DiJet_20141202_MN2010_V16PartV1_METFwd-Run2010B-Apr21ReReco-v1/9cf590952a45e1f0a36f214fc20f558a/'
 sam["METFwd-Run2010B-Apr21ReReco-v1"]["DS"]='/METFwd/Run2010B-Apr21ReReco-v1/AOD'
 
+sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]={}
+sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["sgeJobs"]=80
+sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["crabJobs"]=470
+sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["GT"]='START42_V16::All'
+sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["weightJet15"]='RooFormulaVar("weight","weight", "xsOverEvents*puWeightJet15V4*trgWeightJet15RawTF2*trgWeightJet15L1RawTF2", RooArgList(v["puWeightJet15V4"]["RooVar"],v["trgWeightJet15RawTF2"]["RooVar"],v["trgWeightJet15L1RawTF2"]["RooVar"]))'
+sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["name"]='QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp'
+sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["isData"]=False
+sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["weightPuOnly"]='RooFormulaVar("weight","weight", "xsOverEvents*puWeightJet15V4", RooArgList(v["puWeightJet15V4"]["RooVar"]))'
+sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["weightJet15Inverse"]='RooFormulaVar("weight","weight", "xsOverEvents*puWeightJet15V4", RooArgList(v["puWeightJet15V4"]["RooVar"]))'
+sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["numEvents"]=-1
+sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["lumiJet15"]='crashMeMC'
+sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["weightNoPu"]='RooFormulaVar("weight","weight", "xsOverEvents", RooArgList())'
+sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["json"]=''
+sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["lumiDiJet15FB"]='crashMeMC'
+sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/DiJet_20141202_MN2010_QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/3a65dcd8207723ba8626ed8ecfb9f8a8//'
+sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["XS"]=16953200000.0
+sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/DiJet_20141202_MN2010_QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/3a65dcd8207723ba8626ed8ecfb9f8a8//'
+sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/DiJet_20141202_MN2010_QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/3a65dcd8207723ba8626ed8ecfb9f8a8/'
+sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["DS"]='/QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/Summer12-LowPU2010_DR42_BS2011_PU_S0_START42_V17B-v1/AODSIM'
 def icm(sam):
     import socket
     import os
