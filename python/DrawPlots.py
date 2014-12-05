@@ -168,7 +168,7 @@ class DrawPlots():
 
                 sampleName = l.GetName()
                 if sampleName not in sampleList:
-                    raise Exception("Thats confusing...")
+                    raise Exception("Thats confusing... sample not known (?) " + sampleName)
 
                 isData = sampleList[sampleName]["isData"]
 
