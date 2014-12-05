@@ -1,0 +1,6 @@
+Production of JEC plots 
+
+./BalanceTreeProducer.py
+./mnDraw.py -i treeDiJetBalance.root -o ~/tmp/test/
+
+
