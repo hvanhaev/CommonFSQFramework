@@ -7,6 +7,9 @@ sys.path.append(os.path.dirname(__file__))
 import ROOT
 ROOT.gROOT.SetBatch(True)
 ROOT.gSystem.Load("libFWCoreFWLite.so")
+
+ROOT.gSystem.Load("libRooUnfold.so")
+
 ROOT.AutoLibraryLoader.enable()
 from ROOT import edm, JetCorrectionUncertainty
 
@@ -27,6 +30,9 @@ from  MNTriggerStudies.MNTriggerAna.BetterJetGetter import BetterJetGetter
 class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
     def init( self):
 
+        self.normFactor = self.getNormalizationFactor()
+
+
         #sys.stdout = sys.stderr
         #self.pr = cProfile.Profile()
         print "XXX init - MNxsAnalyzer", self.datasetName, self.isData
@@ -43,6 +49,8 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
         self.hist = {}
         todoTrg = ["_jet15", "_dj15fb"]
 
+        binningDeta = (100, 0, 9.4)
+
         for shift in self.todoShifts:
             for trg in todoTrg:
                 t = shift+trg
@@ -50,13 +58,15 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                 self.hist["ptSublead"+t] =  ROOT.TH1F("ptSublead"+t,   "ptSublead"+t,  100, 0, 100)
                 self.hist["etaLead"+t] =  ROOT.TH1F("etaLead"+t,   "etaLead"+t,  100, -5, 5)
                 self.hist["etaSublead"+t] =  ROOT.TH1F("etaSublead"+t,   "etaSublead"+t,  100, -5, 5)
-                self.hist["xsVsDeltaEta"+t] =  ROOT.TH1F("xs"+t,   "xs"+t,  100, 0, 9.4)
+                self.hist["xsVsDeltaEta"+t] =  ROOT.TH1F("xs"+t,   "xs"+t, binningDeta[0], binningDeta[1], binningDeta[2])
                 self.hist["vtx"+t] =  ROOT.TH1F("vtx"+t,   "vtx"+t,  10, -0.5, 9.5)
+                self.hist["response"+t]= ROOT.RooUnfoldResponse(binningDeta[0], binningDeta[1], binningDeta[2], "response"+t,"response"+t)
+
 
         for h in self.hist:
-            self.hist[h].Sumw2()
+            if not h.startswith("response"):
+                self.hist[h].Sumw2()
             self.GetOutputList().Add(self.hist[h])
-
 
         puFiles = {}
         # MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/
@@ -88,11 +98,26 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
     def analyze(self):
         if self.fChain.ngoodVTX == 0: return
         self.jetGetter.newEvent(self.fChain)
-        for shift in self.todoShifts:
-            weightBase = 1. 
-            if not self.isData:
-                weightBase *= self.fChain.genWeight # keep inside shift iter
+        weightBase = 1. 
+        if not self.isData:
+            weightBase *= self.fChain.genWeight*self.normFactor 
 
+        # fill the roounfoldresponse
+        if not self.isData:
+            genDEta = None
+            etas = []
+            for j in self.fChain.genJets:
+                if j.pt() < self.threshold: continue
+                etas.append(j.eta())
+            if len(etas)>1:
+                genDEta = max(etas)-min(etas)
+
+
+                #deta = abs(mostFwdJetEta - mostBkgJetEta)
+
+
+
+        for shift in self.todoShifts:
             # find best dijet pair
             mostFwdJet = None
             mostBkgJet = None
@@ -100,6 +125,9 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
             mostBkgJetEta = None
             mostFwdJetPt = None
             mostBkgJetPt = None
+
+
+
             for jet in self.jetGetter.get(shift):
                 #if jetID.at(i) < 0.5: continue
                 if not jet.jetid(): continue
@@ -124,12 +152,14 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
 
             # A dijet pair was found. Check trigger for data, calculate weight for MC
             # fill histograms
+            isMiss = True # pair was found
             if pairFound:
                 deta = abs(mostFwdJetEta - mostBkgJetEta)
                 triggerToUse = "_jet15"
                 if abs(mostFwdJetEta) > 3 and abs(mostBkgJetEta) > 3 and mostFwdJetEta*mostBkgJetEta<0:
                     triggerToUse = "_dj15fb"
 
+                # TODO: we need to separate gen level categories!!
                 gotTrigger = True
                 if self.isData: # check trigger
                     if triggerToUse == "_jet15":
@@ -148,6 +178,14 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
 
                     histoName = shift +triggerToUse
                     self.hist["xsVsDeltaEta"+histoName].Fill(deta, weight)
+                    if not self.isData:
+                        isMiss = False
+                        if genDEta == None:    # fake pair, e.g. from bkg
+                            self.hist["response"+histoName].Fake(deta, weight)
+                        else:
+                            self.hist["response"+histoName].Fill(deta, genDEta, weight)
+
+
 
                     # fill also some control plots
                     leadJet = mostBkgJet
@@ -170,10 +208,6 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
 
     def finalize(self):
         print "Finalize:"
-        normFactor = self.getNormalizationFactor()
-        print "  applying norm", normFactor
-        for h in self.hist:
-            self.hist[h].Scale(normFactor)
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
@@ -184,16 +218,18 @@ if __name__ == "__main__":
     nWorkers = 15 
 
     # debug config:
-    '''
-    sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
+    #'''
+    #sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
+    sampleList= ["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]
     #sampleList=  ["JetMETTau-Run2010A-Apr21ReReco-v1"]
     #sampleList=  ["Jet-Run2010B-Apr21ReReco-v1"] 
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
+    #sampleList = ["METFwd-Run2010B-Apr21ReReco-v1"]
     #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
     # '''
-    #maxFilesMC = 2
-    #maxFilesData = 2
-    #nWorkers = 2
+    maxFilesMC = 4
+    maxFilesData = 4
+    nWorkers = 4
     #maxFilesMC = 16
     #nWorkers = 12
 
