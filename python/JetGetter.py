@@ -28,6 +28,10 @@ class Jet():
     def looseId(self):
         return self.jetID
 
+    def jetid(self):
+        return self.jetID
+
+
     def genP4(self):
         return self.p4vecGen
 
