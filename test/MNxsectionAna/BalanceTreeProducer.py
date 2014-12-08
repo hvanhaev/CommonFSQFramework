@@ -131,7 +131,12 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
             self.jetGetter = JetGetter("PFlegacy")
             self.jetGetter.disableGenJet()
 
-        self.jetGetter = BetterJetGetter("PFAK5") 
+        #self.jetGetter = BetterJetGetter("PFAK5") 
+
+        if self.isData:
+            self.jetGetter = JetGetter("PFAK5") 
+        else:
+            self.jetGetter = JetGetter("PFlegacy") 
 
         self.varE = {}
         sys.stdout.flush()
@@ -278,10 +283,11 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
             profName = dname + "stats"
             self.pr.dump_stats(profName)
 
-        normFactor = self.getNormalizationFactor()
-        print "  applying norm", normFactor
-        for h in self.hist:
-            self.hist[h].Scale(normFactor)
+        # note: norm factor applied allready when filling
+        #normFactor = self.getNormalizationFactor()
+        #print "  applying norm", normFactor
+        #for h in self.histos:
+        #    self.histos[h].Scale(normFactor)
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
@@ -313,7 +319,7 @@ if __name__ == "__main__":
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
     #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
     #maxFilesData = 1
-    #maxFilesMC = 48
+    #maxFilesMC = 1
     #nWorkers = 1
     #'''
 

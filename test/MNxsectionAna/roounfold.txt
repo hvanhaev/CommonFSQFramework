@@ -1,0 +1,7 @@
+
+svn co https://svnsrv.desy.de/public/unfolding/RooUnfold/trunk RooUnfold
+-> Checked out revision 349.
+
+make
+cp libRooUnfold.so  $CMSSW_BASE/lib/slc5_amd64_gcc434
+

@@ -212,8 +212,8 @@ sam["JetMETTau-Run2010A-Apr21ReReco-v1-V16TFPartV2"]["pathSE"]='srm://dcache-se-
 #'''
 knownExtraTags = ["-JEC16Full", "-V16TFPartV2"]
 extraTag = "-JEC16Full"
-extraTag = "-V16TFPartV2"
-extraTag = ""
+#extraTag = "-V16TFPartV2"
+#extraTag = ""
 
 samOrg = sam
 sam = {}
