@@ -105,17 +105,20 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
         # fill the roounfoldresponse
         if not self.isData:
             genDEta = None
+            genTopology = None
             etas = []
             for j in self.fChain.genJets:
                 if j.pt() < self.threshold: continue
-                etas.append(j.eta())
+                eta = j.eta()
+                if abs(j.eta())>4.7: continue
+                etas.append(eta)
             if len(etas)>1:
-                genDEta = max(etas)-min(etas)
-
-
-                #deta = abs(mostFwdJetEta - mostBkgJetEta)
-
-
+                fwd = max(etas)
+                bkw = min(etas)
+                genTopology = "CF"
+                if fwd > 3 and bkw < -3:
+                    genTopology = "FB"
+                genDEta = fwd - bkw
 
         for shift in self.todoShifts:
             # find best dijet pair
@@ -125,8 +128,6 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
             mostBkgJetEta = None
             mostFwdJetPt = None
             mostBkgJetPt = None
-
-
 
             for jet in self.jetGetter.get(shift):
                 #if jetID.at(i) < 0.5: continue
@@ -150,9 +151,10 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
             if mostFwdJet != None and mostBkgJet != mostFwdJet:
                 pairFound = True
 
-            # A dijet pair was found. Check trigger for data, calculate weight for MC
+
+            isMiss = True # mark if dijet pair was not found (needed to correctly fill response)
+            # A dijet pair was found. Check trigger for data
             # fill histograms
-            isMiss = True # pair was found
             if pairFound:
                 deta = abs(mostFwdJetEta - mostBkgJetEta)
                 triggerToUse = "_jet15"
@@ -170,6 +172,7 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                         raise Exception("Trigger not known??? "+triggerToUse)
 
                 if gotTrigger:
+                    # calculate weight for MC
                     weight = weightBase
                     if not self.isData:
                         truePU = self.fChain.puTrueNumInteractions
@@ -180,12 +183,11 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                     self.hist["xsVsDeltaEta"+histoName].Fill(deta, weight)
                     if not self.isData:
                         isMiss = False
-                        if genDEta == None:    # fake pair, e.g. from bkg
+                        isCorrectTopo = (triggerToUse == "_jet15") and genTopology == "CF" or (triggerToUse == "_dj15fb") and genTopology == "FB"
+                        if genDEta == None or not isCorrectTopo:    # fake pair, e.g. from bkg or we landed in a wrong category
                             self.hist["response"+histoName].Fake(deta, weight)
                         else:
                             self.hist["response"+histoName].Fill(deta, genDEta, weight)
-
-
 
                     # fill also some control plots
                     leadJet = mostBkgJet
@@ -206,6 +208,20 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                     self.hist["etaLead"+histoName].Fill(etaLead, weight)
                     self.hist["etaSublead"+histoName].Fill(etaSublead, weight)
 
+            if genDEta and isMiss and not self.isData:
+                if genTopology == "CF":
+                    triggerToUse = "_jet15"
+                else:
+                    triggerToUse = "_dj15fb"
+                histoName = shift +triggerToUse
+                weight = weightBase
+                if not self.isData:
+                    truePU = self.fChain.puTrueNumInteractions
+                    puWeight =  self.lumiWeighters[triggerToUse+"_central"].weight(truePU)
+
+                #print "Miss", triggerToUse, genDEta, shift
+                self.hist["response"+histoName].Miss(genDEta, weight)
+
     def finalize(self):
         print "Finalize:"
 
@@ -219,17 +235,17 @@ if __name__ == "__main__":
 
     # debug config:
     #'''
+    sampleList = []
     #sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
-    sampleList= ["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]
-    #sampleList=  ["JetMETTau-Run2010A-Apr21ReReco-v1"]
-    #sampleList=  ["Jet-Run2010B-Apr21ReReco-v1"] 
-    #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
-    #sampleList = ["METFwd-Run2010B-Apr21ReReco-v1"]
-    #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
+    sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
+    sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
+    sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
+    sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
+    sampleList.append("METFwd-Run2010B-Apr21ReReco-v1")
     # '''
-    maxFilesMC = 4
-    maxFilesData = 4
-    nWorkers = 4
+    maxFilesMC = 48
+    #maxFilesData = 1
+    #nWorkers = 1
     #maxFilesMC = 16
     #nWorkers = 12
 
