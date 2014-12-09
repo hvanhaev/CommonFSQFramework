@@ -21,7 +21,6 @@ import cProfile
 
 # you have to run this file from directory where it is saved
 
-
 import MNTriggerStudies.MNTriggerAna.ExampleProofReader
 from  MNTriggerStudies.MNTriggerAna.BetterJetGetter import BetterJetGetter
 
@@ -49,7 +48,7 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
         self.hist = {}
         todoTrg = ["_jet15", "_dj15fb"]
 
-        binningDeta = (100, 0, 9.4)
+        binningDeta = (10, 0, 9.4)
 
         for shift in self.todoShifts:
             for trg in todoTrg:
@@ -62,6 +61,9 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                 self.hist["vtx"+t] =  ROOT.TH1F("vtx"+t,   "vtx"+t,  10, -0.5, 9.5)
                 self.hist["response"+t]= ROOT.RooUnfoldResponse(binningDeta[0], binningDeta[1], binningDeta[2], "response"+t,"response"+t)
 
+
+        self.hist["evcnt"] =  ROOT.TH1F("evcnt_central_jet15", "evcnt_central_jet15",  1, -0.5, 0.5)
+        self.hist["detaGen"] =  ROOT.TH1F("detaGen_central_jet15", "detaGen_central_jet15",  binningDeta[0], binningDeta[1], binningDeta[2])
 
         for h in self.hist:
             if not h.startswith("response"):
@@ -96,6 +98,7 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
 
 
     def analyze(self):
+        self.hist["evcnt"].Fill(0)
         if self.fChain.ngoodVTX == 0: return
         self.jetGetter.newEvent(self.fChain)
         weightBase = 1. 
@@ -119,6 +122,7 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                 if fwd > 3 and bkw < -3:
                     genTopology = "FB"
                 genDEta = fwd - bkw
+                self.hist["detaGen"].Fill(genDEta, weightBase) # basic gen level distribution shouldnt be PU dependent
 
         for shift in self.todoShifts:
             # find best dijet pair
@@ -208,7 +212,7 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                     self.hist["etaLead"+histoName].Fill(etaLead, weight)
                     self.hist["etaSublead"+histoName].Fill(etaSublead, weight)
 
-            if genDEta and isMiss and not self.isData:
+            if not self.isData and genDEta and isMiss:
                 if genTopology == "CF":
                     triggerToUse = "_jet15"
                 else:
@@ -238,12 +242,15 @@ if __name__ == "__main__":
     sampleList = []
     #sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
     sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
+    #'''
     sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
     sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
     sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
     sampleList.append("METFwd-Run2010B-Apr21ReReco-v1")
     # '''
-    maxFilesMC = 48
+    # '''
+    #maxFilesMC = 48
+    #maxFilesMC = 1
     #maxFilesData = 1
     #nWorkers = 1
     #maxFilesMC = 16
@@ -269,5 +276,8 @@ if __name__ == "__main__":
                                usePickle = True,
                                outFile = "plotsMNxs.root" )
 
+    print "TODO: fakes prob vs eta"
+    print "TODO: deta gen vs rec (xs dist bin widt)"
+    print "TODO: xcheck XXX seen"
 
 
