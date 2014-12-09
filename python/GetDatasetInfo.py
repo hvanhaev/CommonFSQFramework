@@ -72,7 +72,7 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
             # TODO: should this be in localAccess part?
             if not quiet: print tab, "path to trees not found! Blame the skim-responsible-guy."
         else:
-            fileListUnvalidated = []
+            fileListUnvalidated = set()
             if localAccess:
                 if not quiet: print tab, "path to trees:",sampleList[s]["pathTrees"]
                 if not quiet: print tab, "path to trees taken from 'sampleList[s][\"pathTrees\"]' variable"
@@ -82,27 +82,37 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                         if not f.startswith("trees_"): continue
                         if not f.endswith(".root"): continue
                         fname = dirpath.replace("//","/") + f   # somehow root doesnt like // at the begining
-                        fileListUnvalidated.append(localROOTPrefix+fname)
+                        fileListUnvalidated.add(localROOTPrefix+fname)
             elif isXrootdAccess:
                 if not quiet: print tab, "will access trees from:",sampleList[s]["pathSE"]
                 # Warning: duplicated from copyAnaData. Fixme
                 import subprocess
                 pathSE = sampleList[s]["pathSE"]
-                command = ["lcg-ls", pathSE]
-                proc = subprocess.Popen(command, stdout=subprocess.PIPE)
-                cnt = 0
-                for line in iter(proc.stdout.readline,''):
-                    l = line.strip()
-                    fname = l.split("/")[-1]
-                    if ".root" not in fname: continue
-                    if "trees_" not in fname: continue
-                    srcFile = pathSE + "/" + fname
-                    if "/store/" not in srcFile:
-                        raise "Cannot convert to lfn:", srcFile
-                    lfn = "/store/"+srcFile.split("/store/")[-1]
+                cnt = 999
+                offset = 0
+                lastSize = len(fileListUnvalidated)
+                while True:
+                    command = ["lcg-ls", "-c", str(cnt), "-o", str(offset), pathSE]
+                    proc = subprocess.Popen(command, stdout=subprocess.PIPE)
+                    for line in iter(proc.stdout.readline,''):
+                        l = line.strip()
+                        fname = l.split("/")[-1]
+                        if ".root" not in fname: continue
+                        if "trees_" not in fname: continue
+                        srcFile = pathSE + "/" + fname
+                        if "/store/" not in srcFile:
+                            raise "Cannot convert to lfn:", srcFile
+                        lfn = "/store/"+srcFile.split("/store/")[-1]
 
-                    #targetFile = targetDir + "/" + fname
-                    fileListUnvalidated.append(localROOTPrefix+lfn)
+                        #targetFile = targetDir + "/" + fname
+                        fileListUnvalidated.add(localROOTPrefix+lfn)
+
+                    if lastSize !=  len(fileListUnvalidated):
+                        lastSize = len(fileListUnvalidated)
+                        offset+=cnt
+                    else:
+                        break
+
             else:
                 raise Exception("Thats confusing! File access method undetermined!")
 
@@ -123,7 +133,7 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                         print "Broken (?) pickle file", pickleName
                     else:
                         print "Cached data from", pickleName
-                        fileListUnvalidated = []  # Q&D - disable validation. 
+                        fileListUnvalidated = set()  # Q&D - disable validation. 
                         fileList = pickledData["files"]
                         evCnt =  pickledData["evCnt"]
                         fromPickle = True
