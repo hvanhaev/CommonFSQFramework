@@ -48,7 +48,7 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
         self.hist = {}
         todoTrg = ["_jet15", "_dj15fb"]
 
-        binningDeta = (10, 0, 9.4)
+        binningDeta = (20, 0, 9.4)
 
         for shift in self.todoShifts:
             for trg in todoTrg:
@@ -64,6 +64,9 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
 
         self.hist["evcnt"] =  ROOT.TH1F("evcnt_central_jet15", "evcnt_central_jet15",  1, -0.5, 0.5)
         self.hist["detaGen"] =  ROOT.TH1F("detaGen_central_jet15", "detaGen_central_jet15",  binningDeta[0], binningDeta[1], binningDeta[2])
+        self.hist["detaGenVsRec"] =  ROOT.TH2F("detaGenVsRec_central_jet15", "detaGenVsRec_central_jet15",\
+                                               binningDeta[0]*20, binningDeta[1], binningDeta[2],\
+                                               binningDeta[0]*20, binningDeta[1], binningDeta[2])
 
         for h in self.hist:
             if not h.startswith("response"):
@@ -161,6 +164,11 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
             # fill histograms
             if pairFound:
                 deta = abs(mostFwdJetEta - mostBkgJetEta)
+                if not self.isData and genDEta:
+                    if shift == "_central":
+                        self.hist["detaGenVsRec"].Fill(genDEta, deta, weightBase)
+                # detaGenVsRec
+
                 triggerToUse = "_jet15"
                 if abs(mostFwdJetEta) > 3 and abs(mostBkgJetEta) > 3 and mostFwdJetEta*mostBkgJetEta<0:
                     triggerToUse = "_dj15fb"
@@ -277,7 +285,7 @@ if __name__ == "__main__":
                                outFile = "plotsMNxs.root" )
 
     print "TODO: fakes prob vs eta"
-    print "TODO: deta gen vs rec (xs dist bin widt)"
     print "TODO: xcheck XXX seen"
+    print "TODO: tree files merging for pythia sample"
 
 
