@@ -13,7 +13,10 @@ from multiprocessing import Process, Queue
 
 import pickle
 import distutils.spawn
-def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet = False, samplesToProcess = None, usePickle=False):
+def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet = False, samplesToProcess = None, usePickle=False, donotvalidate=False):
+
+    if usePickle and donotvalidate:
+        raise Exception("Cannot go this way (usePickle and donotvalidate)")
 
     # TODO: SmallXAnaDefFile access function in Util
     if "SmallXAnaDefFile" not in os.environ:
@@ -124,6 +127,11 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
             threads = {}
             goodFiles = 0
             print "Total number of files in sample:", len(fileListUnvalidated)
+            if donotvalidate:
+                fileList = list(fileListUnvalidated) 
+                evCnt = 0
+                fileListUnvalidated = set()
+
             if maxFiles == None and usePickle: 
                 if os.path.isfile(pickleName):
                     pkl_file = open(pickleName, 'rb')
@@ -239,6 +247,9 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
 
 if __name__ == "__main__":
     getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, usePickle=True)
-    #getTreeFilesAndNormalizations(maxFilesMC = 10, maxFilesData = -10)
+    #sam = getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, donotvalidate = True)
+    #for s in sam:
+    #    print s
+    #getTreeFilesAndNormalizations(maxFilesMC = 10, maxFilesData = 10)
 
 
