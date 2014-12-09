@@ -98,6 +98,8 @@ class MNXSTreeProducer : public edm::EDAnalyzer {
 
       // ----------member data ---------------------------
       std::vector<EventViewBase *> m_views;
+
+      int m_eventsSeen;
 };
 
 //
@@ -113,7 +115,8 @@ class MNXSTreeProducer : public edm::EDAnalyzer {
 //
 MNXSTreeProducer::MNXSTreeProducer(const edm::ParameterSet& iConfig):
 pfJetID(PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE),
-caloJetID(JetIDSelectionFunctor::PURE09,  JetIDSelectionFunctor::LOOSE)
+caloJetID(JetIDSelectionFunctor::PURE09,  JetIDSelectionFunctor::LOOSE),
+m_eventsSeen(0)
 {
 
     m_minGenPT = iConfig.getParameter<double>("minGenPT");
@@ -267,6 +270,7 @@ MNXSTreeProducer::~MNXSTreeProducer()
 void
 MNXSTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+    m_eventsSeen+=1;
 
         
     resetTrees();
@@ -351,6 +355,8 @@ MNXSTreeProducer::beginJob()
 void 
 MNXSTreeProducer::endJob() 
 {
+
+    std::cout << "XXX seen " << m_eventsSeen << std::endl;
 }
 
 // ------------ method called when starting to processes a run  ------------
@@ -376,6 +382,7 @@ MNXSTreeProducer::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSe
 {
 }
 */
+
 
 // ------------ method called when ending the processing of a luminosity block  ------------
 /*
