@@ -116,6 +116,31 @@ sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["XS"]=16953200000.0
 sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/DiJet_20141202_MN2010_QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/3a65dcd8207723ba8626ed8ecfb9f8a8//'
 sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/DiJet_20141202_MN2010_QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/3a65dcd8207723ba8626ed8ecfb9f8a8/'
 sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["DS"]='/QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/Summer12-LowPU2010_DR42_BS2011_PU_S0_START42_V17B-v1/AODSIM'
+
+
+sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]={}
+sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["sgeJobs"]=80
+sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["crabJobs"]=1950
+sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["GT"]='START42_V16::All'
+sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["weightJet15"]='RooFormulaVar("weight","weight", "generatorWeight*puWeightJet15V4*trgWeightJet15RawTF2*trgWeightJet15L1RawTF2", RooArgList(v["generatorWeight"]["RooVar"],v["puWeightJet15V4"]["RooVar"],v["trgWeightJet15RawTF2"]["RooVar"],v["trgWeightJet15L1RawTF2"]["RooVar"]))'
+sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["name"]='QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6'
+sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["isData"]=False
+sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["weightPuOnly"]='RooFormulaVar("weight","weight", "generatorWeight*puWeightJet15V4", RooArgList(v["generatorWeight"]["RooVar"],v["puWeightJet15V4"]["RooVar"]))'
+sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["weightJet15Inverse"]='RooFormulaVar("weight","weight", "generatorWeight*puWeightJet15V4", RooArgList(v["generatorWeight"]["RooVar"],v["puWeightJet15V4"]["RooVar"]))'
+sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["numEvents"]=-1
+sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["lumiJet15"]='crashMeMC'
+sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["weightNoPu"]='RooFormulaVar("weight","weight", "generatorWeight", RooArgList(v["generatorWeight"]["RooVar"]))'
+sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["json"]=''
+sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["lumiDiJet15FB"]='crashMeMC'
+sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["XS"]=22130000000.0
+sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["DS"]='/QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/Summer12-LowPU2010_DR42_PU_S0_START42_V17B-v2/AODSIM'
+
+sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/DiJet_20141202_MN2010_V16PartV1_QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/2c932eb994aa6c90f6b488acf3a24c98//'
+sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/DiJet_20141202_MN2010_V16PartV1_QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/2c932eb994aa6c90f6b488acf3a24c98//'
+sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/DiJet_20141202_MN2010_V16PartV1_QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/2c932eb994aa6c90f6b488acf3a24c98/'
+
+
+
 def icm(sam):
     import socket
     import os
