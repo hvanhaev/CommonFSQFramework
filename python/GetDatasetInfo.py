@@ -14,6 +14,11 @@ from multiprocessing import Process, Queue
 import pickle
 import distutils.spawn
 def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet = False, samplesToProcess = None, usePickle=False, donotvalidate=False):
+    # in principle we should check if lcg-ls supports -c/ -o argumets
+    legacyMode = "slc5" in os.environ["SCRAM_ARCH"] 
+    if legacyMode:
+        print "Warning - running in legacy mode. Access to remote directories with more than 1000 files wont be possible"
+
 
     if usePickle and donotvalidate:
         raise Exception("Cannot go this way (usePickle and donotvalidate)")
@@ -95,7 +100,10 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                 offset = 0
                 lastSize = len(fileListUnvalidated)
                 while True:
-                    command = ["lcg-ls", "-c", str(cnt), "-o", str(offset), pathSE]
+                    if legacyMode:
+                        command = ["lcg-ls", pathSE]
+                    else:
+                        command = ["lcg-ls", "-c", str(cnt), "-o", str(offset), pathSE]
                     proc = subprocess.Popen(command, stdout=subprocess.PIPE)
                     for line in iter(proc.stdout.readline,''):
                         l = line.strip()
@@ -114,6 +122,8 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                         lastSize = len(fileListUnvalidated)
                         offset+=cnt
                     else:
+                        break
+                    if legacyMode:
                         break
 
             else:
