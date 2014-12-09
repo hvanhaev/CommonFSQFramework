@@ -1,0 +1,21 @@
+1. Setup
+
+export SmallXAnaVersion=MNTriggerStudies.MNTriggerAna.samples.Samples_DiJet_20141202_MN2010_V16PartV1
+
+
+2. run 
+
+./MNxsAnalyzer.py
+
+
+3. Detector level plots
+
+./mnDraw.py -i plotsMNxs.root -o ~/tmp/MNXS_detectorLevel/
+
+
+4. Unfolded plots
+
+./unfoldMN.py
+
+(currently writes rootfile in tmp)
+
