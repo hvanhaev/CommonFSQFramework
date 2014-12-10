@@ -60,6 +60,7 @@ class SaveCountHistoInTreeFile : public edm::EDAnalyzer {
       // ----------member data ---------------------------
         TH1D * m_cntHisto;
         int m_evCnt;
+        int m_evCntSeenByTreeProducers;
 
 
 };
@@ -76,7 +77,8 @@ class SaveCountHistoInTreeFile : public edm::EDAnalyzer {
 // constructors and destructor
 //
 SaveCountHistoInTreeFile::SaveCountHistoInTreeFile(const edm::ParameterSet& iConfig):
-m_evCnt(0)
+m_evCnt(0),
+m_evCntSeenByTreeProducers(0)
 {
    //now do what ever initialization is needed
     edm::Service<TFileService> tFileService;
@@ -87,6 +89,7 @@ m_evCnt(0)
 
     m_cntHisto->GetXaxis()->SetBinLabel(2, "XS"); 
     m_cntHisto->GetXaxis()->SetBinLabel(3, "evCnt");
+    m_cntHisto->GetXaxis()->SetBinLabel(4, "evCntSeenByTreeProducers");
 
 }
 
@@ -94,6 +97,7 @@ m_evCnt(0)
 SaveCountHistoInTreeFile::~SaveCountHistoInTreeFile()
 {
     m_cntHisto->SetBinContent(3, m_evCnt);
+    m_cntHisto->SetBinContent(4, m_evCntSeenByTreeProducers);
 }
 
 
@@ -106,7 +110,7 @@ void
 SaveCountHistoInTreeFile::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
     using namespace edm;
-
+    m_evCntSeenByTreeProducers += 1;
 
     static bool runOnce = true;
     if (runOnce){
