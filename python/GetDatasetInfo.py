@@ -67,18 +67,25 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
     ret = {}
     tab = "     "
     for s in sampleList:
+        maxFiles = maxFilesData
+        if not sampleList[s]["isData"]:
+            maxFiles = maxFilesMC
+
         ret[s] = {}
         pickleName = samplesFileDir+"cache_"+anaVersion+"_"+s+".pkl"
         fromPickle = False
+        writePickle = True
         if not quiet: print "#"*120
         if not quiet: print "Found sample:", s
         if not quiet: print tab,"dataset:",sampleList[s]["DS"]
         if not quiet: print tab, "xsection:",sampleList[s]["XS"] # note you can also fetch this from tree files (bin 2 in info histo)
         evCnt = 0
+        evCntSeenByTreeProducers = 0
         fileList = []
         if "pathTrees" not in sampleList[s]:
             # TODO: should this be in localAccess part?
             if not quiet: print tab, "path to trees not found! Blame the skim-responsible-guy."
+            writePickle = False
         else:
             fileListUnvalidated = set()
             if localAccess:
@@ -130,9 +137,6 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                 raise Exception("Thats confusing! File access method undetermined!")
 
             # verify we are able to read event counts from very file
-            maxFiles = maxFilesData
-            if not sampleList[s]["isData"]:
-                maxFiles = maxFilesMC
             fileCnt = 0
             threads = {}
             goodFiles = 0
@@ -154,6 +158,7 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                         fileListUnvalidated = set()  # Q&D - disable validation. 
                         fileList = pickledData["files"]
                         evCnt =  pickledData["evCnt"]
+                        evCntSeenByTreeProducers = pickledData["evCntSeenByTreeProducers"]
                         fromPickle = True
 
 
@@ -174,13 +179,19 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                 def validate(fname, q):
                     rootFile = ROOT.TFile.Open(fname,"r")
                     infoHisto = rootFile.Get("infoHisto/cntHisto")
-                    ret = -1
+                    ret = {}
+                    ret["evCnt"]=-1
+                    ret["evCntSeenByTreeProducers"]=-1
+                    
                     if type(infoHisto) != ROOT.TH1D:
                         print "\nProblem reading info histo from", fname
                     elif infoHisto.GetXaxis().GetBinLabel(3)!="evCnt":
                         if not quiet: print "\nProblem - evCnt bin expected at position 3. Got",  infoHisto.getBinLabel(3)
                     else:
-                        ret =  int(infoHisto.GetBinContent(3))
+                        ret["evCnt"]  =  int(infoHisto.GetBinContent(3))
+                    if  infoHisto.GetXaxis().GetBinLabel(4)=="evCntSeenByTreeProducers":
+                        ret["evCntSeenByTreeProducers"] =  int(infoHisto.GetBinContent(4))
+
                     del infoHisto
                     rootFile.Close()
                     del rootFile
@@ -202,7 +213,7 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                             if threads[t][2] == None:
                                 threads[t][0].join()
                                 threads[t][2] = threads[t][1].get()
-                            if threads[t][2] > 0:
+                            if threads[t][2]["evCnt"] > 0:
                                 goodFiles+=1
 
                     if waitingOrRunning > maxThreads:
@@ -216,7 +227,8 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                 if threads[t][2]==None:
                     threads[t][0].join()
                     threads[t][2] = threads[t][1].get()
-                result = threads[t][2] 
+                result = threads[t][2]["evCnt"] 
+                resEvCntSeenByTreeProducers = threads[t][2]["evCntSeenByTreeProducers"]
                 if result < 0:
                     print "Problematic file", t
                     continue
@@ -224,17 +236,23 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                     print "Warning: 0 ev file", t
 
                 fileList.append(t)
-                evCnt += result
+                if result > 0:
+                    evCnt += result
+
+                if resEvCntSeenByTreeProducers > 0:
+                    evCntSeenByTreeProducers+=resEvCntSeenByTreeProducers
                 fileCnt += 1
                 if maxFiles != None and fileCnt >= maxFiles:
                     print tab, "will process", fileCnt, "files"
                     break
 
 
-        if not fromPickle and  maxFiles == None and usePickle: 
+        if writePickle and not fromPickle and  maxFiles == None and usePickle: 
             toPickle = {}
             toPickle["files"] = fileList
             toPickle["evCnt"] = evCnt
+            toPickle["evCntSeenByTreeProducers"] = evCntSeenByTreeProducers
+
             # pickleName
             outputPickle = open(pickleName, 'wb')
             pickle.dump(toPickle, outputPickle)
@@ -250,16 +268,17 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
         else:
             normFactor = sampleList[s]["XS"]/evCnt
             if not quiet: print tab, "Normalization factor is ", normFactor
+            if not quiet: print tab, "[xcheck] number of events passed to tree producers (ie when running on AOD):", evCntSeenByTreeProducers
         ret[s]["files"] = fileList
         ret[s]["normFactor"] = normFactor
 
     return ret
 
 if __name__ == "__main__":
-    getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, usePickle=True)
+    #getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, usePickle=True)
     #sam = getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, donotvalidate = True)
     #for s in sam:
     #    print s
-    #getTreeFilesAndNormalizations(maxFilesMC = 10, maxFilesData = 10)
+    getTreeFilesAndNormalizations(maxFilesMC = 10, maxFilesData = 10)
 
 
