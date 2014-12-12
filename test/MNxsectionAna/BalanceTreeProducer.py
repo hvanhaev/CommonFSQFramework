@@ -59,6 +59,8 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
 
         self.var = {}
         self.histos = {}
+        self.histos["evcnt"] =  ROOT.TH1F("evcnt_central_jet15", "evcnt_central_jet15",  1, -0.5, 0.5)
+
         self.todoShifts = ["_central"]
 
         if not self.isData and self.doPtShiftsJEC:
@@ -179,6 +181,7 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
     def analyzeTT(self):
         '''
     def analyze(self):
+        self.histos["evcnt"].Fill(0)
         # '''
         if not self.HLT2015TempWorkaround:
             if self.fChain.ngoodVTX == 0: return
@@ -304,11 +307,11 @@ if __name__ == "__main__":
 
     sampleList = []
     #'''
-    #sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
-    sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
-    #sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
-    #sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
-    #sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
+    sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
+    #sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
+    sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
+    sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
+    sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
     #'''
     # '''
 
@@ -321,8 +324,8 @@ if __name__ == "__main__":
     #sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
     #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
-    #maxFilesData = 470
-    maxFilesMC = 340
+    #maxFilesData = 2
+    #maxFilesMC = 1
     #nWorkers = 1
     #'''
 
@@ -338,6 +341,7 @@ if __name__ == "__main__":
     slaveParams["HLT2015TempWorkaround"] = False
 
 
+    print sampleList
 
     BalanceTreeProducer.runAll(treeName=treeName,
                                slaveParameters=slaveParams,

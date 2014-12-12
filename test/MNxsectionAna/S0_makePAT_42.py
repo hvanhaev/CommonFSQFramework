@@ -6,7 +6,7 @@ from PhysicsTools.PatAlgos.tools.coreTools import *
 #  global constants
 #
 ####################################3#####################################3
-
+# export TMFSampleName=JetMETTau-Run2010A-Apr21ReReco-v1
 process.XS =  cms.EDProducer("DoubleProducer",
     value = cms.double(-1),
 )
