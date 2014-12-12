@@ -35,8 +35,8 @@ def validateRootFile(fname, q):
     del rootFile
     return q.put(ret)
 
-def validateRootFiles(fileListUnvalidated, maxFiles):
-    print "Validating",
+def validateRootFiles(fileListUnvalidated, maxFiles=None, quiet = False):
+    if not quiet: print "Validating",
     # verify we are able to read event counts from very file
     fileCnt = 0
     threads = {}
@@ -46,16 +46,16 @@ def validateRootFiles(fileListUnvalidated, maxFiles):
     evCnt = 0
     evCntSeenByTreeProducers = 0
     if maxFiles != None:
-        maxThreads  = min(maxThreads, maxFiles/2+1)
+        maxThreads  = min(maxThreads, maxFiles/2+1, len(fileListUnvalidated))
 
     for fname in fileListUnvalidated:
         if maxFiles != None and goodFiles >= maxFiles:
             break
         fileCnt += 1
         if (fileCnt%50 == 0):
-            sys.stdout.write(str(int(100.*fileCnt/len(fileListUnvalidated)))+"%")
+            if not quiet: sys.stdout.write(str(int(100.*fileCnt/len(fileListUnvalidated)))+"%")
         else:
-            sys.stdout.write('.')
+            if not quiet: sys.stdout.write('.')
 
 
         q = Queue()               
@@ -82,7 +82,7 @@ def validateRootFiles(fileListUnvalidated, maxFiles):
             else:
                 break
 
-    print "" # EOL
+    if not quiet: print "" # EOL
     fileCnt = 0
     for t in threads:
         if threads[t][2]==None:
