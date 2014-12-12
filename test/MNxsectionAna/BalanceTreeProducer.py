@@ -18,6 +18,9 @@ from array import *
 import MNTriggerStudies.MNTriggerAna.ExampleProofReader 
 from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
 from  MNTriggerStudies.MNTriggerAna.BetterJetGetter import BetterJetGetter
+
+
+from HLTMCWeighter import HLTMCWeighter
 #import cProfile
 
 class Proxy():
@@ -48,9 +51,15 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
     def init(self):
         #self.pr = cProfile.Profile()
 
-
-
         print "Params:", self.etaMax, self.ptMin
+
+        if not self.isData:
+            self.hltMCWeighter = HLTMCWeighter("HLT_Jet15U_raw")
+            #self.HLTMCWeighterJ15Raw = HLTMCWeighter("HLT_Jet15U_raw")
+            #self.HLTMCWeighterJ15L1Raw = HLTMCWeighter("HLT_Jet15U_L1Seeding_raw", weight=True)
+            #self.HLTMCWeighterDJ15FBRaw = HLTMCWeighter("HLT_DoubleJet15U_ForwardBackward_raw")
+            #self.HLTMCWeighterDJ15L1FBRaw = HLTMCWeighter("HLT_DoubleJet15U_ForwardBackward_L1Seeding_raw")
+
         self.normFactor = self.getNormalizationFactor()
         self.dphi = ROOT.Math.VectorUtil.DeltaPhi
 
@@ -133,7 +142,8 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
             #self.jetGetter = JetGetter("PFlegacy")
             self.jetGetter.disableGenJet()
 
-        self.jetGetter = BetterJetGetter("PFAK5") 
+        #self.jetGetter = BetterJetGetter("PFAK5") 
+        self.jetGetter = BetterJetGetter("Calo") 
 
         '''
         if self.isData:
@@ -199,6 +209,10 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
         self.setExternals()
 
         self.jetGetter.newEvent(self.fChain)
+        if not self.isData:
+            self.hltMCWeighter.newEvent(self.fChain)
+            print "XXX",  self.hltMCWeighter.getWeight()
+
 
         weight = 1
         if not self.isData:
@@ -309,9 +323,9 @@ if __name__ == "__main__":
     #'''
     sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
     #sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
-    sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
-    sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
-    sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
+    #sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
+    #sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
+    #sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
     #'''
     # '''
 
@@ -325,8 +339,8 @@ if __name__ == "__main__":
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
     #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
     #maxFilesData = 2
-    #maxFilesMC = 1
-    #nWorkers = 1
+    maxFilesMC = 1
+    nWorkers = 1
     #'''
 
     slaveParams = {}
