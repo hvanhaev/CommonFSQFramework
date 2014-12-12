@@ -27,13 +27,14 @@ echo MNTriggerStudies/MNTriggerAna >> .git/info/sparse-checkout
 git checkout -b MNTriggerStudies_42BPort tomasz/MNTriggerStudies
 
 # <Optional part for working within cmssw_4_2>
-export CVSROOT=":ext:fruboes@lxplus5.cern.ch:/afs/cern.ch/user/c/cvscmssw/public/CMSSW"
+export CVSROOT=":ext:fruboes@lxplus.cern.ch:/afs/cern.ch/user/c/cvscmssw/public/CMSSW"
 export CVS_RSH=ssh
 kinit fruboes@CERN.CH
 
 # make sure you have krb based ssh authentication for lxplus5. If yes
 # do checkout:
 
+# add pkg not working, this will fail:
 addpkg DataFormats/PatCandidates  V06-04-19-05
 addpkg PhysicsTools/PatAlgos      V08-06-58
 addpkg PhysicsTools/PatUtils      V03-09-18
@@ -42,6 +43,7 @@ addpkg PhysicsTools/SelectorUtils V00-03-24
 addpkg PhysicsTools/UtilAlgos     V08-02-14
 addpkg PhysicsTools/Utilities     V08-03-17
 
+# ...so instead:
 cvs co -r  V06-04-19-05 DataFormats/PatCandidates  
 cvs co -r  V08-06-58 PhysicsTools/PatAlgos      
 cvs co -r  V03-09-18 PhysicsTools/PatUtils      

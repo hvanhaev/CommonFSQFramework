@@ -317,7 +317,7 @@ class ExampleProofReader( ROOT.TPySelector ):
 
             dataset = ROOT.TDSet( 'TTree', 'data', treeName) # the last name is the directory name inside the root file
             for file in treeFilesAndNormalizations[t]["files"]:
-		dataset.Add(file)
+                dataset.Add(file)
             
             slaveParameters["datasetName"] = t
             slaveParameters["isData"] = sampleListFullInfo[t]["isData"]

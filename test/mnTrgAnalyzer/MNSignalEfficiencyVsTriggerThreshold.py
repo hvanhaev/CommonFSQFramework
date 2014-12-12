@@ -88,8 +88,9 @@ class MNSignalEfficiencyVsTriggerThreshold(MNTriggerStudies.MNTriggerAna.Example
         self.newlumiWeighters = {}
         #self.newlumiWeighters["flat010toPU1"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU1/pileup")
         #self.newlumiWeighters["flat010toPU5"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU5/pileup")
-        self.newlumiWeighters["flat010toPU10"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU10/pileup")
-        #self.newlumiWeighters["flat2050toPU20"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU20/pileup")
+        #self.newlumiWeighters["flat010toPU10"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU10/pileup")
+        self.newlumiWeighters["flat2050toPU20"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU20/pileup")
+        #self.newlumiWeighters["flat40toPU40"] = edm.LumiReWeighting(puFile, puFile, "Flat40/pileup", "PU40/pileup")
 
 
 
@@ -118,6 +119,7 @@ class MNSignalEfficiencyVsTriggerThreshold(MNTriggerStudies.MNTriggerAna.Example
         topologies["forwardAve"] = fAve + "|" + bAve
         topologies["forwardAve"] = fAve + "|" + bAve
         topologies["allHLTjetsForBalanceTrg"] = fAve + "|" + bAve + "|" + cAve
+        topologies["allHLTjets"] = "-5.2 to 5.2"
 
         self.topologies = {} # convert strings to actual representation. Store it
         for t in topologies:
@@ -166,11 +168,13 @@ class MNSignalEfficiencyVsTriggerThreshold(MNTriggerStudies.MNTriggerAna.Example
         if th < 31:
             minBin = int(th/3)-1.5
             maxBin = int(th)+1.5
-            self.effHistos["allHLTjetsForBalanceTrg_"+postfix] = ["allHLTjetsForBalanceTrg", self.singleJetTrg,  None, None, minBin, maxBin]
+            #self.effHistos["allHLTjetsForBalanceTrg_"+postfix] = ["allHLTjetsForBalanceTrg", self.singleJetTrg,  None, None, minBin, maxBin]
+            self.effHistos["allHLTjetsForBalanceTrg_"+postfix] = ["allHLTjets", self.singleJetTrg,  None, None, minBin, maxBin]
         else:
             minBin = int(th/2)-1.5
             maxBin = int(th)+1.5
-            self.effHistos["allHLTjetsForBalanceTrg_"+postfix] = ["allHLTjetsForBalanceTrg", self.singleJetTrg,  None, None, minBin, maxBin]
+            #self.effHistos["allHLTjetsForBalanceTrg_"+postfix] = ["allHLTjetsForBalanceTrg", self.singleJetTrg,  None, None, minBin, maxBin]
+            self.effHistos["allHLTjetsForBalanceTrg_"+postfix] = ["allHLTjets", self.singleJetTrg,  None, None, minBin, maxBin]
 
         '''
         elif th == 60:
@@ -247,8 +251,8 @@ class MNSignalEfficiencyVsTriggerThreshold(MNTriggerStudies.MNTriggerAna.Example
                             
     def analyze(self):
         pu = self.fChain.PUNumInteractions
-        #weight = self.newlumiWeighters["flat2050toPU20"].weight(pu)*self.fChain.genWeight
-        weight = self.newlumiWeighters["flat010toPU10"].weight(pu)*self.fChain.genWeight
+        weight = self.newlumiWeighters["flat2050toPU20"].weight(pu)*self.fChain.genWeight
+        #weight = self.newlumiWeighters["flat010toPU10"].weight(pu)*self.fChain.genWeight
         #weight = self.fChain.genWeight
 
         #'''
@@ -314,7 +318,11 @@ if __name__ == "__main__":
 
     sampleList = None # run through all
     maxFilesMC = None
-    nWorkers = None
+    nWorkers = 12
+
+    sampleList = ["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8_5GeV_Pu20to50"]
+    #sampleList = ["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8_10GeV_Pu20to50"]
+
 
     #'''
     #sampleList = ["QCD_Pt-30to50_Tune4C_13TeV_pythia8",]
@@ -325,7 +333,7 @@ if __name__ == "__main__":
     #maxFilesMC = 2
     #nWorkers = 1
     # '''
-    #maxFilesMC = 32
+    #maxFilesMC = 24
     parser = OptionParser()
     (options, args) = parser.parse_args()
 

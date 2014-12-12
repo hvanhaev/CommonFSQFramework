@@ -97,36 +97,38 @@ MNTriggerAnaNew::MNTriggerAnaNew(const edm::ParameterSet& iConfig)
     m_tree = tFileService->make<TTree>("data", "data");
 
     m_views.push_back(new EventIdData(iConfig, m_tree));
+    /*
     m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewCalo"), m_tree));
     m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPF"), m_tree));
     m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPFAK4CHS"), m_tree));
-    m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPFAK5CHS"), m_tree));
-    m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsView"), m_tree));
+    m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPFAK5CHS"), m_tree));*/
+    //m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsView"), m_tree));
     m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewStage1"), m_tree));
-    m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewStage1Tau"), m_tree));
-    m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewStage1All"), m_tree));
+    //m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewStage1Tau"), m_tree));
+    //m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewStage1All"), m_tree));
     m_views.push_back(new TriggerResultsView(iConfig.getParameter< edm::ParameterSet >("TriggerResultsView"), m_tree));
     ///m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewCalo"), m_tree));
 
     // use m_floatBranches for float values
-    m_vectorBranches["l1Jets"] = std::vector<reco::Candidate::LorentzVector>();
+    //  handled by views
+    //m_vectorBranches["l1Jets"] = std::vector<reco::Candidate::LorentzVector>();
     //m_vectorBranches["hltJets"] = std::vector<reco::Candidate::LorentzVector>();
 
     //* XXX
     m_todoHltCollections["ak5GenJets"] = edm::InputTag("ak5GenJets", "", "SIM");
-    m_todoHltCollections["ak4GenJets"] = edm::InputTag("ak4GenJets", "", "TTT");
+    m_todoHltCollections["ak4GenJets"] = edm::InputTag("ak4GenJets", "", "TEST");
     //"hltAK5PFJetL1FastL2L3Corrected"   ""                "PAT"
     //m_todoHltCollections["hltAK5PFJetL1FastL2L3Corrected"] = edm::InputTag("hltAK5PFJetL1FastL2L3Corrected", "", "PAT");
     
-    m_todoHltCollections["hltAK4PFJets"] = edm::InputTag("hltAK4PFJets", "", "TTT");
-    m_todoHltCollections["hltAK4PFJetsCorrected"]  = edm::InputTag("hltAK4PFJetsCorrected", "", "TTT");
-    m_todoHltCollections["hltAK5PFJets"] = edm::InputTag("hltAK5PFJets", "", "TTT");
-    m_todoHltCollections["hltAK5PFJetsCorrected"]  = edm::InputTag("hltAK5PFJetsCorrected", "", "TTT");
-    m_todoHltCollections["hltAK4CaloJetsCorrected"]  = edm::InputTag("hltAK4CaloJetsCorrected", "", "TTT");
-    m_todoHltCollections["hltAK4CaloJetsCorrectedIDPassed"]  = edm::InputTag("hltAK4CaloJetsCorrectedIDPassed", "", "TTT");
+    m_todoHltCollections["hltAK4PFJets"] = edm::InputTag("hltAK4PFJets", "", "TEST");
+    m_todoHltCollections["hltAK4PFJetsCorrected"]  = edm::InputTag("hltAK4PFJetsCorrected", "", "TEST");
+    m_todoHltCollections["hltAK5PFJets"] = edm::InputTag("hltAK5PFJets", "", "TEST");
+    m_todoHltCollections["hltAK5PFJetsCorrected"]  = edm::InputTag("hltAK5PFJetsCorrected", "", "TEST");
+    m_todoHltCollections["hltAK4CaloJetsCorrected"]  = edm::InputTag("hltAK4CaloJetsCorrected", "", "TEST");
+    m_todoHltCollections["hltAK4CaloJetsCorrectedIDPassed"]  = edm::InputTag("hltAK4CaloJetsCorrectedIDPassed", "", "TEST");
 
 
-    //#m_todoHltCollections["hltPFJetsCorrectedMatchedToL1"]  = edm::InputTag("hltPFJetsCorrectedMatchedToL1", "", "TTT");
+    //#m_todoHltCollections["hltPFJetsCorrectedMatchedToL1"]  = edm::InputTag("hltPFJetsCorrectedMatchedToL1", "", "TEST");
     //*/
 
 
@@ -226,25 +228,6 @@ MNTriggerAnaNew::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
     for (unsigned int i = 0; i < m_views.size(); ++i){
         m_views[i]->fill(iEvent, iSetup);
-    }
-
-
-    //* L1extra part
-    std::vector<edm::InputTag> todo;
-    todo.push_back(edm::InputTag("l1extraParticles", "Central", "RECO"));
-    todo.push_back(edm::InputTag("l1extraParticles", "Forward", "RECO"));
-    todo.push_back(edm::InputTag("l1extraParticles", "Tau", "RECO"));
-    for (unsigned int i = 0; i < todo.size();++i){
-        edm::Handle<std::vector<l1extra::L1JetParticle> > hL1;
-        iEvent.getByLabel(todo.at(i), hL1);
-        for (unsigned iL1 = 0; iL1< hL1->size();++iL1){
-            //std::cout << "L1 cand: " << hL1->at(iL1).pt() << " " << hL1->at(iL1).bx() << std::endl;
-            if (hL1->at(iL1).bx()!=0){
-                std::cout << "Warningn!  L1 cand with bx!=0: " << hL1->at(iL1).pt() << " " << hL1->at(iL1).bx() << std::endl;
-            } else {
-                m_vectorBranches["l1Jets"].push_back(hL1->at(iL1).p4());
-            }
-        }
     }
 
     //std::cout << "---" << std::endl;
