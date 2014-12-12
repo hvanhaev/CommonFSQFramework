@@ -3,7 +3,7 @@ import pickle
 import ROOT
 ROOT.gROOT.SetBatch(True)
 from ROOT import *
-from ProductGetter import ProductGetter
+from  MNTriggerStudies.MNTriggerAna.BetterJetGetter import BetterJetGetter
 
 
 from array import array 
@@ -59,12 +59,14 @@ class HLTMCWeighter:
         self.label = triggerName
 
         shortName = triggerName.replace("HLT_","")
-        self.useRawPt = False
         shortName1 = shortName
         shortName2 = shortName
         if "_raw" in shortName:
-            self.useRawPt = True
             shortName2 = shortName2.replace("_raw","")
+            print "TODO - rawPT"
+            self.getter = BetterJetGetter("Calo")
+        else:
+            self.getter = BetterJetGetter("Calo")
 
         self.l1seeding = False
         if "_L1Seeding" in shortName:
@@ -72,7 +74,6 @@ class HLTMCWeighter:
             shortName2 = shortName2.replace("_L1Seeding","")
             
 
-        self.getter = ProductGetter()
 
         self.etaRangeLowForMax = 3.0 # dj fb
         self.etaRangeHighForMax = 5.1
@@ -188,13 +189,15 @@ class HLTMCWeighter:
         biny = self.efficiencyHisto.GetYaxis().FindBin(eta)
         return self.efficiencyHisto.GetBinContent(binx,biny)
 
+    def newEvent(self, ev):
+        self.ev = ev
+        self.getter.newEvent(self.ev)
+
     # etaHalf = 0 - both
     # etaHalf = + - positive
     # etaHalf = - - negative
-    def getWeight(self, ev, etaHalf=0):
-        jetColType = "vector<pat::Jet>"
-        jetColTag  = ("selectedPatJetsAK5Calo",)
-        jets = self.getter.get(ev, jetColType, jetColTag)
+    def getWeight(self, etaHalf=0):
+        jets = self.getter.get("_central")
         plus = 0
         minus = 0
         '''
@@ -212,22 +215,18 @@ class HLTMCWeighter:
         printD = False
         #printD = True
 
-
-        if printD: print "################################", ev.eventAuxiliary().event()
+        if printD: print "################################", self.ev.event
         if etaHalf==0 and self.fb:
-            w = self.getWeight(ev, -1)*self.getWeight(ev, 1)
+            w = self.getWeight(-1)*self.getWeight(1)
             if printD: print "FB weight", w
             return w
 
-        jetColType = "vector<pat::Jet>"
-        jetColTag  = ("selectedPatJetsAK5Calo",)
-        jets = self.getter.get(ev, jetColType, jetColTag)
         trgFactor = 1.
         #print "#"*10
         for j in jets:
             #eta = abs(j[0].eta())
             eta = j.eta()
-            if printD: print j.eta(), j.pt(), j.correctedJet("Uncorrected").pt(),  j.isCaloJet(), etaHalf
+            if printD: print j.eta(), j.pt(), etaHalf
             if etaHalf!=0 and self.fb:
                 if eta*etaHalf < 0: 
                     if printD: print " ---> etaHalf skip"
@@ -239,8 +238,6 @@ class HLTMCWeighter:
                 if printD: print "  ---> print etaRange skip" 
                 continue
             pt = j.pt()
-            if self.useRawPt:
-                pt = j.correctedJet("Uncorrected").pt()
 
             w1 = self.getEfficiency(eta,pt)
             if printD: print " --->",w1
