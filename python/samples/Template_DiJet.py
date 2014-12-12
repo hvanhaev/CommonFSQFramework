@@ -48,15 +48,30 @@ def name(ds):
     if len(split) == 0: return None
 
     # /Neutrino_Pt-2to20_gun/fruboes-20141023_NuGun162_HLTJetsPu20_720-2f37f2cc398b18482efdc56e9384d725/USER
+    postfix = ""
+    if "5GeV" in ds:
+        postfix += "_5GeV"
+    elif "10GeV" in ds:
+        postfix += "_10GeV"
+
+    if "Pu0to10" in ds:
+        postfix += "_Pu0to10"
+    elif "Pu20to50" in ds:
+        postfix += "_Pu20to50"
+    elif "Pu20" in ds:
+        postfix += "_Pu20"
+    elif "Pu40" in ds:
+        postfix += "_Pu40"
+
+
+    if "162" in ds:
+        postfix+= "_162"
 
 
     if isData(ds):
         ret = split[1] + "-" + split[2]
     else:
-        if "NuGun162" in ds:
-            ret = split[1]+"_162"
-        else:
-            ret = split[1]
+        ret = split[1]+postfix
     return ret
 
 def isData(ds):
@@ -81,7 +96,7 @@ def crabJobs(ds):
     if "QCD_Pt-15to3000" in dsName and "_V17B-v2" in ds:
         return 1950 
 
-    return 470
+    return 115
 
 def numEvents(ds):
     return -1

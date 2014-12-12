@@ -33,12 +33,13 @@ except:
     print "Wrong answer, exiting"
     sys.exit()
 
-if choice != a+b:
+if abs(choice) != a+b:
     print "Wrong answer, exiting"
     sys.exit()
 
-print "10s sleep..."
-time.sleep(10)
+if choice > 0:
+    print "10s sleep..."
+    time.sleep(10)
 
 
 for s in samples:
@@ -62,13 +63,16 @@ for s in samples:
                 continue
 
         fullname = path + "/" +fname
-        subprocess.call(["srmrm", fullname])
-        cnt += 1
-        if cnt % 20 == 0:
-            sys.stdout.write(str(int(100*cnt/total))+"%")
+        if choice > 0:
+            subprocess.call(["srmrm", fullname])
+            cnt += 1
+            if cnt % 20 == 0:
+                sys.stdout.write(str(int(100*cnt/total))+"%")
+            else:
+                sys.stdout.write(".")
+            sys.stdout.flush()
         else:
-            sys.stdout.write(".")
-        sys.stdout.flush()
+            print fullname
 
     print ""
 

@@ -20,14 +20,15 @@ import MNTriggerStudies.MNTriggerAna.Style
 
 class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
     def init(self):
+
         # run MNTriggerAna/test/mnTrgAnalyzer/utils/GetFlatPUDist.py
         puFile = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/PUhists.root").fullPath()
 
         self.newlumiWeighters = {}
         #'''
-        self.newlumiWeighters["flat2050toPU15"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU15/pileup")
-        self.newlumiWeighters["flat2050toPU20"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU20/pileup")
-        self.newlumiWeighters["flat2050toPU25"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU25/pileup")
+        #self.newlumiWeighters["flat2050toPU15"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU15/pileup")
+        #self.newlumiWeighters["flat2050toPU20"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU20/pileup")
+        #self.newlumiWeighters["flat2050toPU25"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU25/pileup")
         #self.newlumiWeighters["flat2050toPU30"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU30/pileup")
         #'''
 
@@ -36,17 +37,27 @@ class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader
         #self.newlumiWeighters["flat2050toPU45"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU45/pileup")
         #self.newlumiWeighters["flat2050toPU50"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU50/pileup")
 
-        '''
+        #'''
         self.newlumiWeighters["PU20toPU20"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU20/pileup")
         self.newlumiWeighters["PU20toPU15"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU15/pileup")
         self.newlumiWeighters["PU20toPU25"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU25/pileup")
-        '''
+        self.newlumiWeighters["PU20toPU30"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU30/pileup")
+        #'''
+
+        #self.newlumiWeighters["PU40toPU45"] = edm.LumiReWeighting(puFile, puFile, "PU40/pileup", "PU45/pileup")
+        #self.newlumiWeighters["PU40toPU40"] = edm.LumiReWeighting(puFile, puFile, "PU40/pileup", "PU40/pileup")
+        #self.newlumiWeighters["PU40toPU35"] = edm.LumiReWeighting(puFile, puFile, "PU40/pileup", "PU35/pileup")
+        #self.newlumiWeighters["PU40toPU30"] = edm.LumiReWeighting(puFile, puFile, "PU40/pileup", "PU30/pileup")
  
         self.histos = {}
+        self.histos["genW"] =   ROOT.TH1D("genW", "genW", 1, 0, 2)
+        self.GetOutputList().Add(self.histos["genW"])
+        self.sumGenW = 0.
+
         self.histoDenoms = {}
 
         todo = []
-        todo.append( ("L1SingleJet", 32.5, 177.5) )
+        todo.append( ("L1SingleJet", 15.5, 177.5) )
         #todo.append( ("L1SingleJet", 150.5, 250.5) )
         #todo.append( ("L1SingleJet", 49.5, 61.5) )
         #todo.append( ("L1DoubleJetCF", 29.5, 71.5) )
@@ -56,9 +67,11 @@ class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader
             puname = "PU_"+w
             self.histos[puname] =   ROOT.TH1D(puname, puname+";PU;", 60, -0.5, 59.5)
             self.GetOutputList().Add(self.histos[puname])
+            '''
             phiname = "phi_"+w
             self.histos[phiname] =   ROOT.TH1D(phiname, phiname, 100, -3.15, 3.15)
             self.GetOutputList().Add(self.histos[phiname])
+            '''
 
 
             for t in todo:
@@ -120,6 +133,10 @@ class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader
 
 
     def analyze(self):
+        genW = self.fChain.genWeight
+        self.sumGenW += genW
+        self.histos["genW"].Fill(1, genW)
+
         #puAvg = self.fChain.puTrueNumInteractions
         #if puAvg < 20 or puAvg > 22: return 0
 
@@ -153,13 +170,15 @@ class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader
 
         #print hardestL1, int(hardestL1)
         for w in self.newlumiWeighters:
-            weight = self.newlumiWeighters[w].weight(pu)
+            weight = self.newlumiWeighters[w].weight(pu)*genW
             puname = "PU_"+w
             self.histos[puname].Fill(pu, weight)
 
+            '''
             phiname = "phi_"+w
             if hardestL1 > 250:
                 self.histos[phiname].Fill(hardestL1Phi, weight)
+            '''
 
 
             if hardestL1 > 0:
@@ -173,6 +192,8 @@ class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader
             #self.histoDenoms["L1DoubleJet35CFDphi_"+w+"Denom"].Fill(0, weight)
 
     def finalize(self):
+        print "XXX", self.sumGenW, self.histos["genW"].Integral()
+
         #print "Finalize:"
         #normFactor = self.getNormalizationFactor()
         pass
@@ -190,12 +211,18 @@ class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader
         filledBunches = 2662.
 
         factor = float(lhcFreq)*filledBunches/totalBunches
+        #if self.fromQCD:
+            #factor *=  (1./histos["genW"].Integral()) * 2429000000./78420000000.
+            #factor *=  2429000000./78420000000.
+
+
         avaliableHistos = []
         for h in histos:
             if "Denom" in h: continue
             if "Dist" in h: continue
             if h.startswith("PU_"): continue
             if h.startswith("phi_"): continue
+            if h.startswith("genW"): continue
             #raise "HERE"
             # ptint XXXXX
             denom = histos[h+"Denom"].GetBinContent(1)
@@ -233,6 +260,7 @@ class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader
 
         #'''  l1 jet scale:  12 16 20 24 28 32.0 36.0 40.0 44.0 48.0 52.0 56.0 60.0 64.0 68.0 72.0 76.0 80.0 84.0 88.0 92.0    '''
         todo = []
+        todo.append( ("L1SingleJet", 16 ) ) # (seed name, threshold)
         todo.append( ("L1SingleJet", 36 ) ) # (seed name, threshold)
         todo.append( ("L1SingleJet", 52 ) ) # (seed name, threshold)
         todo.append( ("L1SingleJet", 68 ) ) # (seed name, threshold)
@@ -303,18 +331,25 @@ if __name__ == "__main__":
     AutoLibraryLoader.enable()
 
     #sampleList = ["Neutrino_Pt-2to20_gun"] # run through all
-    sampleList = ["Neutrino_Pt-2to20_gun_10GeV_Pu20to50"] # run through all
+    #sampleList = ["Neutrino_Pt-2to20_gun_10GeV_Pu20to50"] # run through all
+
     #sampleList =  ["Neutrino_Pt-2to20_gun_5GeV_Pu40_162"]
+    #sampleList =  ["Neutrino_Pt-2to20_gun_10GeV_Pu40_162"]
+
+
     #sampleList =  ["Neutrino_Pt-2to20_gun_10GeV_Pu20_162"]
-    #sampleList =  ["Neutrino_Pt-2to20_gun_10GeV_Pu20_162"]
+    #sampleList =  ["Neutrino_Pt-2to20_gun_5GeV_Pu20_162"]
+    sampleList =  ["Neutrino_Pt-2to20_gun_10GeV_Pu20_162"]
+
+    #sampleList =  ["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8_10GeV_Pu20to50"]
 
     #sampleList =  ["Neutrino_Pt-2to20_gun_162"]
     maxFilesMC = None
     nWorkers = None
 
     # '''
-    #maxFilesMC = 1
-    #nWorkers = 1
+    #maxFilesMC = 24
+    #nWorkers = 12
     # '''
     #maxFilesMC = 32
 
@@ -324,6 +359,12 @@ if __name__ == "__main__":
 
     # note - remove maxFiles parameter in order to run on all files
     #L1Rate.runAll(treeName="L1JetsRateAna",
+
+    slaveParams["fromQCD"] = "QCD" in sampleList[0]
+    if slaveParams["fromQCD"]:
+        raise Exception("Broken, dont use!")
+
+
     L1Rate.runAll(treeName="MNTriggerAnaNew",
                                slaveParameters=slaveParams,
                                sampleList=sampleList,
