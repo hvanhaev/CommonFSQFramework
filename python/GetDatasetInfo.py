@@ -13,6 +13,106 @@ from multiprocessing import Process, Queue
 
 import pickle
 import distutils.spawn
+
+def validateRootFile(fname, q):
+    rootFile = ROOT.TFile.Open(fname,"r")
+    infoHisto = rootFile.Get("infoHisto/cntHisto")
+    ret = {}
+    ret["evCnt"]=-1
+    ret["evCntSeenByTreeProducers"]=-1
+    
+    if type(infoHisto) != ROOT.TH1D:
+        print "\nProblem reading info histo from", fname
+    elif infoHisto.GetXaxis().GetBinLabel(3)!="evCnt":
+        if not quiet: print "\nProblem - evCnt bin expected at position 3. Got",  infoHisto.getBinLabel(3)
+    else:
+        ret["evCnt"]  =  int(infoHisto.GetBinContent(3))
+    if  infoHisto.GetXaxis().GetBinLabel(4)=="evCntSeenByTreeProducers":
+        ret["evCntSeenByTreeProducers"] =  int(infoHisto.GetBinContent(4))
+
+    del infoHisto
+    rootFile.Close()
+    del rootFile
+    return q.put(ret)
+
+def validateRootFiles(fileListUnvalidated, maxFiles):
+    print "Validating",
+    # verify we are able to read event counts from very file
+    fileCnt = 0
+    threads = {}
+    goodFiles = 0
+    maxThreads= 12
+    fileList = []
+    evCnt = 0
+    evCntSeenByTreeProducers = 0
+    if maxFiles != None:
+        maxThreads  = min(maxThreads, maxFiles/2+1)
+
+    for fname in fileListUnvalidated:
+        if maxFiles != None and goodFiles >= maxFiles:
+            break
+        fileCnt += 1
+        if (fileCnt%50 == 0):
+            sys.stdout.write(str(int(100.*fileCnt/len(fileListUnvalidated)))+"%")
+        else:
+            sys.stdout.write('.')
+
+
+        q = Queue()               
+        thr = Process(target=validateRootFile, args=(fname, q))
+        thr.start()
+        threads[fname] = [thr, q, None]
+
+        while True:
+            waitingOrRunning = 0 
+            goodFiles = 0
+            for t in threads:
+                #if not threads[t][0].ident or  threads[t][0].is_alive():
+                if threads[t][0].exitcode == None:
+                    waitingOrRunning+=1
+                else:
+                    if threads[t][2] == None:
+                        threads[t][0].join()
+                        threads[t][2] = threads[t][1].get()
+                    if threads[t][2]["evCnt"] > 0:
+                        goodFiles+=1
+
+            if waitingOrRunning > maxThreads:
+                time.sleep(1)
+            else:
+                break
+
+    print "" # EOL
+    fileCnt = 0
+    for t in threads:
+        if threads[t][2]==None:
+            threads[t][0].join()
+            threads[t][2] = threads[t][1].get()
+        result = threads[t][2]["evCnt"] 
+        resEvCntSeenByTreeProducers = threads[t][2]["evCntSeenByTreeProducers"]
+        if result < 0:
+            print "Problematic file", t
+            continue
+        elif result == 0:
+            print "Warning: 0 ev file", t
+
+        fileList.append(t)
+        if result > 0:
+            evCnt += result
+
+        if resEvCntSeenByTreeProducers > 0:
+            evCntSeenByTreeProducers+=resEvCntSeenByTreeProducers
+        fileCnt += 1
+        if maxFiles != None and fileCnt >= maxFiles:
+            break
+
+    validationResult = {}
+    validationResult["fileList"]=fileList
+    validationResult["evCnt"]=evCnt
+    validationResult["evCntSeenByTreeProducers"]=evCntSeenByTreeProducers
+    return validationResult
+
+
 def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet = False, samplesToProcess = None, usePickle=False, donotvalidate=False):
     # in principle we should check if lcg-ls supports -c/ -o argumets
     legacyMode = "slc5" in os.environ["SCRAM_ARCH"] 
@@ -136,10 +236,6 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
             else:
                 raise Exception("Thats confusing! File access method undetermined!")
 
-            # verify we are able to read event counts from very file
-            fileCnt = 0
-            threads = {}
-            goodFiles = 0
             print "Total number of files in sample:", len(fileListUnvalidated)
             if donotvalidate:
                 fileList = list(fileListUnvalidated) 
@@ -161,91 +257,12 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                         evCntSeenByTreeProducers = pickledData["evCntSeenByTreeProducers"]
                         fromPickle = True
 
-
-            print "Validating",
-            maxThreads= 12
-            if maxFiles != None:
-                maxThreads  = min(maxThreads, maxFiles/2+1)
-
-            for fname in fileListUnvalidated:
-                if maxFiles != None and goodFiles >= maxFiles:
-                    break
-                fileCnt += 1
-                if (fileCnt%50 == 0):
-                    sys.stdout.write(str(int(100.*fileCnt/len(fileListUnvalidated)))+"%")
-                else:
-                    sys.stdout.write('.')
-
-                def validate(fname, q):
-                    rootFile = ROOT.TFile.Open(fname,"r")
-                    infoHisto = rootFile.Get("infoHisto/cntHisto")
-                    ret = {}
-                    ret["evCnt"]=-1
-                    ret["evCntSeenByTreeProducers"]=-1
-                    
-                    if type(infoHisto) != ROOT.TH1D:
-                        print "\nProblem reading info histo from", fname
-                    elif infoHisto.GetXaxis().GetBinLabel(3)!="evCnt":
-                        if not quiet: print "\nProblem - evCnt bin expected at position 3. Got",  infoHisto.getBinLabel(3)
-                    else:
-                        ret["evCnt"]  =  int(infoHisto.GetBinContent(3))
-                    if  infoHisto.GetXaxis().GetBinLabel(4)=="evCntSeenByTreeProducers":
-                        ret["evCntSeenByTreeProducers"] =  int(infoHisto.GetBinContent(4))
-
-                    del infoHisto
-                    rootFile.Close()
-                    del rootFile
-                    return q.put(ret)
-
-                q = Queue()               
-                thr = Process(target=validate, args=(fname, q))
-                thr.start()
-                threads[fname] = [thr, q, None]
-
-                while True:
-                    waitingOrRunning = 0 
-                    goodFiles = 0
-                    for t in threads:
-                        #if not threads[t][0].ident or  threads[t][0].is_alive():
-                        if threads[t][0].exitcode == None:
-                            waitingOrRunning+=1
-                        else:
-                            if threads[t][2] == None:
-                                threads[t][0].join()
-                                threads[t][2] = threads[t][1].get()
-                            if threads[t][2]["evCnt"] > 0:
-                                goodFiles+=1
-
-                    if waitingOrRunning > maxThreads:
-                        time.sleep(1)
-                    else:
-                        break
-
-            print "" # EOL
-            fileCnt = 0
-            for t in threads:
-                if threads[t][2]==None:
-                    threads[t][0].join()
-                    threads[t][2] = threads[t][1].get()
-                result = threads[t][2]["evCnt"] 
-                resEvCntSeenByTreeProducers = threads[t][2]["evCntSeenByTreeProducers"]
-                if result < 0:
-                    print "Problematic file", t
-                    continue
-                elif result == 0:
-                    print "Warning: 0 ev file", t
-
-                fileList.append(t)
-                if result > 0:
-                    evCnt += result
-
-                if resEvCntSeenByTreeProducers > 0:
-                    evCntSeenByTreeProducers+=resEvCntSeenByTreeProducers
-                fileCnt += 1
-                if maxFiles != None and fileCnt >= maxFiles:
-                    print tab, "will process", fileCnt, "files"
-                    break
-
+            # xxxx
+            if fileListUnvalidated:
+                validationResult = validateRootFiles(fileListUnvalidated, maxFiles)
+                fileList =  validationResult["fileList"]
+                evCnt = validationResult["evCnt"]
+                evCntSeenByTreeProducers = validationResult["evCntSeenByTreeProducers"]
 
         if writePickle and not fromPickle and  maxFiles == None and usePickle: 
             toPickle = {}
