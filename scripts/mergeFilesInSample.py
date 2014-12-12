@@ -18,8 +18,7 @@ def runQuiet(command):
 def main():
     filesToMerge = 10
     parser = OptionParser()
-    #parser.add_option("-s", "--sample",   action="store", type="string", dest="sample", help="sample name" )
-    #parser.add_option("-l", "--listSamples",   action="store", type="string", dest="list", help="listAllSamples" )
+    parser.add_option("-f", "--force",   action="store_true",  dest="force", help="run even if target dir is present" )
     (options, args) = parser.parse_args()
 
     anaDef = getAnaDefinition("sam")
@@ -44,17 +43,16 @@ def main():
 
     odirName = indirName+"_merged/"
 
-    #'''
     odirExists = subprocess.call(["lcg-ls", odirName],  stdout=subprocess.PIPE, stderr=subprocess.PIPE)==0
-    if odirExists:
+    if odirExists and not options.force:
         print "output directory seems to allready exist", odirName
         sys.exit(1)
 
-    odirCreated = subprocess.call(["srmmkdir", odirName],  stdout=subprocess.PIPE, stderr=subprocess.PIPE)==0
-    if not odirCreated:
-        print "cannot create output directory", odirName
-        sys.exit(1)
-    #'''
+    if not odirExists:
+        odirCreated = subprocess.call(["srmmkdir", odirName],  stdout=subprocess.PIPE, stderr=subprocess.PIPE)==0
+        if not odirCreated:
+            print "cannot create output directory", odirName
+            sys.exit(1)
 
     aTodo = []
     todos = []
