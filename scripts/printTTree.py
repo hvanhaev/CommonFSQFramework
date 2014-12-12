@@ -31,6 +31,11 @@ def main():
     sample= args[0]
     treeFilesAndNormalizations = getTreeFilesAndNormalizations(maxFilesMC=1, maxFilesData=1,
                 quiet = True, samplesToProcess=[sample,])
+
+    if not treeFilesAndNormalizations[sample]["files"]:
+        print "No files found for sample", sample, "- exiting"
+        sys.exit(0)
+
     filename = treeFilesAndNormalizations[sample]["files"][0]
 
     

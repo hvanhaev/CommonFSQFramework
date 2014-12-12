@@ -6,7 +6,7 @@ from PhysicsTools.PatAlgos.tools.coreTools import *
 #  global constants
 #
 ####################################3#####################################3
-
+# export TMFSampleName=JetMETTau-Run2010A-Apr21ReReco-v1
 process.XS =  cms.EDProducer("DoubleProducer",
     value = cms.double(-1),
 )
@@ -35,7 +35,9 @@ else:
     print "JEC set to:", ver
 
     if ver == None:
-        raise Exception("Cannot determine JECset to use")
+        ver = "V16TFPart"
+        print "Setting JEC to", ver
+        #raise Exception("Cannot determine JECset to use")
 
     XS = sampleList[s]["XS"]
     process.GlobalTag.globaltag = sampleList[s]["GT"]
@@ -69,8 +71,8 @@ else:
 enableTur = True
 is2011Balance = False
 #anaType="ZMuMu"
-anaType="DiJet"
-#anaType="DiJetBalance"
+#anaType="DiJet"
+anaType="DiJetBalance"
 #anaType = "JetTriggerEff"
 
 
@@ -80,7 +82,7 @@ if anaType == "ZMuMu":
     minJets = 0
     minDiMuons = 1
 elif anaType == "DiJetBalance":
-    minJetPT = 27
+    minJetPT = 20
     minJets =  2
     minDiMuons = 0
 elif anaType == "DiJet":
@@ -138,28 +140,23 @@ if enableTur:
 
 if currentSampleName=="QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6":
     f = "/scratch/scratch0/data/store/mc/Summer12/QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/AODSIM/LowPU2010_DR42_PU_S0_START42_V17B-v1/00000/7CFD2C30-ED2F-E211-9866-00215E2221AE.root"
+
+elif currentSampleName=="QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp":
+    f='/store/mc/Summer12/QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/AODSIM/LowPU2010_DR42_BS2011_PU_S0_START42_V17B-v1/00000/7A7D8A2B-72CD-E311-9218-002590200B60.root'
+
 elif currentSampleName=="JetMETTau-Run2010A-Apr21ReReco-v1":
-    # most of the file takes good part of run 139407 - first 26897 events of it are safe to run
-    f = "/scratch/scratch0/data/store/data/Run2010A/JetMETTau/AOD/Apr21ReReco-v1/0000/001144C0-DB6D-E011-9850-002618943911.root"
+    f='/store/data/Run2010A/JetMETTau/AOD/Apr21ReReco-v1/0000/E864253B-A66F-E011-8766-0018F3D096E6.root'
+
 else:
     print ""
     f= "IdontCare.root"
     print "Warning: input file not set (fine if you are running with crab)"
     print ""
 
-# bad file:
-#f = "/scratch/scratch0/data/store/data/Run2010A/JetMETTau/AOD/Apr21ReReco-v1/0000/0036EDAA-8376-E011-9BE1-002618943954.root"
-
-
-#f = "/scratch/scratch0/data/store/data/Run2011A/Jet/AOD/May10ReReco-v1/0000/00452553-347C-E011-8753-00266CF24EEC.root"
-
-#f = "/scratch/scratch0/data/store/mc/Summer12/QCD_Pt-15to3000_Tune23_Flat_HFshowerLibrary_7TeV_herwigpp/AODSIM/LowPU2010_DR42_PU_S0_START42_V17B-v1/00000/02000895-B72E-E211-B897-00215E222268.root"
-
-#f = "/scratch/scratch0/data/store/mc/Summer12/DYToMuMu_M-20_TuneZ2Star_HFshowerLibrary_7TeV_pythia6/AODSIM/LowPU2010_DR42_PU_S0_START42_V17B-v1/10000/0A78309F-AF5B-E211-B615-003048FFCB8C.root"
 
 
 process.source.fileNames = [
-     'file:'+f
+     f
 ]
 
 
@@ -414,10 +411,13 @@ process.pPF = cms.Path(     process.initialSequence
                           * process.countTFJets
                           * process.finalCntrPF    )
 
+
+'''
 process.pCalo = cms.Path (   process.initialSequence
                            * process.selectedTFCaloJets 
                            * process.countTFCaloJets
                            * process.finalCntrCalo )
+'''
 
 
 
@@ -481,7 +481,8 @@ if anaType == "JetTriggerEff":
 # HLT_Mu11
 # HLT_Mu9
 
-process.schedule.extend([process.pPF, process.pCalo])
+process.schedule.extend([process.pPF])
+#process.schedule.extend([process.pPF, process.pCalo])
 #process.schedule = cms.Schedule(process.pCalo, process.outpath)
 process.schedule.extend([process.tfMuonsP,])
 
@@ -492,13 +493,15 @@ process.schedule.extend([process.tfMuonsP,])
         //iEvent.getByLabel( "ak5JetID", hJetIDMap );
 '''
 
-process.exampleTree = cms.EDAnalyzer("ExampleTreeProducer")
+#process.exampleTree = cms.EDAnalyzer("ExampleTreeProducer")
 process.mnXS = cms.EDAnalyzer("MNXSTreeProducer", 
-    minPT = cms.double(30),
+    minGenPT = cms.double(25),
     JetViewPF  = cms.PSet(
+        storeageVersion = cms.untracked.int32(1),
+        disableJetID = cms.bool(False),
         optionalCaloJets4ID = cms.InputTag("ak5CaloJets","","RECO"),
         optionalCaloID4ID  = cms.InputTag("ak5JetID"),
-        branchPrefix = cms.untracked.string("PF"),
+        branchPrefix = cms.untracked.string("PFAK5"),
         maxEta = cms.double(4.9999),
         minPt = cms.double(3),
         maxnum = cms.int32(3),
@@ -512,6 +515,8 @@ process.mnXS = cms.EDAnalyzer("MNXSTreeProducer",
     ),
 
     JetViewCalo  = cms.PSet(
+        storeageVersion = cms.untracked.int32(1),
+        disableJetID = cms.bool(False),
         optionalCaloJets4ID = cms.InputTag("ak5CaloJets","","RECO"),
         optionalCaloID4ID = cms.InputTag("ak5JetID"),
         branchPrefix = cms.untracked.string("Calo"),
@@ -528,6 +533,14 @@ process.mnXS = cms.EDAnalyzer("MNXSTreeProducer",
         ),
     ),
 
+    TriggerResultsView =  cms.PSet(
+        branchPrefix = cms.untracked.string("trg"),
+        process = cms.string("HLT"), # usually HLT
+        triggers = cms.vstring("dj15fb", "djave15", "jet15"),
+        dj15fb =  cms.vstring("HLT_DoubleJet15U_ForwardBackward*"),
+        djave15 =  cms.vstring("HLT_DiJetAve15U*"), 
+        jet15 =  cms.vstring("HLT_Jet15U*"), 
+    ),
 
 )
 '''
@@ -557,7 +570,8 @@ process.mnXS = cms.EDAnalyzer("MNXSTreeProducer",
 
 process.infoHisto = cms.EDAnalyzer("SaveCountHistoInTreeFile")
 #process.initialSequence.remove(process.hltJet)
-process.pTreeProducers = cms.Path(process.initialSequence*process.infoHisto*process.exampleTree*process.mnXS)
+#process.pTreeProducers = cms.Path(process.initialSequence*process.infoHisto*process.exampleTree*process.mnXS)
+process.pTreeProducers = cms.Path(process.initialSequence*process.infoHisto*process.mnXS)
 process.pUtil = cms.Path(process.XS)
 process.schedule.append(process.pUtil)
 process.schedule.append(process.pTreeProducers)
@@ -574,7 +588,8 @@ if anaType == "ZMuMu":
         )
 elif anaType == "DiJet" or anaType == "DiJetBalance":
     process.out.SelectEvents = cms.untracked.PSet(
-            SelectEvents = cms.vstring('pPF', 'pCalo')
+        #    SelectEvents = cms.vstring('pPF', 'pCalo')
+            SelectEvents = cms.vstring('pPF')
         )
 
 
@@ -710,6 +725,8 @@ if anaType == "JetTriggerEff":
 #ver = "V17TFPart"
 #ver = "V16TFFull"
 ver = "V16TFPart"
+#ver = "V16TFPartV2"
+
 process.load("CondCore.DBCommon.CondDBCommon_cfi")
 from CondCore.DBCommon.CondDBSetup_cfi import *
 process.jec = cms.ESSource("PoolDBESSource",

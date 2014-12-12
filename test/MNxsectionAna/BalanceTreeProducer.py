@@ -17,6 +17,8 @@ from array import *
 # you have to run this file from directory where it is saved
 import MNTriggerStudies.MNTriggerAna.ExampleProofReader 
 from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
+from  MNTriggerStudies.MNTriggerAna.BetterJetGetter import BetterJetGetter
+#import cProfile
 
 class Proxy():
     def __init__(self, obj):
@@ -44,6 +46,9 @@ class GenJetProxy():
 
 class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
     def init(self):
+        #self.pr = cProfile.Profile()
+
+
 
         print "Params:", self.etaMax, self.ptMin
         self.normFactor = self.getNormalizationFactor()
@@ -53,16 +58,23 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
         self.GetOutputList().Add(self.tree)
 
         self.var = {}
+        self.histos = {}
+        self.histos["evcnt"] =  ROOT.TH1F("evcnt_central_jet15", "evcnt_central_jet15",  1, -0.5, 0.5)
+
         self.todoShifts = ["_central"]
 
         if not self.isData and self.doPtShiftsJEC:
-            self.todoShifts.append("_ptUp")
-            self.todoShifts.append("_ptDown")
+            #self.todoShifts.append("_ptUp")
+            #self.todoShifts.append("_ptDown")
+            self.todoShifts.append("_jecUp")
+            self.todoShifts.append("_jecDown")
 
         if not self.isData and self.doPtShiftsJER:
             self.todoShifts.append("_jerUp")
             self.todoShifts.append("_jerDown")
 
+
+        trg = "_jet15"
         for t in self.todoShifts:
             self.var["tagPt"+t] = array('d', [0])
             self.var["tagEta"+t] = array('d', [0])
@@ -73,8 +85,20 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
             #//self.var["veto1"+t] = array('d', [0])
             self.var["veto2"+t] = array('d', [0])
 
+            histoPostFix = t+trg
+            self.histos["ptProbe"+t] = ROOT.TH1F("ptProbe"+histoPostFix, "ptProbe"+histoPostFix, 100, 0, 100)
+            self.histos["ptTag"+t] = ROOT.TH1F("ptTag"+histoPostFix, "ptTag"+histoPostFix, 100, 0, 100)
+            self.histos["etaProbe"+t] = ROOT.TH1F("etaProbe"+histoPostFix, "etaProbe"+histoPostFix, 35, 1.3, 4.8)
+            self.histos["etaTag"+t] = ROOT.TH1F("etaTag"+histoPostFix, "etaTag"+histoPostFix, 15, 0, 1.5)
+            self.histos["nvtx"+t] = ROOT.TH1F("nvtx"+histoPostFix, "nvtx"+histoPostFix, 10, -0.5, 9.5)
+ 
+
+        for t in self.histos:
+            #self.histos[t][1] = ROOT.TH1F(name, name, nbins, self.histos[t][2], self.histos[t][3])
+            self.histos[t].Sumw2()
+            self.GetOutputList().Add(self.histos[t])
+
         self.var["weight"] = array('d', [0])
-        
         for v in self.var:
             self.tree.Branch(v, self.var[v], v+"/D")
         
@@ -106,7 +130,17 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
             #self.jetGetter = GenJetProxy()
         else:
             self.jetGetter = JetGetter("PFAK5")
+            #self.jetGetter = JetGetter("PFlegacy")
             self.jetGetter.disableGenJet()
+
+        self.jetGetter = BetterJetGetter("PFAK5") 
+
+        '''
+        if self.isData:
+            self.jetGetter = JetGetter("PFAK5") 
+        else:
+            self.jetGetter = JetGetter("PFlegacy") 
+        '''
 
         self.varE = {}
         sys.stdout.flush()
@@ -138,8 +172,21 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
         #print "ASDFASD", self.fChain.genWeight
         return self.fChain.genWeight*self.normFactor
 
+    '''
+    # stuff for code profiling
     def analyze(self):
-        if not self.HLT2015TempWorkaround and self.fChain.ngoodVTX == 0: return
+        self.pr.enable()
+        self.analyzeTT()
+        self.pr.disable()
+    def analyzeTT(self):
+        '''
+    def analyze(self):
+        self.histos["evcnt"].Fill(0)
+        # '''
+        if not self.HLT2015TempWorkaround:
+            if self.fChain.ngoodVTX == 0: return
+            if self.fChain.HBHENoiseFilterResult == 0: return
+
 
         if self.isData:
             if self.fChain.jet15 < 0.5:
@@ -153,12 +200,14 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
 
         self.jetGetter.newEvent(self.fChain)
 
-        weight = self.genWeight()
-        if not self.isData and not self.HLT2015TempWorkaround:
-            truePU = self.fChain.puTrueNumInteractions
-            puWeight =  self.lumiWeighters["_jet15_central"].weight(truePU)
-            weight *= puWeight
-
+        weight = 1
+        if not self.isData:
+            weight = self.genWeight()
+            if not self.isData and not self.HLT2015TempWorkaround:
+                truePU = self.fChain.puTrueNumInteractions
+                puWeight =  self.lumiWeighters["_jet15_central"].weight(truePU)
+                weight *= puWeight
+            
         self.var["weight"][0] = weight
 
         fill = False
@@ -169,25 +218,15 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
             tagPT = None
 
 
-            #dbgCnt = 0
             for jet in self.jetGetter.get(shift):
-            #for i in xrange(0, recoJets.size()):
-            #    jet = recoJets.at(i)
-                #dbgJet = recoJets.at(dbgCnt)
-                #dbgCnt+=1
-                #print shift, dbgCnt,"|", jet.pt(), jet.eta(), "|", dbgJet.pt(), dbgJet.eta()
-                #print pt, jet.eta()
-
                 pt = jet.pt()
-                #print "XXX", shift, dbgCnt, pt, jet.eta()
-                #dbgCnt += 1
 
                 if pt < self.ptMin: continue
                 eta = abs(jet.eta())
                 if eta > self.etaMax: continue
 
                 if not self.HLT2015TempWorkaround:
-                    if not jet.looseId(): continue
+                    if not jet.jetid(): continue
                 if eta < 1.4:
                     tagJet = jet
                     tagPT = pt
@@ -196,28 +235,42 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
                     probePT = pt
 
             if tagJet != None and probeJet != None:
-                dphi = self.dphi(tagJet.p4(), probeJet.p4())
+                dphi = abs(self.dphi(tagJet.p4(), probeJet.p4()))
                 if dphi < 2.7: continue
                 
                 # check veto:
                 ptAve = (probePT+tagPT)/2
+                if ptAve < 25: continue
+
 
                 veto2 = -1
+                #for jet in self.jetGetter.get(shift):
                 for jet in self.jetGetter.get(shift):
                     if jet == tagJet or probeJet == jet: continue
                     eta = abs(jet.eta())
                     if eta > self.etaMax: continue
                     veto2 =  jet.pt()/ptAve
 
+                tagEta = abs(tagJet.eta())
+                probeEta = abs(probeJet.eta())
+
                 self.var["tagPt"+shift][0] = tagPT 
-                self.var["tagEta"+shift][0] =  abs(tagJet.eta())
+                self.var["tagEta"+shift][0] = tagEta
                 self.var["probePt"+shift][0] = probePT
-                self.var["probeEta"+shift][0] = abs(probeJet.eta())
+                self.var["probeEta"+shift][0] = probeEta
                 self.var["ptAve"+shift][0] = ptAve
                 self.var["balance"+shift][0] = (probePT-tagPT)/ptAve
                 #self.var["veto1"+shift][0] = veto1
                 self.var["veto2"+shift][0] = veto2
                 fill = True
+
+
+                #print "Hist fill", weight
+                self.histos["ptProbe"+shift].Fill(probePT, weight)
+                self.histos["ptTag"+shift].Fill(tagPT, weight)
+                self.histos["etaProbe"+shift].Fill(probeEta, weight)
+                self.histos["etaTag"+shift].Fill(tagEta, weight)
+                self.histos["nvtx"+shift].Fill(self.fChain.ngoodVTX, weight)
 
    
         # at least one variation ok.
@@ -230,10 +283,16 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
 
     def finalize(self):
         print "Finalize:"
+        if hasattr(self, "pr"):
+            dname = "/nfs/dust/cms/user/fruboest/2014.11.MN2010/CMSSW_4_2_8_lowpupatch1/src/MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"
+            profName = dname + "stats"
+            self.pr.dump_stats(profName)
+
+        # note: norm factor applied allready when filling
         #normFactor = self.getNormalizationFactor()
         #print "  applying norm", normFactor
-        #for h in self.hist:
-        #    self.hist[h].Scale(normFactor)
+        #for h in self.histos:
+        #    self.histos[h].Scale(normFactor)
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
@@ -243,20 +302,31 @@ if __name__ == "__main__":
     sampleList = None
     maxFilesMC = None
     maxFilesData = None
-    nWorkers = None # Use all
+    nWorkers = 12
     treeName = "mnXS"
 
+    sampleList = []
+    #'''
+    sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
+    #sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
+    sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
+    sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
+    sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
+    #'''
+    # '''
+
     # debug config:
-    '''
-    sampleList=[]
-    sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
+    #'''
+    #sampleList=["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]
+    #sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
+    #sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
     #sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
     #sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
     #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
-    maxFilesData = 1
-    maxFilesMC = 1
-    nWorkers = 1
+    #maxFilesData = 2
+    #maxFilesMC = 1
+    #nWorkers = 1
     #'''
 
     slaveParams = {}
@@ -266,16 +336,19 @@ if __name__ == "__main__":
     #slaveParams["doPtShiftsJER"] = False
     slaveParams["doPtShiftsJER"] = True
 
-    slaveParams["ptMin"] = 35
+    slaveParams["ptMin"] = 15
     slaveParams["etaMax"] = 4.7
+    slaveParams["HLT2015TempWorkaround"] = False
 
 
+    print sampleList
 
     BalanceTreeProducer.runAll(treeName=treeName,
                                slaveParameters=slaveParams,
                                sampleList=sampleList,
                                maxFilesMC = maxFilesMC,
                                maxFilesData = maxFilesData,
-                               nWorkers=nWorkers,
+                               nWorkers=nWorkers, 
+                               usePickle = True,
                                outFile = "treeDiJetBalance.root" )
 

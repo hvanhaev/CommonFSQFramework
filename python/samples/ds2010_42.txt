@@ -1,7 +1,7 @@
 #xx 1 + 2.3 + 1.7 TB
 /JetMETTau/Run2010A-Apr21ReReco-v1/AOD
 /JetMET/Run2010A-Apr21ReReco-v1/AOD
-#/METFwd/Run2010B-Apr21ReReco-v1/AOD
+/METFwd/Run2010B-Apr21ReReco-v1/AOD
 /Jet/Run2010B-Apr21ReReco-v1/AOD
 #xx/Jet/Run2011A-May10ReReco-v1/AOD
 #xx aug rereco only on T1
@@ -13,8 +13,9 @@
 #    pythia 6 low pu
 #
 #######################3333
-/QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/Summer12-LowPU2010_DR42_PU_S0_START42_V17B-v1/AODSIM
-#/QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/Summer12-LowPU2010_DR42_PU_S0_START42_V17B-v2/AODSIM
+#/QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/Summer12-LowPU2010_DR42_PU_S0_START42_V17B-v1/AODSIM
+/QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/Summer12-LowPU2010_DR42_BS2011_PU_S0_START42_V17B-v1/AODSIM 
+/QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/Summer12-LowPU2010_DR42_PU_S0_START42_V17B-v2/AODSIM
 #/QCD_Pt_15to30_TuneZ2star_HFshowerLibrary_7TeV_pythia6/Summer12-LowPU2010_DR42_PU_S0_START42_V17B-v1/AODSIM
 #/QCD_Pt_30to50_TuneZ2star_HFshowerLibrary_7TeV_pythia6/Summer12-LowPU2010_DR42_PU_S0_START42_V17B-v1/AODSIM
 #/QCD_Pt_50to80_TuneZ2star_HFshowerLibrary_7TeV_pythia6/Summer12-LowPU2010_DR42_PU_S0_START42_V17B-v1/AODSIM

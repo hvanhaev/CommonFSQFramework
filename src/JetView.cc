@@ -50,6 +50,8 @@ caloJetID(JetIDSelectionFunctor::PURE09,  JetIDSelectionFunctor::LOOSE),
 m_jecUnc(0)
 
 {
+
+    m_storageVersion =  iConfig.getUntrackedParameter<int>("storeageVersion", 0);
     m_maxEta = iConfig.getParameter<double>("maxEta");
     m_minPt = iConfig.getParameter<double>("minPt");
     m_maxnum = iConfig.getParameter<int>("maxnum"); // save maxnum hardest jets
@@ -78,9 +80,26 @@ m_jecUnc(0)
             throw "Variation not known "+s + "\n";
         }
         if (s != "") s = "_" + s;
-        registerVecP4("newjets"+s, tree);
-        registerVecP4("newgenjets"+s, tree);
-        registerVecInt("newjetid"+s, tree);
+        if (m_storageVersion == 0) {
+            registerVecP4("newjets"+s, tree);
+            registerVecP4("newgenjets"+s, tree);
+            registerVecInt("newjetid"+s, tree);
+        } else if (m_storageVersion == 1){
+            registerVecInt("jetid"+s, tree);
+            registerVecFloat("pt"+s, tree);
+            registerVecFloat("eta"+s, tree);
+            registerVecFloat("phi"+s, tree);
+            registerVecFloat("genpt"+s, tree);
+            registerVecFloat("geneta"+s, tree);
+            registerVecFloat("genphi"+s, tree);
+
+
+
+        } else {
+            throw cms::Exception("Storage version not known");
+        }
+
+
     }
 
     std::vector<std::string> JERdesc = iConfig.getParameter<std::vector<std::string> >("jerFactors");
@@ -163,9 +182,19 @@ void JetView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSet
         while (tj.size() > m_maxnum) tj.pop_back();
         if (variation != "") variation = "_" + variation;
         BOOST_FOREACH(xx::TempJetHolder t, tj){
-            addToP4Vec("newjets"+variation, t.p4);
-            addToP4Vec("newgenjets"+variation, t.p4Gen);
-            addToIVec("newjetid"+variation, t.jetId);
+            if (m_storageVersion == 0) {
+                addToP4Vec("newjets"+variation, t.p4);
+                addToP4Vec("newgenjets"+variation, t.p4Gen);
+                addToIVec("newjetid"+variation, t.jetId);
+            } else {
+                addToIVec("jetid"+variation, t.jetId);
+                addToFVec("pt"+variation, t.p4.pt());
+                addToFVec("eta"+variation, t.p4.eta());
+                addToFVec("phi"+variation, t.p4.phi());
+                addToFVec("genpt"+variation, t.p4Gen.pt());
+                addToFVec("geneta"+variation, t.p4Gen.eta());
+                addToFVec("genphi"+variation, t.p4Gen.phi());
+            }
         }
     }
 }

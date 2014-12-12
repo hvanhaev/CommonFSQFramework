@@ -81,7 +81,9 @@ class DrawBalancePlots(DrawPlots):
 
     def applyScale(self, histoName, sampleName): # override
         if histoName.startswith("balance"): return False
-        return True
+        print "Fixme: scaling"
+        return False
+        #return True
 
     def setGlobalStyle(self):  # override
         MNTriggerStudies.MNTriggerAna.Style.setStyle()

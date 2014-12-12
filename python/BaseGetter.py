@@ -4,21 +4,20 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
 class Entry:
-    def __init__(self, chain, branchPrefix, variation, variationToNames, branchStore, index):
+    def __init__(self, chain, branchPrefix, variation, branchStore, index):
         self.chain = chain
         self.branchPrefix = branchPrefix
         self.variation = variation
-        self.variationToNames = variationToNames
         self.index = index
         self.branchStore = branchStore
+        self.cache = {}
 
     # TODO: add "_" as a separator
     def __getattr__(self, name):
-        if self.variation in self.variationToNames and name in self.variationToNames[self.variation]:
-            branchName = self.branchPrefix + name + self.variation
-        else:
-            branchName = self.branchPrefix + name # use central value, variable not affected by variation
+        if name in self.cache:
+            return self.cache[name]
 
+        branchName = self.branchPrefix + name + self.variation
         # we could do following, instead of using self.variationToNames:
         #if not hasattr(self.chain, branchName): # what is cost of this call??
         #    branchName = self.branchPrefix + name 
@@ -26,7 +25,10 @@ class Entry:
         if branchName  not in self.branchStore:
             self.branchStore[branchName] = getattr(self.chain, branchName)
 
-        return self.branchStore[branchName].at(self.index)
+        #return self.branchStore[branchName].at(self.index)
+        ret = self.branchStore[branchName].at(self.index)
+        self.cache[name] = ret
+        return ret
         #return getattr(self.chain, branchName).at(self.index)
 
     # FIXME: entries from two different events can be equal
@@ -48,7 +50,6 @@ class BaseGetter:
     def __init__(self, branchPrefix):
         self.branchPrefix = branchPrefix
         self.knownVariations = set()
-        self.variationToNames = {}
 
     def newEvent(self, chain):
         self.branchStore = {}
@@ -71,5 +72,5 @@ class BaseGetter:
         index = 0
         size = self.getSize() # XXX
         while index < size:
-            yield Entry(self.chain, self.branchPrefix, variation, self.variationToNames, self.branchStore, index)
+            yield Entry(self.chain, self.branchPrefix, variation, self.branchStore, index)
             index += 1

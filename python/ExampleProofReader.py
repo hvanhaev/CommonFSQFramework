@@ -275,7 +275,7 @@ class ExampleProofReader( ROOT.TPySelector ):
     @classmethod
     def runAll(cls, treeName, outFile, sampleList = None, \
                 maxFilesMC=None, maxFilesData=None, \
-                slaveParameters = None, nWorkers=None):
+                slaveParameters = None, nWorkers=None, usePickle=False):
 
 
         if slaveParameters == None: # When default param is used reset contents on every call to runAll
@@ -283,7 +283,7 @@ class ExampleProofReader( ROOT.TPySelector ):
 
         cwd = os.getcwd()+"/"
         treeFilesAndNormalizations = getTreeFilesAndNormalizations(maxFilesMC=maxFilesMC, 
-                                maxFilesData=maxFilesData, samplesToProcess=sampleList)
+                                maxFilesData=maxFilesData, samplesToProcess=sampleList, usePickle=usePickle)
 
         if sampleList == None:
             todo = treeFilesAndNormalizations.keys() # run them all

@@ -46,8 +46,10 @@ def name(ds):
     if len(split) == 0: return None
 
     if isData(ds):
+        #ret = split[1] + "-" + split[2]+"-V16TFPartV2"
         ret = split[1] + "-" + split[2]
     else:
+        #ret = split[1]+"-V16TFPartV2"
         ret = split[1]
     return ret
 
@@ -114,6 +116,9 @@ def XS(ds):
     s = {}
 
     s["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"] = 2.213E10
+    s["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"] = 16953200000.  # 30% difference wrt pythia. Note different pt Range!
+
+
 
 
     dsName = name(ds)

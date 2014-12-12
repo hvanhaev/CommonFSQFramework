@@ -85,12 +85,18 @@ for s in sampleListTodo:
   # note, there was a limit of ~2000 jobs per task (one could
   # submit more than 2000, but job status check resulted in crash
   if int(sampleList[s]["crabJobs"]) >= 500:
-    i=1
-    step = 400
-    while i<int(sampleList[s]["crabJobs"]):
-        range=str(i)+","+str(i+step)
-        command+="crab -submit " + range + " -c " + name
-        i+=step
+    # XXX TODO       
+    command.replace("-submit", " ")
+    print "#"*40
+    print "Note: submission of more then 500 jobs is currently not supported. Jobs will be created, please submit manually"
+    print "#"*40
+    os.system(command)
+    #i=1
+    #step = 400
+    #while i<int(sampleList[s]["crabJobs"]):
+    #    range=str(i)+","+str(i+step)
+    #    command+="crab -submit " + range + " -c " + name
+    #    i+=step
   else:
       #print command
       #sys.exit()

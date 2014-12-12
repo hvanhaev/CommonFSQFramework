@@ -39,7 +39,7 @@ class JetView: public EventViewBase{
       edm::InputTag m_caloBaseID;
       bool m_disableJetID;
 
-
+      int m_storageVersion; // 0 - use p4; 1 - use floats for pt, eta, phi
 
 
 };

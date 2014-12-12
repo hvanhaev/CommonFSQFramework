@@ -23,6 +23,9 @@ void EventIdData::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& 
     setI("lumi", iEvent.eventAuxiliary().luminosityBlock());
     setI("event", iEvent.eventAuxiliary().event());
 
+    if (iEvent.isRealData()) return;
+
+    // MC only stuff below
     edm::Handle<GenEventInfoProduct> hGW; 
     iEvent.getByLabel(edm::InputTag("generator"), hGW);
     setF("genWeight", hGW->weight());

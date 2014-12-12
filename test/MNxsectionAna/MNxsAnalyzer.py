@@ -7,6 +7,9 @@ sys.path.append(os.path.dirname(__file__))
 import ROOT
 ROOT.gROOT.SetBatch(True)
 ROOT.gSystem.Load("libFWCoreFWLite.so")
+
+ROOT.gSystem.Load("libRooUnfold.so")
+
 ROOT.AutoLibraryLoader.enable()
 from ROOT import edm, JetCorrectionUncertainty
 
@@ -18,14 +21,16 @@ import cProfile
 
 # you have to run this file from directory where it is saved
 
-
 import MNTriggerStudies.MNTriggerAna.ExampleProofReader
-from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
+from  MNTriggerStudies.MNTriggerAna.BetterJetGetter import BetterJetGetter
 
 #import DiJetBalancePlugin
 
 class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
     def init( self):
+
+        self.normFactor = self.getNormalizationFactor()
+
 
         #sys.stdout = sys.stderr
         #self.pr = cProfile.Profile()
@@ -33,8 +38,8 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
 
         self.todoShifts = ["_central"]
         if not self.isData and self.doPtShiftsJEC:
-            self.todoShifts.append("_ptUp")
-            self.todoShifts.append("_ptDown")
+            self.todoShifts.append("_jecUp")
+            self.todoShifts.append("_jecDown")
 
         if not self.isData and self.doPtShiftsJER:
             self.todoShifts.append("_jerUp")
@@ -43,6 +48,8 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
         self.hist = {}
         todoTrg = ["_jet15", "_dj15fb"]
 
+        binningDeta = (20, 0, 9.4)
+
         for shift in self.todoShifts:
             for trg in todoTrg:
                 t = shift+trg
@@ -50,13 +57,21 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                 self.hist["ptSublead"+t] =  ROOT.TH1F("ptSublead"+t,   "ptSublead"+t,  100, 0, 100)
                 self.hist["etaLead"+t] =  ROOT.TH1F("etaLead"+t,   "etaLead"+t,  100, -5, 5)
                 self.hist["etaSublead"+t] =  ROOT.TH1F("etaSublead"+t,   "etaSublead"+t,  100, -5, 5)
-                self.hist["xsVsDeltaEta"+t] =  ROOT.TH1F("xs"+t,   "xs"+t,  100, 0, 9.4)
+                self.hist["xsVsDeltaEta"+t] =  ROOT.TH1F("xs"+t,   "xs"+t, binningDeta[0], binningDeta[1], binningDeta[2])
                 self.hist["vtx"+t] =  ROOT.TH1F("vtx"+t,   "vtx"+t,  10, -0.5, 9.5)
+                self.hist["response"+t]= ROOT.RooUnfoldResponse(binningDeta[0], binningDeta[1], binningDeta[2], "response"+t,"response"+t)
+
+
+        self.hist["evcnt"] =  ROOT.TH1F("evcnt_central_jet15", "evcnt_central_jet15",  1, -0.5, 0.5)
+        self.hist["detaGen"] =  ROOT.TH1F("detaGen_central_jet15", "detaGen_central_jet15",  binningDeta[0], binningDeta[1], binningDeta[2])
+        self.hist["detaGenVsRec"] =  ROOT.TH2F("detaGenVsRec_central_jet15", "detaGenVsRec_central_jet15",\
+                                               binningDeta[0]*20, binningDeta[1], binningDeta[2],\
+                                               binningDeta[0]*20, binningDeta[1], binningDeta[2])
 
         for h in self.hist:
-            self.hist[h].Sumw2()
+            if not h.startswith("response"):
+                self.hist[h].Sumw2()
             self.GetOutputList().Add(self.hist[h])
-
 
         puFiles = {}
         # MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/
@@ -78,36 +93,41 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
         self.lumiWeighters["_dj15fb_puUp"] = edm.LumiReWeighting(jet15FileV2, puFiles["dj15_1_05"], "MC", "pileup")
         self.lumiWeighters["_dj15fb_puDown"] = edm.LumiReWeighting(jet15FileV2, puFiles["dj15_0_95"], "MC", "pileup")
 
-        self.jetGetter = JetGetter("PF")
-        if hasattr(self, "jetUncFile"):
-            self.jetGetter.setJecUncertainty(self.jetUncFile)
+        #self.jetGetter = JetGetter("PF")
+        #if hasattr(self, "jetUncFile"):
+        #    self.jetGetter.setJecUncertainty(self.jetUncFile)
 
-    '''
-    # stuff for code profiling
+        self.jetGetter = BetterJetGetter("PFAK5") 
+
+
     def analyze(self):
-        self.pr.enable()
-        self.analyzeTT()
-        self.pr.disable()
-
-
-    def SlaveTerminate( self ):
-        print 'py: slave terminating AAZAZ'
-        dname = "/scratch/scratch0/tfruboes/2014.05.NewFWAnd4_2/CMSSW_4_2_8_patch7/src/MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/stats/"
-        profName = dname + "stats"
-        self.pr.dump_stats(profName)
-    # '''
-        
-
-
-    #def analyzeTT(self):
-    def analyze(self):
+        self.hist["evcnt"].Fill(0)
         if self.fChain.ngoodVTX == 0: return
         self.jetGetter.newEvent(self.fChain)
-        for shift in self.todoShifts:
-            weightBase = 1. 
-            if not self.isData:
-                weightBase *= self.fChain.genWeight # keep inside shift iter
+        weightBase = 1. 
+        if not self.isData:
+            weightBase *= self.fChain.genWeight*self.normFactor 
 
+        # fill the roounfoldresponse
+        if not self.isData:
+            genDEta = None
+            genTopology = None
+            etas = []
+            for j in self.fChain.genJets:
+                if j.pt() < self.threshold: continue
+                eta = j.eta()
+                if abs(j.eta())>4.7: continue
+                etas.append(eta)
+            if len(etas)>1:
+                fwd = max(etas)
+                bkw = min(etas)
+                genTopology = "CF"
+                if fwd > 3 and bkw < -3:
+                    genTopology = "FB"
+                genDEta = fwd - bkw
+                self.hist["detaGen"].Fill(genDEta, weightBase) # basic gen level distribution shouldnt be PU dependent
+
+        for shift in self.todoShifts:
             # find best dijet pair
             mostFwdJet = None
             mostBkgJet = None
@@ -115,8 +135,10 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
             mostBkgJetEta = None
             mostFwdJetPt = None
             mostBkgJetPt = None
+
             for jet in self.jetGetter.get(shift):
                 #if jetID.at(i) < 0.5: continue
+                if not jet.jetid(): continue
                 eta =  jet.eta()
                 if abs(eta) > 4.7: continue
 
@@ -136,14 +158,22 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
             if mostFwdJet != None and mostBkgJet != mostFwdJet:
                 pairFound = True
 
-            # A dijet pair was found. Check trigger for data, calculate weight for MC
+
+            isMiss = True # mark if dijet pair was not found (needed to correctly fill response)
+            # A dijet pair was found. Check trigger for data
             # fill histograms
             if pairFound:
                 deta = abs(mostFwdJetEta - mostBkgJetEta)
+                if not self.isData and genDEta:
+                    if shift == "_central":
+                        self.hist["detaGenVsRec"].Fill(genDEta, deta, weightBase)
+                # detaGenVsRec
+
                 triggerToUse = "_jet15"
                 if abs(mostFwdJetEta) > 3 and abs(mostBkgJetEta) > 3 and mostFwdJetEta*mostBkgJetEta<0:
                     triggerToUse = "_dj15fb"
 
+                # TODO: we need to separate gen level categories!!
                 gotTrigger = True
                 if self.isData: # check trigger
                     if triggerToUse == "_jet15":
@@ -154,6 +184,7 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                         raise Exception("Trigger not known??? "+triggerToUse)
 
                 if gotTrigger:
+                    # calculate weight for MC
                     weight = weightBase
                     if not self.isData:
                         truePU = self.fChain.puTrueNumInteractions
@@ -162,6 +193,13 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
 
                     histoName = shift +triggerToUse
                     self.hist["xsVsDeltaEta"+histoName].Fill(deta, weight)
+                    if not self.isData:
+                        isMiss = False
+                        isCorrectTopo = (triggerToUse == "_jet15") and genTopology == "CF" or (triggerToUse == "_dj15fb") and genTopology == "FB"
+                        if genDEta == None or not isCorrectTopo:    # fake pair, e.g. from bkg or we landed in a wrong category
+                            self.hist["response"+histoName].Fake(deta, weight)
+                        else:
+                            self.hist["response"+histoName].Fill(deta, genDEta, weight)
 
                     # fill also some control plots
                     leadJet = mostBkgJet
@@ -182,12 +220,22 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                     self.hist["etaLead"+histoName].Fill(etaLead, weight)
                     self.hist["etaSublead"+histoName].Fill(etaSublead, weight)
 
+            if not self.isData and genDEta and isMiss:
+                if genTopology == "CF":
+                    triggerToUse = "_jet15"
+                else:
+                    triggerToUse = "_dj15fb"
+                histoName = shift +triggerToUse
+                weight = weightBase
+                if not self.isData:
+                    truePU = self.fChain.puTrueNumInteractions
+                    puWeight =  self.lumiWeighters[triggerToUse+"_central"].weight(truePU)
+
+                #print "Miss", triggerToUse, genDEta, shift
+                self.hist["response"+histoName].Miss(genDEta, weight)
+
     def finalize(self):
         print "Finalize:"
-        normFactor = self.getNormalizationFactor()
-        print "  applying norm", normFactor
-        for h in self.hist:
-            self.hist[h].Scale(normFactor)
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
@@ -195,20 +243,24 @@ if __name__ == "__main__":
     sampleList = None
     maxFilesMC = None
     maxFilesData = None
-    nWorkers = None # Use all
+    nWorkers = 15 
 
     # debug config:
-    '''
-    sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
-    #sampleList=  ["JetMETTau-Run2010A-Apr21ReReco-v1"]
-    #sampleList=  ["Jet-Run2010B-Apr21ReReco-v1"] 
-    #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
-    #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
-    maxFilesMC = 1
-    maxFilesData = 2
-    #maxFilesMC = 12
-    nWorkers = 1
+    #'''
+    sampleList = []
+    #sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
+    sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
+    #'''
+    sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
+    sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
+    sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
+    sampleList.append("METFwd-Run2010B-Apr21ReReco-v1")
     # '''
+    # '''
+    #maxFilesMC = 48
+    #maxFilesMC = 1
+    #maxFilesData = 1
+    #nWorkers = 1
     #maxFilesMC = 16
     #nWorkers = 12
 
@@ -222,10 +274,6 @@ if __name__ == "__main__":
 
     #slaveParams["jetID"] = "pfJets_jetID" # TODO
 
-    #jetUncFile = "START42_V11_AK5PF_Uncertainty.txt"
-    jetUncFile = "START41_V0_AK5PF_Uncertainty.txt"
-
-    slaveParams["jetUncFile"] =  edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"+jetUncFile).fullPath()
 
     MNxsAnalyzer.runAll(treeName="mnXS",
                                slaveParameters=slaveParams,
@@ -233,7 +281,11 @@ if __name__ == "__main__":
                                maxFilesMC = maxFilesMC,
                                maxFilesData = maxFilesData,
                                nWorkers=nWorkers,
+                               usePickle = True,
                                outFile = "plotsMNxs.root" )
 
+    print "TODO: fakes prob vs eta"
+    print "TODO: xcheck XXX seen"
+    print "TODO: tree files merging for pythia sample"
 
 
