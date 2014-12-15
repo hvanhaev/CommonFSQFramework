@@ -292,10 +292,10 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
     return ret
 
 if __name__ == "__main__":
-    #getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, usePickle=True)
+    getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, usePickle=True)
     #sam = getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, donotvalidate = True)
     #for s in sam:
     #    print s
-    getTreeFilesAndNormalizations(maxFilesMC = 10, maxFilesData = 10)
+    #getTreeFilesAndNormalizations(maxFilesMC = 10, maxFilesData = 10)
 
 

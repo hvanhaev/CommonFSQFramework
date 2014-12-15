@@ -63,8 +63,7 @@ class HLTMCWeighter:
         shortName2 = shortName
         if "_raw" in shortName:
             shortName2 = shortName2.replace("_raw","")
-            print "TODO - rawPT"
-            self.getter = BetterJetGetter("Calo")
+            self.getter = BetterJetGetter("CaloRaw")
         else:
             self.getter = BetterJetGetter("Calo")
 

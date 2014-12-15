@@ -54,9 +54,9 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
         print "Params:", self.etaMax, self.ptMin
 
         if not self.isData:
-            self.hltMCWeighter = HLTMCWeighter("HLT_Jet15U_raw")
-            #self.HLTMCWeighterJ15Raw = HLTMCWeighter("HLT_Jet15U_raw")
-            #self.HLTMCWeighterJ15L1Raw = HLTMCWeighter("HLT_Jet15U_L1Seeding_raw", weight=True)
+            #self.hltMCWeighter = HLTMCWeighter("HLT_Jet15U")
+            self.HLTMCWeighterJ15Raw = HLTMCWeighter("HLT_Jet15U_raw")
+            self.HLTMCWeighterJ15L1Raw = HLTMCWeighter("HLT_Jet15U_L1Seeding_raw")
             #self.HLTMCWeighterDJ15FBRaw = HLTMCWeighter("HLT_DoubleJet15U_ForwardBackward_raw")
             #self.HLTMCWeighterDJ15L1FBRaw = HLTMCWeighter("HLT_DoubleJet15U_ForwardBackward_L1Seeding_raw")
 
@@ -210,8 +210,11 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
 
         self.jetGetter.newEvent(self.fChain)
         if not self.isData:
-            self.hltMCWeighter.newEvent(self.fChain)
-            print "XXX",  self.hltMCWeighter.getWeight()
+            self.HLTMCWeighterJ15L1Raw.newEvent(self.fChain)
+            self.HLTMCWeighterJ15Raw.newEvent(self.fChain)
+            w1 = self.HLTMCWeighterJ15L1Raw.getWeight()
+            w2 = self.HLTMCWeighterJ15Raw.getWeight()
+            triggerEff = w1*w2
 
 
         weight = 1
@@ -221,6 +224,8 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
                 truePU = self.fChain.puTrueNumInteractions
                 puWeight =  self.lumiWeighters["_jet15_central"].weight(truePU)
                 weight *= puWeight
+                weight *= triggerEff
+
             
         self.var["weight"][0] = weight
 
@@ -323,9 +328,9 @@ if __name__ == "__main__":
     #'''
     sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
     #sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
-    #sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
-    #sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
-    #sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
+    sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
+    sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
+    sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
     #'''
     # '''
 
@@ -339,8 +344,8 @@ if __name__ == "__main__":
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
     #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
     #maxFilesData = 2
-    maxFilesMC = 1
-    nWorkers = 1
+    #maxFilesMC = 1
+    #nWorkers = 1
     #'''
 
     slaveParams = {}
