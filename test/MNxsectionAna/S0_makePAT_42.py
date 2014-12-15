@@ -496,6 +496,10 @@ process.schedule.extend([process.tfMuonsP,])
 #process.exampleTree = cms.EDAnalyzer("ExampleTreeProducer")
 process.mnXS = cms.EDAnalyzer("MNXSTreeProducer", 
     minGenPT = cms.double(25),
+    RawCaloJetsView = cms.PSet(
+        src = cms.VInputTag(cms.InputTag("ak5CaloJets")),
+        branchPrefix = cms.untracked.string("CaloRaw"),
+    ),
     JetViewPF  = cms.PSet(
         storeageVersion = cms.untracked.int32(1),
         disableJetID = cms.bool(False),

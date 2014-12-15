@@ -51,6 +51,7 @@
 #include "MNTriggerStudies/MNTriggerAna/interface/JetView.h"
 #include "MNTriggerStudies/MNTriggerAna/interface/EventIdData.h"
 #include "MNTriggerStudies/MNTriggerAna/interface/TriggerResultsView.h"
+#include "MNTriggerStudies/MNTriggerAna/interface/GenericCandidateView.h"
 
 //
 // class declaration
@@ -127,6 +128,7 @@ m_eventsSeen(0)
     m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPF"), m_tree));
     m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewCalo"), m_tree));
     m_views.push_back(new TriggerResultsView(iConfig.getParameter< edm::ParameterSet >("TriggerResultsView"), m_tree));
+    m_views.push_back(new GenericCandidateView(iConfig.getParameter< edm::ParameterSet >("RawCaloJetsView"), m_tree));
 
 
     m_todoTriggers["doubleJ15FB"] = std::vector<std::string>();
