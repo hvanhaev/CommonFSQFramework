@@ -142,8 +142,8 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
             #self.jetGetter = JetGetter("PFlegacy")
             self.jetGetter.disableGenJet()
 
-        #self.jetGetter = BetterJetGetter("PFAK5") 
-        self.jetGetter = BetterJetGetter("Calo") 
+        self.jetGetter = BetterJetGetter("PFAK5") 
+        #self.jetGetter = BetterJetGetter("Calo") 
 
         '''
         if self.isData:
@@ -326,11 +326,11 @@ if __name__ == "__main__":
 
     sampleList = []
     #'''
-    sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
-    #sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
-    sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
-    sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
-    sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
+    #sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
+    sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
+    #sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
+    #sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
+    #sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
     #'''
     # '''
 
