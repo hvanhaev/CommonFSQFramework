@@ -181,6 +181,27 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
     def genWeight(self):
         #print "ASDFASD", self.fChain.genWeight
         return self.fChain.genWeight*self.normFactor
+    
+    def weight(self):
+        if self.weightCache != None:
+            return self.weightCache
+        if not self.isData:
+            weight = self.genWeight()
+            if not self.HLT2015TempWorkaround:
+                truePU = self.fChain.puTrueNumInteractions
+                puWeight =  self.lumiWeighters["_jet15_central"].weight(truePU)
+                weight *= puWeight
+                w1 = self.HLTMCWeighterJ15L1Raw.getWeight()
+                w2 = self.HLTMCWeighterJ15Raw.getWeight()
+                triggerEff = w1*w2
+                weight *= triggerEff
+        else:
+            weight = 1
+
+        self.weightCache = weight
+        return weight
+
+
 
     '''
     # stuff for code profiling
@@ -191,6 +212,7 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
     def analyzeTT(self):
         '''
     def analyze(self):
+        self.weightCache = None
         self.histos["evcnt"].Fill(0)
         # '''
         if not self.HLT2015TempWorkaround:
@@ -212,22 +234,11 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
         if not self.isData:
             self.HLTMCWeighterJ15L1Raw.newEvent(self.fChain)
             self.HLTMCWeighterJ15Raw.newEvent(self.fChain)
-            w1 = self.HLTMCWeighterJ15L1Raw.getWeight()
-            w2 = self.HLTMCWeighterJ15Raw.getWeight()
-            triggerEff = w1*w2
 
 
-        weight = 1
-        if not self.isData:
-            weight = self.genWeight()
-            if not self.isData and not self.HLT2015TempWorkaround:
-                truePU = self.fChain.puTrueNumInteractions
-                puWeight =  self.lumiWeighters["_jet15_central"].weight(truePU)
-                weight *= puWeight
-                weight *= triggerEff
+        # xxxwei
 
             
-        self.var["weight"][0] = weight
 
         fill = False
         for shift in self.todoShifts:
@@ -285,6 +296,7 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
 
 
                 #print "Hist fill", weight
+                weight = self.weight()
                 self.histos["ptProbe"+shift].Fill(probePT, weight)
                 self.histos["ptTag"+shift].Fill(tagPT, weight)
                 self.histos["etaProbe"+shift].Fill(probeEta, weight)
@@ -294,6 +306,7 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
    
         # at least one variation ok.
         if fill:
+            self.var["weight"][0] = self.weight()
             self.fill()
 
         self.resetExternals()
@@ -321,7 +334,7 @@ if __name__ == "__main__":
     sampleList = None
     maxFilesMC = None
     maxFilesData = None
-    nWorkers = 12
+    nWorkers = 10
     treeName = "mnXS"
 
     sampleList = []

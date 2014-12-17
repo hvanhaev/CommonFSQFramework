@@ -189,6 +189,7 @@ class HLTMCWeighter:
         return self.efficiencyHisto.GetBinContent(binx,biny)
 
     def newEvent(self, ev):
+        self.cached = None
         self.ev = ev
         self.getter.newEvent(self.ev)
 
@@ -196,6 +197,11 @@ class HLTMCWeighter:
     # etaHalf = + - positive
     # etaHalf = - - negative
     def getWeight(self, etaHalf=0):
+        # in case of etaHalf!=0 execute normally
+        # result will be cached in etaHalf==0 case
+        if etaHalf==0 and self.cached != None:
+            return self.cached
+
         jets = self.getter.get("_central")
         plus = 0
         minus = 0
@@ -248,7 +254,10 @@ class HLTMCWeighter:
             if printD: print " --> factor:", trgFactor
 
         #print 1.- trgFactor
-        return 1. - trgFactor
+        
+        ret = 1. - trgFactor
+        self.cached = ret
+        return ret
 
 
     def dumpEfficiencyHisto(self, name=""):
