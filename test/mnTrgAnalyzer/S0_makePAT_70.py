@@ -136,6 +136,8 @@ import MNTriggerStudies.MNTriggerAna.customizePAT
 process = MNTriggerStudies.MNTriggerAna.customizePAT.customize(process)
 
 
+
+print "FIXME: please use definition from ../../python/MNTrgAnalyzer.py"
 stage1extralabel = "hltL1extraParticles"
 #stage1extralabel = "l1ExtraReEmul"
 
