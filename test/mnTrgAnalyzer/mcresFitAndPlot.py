@@ -246,13 +246,15 @@ def main():
     #etaRanges.extend([1.401, 1.701, 2.001, 2.322, 2.411, 2.601, 2.801, 3.001, 3.201, 3.501, 3.801, 4.101, 4.701])
     #etaRanges.extend([2.801, 3.001, 3.201, 3.501, 3.801, 4.101, 4.401, 4.701, 5.001])
     #etaRanges.extend([4.101, 4.701])
-    minPt = 60
-    maxPt = 70
+    #minPt = 60
+    #maxPt = 70
     #maxPt = 100
     #minPt = 20
     #maxPt = 30
     #minPt = 30
     #maxPt = 40
+    minPt = 20
+    maxPt = 25
 
     curPath = ROOT.gDirectory.GetPath()
     of = ROOT.TFile(odir+"mcresHistos.root","RECREATE")

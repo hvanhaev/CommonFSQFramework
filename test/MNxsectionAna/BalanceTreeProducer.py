@@ -142,7 +142,7 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
             #self.jetGetter = JetGetter("PFlegacy")
             self.jetGetter.disableGenJet()
 
-        self.jetGetter = BetterJetGetter("PFAK5") 
+        #self.jetGetter = BetterJetGetter("PFAK5") 
         #self.jetGetter = BetterJetGetter("Calo") 
 
         '''
@@ -301,7 +301,7 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
                 self.histos["ptTag"+shift].Fill(tagPT, weight)
                 self.histos["etaProbe"+shift].Fill(probeEta, weight)
                 self.histos["etaTag"+shift].Fill(tagEta, weight)
-                self.histos["nvtx"+shift].Fill(self.fChain.ngoodVTX, weight)
+                #self.histos["nvtx"+shift].Fill(self.fChain.ngoodVTX, weight)
 
    
         # at least one variation ok.

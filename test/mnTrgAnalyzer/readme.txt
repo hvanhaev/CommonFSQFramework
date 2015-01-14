@@ -12,3 +12,9 @@ Workflows:
 ./drawMNTrgEfficiencyPlots.py
 
 
+3. JEC tests
+
+./MCResolutionTreeProducer.py
+ ./mcresFitAndPlot.py -o ~/tmp/xxx/
+
+

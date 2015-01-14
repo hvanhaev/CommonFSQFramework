@@ -8,7 +8,7 @@ import ROOT
 ROOT.gROOT.SetBatch(True)
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 
-ROOT.gSystem.Load("libRooUnfold.so")
+#ROOT.gSystem.Load("libRooUnfold.so")
 
 ROOT.AutoLibraryLoader.enable()
 from ROOT import edm, JetCorrectionUncertainty
@@ -59,7 +59,8 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                 self.hist["etaSublead"+t] =  ROOT.TH1F("etaSublead"+t,   "etaSublead"+t,  100, -5, 5)
                 self.hist["xsVsDeltaEta"+t] =  ROOT.TH1F("xs"+t,   "xs"+t, binningDeta[0], binningDeta[1], binningDeta[2])
                 self.hist["vtx"+t] =  ROOT.TH1F("vtx"+t,   "vtx"+t,  10, -0.5, 9.5)
-                self.hist["response"+t]= ROOT.RooUnfoldResponse(binningDeta[0], binningDeta[1], binningDeta[2], "response"+t,"response"+t)
+                if self.unfoldEnabled:
+                    self.hist["response"+t]= ROOT.RooUnfoldResponse(binningDeta[0], binningDeta[1], binningDeta[2], "response"+t,"response"+t)
 
 
         self.hist["evcnt"] =  ROOT.TH1F("evcnt_central_jet15", "evcnt_central_jet15",  1, -0.5, 0.5)
@@ -197,9 +198,11 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                         isMiss = False
                         isCorrectTopo = (triggerToUse == "_jet15") and genTopology == "CF" or (triggerToUse == "_dj15fb") and genTopology == "FB"
                         if genDEta == None or not isCorrectTopo:    # fake pair, e.g. from bkg or we landed in a wrong category
-                            self.hist["response"+histoName].Fake(deta, weight)
+                            if self.unfoldEnabled:
+                                self.hist["response"+histoName].Fake(deta, weight)
                         else:
-                            self.hist["response"+histoName].Fill(deta, genDEta, weight)
+                            if self.unfoldEnabled:
+                                self.hist["response"+histoName].Fill(deta, genDEta, weight)
 
                     # fill also some control plots
                     leadJet = mostBkgJet
@@ -232,7 +235,8 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                     puWeight =  self.lumiWeighters[triggerToUse+"_central"].weight(truePU)
 
                 #print "Miss", triggerToUse, genDEta, shift
-                self.hist["response"+histoName].Miss(genDEta, weight)
+                if self.unfoldEnabled:
+                    self.hist["response"+histoName].Miss(genDEta, weight)
 
     def finalize(self):
         print "Finalize:"
@@ -243,7 +247,7 @@ if __name__ == "__main__":
     sampleList = None
     maxFilesMC = None
     maxFilesData = None
-    nWorkers = 15 
+    nWorkers = 12
 
     # debug config:
     #'''
@@ -273,6 +277,8 @@ if __name__ == "__main__":
     slaveParams["doPtShiftsJER"] = True
 
     #slaveParams["jetID"] = "pfJets_jetID" # TODO
+
+    slaveParams["unfoldEnabled"] = False
 
 
     MNxsAnalyzer.runAll(treeName="mnXS",
