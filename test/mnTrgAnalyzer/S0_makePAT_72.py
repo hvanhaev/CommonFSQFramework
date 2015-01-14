@@ -122,11 +122,20 @@ process = MNTriggerStudies.MNTriggerAna.customizePAT.customize(process)
 import MNTriggerStudies.MNTriggerAna.MNTrgAnalyzer
 process = MNTriggerStudies.MNTriggerAna.MNTrgAnalyzer.addTreeProducer(process, triggerResults=triggerProcess, disable = ["hlt", "l1"])
 
+for p in process.MNTriggerAnaNew.__dict__:
+    if hasattr(getattr(process.MNTriggerAnaNew, p), "variations"):
+        getattr(process.MNTriggerAnaNew, p).variations = cms.vstring("")
+
+
+
+
 process = MNTriggerStudies.MNTriggerAna.customizePAT.removeEdmOutput(process)
-process.GlobalTag.globaltag = "PHYS14_25_V3::All"
+process.GlobalTag.globaltag = "PHYS14_25_V2::All"
 
 # /QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/Phys14DR-PU20bx25_trkalmb_PHYS14_25_V1-v1/AODSIM
 prefix='root://xrootd.ba.infn.it/'
 infile=prefix+"/store/mc/Phys14DR/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/AODSIM/PU20bx25_trkalmb_PHYS14_25_V1-v1/00000/E6056E6A-AD6B-E411-889A-002590747E1A.root"
+
+#print infile
 
 process.source.fileNames =  cms.untracked.vstring([infile])

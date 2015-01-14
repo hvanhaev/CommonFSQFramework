@@ -135,14 +135,17 @@ void JetView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSet
     iEvent.getByLabel(m_inputCol, hJets);
 
     if (m_jecUnc == 0 && hJets->size()>0 ) { // couldnt find better place..
-        edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
-        std::string payload("AK5PF");
-        if (hJets->at(0).isCaloJet()) {
-            payload == "AK5Calo";
+        // Q&D. Proper solution - check if jec up/down are inside
+        if (m_variations.size()>1){
+            edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
+            std::string payload("AK5PF");
+            if (hJets->at(0).isCaloJet()) {
+                payload == "AK5Calo";
+            }
+            iSetup.get<JetCorrectionsRecord>().get(payload,JetCorParColl); 
+            JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
+            m_jecUnc = new JetCorrectionUncertainty(JetCorPar);
         }
-        iSetup.get<JetCorrectionsRecord>().get(payload,JetCorParColl); 
-        JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
-        m_jecUnc = new JetCorrectionUncertainty(JetCorPar);
     }
 
 
