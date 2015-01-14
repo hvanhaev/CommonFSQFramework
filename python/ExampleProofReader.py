@@ -348,10 +348,18 @@ class ExampleProofReader( ROOT.TPySelector ):
             ROOT.gSystem.Setenv(cls.encodeEnvString("VariablesToFetch"), variablesToFetch)
             variablesToSetInProof[cls.encodeEnvString("VariablesToFetch")] = variablesToFetch
 
-            if nWorkers == None:
-                proof = ROOT.TProof.Open('')
+            proofConnectionString = None
+            if "proofConnectionString" in os.environ:
+                proofConnectionString = os.environ["proofConnectionString"]
+                print "Found proof environment. Will try to connect to", proofConnectionString
+
+            if not proofConnectionString:
+                if nWorkers == None:
+                    proof = ROOT.TProof.Open('')
+                else:
+                    proof = ROOT.TProof.Open('workers='+str(nWorkers))
             else:
-                proof = ROOT.TProof.Open('workers='+str(nWorkers))
+                proof = ROOT.TProof.Open(proofConnectionString)
 
             
             proof.Exec( 'gSystem->Setenv("PYTHONPATH",gSystem->Getenv("PATH2"));') # for some reason cannot use method below for python path
