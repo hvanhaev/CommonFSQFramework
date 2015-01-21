@@ -13,9 +13,18 @@ export SmallXAnaVersion=MNTriggerStudies.MNTriggerAna.samples.Samples_DiJet_2014
 ./mnDraw.py -i plotsMNxs.root -o ~/tmp/MNXS_detectorLevel/
 
 
-4. Unfolded plots
+4. Create unfolded plots:
 
 ./unfoldMN.py
 
-(currently writes rootfile in tmp)
+Writes some rootfiles in tmp, e.g.:
+    mnxsHistos_unfolded_herwigOnData.root
+    mnxsHistos_unfolded_pythiaOnData.root
+    mnxsHistos_unfolded_herwigOnPythia.root
+    mnxsHistos_unfolded_pythiaOnHerwig.root
+
+Part of them are MConMC tests
+
+the png files of MConMC are also save in ~/tmp
+
 
