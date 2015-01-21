@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-
-
 import sys, os, time
 sys.path.append(os.path.dirname(__file__))
 
@@ -8,7 +6,7 @@ import ROOT
 ROOT.gROOT.SetBatch(True)
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 
-#ROOT.gSystem.Load("libRooUnfold.so")
+ROOT.gSystem.Load("libRooUnfold.so")
 
 ROOT.AutoLibraryLoader.enable()
 from ROOT import edm, JetCorrectionUncertainty
@@ -64,7 +62,12 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
 
 
         self.hist["evcnt"] =  ROOT.TH1F("evcnt_central_jet15", "evcnt_central_jet15",  1, -0.5, 0.5)
-        self.hist["detaGen"] =  ROOT.TH1F("detaGen_central_jet15", "detaGen_central_jet15",  binningDeta[0], binningDeta[1], binningDeta[2])
+        self.hist["detaGen"] =  ROOT.TH1F("detaGen_central_sum", "detaGen_central_sum",  binningDeta[0], binningDeta[1], binningDeta[2])
+
+        # in principle trigger does not applies to gen plots. We keep consistent naming though, so the unfolded result to gen level plots is possible
+        # in each category
+        self.hist["detaGen_jet15"] =  ROOT.TH1F("detaGen_central_jet15", "detaGen_central_jet15",  binningDeta[0], binningDeta[1], binningDeta[2])
+        self.hist["detaGen_dj15fb"] =  ROOT.TH1F("detaGen_central_dj15fb", "detaGen_central_dj15fb",  binningDeta[0], binningDeta[1], binningDeta[2])
         self.hist["detaGenVsRec"] =  ROOT.TH2F("detaGenVsRec_central_jet15", "detaGenVsRec_central_jet15",\
                                                binningDeta[0]*20, binningDeta[1], binningDeta[2],\
                                                binningDeta[0]*20, binningDeta[1], binningDeta[2])
@@ -127,6 +130,11 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                     genTopology = "FB"
                 genDEta = fwd - bkw
                 self.hist["detaGen"].Fill(genDEta, weightBase) # basic gen level distribution shouldnt be PU dependent
+                if genTopology == "FB":
+                    self.hist["detaGen_dj15fb"].Fill(genDEta, weightBase) # basic gen level distribution shouldnt be PU dependent
+                else:
+                    self.hist["detaGen_jet15"].Fill(genDEta, weightBase) # basic gen level distribution shouldnt be PU dependent
+
 
         for shift in self.todoShifts:
             # find best dijet pair
@@ -252,21 +260,21 @@ if __name__ == "__main__":
     # debug config:
     #'''
     sampleList = []
-    #sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
+    sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
     sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
-    #'''
     sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
+    #'''
     sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
     sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
     sampleList.append("METFwd-Run2010B-Apr21ReReco-v1")
     # '''
     # '''
     #maxFilesMC = 48
-    #maxFilesMC = 1
+    #maxFilesMC = 30
     #maxFilesData = 1
     #nWorkers = 1
     #maxFilesMC = 16
-    #nWorkers = 12
+    nWorkers = 15
 
     slaveParams = {}
     slaveParams["threshold"] = 35.
@@ -278,7 +286,7 @@ if __name__ == "__main__":
 
     #slaveParams["jetID"] = "pfJets_jetID" # TODO
 
-    slaveParams["unfoldEnabled"] = False
+    slaveParams["unfoldEnabled"] = True
 
 
     MNxsAnalyzer.runAll(treeName="mnXS",
