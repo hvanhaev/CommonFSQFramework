@@ -56,7 +56,7 @@ def getHistos(infile):
     return finalMap
 
 def getPossibleActions():
-    return set(["pythiaOnData", "herwigOnData", "pythiaOnHerwig", "herwigOnPythia"])
+    return set(["pythiaOnData", "herwigOnData", "pythiaOnHerwig", "herwigOnPythia", "herwigOnHerwig", "pythiaOnPythia"])
 
 def unfold(action):
     possibleActions = getPossibleActions()
@@ -79,7 +79,14 @@ def unfold(action):
         categories["_dj15fb"] = ["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]
     elif action ==  "herwigOnPythia":
         baseMC = "QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"
-        "QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"
+        categories["_jet15"] = ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
+        categories["_dj15fb"] = ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
+    elif action ==  "herwigOnHerwig":
+        baseMC = "QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"
+        categories["_jet15"] = ["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]
+        categories["_dj15fb"] = ["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]
+    elif action ==  "pythiaOnPythia":
+        baseMC = "QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"
         categories["_jet15"] = ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
         categories["_dj15fb"] = ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
 
@@ -137,11 +144,52 @@ def unfold(action):
     # centralResponsesFromPythia =  filter(lambda x: x.startswith("response_"), histos["QCD_Pt-15to1000_XXX_pythiap"].keys())
     # rename central to pythia, add to responsesVariations
 
+def compareMCGentoMCUnfolded(action):
+    if action == "herwigOnPythia" or action == "pythiaOnPythia":
+        unfoldingWasDoneOn = "QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"
+    elif action == "pythiaOnHerwig" or action == "herwigOnHerwig":
+        unfoldingWasDoneOn = "QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"
+    else:
+        print "compareMCGentoMCUnfolded: wrong action", action, "skipping (usually you can ignore this message)"
+        return
+
+    # detaGen_central_jet15
+    fileWithUnfoldedPlotsName = "~/tmp/mnxsHistos_unfolded_"+action +".root"
+    fileWithUnfoldedPlots = ROOT.TFile(fileWithUnfoldedPlotsName)
+
+
+    #mnxsHistos_unfolded_pythiaOnHerwig.root
+    histos = getHistos("plotsMNxs.root")
+    #print histos[unfoldingWasDoneOn].keys()
+    todo = ["_jet15", "_dj15fb"]
+
+    c = ROOT.TCanvas()
+    for t in todo:
+        genHisto = histos[unfoldingWasDoneOn]["detaGen_central"+t]
+        unfoldedHistoName = t+"/xsunfolded_central"+t
+        unfoldedHisto = fileWithUnfoldedPlots.Get(unfoldedHistoName)
+        #print unfoldedHistoName, type(unfoldedHisto), unfoldedHisto.ClassName()
+        genHisto.Draw()
+        genHisto.SetMarkerColor(2)
+        genHisto.SetLineColor(2)
+        unfoldedHisto.Draw("SAME")
+        trueMax = max(genHisto.GetMaximum(), unfoldedHisto.GetMaximum())
+        genHisto.SetMaximum(trueMax*1.07)
+
+        c.Print("~/tmp/MConMCunfoldingTest_"+action+t+".png")
+
+
+
+
+
+
+
 
 def main():
     possibleActions = getPossibleActions()
     for action in possibleActions:
         unfold(action)
+        compareMCGentoMCUnfolded(action)
 
 
 if __name__ == "__main__":
