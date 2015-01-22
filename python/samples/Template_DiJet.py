@@ -30,7 +30,8 @@ MyVariablesAllEvents="DiJetAnalysis.DiJetAna.ana.BaseVariables"
 '''
 # /scratch/scratch0/tfruboes/2013.05.DiJetNewGit/CMSSW_4_2_8_patch7/src/DiJetAnalysis/DiJetAna/python/samples
 #dsFile="MNTriggerStudies/MNTriggerAna/python/samples/dsBase.txt"
-dsFile="MNTriggerStudies/MNTriggerAna/python/samples/ds70TriggerStudies.txt"
+#dsFile="MNTriggerStudies/MNTriggerAna/python/samples/ds70TriggerStudies.txt"
+dsFile="MNTriggerStudies/MNTriggerAna/python/samples/ds72TriggerStudies.txt"
 #dsFile="MNTriggerStudies/MNTriggerAna/python/samples/dsFwdQCD70PU20.txt"
 
 # define the util decorator. Functions marked with this wont turn into ds attribute
@@ -58,9 +59,9 @@ def name(ds):
         postfix += "_Pu0to10"
     elif "Pu20to50" in ds:
         postfix += "_Pu20to50"
-    elif "Pu20" in ds:
+    elif "pu20" in ds.lower() or "AVE20BX25" in ds.lower():
         postfix += "_Pu20"
-    elif "Pu40" in ds:
+    elif "pu40" in ds.lower():
         postfix += "_Pu40"
 
 
@@ -181,6 +182,7 @@ def XS(ds):
     s["DYToEE_M-50_Tune4C_13TeV-pythia8"] = 1604.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00025
 
     s["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8"] = 2429000000 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/JME-Fall13-00001
+    s["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8_Pu20"] = 2429000000
 
     s["QCD_Pt-10to15_fwdJet_Tune4C_13TeV_pythia8"] = 564600000.0 # filt=0.075 https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00003
     s["QCD_Pt-15to30_fwdJet_Tune4C_13TeV_pythia8"] = 550302000.0 # filt=0.246 https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00004

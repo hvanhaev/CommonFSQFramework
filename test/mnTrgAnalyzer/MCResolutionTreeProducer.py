@@ -105,8 +105,8 @@ class MCResolutionTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.
 
 
 
-        #hlt = self.fChain.PFAK4CHSnewjets
-        hlt = self.fChain.hltAK4PFJetsCorrected
+        hlt = self.fChain.PFAK4CHSnewjets
+        #hlt = self.fChain.hltAK4PFJetsCorrected
         #hlt = self.fChain.hltAK5PFJetsCorrected
         for shift in self.todoShifts:
            for jetGetter in self.getters: 
@@ -167,7 +167,8 @@ if __name__ == "__main__":
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     ROOT.AutoLibraryLoader.enable()
 
-    sampleList = ["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8",]
+    #sampleList = ["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8",]
+    sampleList = ["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8_Pu20",]
     maxFilesMC = None
     maxFilesData = None
     nWorkers = None # Use all
@@ -178,13 +179,13 @@ if __name__ == "__main__":
     sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
     maxFilesData = 1
     '''
-    #maxFilesMC = 1
+    #maxFilesMC = 12
     #nWorkers = 1
     #'''
 
     slaveParams = {}
-    slaveParams["ptMin"] = 60
-    slaveParams["ptMax"] = 100
+    slaveParams["ptMin"] = 5
+    slaveParams["ptMax"] = 30
     slaveParams["etaMax"] = 5.2
 
 
