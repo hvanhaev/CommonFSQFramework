@@ -334,16 +334,16 @@ if __name__ == "__main__":
     sampleList = None
     maxFilesMC = None
     maxFilesData = None
-    nWorkers = 10
+    nWorkers = 12
     treeName = "mnXS"
 
     sampleList = []
     #'''
     #sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
     sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
-    #sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
-    #sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
-    #sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
+    sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
+    sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
+    sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
     #'''
     # '''
 
@@ -357,7 +357,7 @@ if __name__ == "__main__":
     #sampleList = ["JetMET-Run2010A-Apr21ReReco-v1"]
     #sampleList = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1", "METFwd-Run2010B-Apr21ReReco-v1"]
     #maxFilesData = 2
-    #maxFilesMC = 1
+    maxFilesMC = 60
     #nWorkers = 1
     #'''
 

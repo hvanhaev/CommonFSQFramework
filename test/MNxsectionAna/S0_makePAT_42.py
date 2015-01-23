@@ -154,9 +154,10 @@ else:
     print ""
 
 
+prefix = "root://xrootd.ba.infn.it/"
 
 process.source.fileNames = [
-     f
+     prefix+f
 ]
 
 
