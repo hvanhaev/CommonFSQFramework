@@ -22,6 +22,7 @@ import cProfile
 import MNTriggerStudies.MNTriggerAna.ExampleProofReader
 from  MNTriggerStudies.MNTriggerAna.BetterJetGetter import BetterJetGetter
 
+from optparse import OptionParser
 #import DiJetBalancePlugin
 
 class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
@@ -72,10 +73,24 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                                                binningDeta[0]*20, binningDeta[1], binningDeta[2],\
                                                binningDeta[0]*20, binningDeta[1], binningDeta[2])
 
-        for h in self.hist:
-            if not h.startswith("response"):
-                self.hist[h].Sumw2()
-            self.GetOutputList().Add(self.hist[h])
+
+        if self.onlyPtHatReweighing:
+            self.var = {}
+            self.var["leadPt"] = array('d', [0])
+            self.var["leadEta"] = array('d', [0])
+            self.var["weight"] = array('d', [0]) # only jet15 trigger??
+            #self.var["alphaQCD"] = array('d', [0])
+            self.var["qScale"]   = array('d', [0])
+            self.tree = ROOT.TTree("data", "data")
+            for v in self.var:
+                self.tree.Branch(v, self.var[v], v+"/D")
+            self.GetOutputList().Add(self.tree)
+
+        else:
+            for h in self.hist:
+                if not h.startswith("response"):
+                    self.hist[h].Sumw2()
+                self.GetOutputList().Add(self.hist[h])
 
         puFiles = {}
         # MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/
@@ -103,6 +118,42 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
 
         self.jetGetter = BetterJetGetter("PFAK5") 
 
+    # note: for the ptHat reweighing we will do only the central variation.
+    #       otherwise the changes from the JEC/JER variations would be fixed
+    #       by the ptHat reweighing procedure
+
+    #
+    # leadPt:qScale gives a nice linear response
+    #
+    # todo: trigger correction for data
+    def doPtHatReweighing(self, weightBase):
+        if self.isData:
+            if self.fChain.jet15 < 0.5:
+                return
+            weight = weightBase
+        else:
+            truePU = self.fChain.puTrueNumInteractions
+            puWeight =  self.lumiWeighters["_jet15_central"].weight(truePU)
+            weight = weightBase*puWeight
+
+        sortKey = lambda j: j.pt()*(j.pt()>self.threshold)\
+                          *(j.jetid()>0.5)*(abs(j.eta())<4.7)
+
+        # if empty sequence...
+        try:
+            bestJet = max(self.jetGetter.get("_central"), key=sortKey)
+        except ValueError:
+            return
+
+        if not sortKey(bestJet): return # do we really have a jet passing the criteria?
+        pt, eta =  bestJet.pt(), bestJet.eta()
+        self.var["leadPt"][0] = pt
+        self.var["leadEta"][0] = eta
+        self.var["weight"][0] = weight
+        if not self.isData:
+            #self.var["alphaQCD"][0] = self.fChain.alphaQCD
+            self.var["qScale"][0] = self.fChain.qScale
+        self.tree.Fill()
 
     def analyze(self):
         self.hist["evcnt"].Fill(0)
@@ -111,6 +162,13 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
         weightBase = 1. 
         if not self.isData:
             weightBase *= self.fChain.genWeight*self.normFactor 
+
+
+        if self.onlyPtHatReweighing:
+            self.doPtHatReweighing(weightBase)
+            return
+
+
 
         # fill the roounfoldresponse
         if not self.isData:
@@ -251,6 +309,13 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+    parser = OptionParser(usage="usage: %prog [options] filename",
+                            version="%prog 1.0")
+
+    parser.add_option("-p", "--ptHatReweighing",   action="store_true", dest="ptHatReweighing", \
+                                help="produce tree for ptHat reweighing")
+
+    (options, args) = parser.parse_args()
 
     sampleList = None
     maxFilesMC = None
@@ -260,21 +325,21 @@ if __name__ == "__main__":
     # debug config:
     #'''
     sampleList = []
-    sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
-    sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
+    #sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
+    #sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
     sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
     #'''
-    sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
-    sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
-    sampleList.append("METFwd-Run2010B-Apr21ReReco-v1")
+    #sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
+    #sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
+    #sampleList.append("METFwd-Run2010B-Apr21ReReco-v1")
     # '''
     # '''
     #maxFilesMC = 48
-    #maxFilesMC = 30
-    #maxFilesData = 1
+    maxFilesMC = 1
+    maxFilesData = 1
     #nWorkers = 1
     #maxFilesMC = 16
-    nWorkers = 15
+    nWorkers = 1
 
     slaveParams = {}
     slaveParams["threshold"] = 35.
@@ -288,6 +353,13 @@ if __name__ == "__main__":
 
     slaveParams["unfoldEnabled"] = True
 
+    if options.ptHatReweighing:
+        slaveParams["onlyPtHatReweighing"] = True
+        ofile = "treesForPTHatReweighing.root"
+    else:
+        slaveParams["onlyPtHatReweighing"] = False
+        ofile = "plotsMNxs.root"
+
 
     MNxsAnalyzer.runAll(treeName="mnXS",
                                slaveParameters=slaveParams,
@@ -296,7 +368,7 @@ if __name__ == "__main__":
                                maxFilesData = maxFilesData,
                                nWorkers=nWorkers,
                                usePickle = True,
-                               outFile = "plotsMNxs.root" )
+                               outFile = ofile )
 
     print "TODO: fakes prob vs eta"
     print "TODO: xcheck XXX seen"

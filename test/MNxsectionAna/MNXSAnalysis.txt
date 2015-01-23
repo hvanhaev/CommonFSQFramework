@@ -1,19 +1,27 @@
 1. Setup
 
-export SmallXAnaVersion=MNTriggerStudies.MNTriggerAna.samples.Samples_DiJet_20141202_MN2010_V16PartV1
-
+export SmallXAnaVersion=MNTriggerStudies.MNTriggerAna.samples.Samples_DiJet_20140122_MN2010
 
 2. run 
 
+./MNxsAnalyzer.py -p
+
+# this creates a simple tree for ptHat reweighing determination
+
+3. TODO: 
+
+  fitPtHatReweighing.py
+
+4. Run actuall analisis:
+
 ./MNxsAnalyzer.py
 
-
-3. Detector level plots
+5. Detector level plots
 
 ./mnDraw.py -i plotsMNxs.root -o ~/tmp/MNXS_detectorLevel/
 
 
-4. Create unfolded plots:
+6. Create unfolded plots:
 
 ./unfoldMN.py
 
