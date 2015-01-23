@@ -10,6 +10,11 @@ EventViewBase(iConfig, tree)
     registerInt("lumi", tree);
     registerInt("event", tree);
     registerFloat("genWeight", tree);
+
+    registerFloat("alphaQCD", tree);
+    registerFloat("qScale", tree);
+    
+
     registerFloat("puTrueNumInteractions", tree);
     registerFloat("PUNumInteractions", tree);
 
@@ -29,6 +34,8 @@ void EventIdData::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& 
     edm::Handle<GenEventInfoProduct> hGW; 
     iEvent.getByLabel(edm::InputTag("generator"), hGW);
     setF("genWeight", hGW->weight());
+    setF("alphaQCD", hGW->alphaQCD());
+    setF("qScale", hGW->qScale());
 
     edm::Handle< std::vector<PileupSummaryInfo> > hPU;
     iEvent.getByLabel(edm::InputTag("addPileupInfo"), hPU);
