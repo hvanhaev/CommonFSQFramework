@@ -256,17 +256,16 @@ MNTriggerAnaHLTJECOnFly::analyze(const edm::Event& iEvent, const edm::EventSetup
         corrector->setRho(rho);
         double jec = corrector->getCorrection();
         if (jec < 0) {
-            std::cout << "Warning: correction < 0\n";
+            std::cout << "XXX Warning: correction < 0\n";
             jec = 0;
-        }
-        /*
-        std::cout << hHLTJets->at(i).eta()
+            std::cout << hHLTJets->at(i).eta()
                     << " pt " << hHLTJets->at(i).pt()
                     << " area " << hHLTJets->at(i).jetArea()
                     << " rho " << rho
                     << " cor " << jec
                     << " ptcor " << (jec*hHLTJets->at(i).p4()).pt()
-                    << std::endl;// */
+                    << std::endl;
+        }
         m_correctedHLTJets.push_back(jec*hHLTJets->at(i).p4());
         //m_vectorBranches[it->first].push_back(hHLTJets->at(i).p4());
     }
