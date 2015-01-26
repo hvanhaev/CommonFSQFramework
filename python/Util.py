@@ -9,7 +9,7 @@ def getCrabVersion():
 
 
     except OSError:
-        raise Exeption("Seems that crab environment is not defined. Exit... stage left")
+        raise Exception("Seems that crab environment is not defined. Exit... stage left")
 
     ret = 2
     if "v3" in ver:
