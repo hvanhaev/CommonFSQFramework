@@ -174,6 +174,7 @@ primary = "file:/pnfs/desy.de/cms/tier2/store/user/fruboes/Neutrino_Pt-2to20_gun
 
 
 primary = "file:/nfs/dust/cms/user/fruboest/2015.01.ProduceAndTestJECFromFeng/CMSSW_7_2_1_patch2/src/outputA.root"
+primary = "file:/nfs/dust/cms/user/fruboest/2015.01.ProduceAndTestJECFromFeng/CMSSW_7_3_0/src/outputA.root"
 
 process.source = cms.Source("PoolSource",
 #    secondaryFileNames = cms.untracked.vstring([sec1, sec2]),
