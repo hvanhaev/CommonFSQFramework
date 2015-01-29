@@ -86,7 +86,7 @@ class DrawPlots():
     def decorate(self, canvas, dataHisto, MCStack, errBand): # override
         pass
 
-    def draw(self): # core function
+    def draw(self, ignoreSamples = None): # core function
         self.setGlobalStyle()
         sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
         parser = OptionParser(usage="usage: %prog [options] filename",
@@ -167,6 +167,10 @@ class DrawPlots():
                     continue
 
                 sampleName = l.GetName()
+                if ignoreSamples and sampleName in ignoreSamples:
+                    print "Skipping", sampleName
+                    continue
+
                 if sampleName not in sampleList:
                     raise Exception("Thats confusing... sample not known (?) " + sampleName)
 
