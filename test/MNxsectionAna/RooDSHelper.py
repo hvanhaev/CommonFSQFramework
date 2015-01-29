@@ -51,7 +51,7 @@ def getSummedRooDS(rootName, infile, samplesToAdd, weight=None):
 
     dummyFile = ROOT.TFile("/tmp/dummy.root", "recreate")
     if len(trees) != len(samplesToAdd):
-        raise Exception("Wrong number of trees found!")
+        raise Exception("Wrong number of trees found !" + str(len(trees)) + " " + str(len(samplesToAdd)) + " ".join(samplesToAdd))
 
     tlist = ROOT.TList()
     for tree in trees:
