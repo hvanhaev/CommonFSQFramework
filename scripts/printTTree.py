@@ -21,22 +21,32 @@ def main():
     (options, args) = parser.parse_args()
 
     anaDef = getAnaDefinition("sam")
-    if len(args) != 1 or args[0] not in anaDef:
-        print "Usage: printTTree.py sampleName"
-        print "Avaliable samples:"
-        for t in anaDef:
-            print " ", t
-        sys.exit(0)
+    directlyFromRootfile = False
+    if len(args) != 1 or (not args[0].endswith(".root") and args[0] not in anaDef):
+            print "Usage: printTTree.py sampleName"
+            print " - or -"
+            print "Usage: printTTree.py rootfile"
+            print "Avaliable samples:"
+            for t in anaDef:
+                print " ", t
+            sys.exit(0)
 
-    sample= args[0]
-    treeFilesAndNormalizations = getTreeFilesAndNormalizations(maxFilesMC=1, maxFilesData=1,
-                quiet = True, samplesToProcess=[sample,])
+    if args[0].endswith(".root"):
+        print "Will print structure of given file"
+        directlyFromRootfile = True
 
-    if not treeFilesAndNormalizations[sample]["files"]:
-        print "No files found for sample", sample, "- exiting"
-        sys.exit(0)
+    if not directlyFromRootfile:
+        sample= args[0]
+        treeFilesAndNormalizations = getTreeFilesAndNormalizations(maxFilesMC=1, maxFilesData=1,
+                    quiet = True, samplesToProcess=[sample,])
 
-    filename = treeFilesAndNormalizations[sample]["files"][0]
+        if not treeFilesAndNormalizations[sample]["files"]:
+            print "No files found for sample", sample, "- exiting"
+            sys.exit(0)
+
+        filename = treeFilesAndNormalizations[sample]["files"][0]
+    else:
+        filename = args[0]
 
     
     rootfile = ROOT.TFile.Open(filename, "read")
