@@ -63,7 +63,7 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
 
 
         self.hist["evcnt"] =  ROOT.TH1F("evcnt_central_jet15", "evcnt_central_jet15",  1, -0.5, 0.5)
-        self.hist["detaGen"] =  ROOT.TH1F("detaGen_central_sum", "detaGen_central_sum",  binningDeta[0], binningDeta[1], binningDeta[2])
+        #self.hist["detaGen"] =  ROOT.TH1F("detaGen_central_sum", "detaGen_central_sum",  binningDeta[0], binningDeta[1], binningDeta[2])
 
         # in principle trigger does not applies to gen plots. We keep consistent naming though, so the unfolded result to gen level plots is possible
         # in each category
@@ -91,6 +91,10 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                 if not h.startswith("response"):
                     self.hist[h].Sumw2()
                 self.GetOutputList().Add(self.hist[h])
+            if self.applyPtHatReweighing and not self.isData:
+                ptHatFileName = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/ptHatWeighters.root").fullPath()
+                ptHatFile = ROOT.TFile(ptHatFileName)
+                self.ptHatW = ptHatFile.Get(self.datasetName+"/ptHatW")
 
         puFiles = {}
         # MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/
@@ -167,8 +171,9 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
         if self.onlyPtHatReweighing:
             self.doPtHatReweighing(weightBase)
             return
-
-
+        elif self.applyPtHatReweighing:
+            ptHat = self.fChain.qScale
+            ptHatW = self.ptHatW.Eval(ptHat)
 
         # fill the roounfoldresponse
         if not self.isData:
@@ -187,7 +192,7 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                 if fwd > 3 and bkw < -3:
                     genTopology = "FB"
                 genDEta = fwd - bkw
-                self.hist["detaGen"].Fill(genDEta, weightBase) # basic gen level distribution shouldnt be PU dependent
+                #self.hist["detaGen"].Fill(genDEta, weightBase) # basic gen level distribution shouldnt be PU dependent
                 if genTopology == "FB":
                     self.hist["detaGen_dj15fb"].Fill(genDEta, weightBase) # basic gen level distribution shouldnt be PU dependent
                 else:
@@ -325,21 +330,21 @@ if __name__ == "__main__":
     # debug config:
     #'''
     sampleList = []
-    #sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
-    #sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
+    sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
+    sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
     sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
     #'''
-    #sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
-    #sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
-    #sampleList.append("METFwd-Run2010B-Apr21ReReco-v1")
+    sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
+    sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
+    sampleList.append("METFwd-Run2010B-Apr21ReReco-v1")
     # '''
     # '''
-    #maxFilesMC = 48
-    maxFilesMC = 1
-    maxFilesData = 1
+    maxFilesMC = 48
+    #maxFilesMC = 1
+    #maxFilesData = 1
     #nWorkers = 1
     #maxFilesMC = 16
-    nWorkers = 1
+    nWorkers = 12
 
     slaveParams = {}
     slaveParams["threshold"] = 35.
@@ -355,9 +360,11 @@ if __name__ == "__main__":
 
     if options.ptHatReweighing:
         slaveParams["onlyPtHatReweighing"] = True
+        slaveParams["applyPtHatReweighing"] = False
         ofile = "treesForPTHatReweighing.root"
     else:
         slaveParams["onlyPtHatReweighing"] = False
+        slaveParams["applyPtHatReweighing"] = False
         ofile = "plotsMNxs.root"
 
 
