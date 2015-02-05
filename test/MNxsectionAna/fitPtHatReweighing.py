@@ -46,7 +46,7 @@ def main():
 
         hData2MC.Divide(hMC)
 
-        fitF = ROOT.TF1("ptHatW","[0]*x + [1]", 0, 1000000);
+        fitF = ROOT.TF1("ptHatW","[0]/x + [1]", 0, 1000000);
         fitF.SetParameter(0, 0.)
         fitF.SetParameter(1, 1.)
         hData2MC.Fit("ptHatW")

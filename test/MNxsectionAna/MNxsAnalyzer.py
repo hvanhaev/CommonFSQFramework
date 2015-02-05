@@ -91,10 +91,22 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                 if not h.startswith("response"):
                     self.hist[h].Sumw2()
                 self.GetOutputList().Add(self.hist[h])
-            if self.applyPtHatReweighing and not self.isData:
-                ptHatFileName = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/ptHatWeighters.root").fullPath()
-                ptHatFile = ROOT.TFile(ptHatFileName)
-                self.ptHatW = ptHatFile.Get(self.datasetName+"/ptHatW")
+
+        if self.applyPtHatReweighing and not self.isData:
+                fp = "MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"
+                todo = ["ptHatWeighters_invx_pass1.root_invX", 
+                        "ptHatWeighters_invx_pass2.root_invX",
+                        "ptHatWeighters_invx_pass3.root_invX",]
+                self.ptHatW = []
+                for t in todo:
+                    ptHatFileName = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"+t).fullPath()
+                    ptHatFile = ROOT.TFile(ptHatFileName)
+                    self.ptHatW.append(ptHatFile.Get(self.datasetName+"/ptHatW"))
+                    #print "PTHat weighter set to", self.datasetName+"/ptHatW"
+                    #print "PTHat test@30:", self.ptHatW.Eval(30)
+
+
+
 
         puFiles = {}
         # MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/
@@ -167,13 +179,18 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
         if not self.isData:
             weightBase *= self.fChain.genWeight*self.normFactor 
 
+        if not self.isData and  self.applyPtHatReweighing:
+            ptHat = self.fChain.qScale
+            w = 1.
+            for weighter in self.ptHatW:
+                w*=max(weighter.Eval(ptHat), 0.)
+            weightBase *= w
+ 
 
         if self.onlyPtHatReweighing:
             self.doPtHatReweighing(weightBase)
             return
-        elif self.applyPtHatReweighing:
-            ptHat = self.fChain.qScale
-            ptHatW = self.ptHatW.Eval(ptHat)
+           
 
         # fill the roounfoldresponse
         if not self.isData:
@@ -331,9 +348,10 @@ if __name__ == "__main__":
     #'''
     sampleList = []
     sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
+
+    #'''
     sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
     sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
-    #'''
     sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
     sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
     sampleList.append("METFwd-Run2010B-Apr21ReReco-v1")
@@ -360,11 +378,11 @@ if __name__ == "__main__":
 
     if options.ptHatReweighing:
         slaveParams["onlyPtHatReweighing"] = True
-        slaveParams["applyPtHatReweighing"] = False
+        slaveParams["applyPtHatReweighing"] = True
         ofile = "treesForPTHatReweighing.root"
     else:
         slaveParams["onlyPtHatReweighing"] = False
-        slaveParams["applyPtHatReweighing"] = False
+        slaveParams["applyPtHatReweighing"] = True
         ofile = "plotsMNxs.root"
 
 
