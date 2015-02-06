@@ -30,8 +30,8 @@ class MCResolutionTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.
 
         puFile = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/PUhists.root").fullPath()
         self.newlumiWeighters = {}
-        #self.newlumiWeighters["flat010toPU1"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU1/pileup")
-        self.newlumiWeighters["flat2050toPU20"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU20/pileup")
+        self.newlumiWeighters["flat010toPU1"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU1/pileup")
+        #self.newlumiWeighters["flat2050toPU20"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU20/pileup")
 
         self.var = {}
         self.todoShifts = ["_central"]
@@ -105,7 +105,8 @@ class MCResolutionTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.
 
 
 
-        hlt = self.fChain.PFAK4CHSnewjets
+        hlt = self.fChain.hlt_EcalMultifit_HCALMethod2
+        #hlt = self.fChain.PFAK4CHSnewjets
         #hlt = self.fChain.hltAK4PFJetsCorrected
         #hlt = self.fChain.hltAK5PFJetsCorrected
         for shift in self.todoShifts:
@@ -129,6 +130,7 @@ class MCResolutionTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.
 
                 #print "----"
                 #for jet in self.getters[jetGetter].get(shift):
+                '''
                 for jet in self.getters[jetGetter]:
                     ptRec = jet.pt()
                     if ptRec < self.ptMin: 
@@ -152,6 +154,43 @@ class MCResolutionTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.
                         self.var["jetType"+shift][0] = jetType
                         self.tree.Fill()
                         break
+                '''
+                for hltJet in hlt:
+                    bestJet = None
+                    bestJetDR = None
+                    for jet in self.getters[jetGetter]:
+                        ptRec = jet.pt()
+                        if ptRec < self.ptMin: 
+                            break # gen jets are pt sorted
+                        etaRec = abs(jet.eta())
+                        if etaRec > self.etaMax: continue
+
+                        if isGen:
+                            dr = self.dr(jet, hltJet)
+                        else:
+                            dr = self.dr(jet.p4(), hltJet)
+                        if dr > 0.3: continue
+                        if bestJet == None or dr < bestJetDR:
+                            bestJet = jet
+                            bestJetDR = dr
+                    if bestJet != None:
+                        ptHLT = hltJet.pt()
+                        ptRec = bestJet.pt()
+                        etaRec = abs(bestJet.eta())
+                        r = ptHLT/ptRec
+                        #print bestJetDR
+                        self.var["ptRec"+shift][0] = ptRec
+                        self.var["etaRec"+shift][0]= etaRec
+                        self.var["ptHLT"+shift][0] = ptHLT
+                        self.var["hlt2recRatio"+shift][0] = r
+                        self.var["jetType"+shift][0] = jetType
+                        self.tree.Fill()
+    
+
+
+
+
+
 
         return 1
 
@@ -168,7 +207,9 @@ if __name__ == "__main__":
     ROOT.AutoLibraryLoader.enable()
 
     #sampleList = ["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8",]
-    sampleList = ["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8_Pu20",]
+    #sampleList = ["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8_Pu20",]
+    #sampleList = ["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8_Pu20to50"]
+    sampleList = ["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8_Pu0to10"]
     maxFilesMC = None
     maxFilesData = None
     nWorkers = None # Use all
@@ -179,18 +220,19 @@ if __name__ == "__main__":
     sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
     maxFilesData = 1
     '''
-    #maxFilesMC = 12
+    maxFilesMC = 120
     #nWorkers = 1
     #'''
 
     slaveParams = {}
-    slaveParams["ptMin"] = 5
-    slaveParams["ptMax"] = 30
+    slaveParams["ptMin"] = 30
+    slaveParams["ptMax"] = 70
     slaveParams["etaMax"] = 5.2
 
 
 
-    MCResolutionTreeProducer.runAll(treeName="MNTriggerAnaNew",
+    #MCResolutionTreeProducer.runAll(treeName="MNTriggerAnaNew",
+    MCResolutionTreeProducer.runAll(treeName="MNTriggerAnaHLTJECOnFly",
                                slaveParameters=slaveParams,
                                sampleList=sampleList,
                                maxFilesMC = maxFilesMC,
