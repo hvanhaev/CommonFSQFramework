@@ -2,6 +2,7 @@
 
 import ROOT
 ROOT.gROOT.SetBatch(True)
+ROOT.gSystem.Load("libRooUnfold.so")
 
 import os,re,sys,math
 
@@ -74,6 +75,8 @@ class DrawMNPlots(DrawPlots):
             triggersToSamples = {} # TODO make accessible from self
             triggersToSamples["jet15"] = ["Jet-Run2010B-Apr21ReReco-v1", "JetMETTau-Run2010A-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1"]
             triggersToSamples["dj15fb"] = ["METFwd-Run2010B-Apr21ReReco-v1", "JetMETTau-Run2010A-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1"]
+            triggersToSamples["sum"] = []
+
             if sampleName in triggersToSamples[triggerName]:
                 retName = "data_" + triggerName
 
@@ -137,6 +140,7 @@ if __name__ == "__main__":
 
     parser.add_option("-i", "--infile", action="store", type="string",  dest="infile" )
     parser.add_option("-o", "--outdir", action="store", type="string",  dest="outdir" )
+    parser.add_option("-s", "--skip", action="store", type="string",  dest="skip" ) # coma separated list of samples to skip
     (options, args) = parser.parse_args()
 
     infile = "plotsMNxs.root"
@@ -149,6 +153,8 @@ if __name__ == "__main__":
     else:
         d = DrawMNPlots(infile)
 
-
-    d.draw()
+    ignoreSamples = None
+    if options.skip:
+        ignoreSamples =options.skip.split(",")
+    d.draw(ignoreSamples=ignoreSamples)
 
