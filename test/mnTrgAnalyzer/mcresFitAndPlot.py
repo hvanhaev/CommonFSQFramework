@@ -103,6 +103,10 @@ class FitThread(multiprocessing.Process):
         fitResult["gaussWidth"] = sigma2.getVal()
         fitResult["gaussWidthErr"] = sigma2.getError()
         fitResult["sumEntries"] = dsReduced.sumEntries() # return sum of weights
+
+        fitResult["meanFromDS"] = meanVal
+        fitResult["stderrFromDS"] = sigma
+
         self.queue.put(fitResult)
 
 
@@ -249,12 +253,14 @@ def main():
     #minPt = 60
     #maxPt = 70
     #maxPt = 100
-    #minPt = 20
-    #maxPt = 30
-    #minPt = 30
-    #maxPt = 40
+    #minPt = 10
+    #maxPt = 15
     minPt = 20
     maxPt = 25
+    #minPt = 30
+    #maxPt = 40
+    #minPt = 30
+    #maxPt = 40
 
     curPath = ROOT.gDirectory.GetPath()
     of = ROOT.TFile(odir+"mcresHistos.root","RECREATE")
@@ -285,6 +291,8 @@ def main():
             #cutBase += " && " + " PU < 0.5"
             #cut += " && " + vary("balance") + " > " + str(-1)
             #cut += " && " + vary("balance") + " < " + str(1)
+            cutBase += "&&" + vary("hlt2recRatio") + " < 2."
+            cutBase += "&&" + vary("hlt2recRatio") + " > 0.01"
             if options.cutExtra != None:
                 cutBase += " && " +  options.cutExtra
             
@@ -347,7 +355,10 @@ def main():
 
             # all etas done. Create summary (vs eta) histogram
             etaArray = array('d', etaRanges)
-            histName = "balance_"+v + "_jet15"
+            #histName = "balance_"+v + "_jet15"
+            print "Note: non standard name"
+            histName = "avgHLT2GenVsEta;#eta;response"
+        
             #print etaRanges
             #print etaArray
             hist = ROOT.TH1F(histName, histName, len(etaArray)-1, etaArray)
@@ -364,10 +375,24 @@ def main():
                 if bin != iEta:
                     print bin, iEta, etaAvg
                     raise Exception("Problem with binning")
+
+                #hist.SetBinContent(bin, res["meanFromDS"])
+                #hist.SetBinError(bin, res["stderrFromDS"])
+                #print "Note: fit values ommited. Avg from DS taken"
                 hist.SetBinContent(bin, res["mean"])
                 hist.SetBinError(bin, res["meanErr"])
+
+
                 histEff.SetBinContent(bin, res["sumEntries"])
             outputHistos[t].WriteTObject(hist,histName)
+            c1 = ROOT.TCanvas()
+            hist.Draw()
+
+            hist.SetMaximum(1.6)
+            hist.SetMinimum(0.4)
+            hist.SetStats(False)
+            # Warning: Q&D definition!
+            c1.Print(odir+"/asEtaF.png")
             outputHistos[t].WriteTObject(histEff, histEffName)
 
 
