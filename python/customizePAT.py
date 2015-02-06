@@ -11,6 +11,13 @@ def addTreeProducer(process, prod):
     process.schedule.insert(-1, getattr(process, pathName)) 
     return process
 
+def addPath(process, path):
+    if not hasattr(process, "schedule"):
+        raise Exception("Given process seems not to have a valid scheduler. Run the base customize function first")
+
+    process.schedule.insert(-1, path)
+    return process
+
 # TODO: remove jobs output
 def customize(process):
     if hasattr(process, "out"):
