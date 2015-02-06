@@ -98,12 +98,25 @@ MNTriggerAnaNew::MNTriggerAnaNew(const edm::ParameterSet& iConfig)
 
     m_views.push_back(new EventIdData(iConfig, m_tree));
     //*
-    m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewCalo"), m_tree));
-    //m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPF"), m_tree));
-    m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPFAK4CHS"), m_tree));
-    //m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPFAK5CHS"), m_tree));*/
-    //m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsView"), m_tree));
     //
+    if (iConfig.exists("JetViewCalo"))
+    {
+        m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewCalo"), m_tree));
+    } else {
+        std::cout << "Disabling JetViewCalo" << std::endl;
+    }
+    //m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPF"), m_tree));
+    if (iConfig.exists("JetViewPFAK4CHS")){
+        m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPFAK4CHS"), m_tree));
+    } else {
+        std::cout << "Disabling JetViewPFAK4CHS" << std::endl;
+    }
+    //m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPFAK5CHS"), m_tree));*/
+    if (iConfig.exists("L1JetsView")){
+        m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsView"), m_tree));
+    } else {
+        std::cout << "Disabling L1JetsView (legacy l1)" << std::endl;
+    }
     if (iConfig.exists("L1JetsViewStage1")){
         m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewStage1"), m_tree));
     } else {
@@ -132,12 +145,13 @@ MNTriggerAnaNew::MNTriggerAnaNew(const edm::ParameterSet& iConfig)
     //"hltAK5PFJetL1FastL2L3Corrected"   ""                "PAT"
     //m_todoHltCollections["hltAK5PFJetL1FastL2L3Corrected"] = edm::InputTag("hltAK5PFJetL1FastL2L3Corrected", "", "PAT");
     
-    //m_todoHltCollections["hltAK4PFJets"] = edm::InputTag("hltAK4PFJets");
-    //m_todoHltCollections["hltAK4PFJetsCorrected"]  = edm::InputTag("hltAK4PFJetsCorrected", "", "TEST");
+    m_todoHltCollections["hltAK4PFJets"] = edm::InputTag("hltAK4PFJets");
+    m_todoHltCollections["hltAK4PFJetsCorrected"]  = edm::InputTag("hltAK4PFJetsCorrected", "", "TEST");
     //m_todoHltCollections["hltAK5PFJets"] = edm::InputTag("hltAK5PFJets", "", "TEST");
     //m_todoHltCollections["hltAK5PFJetsCorrected"]  = edm::InputTag("hltAK5PFJetsCorrected", "", "TEST");
-    //m_todoHltCollections["hltAK4CaloJetsCorrected"]  = edm::InputTag("hltAK4CaloJetsCorrected", "", "TEST");
-    //m_todoHltCollections["hltAK4CaloJetsCorrectedIDPassed"]  = edm::InputTag("hltAK4CaloJetsCorrectedIDPassed", "", "TEST");
+    m_todoHltCollections["hltAK4CaloJets"]  = edm::InputTag("hltAK4CaloJets", "", "TEST");
+    m_todoHltCollections["hltAK4CaloJetsCorrected"]  = edm::InputTag("hltAK4CaloJetsCorrected", "", "TEST");
+    m_todoHltCollections["hltAK4CaloJetsCorrectedIDPassed"]  = edm::InputTag("hltAK4CaloJetsCorrectedIDPassed", "", "TEST");
 
 
     //#m_todoHltCollections["hltPFJetsCorrectedMatchedToL1"]  = edm::InputTag("hltPFJetsCorrectedMatchedToL1", "", "TEST");
