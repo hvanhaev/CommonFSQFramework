@@ -37,7 +37,7 @@ def doMinuitFit(ofile, dsData, dsMC, lumi):
 
     # Set starting values and step sizes for parameters
     vstart = array( 'd', ( 1,  0) )
-    step   = array( 'd', ( 0.01, 0.01 ) )
+    step   = array( 'd', ( 0.1, 0.1 ) )
     gMinuit.mnparm( 0, "a1", vstart[0], step[0], 0, 0, ierflg )
     gMinuit.mnparm( 1, "a2", vstart[1], step[1], 0, 0, ierflg )
 
@@ -73,6 +73,13 @@ def fcn( npar, gin, f, par, iflag ):
     # fill MC histograms
     hMC = hMCbase.Clone("MC")
     wds.fillHistogram(hMC, ROOT.RooArgList(vars["leadPt"]))
+    #globalMC[0].fillHistogram(hMC, ROOT.RooArgList(vars["leadPt"]))
+
+    c = ROOT.TCanvas()
+    hMC.Draw()
+    hMC.SetLineColor(2)
+    hData.Draw("SAME")
+    c.Print("~/tmp/steps/"+str(cnt)+".png")
 
     # get chi2
     chisq, delta = 0., 0.
@@ -139,6 +146,7 @@ def main():
     for t in todoQCDNames:
         xxx = outFile.mkdir(t)
         dMC = getSummedRooDS(t, "treesForPTHatReweighing.root", [t], "weight")
+        #dMC = getSummedRooDS(t, "treesForPTHatReweighing.root", [t])
 
         #doBaselineFit(xxx, data, dMC, lumi)
         doMinuitFit(xxx, data, dMC, lumi)
