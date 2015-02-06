@@ -1,5 +1,9 @@
 Workflows:
 
+0. Prep run
+
+./utils/GetFlatPUDist.py
+
 
 1. Rate estimation
 

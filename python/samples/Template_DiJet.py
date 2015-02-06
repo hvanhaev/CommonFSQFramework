@@ -31,8 +31,10 @@ MyVariablesAllEvents="DiJetAnalysis.DiJetAna.ana.BaseVariables"
 # /scratch/scratch0/tfruboes/2013.05.DiJetNewGit/CMSSW_4_2_8_patch7/src/DiJetAnalysis/DiJetAna/python/samples
 #dsFile="MNTriggerStudies/MNTriggerAna/python/samples/dsBase.txt"
 #dsFile="MNTriggerStudies/MNTriggerAna/python/samples/ds70TriggerStudies.txt"
-dsFile="MNTriggerStudies/MNTriggerAna/python/samples/ds72TriggerStudies.txt"
+#dsFile="MNTriggerStudies/MNTriggerAna/python/samples/ds72TriggerStudies.txt"
+#dsFile="MNTriggerStudies/MNTriggerAna/python/samples/ds73dijethltstudies.txt"
 #dsFile="MNTriggerStudies/MNTriggerAna/python/samples/dsFwdQCD70PU20.txt"
+dsFile="MNTriggerStudies/MNTriggerAna/python/samples/dsHLT1Step.txt"
 
 # define the util decorator. Functions marked with this wont turn into ds attribute
 def util(func):
@@ -44,7 +46,7 @@ setattr(util, "ignore", 1) # for this function only
 def DS(ds):
     return ds
 
-def name(ds):
+def name(ds, noPostfix = False):
     split=ds.split("/") 
     if len(split) == 0: return None
 
@@ -55,19 +57,20 @@ def name(ds):
     elif "10GeV" in ds:
         postfix += "_10GeV"
 
-    if "Pu0to10" in ds:
+    if "pu0to10" in ds.lower():
         postfix += "_Pu0to10"
-    elif "Pu20to50" in ds:
+    elif "pu20to50" in ds.lower():
         postfix += "_Pu20to50"
     elif "pu20" in ds.lower() or "AVE20BX25" in ds.lower():
         postfix += "_Pu20"
     elif "pu40" in ds.lower():
         postfix += "_Pu40"
 
-
     if "162" in ds:
         postfix+= "_162"
 
+    if noPostfix:
+        postfix=""
 
     if isData(ds):
         ret = split[1] + "-" + split[2]
@@ -194,8 +197,10 @@ def XS(ds):
 
 
     dsName = name(ds)
-    if dsName in s:
-        return s[dsName]
+    dsNameNoPF = name(ds, True)
+    print "XXX", dsNameNoPF
+    if dsNameNoPF in s:
+        return s[dsNameNoPF]
     else:
         print "FIXME - XS missing for", dsName
         print '    s["'+dsName+'"] = '
