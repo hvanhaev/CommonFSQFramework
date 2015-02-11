@@ -122,6 +122,13 @@ MNTriggerAnaNew::MNTriggerAnaNew(const edm::ParameterSet& iConfig)
     } else {
         std::cout << "Disabling L1JetsViewStage1 " << std::endl;
     }
+
+    if (iConfig.exists("L1JetsViewRedone")){
+        m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewRedone"), m_tree));
+    } else {
+        std::cout << "Disabling L1JetsViewRedone " << std::endl;
+    }
+
     //m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewStage1Tau"), m_tree));
     //m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewStage1All"), m_tree));
     if (iConfig.exists("TriggerResultsView")){
