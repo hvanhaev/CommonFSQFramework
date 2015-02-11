@@ -2,7 +2,22 @@
 import imp
 import FWCore.ParameterSet.Config as cms
 
-filename = "hlt.py"
+
+# hlt config files preparation:
+# hltGetConfiguration /dev/CMSSW_7_3_0/HLT/V105 --full --offline --mc --unprescale --process TEST --globaltag auto:run2_mc_GRun --l1-emulator 'gct,gt' > hlt_gctgt.py
+#  hltGetConfiguration /dev/CMSSW_7_3_0/GRun --full --offline --mc --unprescale --process TEST --globaltag auto:run2_mc_GRun --l1-emulator 'stage1,gt' --l1Xml L1Menu_Collisions2015_25ns_v2_L1T_Scales_20141121_Imp0_0x1030.xml > hlt.py
+
+# we can redo only one type of trigger a time
+# note: auto GT setting at the end
+l1SeedThr = 0
+todo = "legacy"
+#todo = "stage1"
+
+
+if todo == "stage1":
+    filename = "hlt.py"
+elif todo == "legacy":
+    filename = "hlt_gctgt.py"
 handle = open(filename, 'r')
 cfo = imp.load_source("pycfg", filename, handle)
 process = cfo.process
@@ -27,12 +42,16 @@ process.jets = cms.Path( process.HLTBeginSequence + process.HLTAK4CaloJetsSequen
 process.source.fileNames = cms.untracked.vstring(
         '/store/mc/Spring14dr/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/GEN-SIM-RAW/Flat0to10_POSTLS170_V5-v1/00000/0002A86F-3408-E411-B90A-E0CB4E19F961.root'
 )
-#del process.hltOutputA.SelectEvents
+
+
+del process.hltOutputA.SelectEvents
+#'''
 del process.hltOutputA
 del process.dqmOutput
 
 del process.AOutput
 del process.DQMOutput
+#'''
 #del process.hltOutputA.outputCommands
 
 import MNTriggerStudies.MNTriggerAna.customizePAT
@@ -51,6 +70,22 @@ del process.MNTriggerAnaNew.JetViewPF
 del process.MNTriggerAnaNew.JetViewCalo
 del process.MNTriggerAnaNew.JetViewPFAK4CHS
 del process.MNTriggerAnaNew.JetViewPFAK5CHS
+
+if todo == "legacy":
+    print "Warning, stage1 disabled"
+    del process.MNTriggerAnaNew.L1JetsViewStage1
+    process.MNTriggerAnaNew.L1JetsViewRedone = process.MNTriggerAnaNew.L1JetsView.clone()
+    process.MNTriggerAnaNew.L1JetsViewRedone.branchPrefix = cms.untracked.string('oldRedone')
+
+    process.MNTriggerAnaNew.L1JetsViewRedone.src = cms.VInputTag(cms.InputTag("hltL1extraParticles","Central", "TEST"), 
+                                                           cms.InputTag("hltL1extraParticles","Forward", "TEST"), 
+                                                       cms.InputTag("hltL1extraParticles","Tau", "TEST"))
+
+    process.load('L1TriggerConfig.GctConfigProducers.l1GctConfig_cfi')
+    process.L1GctConfigProducers.JetFinderCentralJetSeed = cms.double(l1SeedThr)
+    process.L1GctConfigProducers.JetFinderForwardJetSeed = cms.double(l1SeedThr)
+elif todo == "stage1":
+    process.caloStage1Params.jetSeedThreshold = cms.double(l1SeedThr) 
 
 
 process = MNTriggerStudies.MNTriggerAna.customizePAT.removeEdmOutput(process)
@@ -75,7 +110,6 @@ process.source = cms.Source( "PoolSource",
     )
 )
 
-process.caloStage1Params.jetSeedThreshold = cms.double(0) 
 GT= "MCRUN2_72_V4A" # 62 produced 50 ns
 #GT= "MCRUN2_72_V3A::All" # 62 produced 25 ns
 
@@ -87,6 +121,7 @@ if "TMFSampleName" in os.environ:
 
     print "XXXX",  sample, GT
 
+#GT = "PHYS14_25_V1"
 process.GlobalTag.globaltag = cms.string(GT)
 
 '''
@@ -112,5 +147,6 @@ process.jec = cms.ESSource("PoolDBESSource",
 ## add an es_prefer statement to resolve a possible conflict from simultaneous connection to a global tag
 process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
 '''
+
 
 
