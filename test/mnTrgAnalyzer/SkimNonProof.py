@@ -21,6 +21,9 @@ maxFiles = None
 #samplesToProcess = ["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8_10GeV_Pu0to10"]
 
 
+samplesToProcess = ["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8"]
+
+
 samples2files = getTreeFilesAndNormalizations(maxFilesMC=maxFiles, samplesToProcess=samplesToProcess)
 if len(samples2files) != 1:
     raise Exception("TODO")

@@ -48,6 +48,8 @@ if __name__ == "__main__":
     sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
     maxFilesData = 1
     '''
+    sampleList=[]
+    sampleList.append("QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8")
     maxFilesMC = 1
     nWorkers = 1
     #'''
