@@ -23,10 +23,16 @@ import MNTriggerStudies.MNTriggerAna.ExampleProofReader
 from  MNTriggerStudies.MNTriggerAna.BetterJetGetter import BetterJetGetter
 
 from optparse import OptionParser
+
+from HLTMCWeighter import HLTMCWeighter
 #import DiJetBalancePlugin
 
 class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
     def init( self):
+        if not self.isData:
+            #self.hltMCWeighter = HLTMCWeighter("HLT_Jet15U")
+            self.HLTMCWeighterJ15Raw = HLTMCWeighter("HLT_Jet15U_raw")
+            self.HLTMCWeighterJ15L1Raw = HLTMCWeighter("HLT_Jet15U_L1Seeding_raw")
 
         self.normFactor = self.getNormalizationFactor()
 
@@ -94,9 +100,10 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
 
         if self.applyPtHatReweighing and not self.isData:
                 fp = "MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"
-                todo = ["ptHatWeighters_invx_pass1.root_invX", 
-                        "ptHatWeighters_invx_pass2.root_invX",
-                        "ptHatWeighters_invx_pass3.root_invX",]
+                todo = ["ptHatWeighters.root"]
+                #todo = ["ptHatWeighters_invx_pass1.root_invX", 
+                #        "ptHatWeighters_invx_pass2.root_invX",
+                #        "ptHatWeighters_invx_pass3.root_invX",]
                 self.ptHatW = []
                 for t in todo:
                     ptHatFileName = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"+t).fullPath()
@@ -178,12 +185,19 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
         weightBase = 1. 
         if not self.isData:
             weightBase *= self.fChain.genWeight*self.normFactor 
+            self.HLTMCWeighterJ15L1Raw.newEvent(self.fChain)
+            self.HLTMCWeighterJ15Raw.newEvent(self.fChain)
+            w1 = self.HLTMCWeighterJ15L1Raw.getWeight()
+            w2 = self.HLTMCWeighterJ15Raw.getWeight()
+            #print "WTRG", w1, w2
+            weightBase *= w1*w2
 
         if not self.isData and  self.applyPtHatReweighing:
             ptHat = self.fChain.qScale
             w = 1.
             for weighter in self.ptHatW:
                 w*=max(weighter.Eval(ptHat), 0.)
+                #print "W:", ptHat, weighter.Eval(ptHat)
             weightBase *= w
  
 
@@ -349,7 +363,7 @@ if __name__ == "__main__":
     sampleList = []
     sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
 
-    #'''
+    '''
     sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
     sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
     sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
@@ -357,12 +371,13 @@ if __name__ == "__main__":
     sampleList.append("METFwd-Run2010B-Apr21ReReco-v1")
     # '''
     # '''
-    maxFilesMC = 48
+    #maxFilesMC = 48
     #maxFilesMC = 1
     #maxFilesData = 1
     #nWorkers = 1
     #maxFilesMC = 16
     nWorkers = 12
+    #nWorkers = 1
 
     slaveParams = {}
     slaveParams["threshold"] = 35.
@@ -378,11 +393,13 @@ if __name__ == "__main__":
 
     if options.ptHatReweighing:
         slaveParams["onlyPtHatReweighing"] = True
-        slaveParams["applyPtHatReweighing"] = True
+        slaveParams["applyPtHatReweighing"] = False
+        slaveParams["threshold"] = 30.
         ofile = "treesForPTHatReweighing.root"
     else:
         slaveParams["onlyPtHatReweighing"] = False
-        slaveParams["applyPtHatReweighing"] = True
+        #slaveParams["applyPtHatReweighing"] = True
+        slaveParams["applyPtHatReweighing"] = False
         ofile = "plotsMNxs.root"
 
 
