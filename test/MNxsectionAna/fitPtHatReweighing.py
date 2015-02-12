@@ -13,7 +13,15 @@ import MNTriggerStudies.MNTriggerAna.Util
 from  RooDSHelper import getSummedRooDS, reweighDS
 
 # I hate myself...
-hData = ROOT.TH1F("dataa", "dataa", 100, 35, 135)
+#bins = [x for x in xrange(35, 81,5)]
+bins = [x for x in xrange(30, 81,5)]
+bins.append(100)
+bins.append(120)
+bins.append(140)
+binsArray = array('d',bins)
+hData = ROOT.TH1F("dataa", "dataa", len(binsArray)-1, binsArray)
+#hData = ROOT.TH1F("dataa", "dataa", 100, 35, 135)
+hData.Sumw2()
 hMCbase = hData.Clone()
 globalMC = None
 
@@ -35,17 +43,22 @@ def doMinuitFit(ofile, dsData, dsMC, lumi):
     #fitF = ROOT.TF1("ptHatW","[0]+[1]*(x**[2])", 0, 1000000);
     #fitF = ROOT.TF1("ptHatW","[0]+[1]*x", 0, 1000000);
     fitF = ROOT.TF1("ptHatW","[0]+[1]/x", 0, 1000000);
+    #fitF = ROOT.TF1("ptHatW","[0]+[1]*exp(x/[2])", 0, 1000000);#
+    #     linear = ROOT.RooFormulaVar("lin", "lin", "a1+a2*(qScale/a3)", args)
+
+
     fitF.SetParameter(0, 0.)
     fitF.SetParameter(1, 1.)
-    #fitF.SetParameter(2, -1)
+    #fitF.SetParameter(2, -10) #xxx
     hData2MC.Fit("ptHatW")
     hData2MC.Draw()
     c.Print("~/tmp/steps/start_"+dsMC[0].GetName()+".png")
 
     
-    a1Start = fitF.GetParameter(0)
-    a2Start = fitF.GetParameter(1)
-    #a3Start = fitF.GetParameter(2)
+    a1Start, a1err = fitF.GetParameter(0), fitF.GetParError(0)
+    a2Start, a2err = fitF.GetParameter(1), fitF.GetParError(1)
+    #a3Start, a3err = fitF.GetParameter(2), fitF.GetParError(2) # xxx
+
 
     # setup minuit
     gMinuit = ROOT.TMinuit(5)
@@ -59,15 +72,30 @@ def doMinuitFit(ofile, dsData, dsMC, lumi):
 
     # Set starting values and step sizes for parameters
     # Best linear, herwig: Call: 63 0.495972878319 0.0115689236499 chisq 192.329885935
-    # Best a+b/x, herwig:  Call: 24 1.92390517547 -33.845722655 chisq 241.757628071
+    # Best a+b/x,
+    #   herwig (my chi2, no lowPT):     Call: 142 1.74440199586 -27.5599163958 chisq 28.5523011508
+    #   herwig (my chi2, lowPT): Call: 142 1.74440199586 -27.5599163958 chisq 28.5523011508 # same vals?
+    #   herwig (root chi2, WW, no lowPT) : Call: 65 2.00594999924 -33.8966266938 chisq 112.237294756
+    #   herwig (root chi2, UW, no lowPT) : Call: 117 2.11427928202 -33.999978712 chisq 66.8756343924
+
+
     # best a+bx**c, herwig: Call: 30 -8.19785565098 6.92050519408 0.0768261455595 chisq 155.637202664
 
-    vstart = array( 'd', ( a1Start,  a2Start) )
-    #vstart = array( 'd', ( a1Start,  a2Start, a3Start) )
-    step   = array( 'd', ( 0.1, 0.1, 0.01 ) )
+    # best exp so far: herwig : Call: 191 0.662748696815 -1.28651289298 -148.376339102 chisq 157.633606971
+
+
+    #vstart = array( 'd', ( a1Start,  a2Start) )
+    vstart = array( 'd', ( 2,  -35) )
+    step   = array( 'd', ( 0.1, 1 ) )
+    #vstart = array( 'd', ( a1Start,  a2Start, a3Start) ) # xxx
+    #vstart = array( 'd', ( 0.2,  -0.5, -150.) )
+    #step   = array( 'd', ( 0.1, 0.1, 0.01 ) )
+    #step   = array( 'd', ( a1err, a2err ) )
+    #step   = array( 'd', ( a1err, a2err, a3err ) ) # xxx
+    #step   = array( 'd', ( 0.02, 0.02, 5 ) )
     gMinuit.mnparm( 0, "a1", vstart[0], step[0], 0, 0, ierflg )
     gMinuit.mnparm( 1, "a2", vstart[1], step[1], 0, 0, ierflg )
-    #gMinuit.mnparm( 2, "a3", vstart[2], step[2], 0, 0, ierflg )
+    #gMinuit.mnparm( 2, "a3", vstart[2], step[2], 0, 0, ierflg ) # xxx
 
     # 
     #gMinuit.DefineParameter( 0, "a1", vstart[0], step[0], -100, 100)
@@ -77,7 +105,7 @@ def doMinuitFit(ofile, dsData, dsMC, lumi):
 
     # Now ready for minimization step
     arglist[0] = 500 # max calls 
-    arglist[1] = 10000.  # tolerance - how far from minimum
+    arglist[1] = 1000.  # tolerance - how far from minimum
     gMinuit.mnexcm( "MIGRAD", arglist, 2, ierflg )
 
     # Print results
@@ -87,7 +115,7 @@ def doMinuitFit(ofile, dsData, dsMC, lumi):
 
 
     val, err = ROOT.Double(0), ROOT.Double(0)
-    for i in xrange(2):
+    for i in xrange(len(vstart)):
         gMinuit.GetParameter(i, val, err)
         fitF.SetParameter(i, val)
 
@@ -96,8 +124,24 @@ def doMinuitFit(ofile, dsData, dsMC, lumi):
 
 
 cnt = 0
+lastTime = None
+import time
+def sinceLast(msg):
+    return
+    global lastTime
+    #cur = time.clock()
+    cur = time.time()
+    if not lastTime:
+        lastTime = cur
+
+    print "T", msg, cur-lastTime
+    lastTime = cur
+
+
+
 
 def fcn( npar, gin, f, par, iflag ):
+    sinceLast("fcn start")
     global cnt
     cnt +=1
     # get weighted MC ds
@@ -107,32 +151,37 @@ def fcn( npar, gin, f, par, iflag ):
     baseWeight = "weight" # yuck, Q&D
     a1 = ROOT.RooRealVar("a1","a1", par[0])
     a2 = ROOT.RooRealVar("a2","a2", par[1])
-    #a3 = ROOT.RooRealVar("a3","a3", par[2])
-    #args = ROOT.RooArgList(vars["qScale"], a1, a2, a3)
+    #a3 = ROOT.RooRealVar("a3","a3", par[2]) # xxx
+    #args = ROOT.RooArgList(vars["qScale"], a1, a2, a3) # xxx
     args = ROOT.RooArgList(vars["qScale"], a1, a2)
     #linear = ROOT.RooFormulaVar("lin", "lin", "a1+a2*qScale", args)
     linear = ROOT.RooFormulaVar("lin", "lin", "(a1+a2/qScale)*(qScale>0.01)", args)
     #linear = ROOT.RooFormulaVar("lin", "lin", "(a1+a2*(qScale**a3))*(qScale>0.01)", args)
+    #linear = ROOT.RooFormulaVar("lin", "lin", "a1+a2*exp(qScale/a3)", args)
 
     newweight = ROOT.RooFormulaVar("w"+str(cnt), "ww", baseWeight+"*lin"  , ROOT.RooArgList(vars[baseWeight], linear))
 
     sys.stdout.flush()
-    toRemove = None
-    if cnt > 0:
-        toRemove = "w"+str(cnt-1)
 
-    wds = reweighDS(globalMC[0], "neww", newweight, toRemove) # 
+    sinceLast("fcn init donw, now reweigh")
+    wds = reweighDS(globalMC[0], "neww", newweight) # 
 
     # fill MC histograms
     hMC = hMCbase.Clone("MC")
+    sinceLast("fcn rew done, now fill")
     wds.fillHistogram(hMC, ROOT.RooArgList(vars["leadPt"]))
     del wds
     #globalMC[0].fillHistogram(hMC, ROOT.RooArgList(vars["leadPt"]))
 
+    sinceLast("fcn fill done, now plots")
     c = ROOT.TCanvas()
     hMC.Draw()
     hMC.SetLineColor(2)
+
     hData.Draw("SAME")
+    newMax = 1.05*max(hMC.GetMaximum(), hData.GetMaximum())
+    hMC.SetMaximum(newMax)
+    #hData.SetMaximum(newMax)
     c.Print("~/tmp/steps/"+globalMC[0].GetName()+"_"+str(cnt)+".png")
 
     hRatio = hData.Clone()
@@ -142,6 +191,8 @@ def fcn( npar, gin, f, par, iflag ):
     c.Print("~/tmp/steps/ratio_"+globalMC[0].GetName()+"_"+str(cnt)+".png")
 
     # get chi2
+    sinceLast("fcn plots dons, now chi2")
+    #'''
     chisq, delta = 0., 0.
     for i in xrange(1, hMC.GetNbinsX()+1):
         errData = hData.GetBinError(i)
@@ -151,14 +202,17 @@ def fcn( npar, gin, f, par, iflag ):
         if err > 0:
             delta = (hData.GetBinContent(i)-hMC.GetBinContent(i))/err
             chisq += delta*delta
-        
+    '''    
+    #chisq = hData.Chi2Test(hMC, "WW OF CHI2") # overflow bin included in comparison
+    #chisq = hData.Chi2Test(hMC, "WW CHI2") 
+    #chisq = hData.Chi2Test(hMC, "UW CHI2") 
+    # '''
     f[0] = chisq
     #print "Call:", cnt, par[0], par[1], par[2], "chisq", chisq
     print "Call:", cnt, par[0], par[1], "chisq", chisq
 
-
-
-
+    
+    sinceLast("fcn end")
 
 def doBaselineFit(ofile, dsData, dsMC, lumi):
     c = ROOT.TCanvas()
