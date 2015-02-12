@@ -24,24 +24,13 @@ def init():
 # rooFVar - RooFormulaVar, e.g.
 #  ROOT.RooFormulaVar("w", "ww", "1", ROOT.RooArgList()) (switches off weighing)
 # FIXME (?) - input dataset gets modified (new variable is added)
-def reweighDS(ds, newname, rooFVar, varToRemove=None):
+def reweighDS(ds, newname, rooFVar):
+    ds = ds.Clone()
     wvar = ds.addColumn(rooFVar)
-
-    variables = ds.get()
-    #print "dupa", variables.find("dupa")
-    #print "weight", variables.find("weight")
-
-    if varToRemove:
-        toRemove = variables.find(varToRemove)
-        if toRemove:
-            variables.remove(toRemove)
-            print "Removed", varToRemove
-        else:
-            print "not found:", varToRemove
-
-
-    newDS = ROOT.RooDataSet(newname, ds.GetTitle(), ds, variables, "", wvar.GetName() )
+    newDS = ROOT.RooDataSet(newname, ds.GetTitle(), ds, ds.get(), "", wvar.GetName() )
     # should we return the wvar aswell?
+    #del ds
+    ds.IsA().Destructor(ds)
     return newDS
 
 
