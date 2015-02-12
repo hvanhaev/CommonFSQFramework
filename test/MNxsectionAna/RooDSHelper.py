@@ -24,10 +24,23 @@ def init():
 # rooFVar - RooFormulaVar, e.g.
 #  ROOT.RooFormulaVar("w", "ww", "1", ROOT.RooArgList()) (switches off weighing)
 # FIXME (?) - input dataset gets modified (new variable is added)
-def reweighDS(ds, newname, rooFVar):
+def reweighDS(ds, newname, rooFVar, varToRemove=None):
     wvar = ds.addColumn(rooFVar)
-    newDS = ROOT.RooDataSet(newname, ds.GetTitle(), ds, ds.get(), "", wvar.GetName() )
-    #newDS = ROOT.RooDataSet(newname, ds.GetTitle(), ds, ds.get(), "", "weight" )
+
+    variables = ds.get()
+    #print "dupa", variables.find("dupa")
+    #print "weight", variables.find("weight")
+
+    if varToRemove:
+        toRemove = variables.find(varToRemove)
+        if toRemove:
+            variables.remove(toRemove)
+            print "Removed", varToRemove
+        else:
+            print "not found:", varToRemove
+
+
+    newDS = ROOT.RooDataSet(newname, ds.GetTitle(), ds, variables, "", wvar.GetName() )
     # should we return the wvar aswell?
     return newDS
 
@@ -117,6 +130,10 @@ def getSummedRooDS(rootName, infile, samplesToAdd, weight=None):
     print "        ...done"
 
     print "Dataset:", rootName, ds.numEntries()
+    print "Convert to vectorstore"
+    ds.convertToVectorStore()
+    print "        ...done"
+
 
     #if "central" not in variations:
     #    raise Exception("Central value not found!")
