@@ -115,12 +115,18 @@ def fcn( npar, gin, f, par, iflag ):
     #linear = ROOT.RooFormulaVar("lin", "lin", "(a1+a2*(qScale**a3))*(qScale>0.01)", args)
 
     newweight = ROOT.RooFormulaVar("w"+str(cnt), "ww", baseWeight+"*lin"  , ROOT.RooArgList(vars[baseWeight], linear))
-    wds = reweighDS(globalMC[0], "neww", newweight)
 
+    sys.stdout.flush()
+    toRemove = None
+    if cnt > 0:
+        toRemove = "w"+str(cnt-1)
+
+    wds = reweighDS(globalMC[0], "neww", newweight, toRemove) # 
 
     # fill MC histograms
     hMC = hMCbase.Clone("MC")
     wds.fillHistogram(hMC, ROOT.RooArgList(vars["leadPt"]))
+    del wds
     #globalMC[0].fillHistogram(hMC, ROOT.RooArgList(vars["leadPt"]))
 
     c = ROOT.TCanvas()
@@ -194,8 +200,8 @@ def main():
     print "Lumi:", lumi
 
     #todoQCDNames = ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6", "QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]
-    #todoQCDNames = ["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp",]
-    todoQCDNames = ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
+    todoQCDNames = ["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp",]
+    #todoQCDNames = ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
 
     outFile = ROOT.TFile("ptHatWeighters.root", "recreate")
     for t in todoQCDNames:
