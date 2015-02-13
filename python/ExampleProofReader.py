@@ -120,16 +120,16 @@ class ExampleProofReader( ROOT.TPySelector ):
             traceback.print_exc(file=sys.stdout)
             sys.stdout.flush()
 
-        if self.outFile.count(".root") != 1:
-            #print self.outFile, self.outFile.find(".root")
-            raise Exception("outFile name contains .root more/less than once.")
+        if self.useProofOFile:
+            self.newStyleOutputList = []
+            curPath = ROOT.gDirectory.GetPath()
+            bigFileName = self.outFile.replace(".root","")+".root"
+            self.proofFile=ROOT.TProofOutputFile(bigFileName,"M")
+            self.oFileViaPOF = self.proofFile.OpenFile("RECREATE") 
+            print "opened file:", self.oFileViaPOF
+            self.outDirViaPOF = self.oFileViaPOF.mkdir(self.datasetName)
 
-        curPath = ROOT.gDirectory.GetPath()
-        bigFileName = self.outFile.replace(".root","")+"_BF.root"
-        self.proofFile=ROOT.TProofOutputFile(bigFileName,"M")
-        self.oFileViaPOF = self.proofFile.OpenFile("RECREATE") 
-        print "opened file:", self.oFileViaPOF
-        ROOT.gDirectory.cd(curPath)
+            ROOT.gDirectory.cd(curPath)
 
         try:
             self.init() 
@@ -139,9 +139,15 @@ class ExampleProofReader( ROOT.TPySelector ):
             sys.stdout.flush()
             raise Exception("Whooopps!")
 
+    def addToOutput(self, obj):
+        if self.useProofOFile:
+            self.newStyleOutputList.append(obj)
+        else:
+            self.GetOutputList().Add(obj)
 
     # this method will be overridden in derived class
     def init(self):
+
         self.histograms = {}
         self.ptLeadHisto = ROOT.TH1F("ptLead",   "ptLead",  100, 0, 100)      
         self.ptRatioHisto = ROOT.TH1F("ptRatio", "ptRatio", 100, -0.0001, 10)      
@@ -212,9 +218,14 @@ class ExampleProofReader( ROOT.TPySelector ):
             raise Exception("Whooopps!")
 
         if self.oFileViaPOF:
+            curPath = ROOT.gDirectory.GetPath()
+            self.outDirViaPOF.cd()
+            for o in self.newStyleOutputList:
+                o.Write()
             self.oFileViaPOF.cd()
             self.oFileViaPOF.Write()
             self.GetOutputList().Add(self.proofFile)
+            ROOT.gDirectory.cd(curPath)
 
 
 
@@ -285,20 +296,19 @@ class ExampleProofReader( ROOT.TPySelector ):
 
         #print 'py: terminating' 
         olist =  self.GetOutputList()
-        of = ROOT.TFile(self.outFile, "UPDATE") # TODO - take dir name from Central file
-        outDir = of.mkdir(self.datasetName)
-        outDir.cd()
 
-        #print "XXXX", ROOT.gDirectory.GetPath()
-        for o in olist:
-            o.Write()
-
-        of.Close()
+        if not self.useProofOFile:
+            of = ROOT.TFile(self.outFile, "UPDATE") # TODO - take dir name from Central file
+            outDir = of.mkdir(self.datasetName)
+            outDir.cd()
+            for o in olist:
+                o.Write()
+            of.Close()
 
     @classmethod
     def runAll(cls, treeName, outFile, sampleList = None, \
                 maxFilesMC=None, maxFilesData=None, \
-                slaveParameters = None, nWorkers=None, usePickle=False):
+                slaveParameters = None, nWorkers=None, usePickle=False, useProofOFile = False):
 
 
         if slaveParameters == None: # When default param is used reset contents on every call to runAll
@@ -313,12 +323,15 @@ class ExampleProofReader( ROOT.TPySelector ):
         else:
             todo = sampleList
 
+        slaveParameters["useProofOFile"] = useProofOFile
 
-        of = ROOT.TFile(outFile,"RECREATE")
-        if not of:
-            print "Cannot create outfile:", outFile
-            sys.exit()
-        of.Close() # so we dont mess with file opens during proof ana
+
+        if not useProofOFile:
+            of = ROOT.TFile(outFile,"RECREATE")
+            if not of:
+                print "Cannot create outfile:", outFile
+                sys.exit()
+            of.Close() # so we dont mess with file opens during proof ana
         
         slaveParameters["outFile"] = outFile
 

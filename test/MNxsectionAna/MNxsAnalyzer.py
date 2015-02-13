@@ -88,11 +88,9 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
             #self.var["alphaQCD"] = array('d', [0])
             self.var["qScale"]   = array('d', [0])
             self.tree = ROOT.TTree("data", "data")
-            self.tree.SetDirectory(self.oFileViaPOF)
             for v in self.var:
                 self.tree.Branch(v, self.var[v], v+"/D")
-            #self.GetOutputList().Add(self.tree)
-            self.tree.AutoSave()
+            self.addToOutput(self.tree)
 
         else:
             for h in self.hist:
@@ -412,6 +410,7 @@ if __name__ == "__main__":
                                maxFilesData = maxFilesData,
                                nWorkers=nWorkers,
                                usePickle = True,
+                               useProofOFile = True,
                                outFile = ofile )
 
     print "TODO: fakes prob vs eta"
