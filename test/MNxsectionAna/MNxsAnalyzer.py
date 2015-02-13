@@ -88,9 +88,11 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
             #self.var["alphaQCD"] = array('d', [0])
             self.var["qScale"]   = array('d', [0])
             self.tree = ROOT.TTree("data", "data")
+            self.tree.SetDirectory(self.oFileViaPOF)
             for v in self.var:
                 self.tree.Branch(v, self.var[v], v+"/D")
-            self.GetOutputList().Add(self.tree)
+            #self.GetOutputList().Add(self.tree)
+            self.tree.AutoSave()
 
         else:
             for h in self.hist:
@@ -372,7 +374,7 @@ if __name__ == "__main__":
     # '''
     # '''
     #maxFilesMC = 48
-    #maxFilesMC = 1
+    maxFilesMC = 2
     #maxFilesData = 1
     #nWorkers = 1
     #maxFilesMC = 16

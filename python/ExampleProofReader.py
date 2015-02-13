@@ -113,9 +113,25 @@ class ExampleProofReader( ROOT.TPySelector ):
 
     def SlaveBegin( self, tree ):
         #print 'py: slave beginning'
+        try:
+            self.getVariables() # needed for 
+        except:
+            print "Exception catched during worker configuration. Traceback:"
+            traceback.print_exc(file=sys.stdout)
+            sys.stdout.flush()
+
+        if self.outFile.count(".root") != 1:
+            #print self.outFile, self.outFile.find(".root")
+            raise Exception("outFile name contains .root more/less than once.")
+
+        curPath = ROOT.gDirectory.GetPath()
+        bigFileName = self.outFile.replace(".root","")+"_BF.root"
+        self.proofFile=ROOT.TProofOutputFile(bigFileName,"M")
+        self.oFileViaPOF = self.proofFile.OpenFile("RECREATE") 
+        print "opened file:", self.oFileViaPOF
+        ROOT.gDirectory.cd(curPath)
 
         try:
-            self.getVariables()
             self.init() 
         except:
             print "Exception catched during worker configuration. Traceback:"
@@ -194,6 +210,13 @@ class ExampleProofReader( ROOT.TPySelector ):
             print ""
             sys.stdout.flush()
             raise Exception("Whooopps!")
+
+        if self.oFileViaPOF:
+            self.oFileViaPOF.cd()
+            self.oFileViaPOF.Write()
+            self.GetOutputList().Add(self.proofFile)
+
+
 
     def finalize(self):
         print "finalize function called from base class. You may want to implement this."
