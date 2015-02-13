@@ -131,10 +131,10 @@ sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["lumiJet15"]
 sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["weightNoPu"]='RooFormulaVar("weight","weight", "generatorWeight", RooArgList(v["generatorWeight"]["RooVar"]))'
 sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["json"]=''
 sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["lumiDiJet15FB"]='crashMeMC'
-sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/DiJet_20140122_QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/41604368d448ae281f8d712ffb270cb3//'
+sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/DiJet_20140122_QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/41604368d448ae281f8d712ffb270cb3/_merged/'
 sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["XS"]=22130000000.0
 sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/DiJet_20140122_QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/41604368d448ae281f8d712ffb270cb3//'
-sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/DiJet_20140122_QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/41604368d448ae281f8d712ffb270cb3/'
+sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/DiJet_20140122_QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/41604368d448ae281f8d712ffb270cb3_merged/'
 sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]["DS"]='/QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6/Summer12-LowPU2010_DR42_PU_S0_START42_V17B-v2/AODSIM'
 
 def icm(sam):
