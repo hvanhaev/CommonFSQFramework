@@ -25,6 +25,9 @@ hData.Sumw2()
 hMCbase = hData.Clone()
 globalMC = None
 
+
+numParams = 4
+
 def doMinuitFit(ofile, dsData, dsMC, lumi):
     c = ROOT.TCanvas()
     hData.Reset()
@@ -42,22 +45,30 @@ def doMinuitFit(ofile, dsData, dsMC, lumi):
 
     #fitF = ROOT.TF1("ptHatW","[0]+[1]*(x**[2])", 0, 1000000);
     #fitF = ROOT.TF1("ptHatW","[0]+[1]*x", 0, 1000000);
-    fitF = ROOT.TF1("ptHatW","[0]+[1]/x", 0, 1000000);
+    #fitF = ROOT.TF1("ptHatW","[0]+[1]/x", 0, 1000000);
     #fitF = ROOT.TF1("ptHatW","[0]+[1]*exp(x/[2])", 0, 1000000);#
     #     linear = ROOT.RooFormulaVar("lin", "lin", "a1+a2*(qScale/a3)", args)
+    fitF = ROOT.TF1("ptHatW","[0]+[1]/([2]*x-[3])", 0, 1000000);
 
-
-    fitF.SetParameter(0, 0.)
-    fitF.SetParameter(1, 1.)
-    #fitF.SetParameter(2, -10) #xxx
+    fitF.SetParameter(0, 1.)
+    fitF.SetParameter(1, 0.)
+    fitF.SetParameter(2, 1.) 
+    fitF.SetParameter(3, 0.) 
     hData2MC.Fit("ptHatW")
     hData2MC.Draw()
     c.Print("~/tmp/steps/start_"+dsMC[0].GetName()+".png")
 
-    
+    aStart, aErr = [], [] 
+    global numParams
+    for i in xrange(numParams):
+        aStart.append(fitF.GetParameter(i))   
+        aErr.append(fitF.GetParError(i)/10.)   
+
+    '''
     a1Start, a1err = fitF.GetParameter(0), fitF.GetParError(0)
     a2Start, a2err = fitF.GetParameter(1), fitF.GetParError(1)
-    #a3Start, a3err = fitF.GetParameter(2), fitF.GetParError(2) # xxx
+    a3Start, a3err = fitF.GetParameter(2), fitF.GetParError(2) # xxx
+    a4Start, a4err = fitF.GetParameter(3), fitF.GetParError(3) '''
 
 
     # setup minuit
@@ -70,35 +81,14 @@ def doMinuitFit(ofile, dsData, dsMC, lumi):
     arglist[0] = 1
     gMinuit.mnexcm( "SET ERR", arglist, 1, ierflg )
 
-    # Set starting values and step sizes for parameters
-    # Best linear, herwig: Call: 63 0.495972878319 0.0115689236499 chisq 192.329885935
-    # Best a+b/x,
-    #   herwig (my chi2, no lowPT):     Call: 142 1.74440199586 -27.5599163958 chisq 28.5523011508
-    #   herwig (my chi2, lowPT): Call: 142 1.74440199586 -27.5599163958 chisq 28.5523011508 # same vals?
-    #   herwig (root chi2, WW, no lowPT) : Call: 65 2.00594999924 -33.8966266938 chisq 112.237294756
-    #   herwig (root chi2, UW, no lowPT) : Call: 117 2.11427928202 -33.999978712 chisq 66.8756343924
-    #   pythia (my chi2, lowPT): Call: 144 1.0937994778 -11.5629304828 chisq 17.9163721952 # migrad fails to find impr...
-
-
-    # TODO: 
-
-
-    # best a+bx**c, herwig: Call: 30 -8.19785565098 6.92050519408 0.0768261455595 chisq 155.637202664
-
-    # best exp so far: herwig : Call: 191 0.662748696815 -1.28651289298 -148.376339102 chisq 157.633606971
-
-
-    #vstart = array( 'd', ( a1Start,  a2Start) )
-    vstart = array( 'd', ( 2,  -35) )
-    step   = array( 'd', ( 0.1, 1 ) )
-    #vstart = array( 'd', ( a1Start,  a2Start, a3Start) ) # xxx
-    #vstart = array( 'd', ( 0.2,  -0.5, -150.) )
-    #step   = array( 'd', ( 0.1, 0.1, 0.01 ) )
-    #step   = array( 'd', ( a1err, a2err ) )
-    #step   = array( 'd', ( a1err, a2err, a3err ) ) # xxx
-    #step   = array( 'd', ( 0.02, 0.02, 5 ) )
-    gMinuit.mnparm( 0, "a1", vstart[0], step[0], 0, 0, ierflg )
-    gMinuit.mnparm( 1, "a2", vstart[1], step[1], 0, 0, ierflg )
+    vstart = array( 'd', tuple( aStart))
+    step   = array( 'd', tuple( aErr))
+    #vstart = array( 'd', (2, -1, 1, 0 ))
+    #step   = array( 'd', (0.1, 0.1, 0.01, 0.01))
+    for i in xrange(numParams):
+        gMinuit.mnparm( i, "a"+str(i), vstart[i], step[i], 0, 0, ierflg )
+    #gMinuit.mnparm( 0, "a1", vstart[0], step[0], 0, 0, ierflg )
+    #gMinuit.mnparm( 1, "a2", vstart[1], step[1], 0, 0, ierflg )
     #gMinuit.mnparm( 2, "a3", vstart[2], step[2], 0, 0, ierflg ) # xxx
 
     # 
@@ -151,17 +141,29 @@ def fcn( npar, gin, f, par, iflag ):
     # get weighted MC ds
     global globalMC
     vars = globalMC[1]
-    #localMCds = globalMC[0].Clone()
     baseWeight = "weight" # yuck, Q&D
-    a1 = ROOT.RooRealVar("a1","a1", par[0])
-    a2 = ROOT.RooRealVar("a2","a2", par[1])
-    #a3 = ROOT.RooRealVar("a3","a3", par[2]) # xxx
-    #args = ROOT.RooArgList(vars["qScale"], a1, a2, a3) # xxx
-    args = ROOT.RooArgList(vars["qScale"], a1, a2)
+
+
+    args = ROOT.RooArgList()
+    pars = ROOT.RooArgList()
+    obs = ROOT.RooArgList()
+    args.add(vars["qScale"])
+    obs.add(vars["qScale"])
+    global numParams
+    store = []
+    for i in xrange(numParams):
+        name = "a"+str(i)
+        var = ROOT.RooRealVar(name, name, par[i])
+        args.add( var)
+        pars.add( var)
+        store.append(var) # prevent gc
+
+
     #linear = ROOT.RooFormulaVar("lin", "lin", "a1+a2*qScale", args)
-    linear = ROOT.RooFormulaVar("lin", "lin", "(a1+a2/qScale)*(qScale>0.01)", args)
+    #linear = ROOT.RooFormulaVar("lin", "lin", "(a0+a1/qScale)*(qScale>0.01)", args)
     #linear = ROOT.RooFormulaVar("lin", "lin", "(a1+a2*(qScale**a3))*(qScale>0.01)", args)
     #linear = ROOT.RooFormulaVar("lin", "lin", "a1+a2*exp(qScale/a3)", args)
+    linear = ROOT.RooFormulaVar("lin", "lin", "(a0+a1/(a2*qScale-a3))*( (a0+a1/(a2*qScale-a3))>0  )", args)
 
     newweight = ROOT.RooFormulaVar("w"+str(cnt), "ww", baseWeight+"*lin"  , ROOT.RooArgList(vars[baseWeight], linear))
 
@@ -212,8 +214,19 @@ def fcn( npar, gin, f, par, iflag ):
     #chisq = hData.Chi2Test(hMC, "UW CHI2") 
     # '''
     f[0] = chisq
-    #print "Call:", cnt, par[0], par[1], par[2], "chisq", chisq
-    print "Call:", cnt, par[0], par[1], "chisq", chisq
+
+    sss = " "
+    for i in xrange(numParams):
+        sss += str(par[i]) + " "
+    print "Call:", cnt, sss, "chisq", chisq
+
+    f = linear.asTF(obs, pars)
+    todo = [30, 50, 100, 200, 500, 1000, 3000]
+    print " ".join(map(str,  todo))
+    print " ".join(map(str,  map(f, todo)))
+    #for t in todo:
+    #print "At 100:", f.Eval(100)
+    f.IsA().Destructor(f)
 
     
     sinceLast("fcn end")
