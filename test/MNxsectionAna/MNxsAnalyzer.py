@@ -155,6 +155,8 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                 return
             weight = weightBase
         else:
+            if not self.MC_jet15_triggerFired:
+                return
             truePU = self.fChain.puTrueNumInteractions
             puWeight =  self.lumiWeighters["_jet15_central"].weight(truePU)
             weight = weightBase*puWeight
@@ -184,13 +186,19 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
         self.jetGetter.newEvent(self.fChain)
         weightBase = 1. 
         if not self.isData:
+            # TODO: dijet15FB case
+            ev = self.fChain.event
+            rnd4eff = ev%10000/9999.
             weightBase *= self.fChain.genWeight*self.normFactor 
             self.HLTMCWeighterJ15L1Raw.newEvent(self.fChain)
             self.HLTMCWeighterJ15Raw.newEvent(self.fChain)
             w1 = self.HLTMCWeighterJ15L1Raw.getWeight()
             w2 = self.HLTMCWeighterJ15Raw.getWeight()
             #print "WTRG", w1, w2
-            weightBase *= w1*w2
+            #weightBase *= w1*w2
+            self.MC_jet15_triggerFired = w1*w2 > rnd4eff
+            #print ev, w1*w2, rnd4eff, triggerFired
+
 
         if not self.isData and  self.applyPtHatReweighing:
             ptHat = self.fChain.qScale
@@ -285,6 +293,12 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                         gotTrigger = self.fChain.doubleJ15FB > 0.5
                     else:
                         raise Exception("Trigger not known??? "+triggerToUse)
+                else:
+                    gotTrigger = True
+                    if triggerToUse == "_jet15":
+                        gotTrigger = self.MC_jet15_triggerFired
+
+
 
                 if gotTrigger:
                     # calculate weight for MC
@@ -363,21 +377,22 @@ if __name__ == "__main__":
     sampleList = []
     sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
 
-    '''
-    sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
+    #'''
+    #sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
     sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
-    sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
-    sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
-    sampleList.append("METFwd-Run2010B-Apr21ReReco-v1")
+    #sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
+    #sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
+    #sampleList.append("METFwd-Run2010B-Apr21ReReco-v1")
     # '''
     # '''
     #maxFilesMC = 48
-    maxFilesMC = 2
-    #maxFilesData = 1
+    #maxFilesMC = 10
+    maxFilesMC = 1
+    maxFilesData = 1
     #nWorkers = 1
     #maxFilesMC = 16
+    #nWorkers = 12
     nWorkers = 12
-    #nWorkers = 1
 
     slaveParams = {}
     slaveParams["threshold"] = 35.
