@@ -77,6 +77,10 @@ def doMinuitFit(ofile, dsData, dsMC, lumi):
     #   herwig (my chi2, lowPT): Call: 142 1.74440199586 -27.5599163958 chisq 28.5523011508 # same vals?
     #   herwig (root chi2, WW, no lowPT) : Call: 65 2.00594999924 -33.8966266938 chisq 112.237294756
     #   herwig (root chi2, UW, no lowPT) : Call: 117 2.11427928202 -33.999978712 chisq 66.8756343924
+    #   pythia (my chi2, lowPT): Call: 144 1.0937994778 -11.5629304828 chisq 17.9163721952 # migrad fails to find impr...
+
+
+    # TODO: 
 
 
     # best a+bx**c, herwig: Call: 30 -8.19785565098 6.92050519408 0.0768261455595 chisq 155.637202664
@@ -254,8 +258,8 @@ def main():
     print "Lumi:", lumi
 
     #todoQCDNames = ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6", "QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]
-    todoQCDNames = ["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp",]
-    #todoQCDNames = ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
+    #todoQCDNames = ["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp",]
+    todoQCDNames = ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
 
     outFile = ROOT.TFile("ptHatWeighters.root", "recreate")
     for t in todoQCDNames:
