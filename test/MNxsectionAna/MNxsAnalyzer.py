@@ -378,17 +378,16 @@ if __name__ == "__main__":
     sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
 
     #'''
-    #sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
+    sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
     sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
-    #sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
-    #sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
-    #sampleList.append("METFwd-Run2010B-Apr21ReReco-v1")
+    sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
+    sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
+    sampleList.append("METFwd-Run2010B-Apr21ReReco-v1")
     # '''
     # '''
     #maxFilesMC = 48
-    #maxFilesMC = 10
-    maxFilesMC = 1
-    maxFilesData = 1
+    maxFilesMC = 10
+    #maxFilesData = 1
     #nWorkers = 1
     #maxFilesMC = 16
     #nWorkers = 12
@@ -411,6 +410,7 @@ if __name__ == "__main__":
         slaveParams["applyPtHatReweighing"] = False
         slaveParams["threshold"] = 30.
         ofile = "treesForPTHatReweighing.root"
+        sampleList.remove("METFwd-Run2010B-Apr21ReReco-v1")
     else:
         slaveParams["onlyPtHatReweighing"] = False
         #slaveParams["applyPtHatReweighing"] = True
