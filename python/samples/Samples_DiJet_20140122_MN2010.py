@@ -111,10 +111,10 @@ sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["lumiJet15"]='crashMeMC'
 sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["weightNoPu"]='RooFormulaVar("weight","weight", "xsOverEvents", RooArgList())'
 sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["json"]=''
 sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["lumiDiJet15FB"]='crashMeMC'
-sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/DiJet_20140122_QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/2453dbe65c7b76fab446f730c3641860//'
+sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/DiJet_20140122_QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/2453dbe65c7b76fab446f730c3641860_merged//'
 sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["XS"]=16953200000.0
-sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/DiJet_20140122_QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/2453dbe65c7b76fab446f730c3641860//'
-sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/DiJet_20140122_QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/2453dbe65c7b76fab446f730c3641860/'
+sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/DiJet_20140122_QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/2453dbe65c7b76fab446f730c3641860_merged//'
+sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/DiJet_20140122_QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/2453dbe65c7b76fab446f730c3641860_merged/'
 sam["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]["DS"]='/QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp/Summer12-LowPU2010_DR42_BS2011_PU_S0_START42_V17B-v1/AODSIM'
 
 sam["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]={}
