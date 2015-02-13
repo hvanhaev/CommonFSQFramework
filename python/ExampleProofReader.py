@@ -123,10 +123,9 @@ class ExampleProofReader( ROOT.TPySelector ):
         if self.useProofOFile:
             self.newStyleOutputList = []
             curPath = ROOT.gDirectory.GetPath()
-            bigFileName = self.outFile.replace(".root","")+".root"
+            bigFileName = self.outFile.replace(".root","")+"_"+ self.datasetName+".root"
             self.proofFile=ROOT.TProofOutputFile(bigFileName,"M")
             self.oFileViaPOF = self.proofFile.OpenFile("RECREATE") 
-            print "opened file:", self.oFileViaPOF
             self.outDirViaPOF = self.oFileViaPOF.mkdir(self.datasetName)
 
             ROOT.gDirectory.cd(curPath)
@@ -142,6 +141,11 @@ class ExampleProofReader( ROOT.TPySelector ):
     def addToOutput(self, obj):
         if self.useProofOFile:
             self.newStyleOutputList.append(obj)
+            # this fixes "inmemory" trees problem
+            if "TTree" in obj.ClassName():
+                obj.SetDirectory(self.outDirViaPOF)
+
+
         else:
             self.GetOutputList().Add(obj)
 
@@ -415,8 +419,11 @@ class ExampleProofReader( ROOT.TPySelector ):
 
             curPath = ROOT.gDirectory.GetPath()
 
-
-            of = ROOT.TFile(outFile,"UPDATE")
+            if useProofOFile:
+                bigFileName = outFile.replace(".root","")+"_"+t+".root"
+                of = ROOT.TFile(bigFileName,"UPDATE")
+            else:
+                of = ROOT.TFile(outFile,"UPDATE")
 
             # Write norm value and other info
             saveDir = of.Get(t)
@@ -440,19 +447,22 @@ class ExampleProofReader( ROOT.TPySelector ):
                 #print command
                 proof.Exec('gSystem->Unsetenv("'+v+'");')
 
-            
-
-
-
         if len(skipped)>0:
             print "Note: following samples were skipped:"
             for sk in skipped:
                 print "  ",sk
 
         print "Analyzed:"
-
-        for t in set(todo)-set(skipped):
+        done = set(todo)-set(skipped)
+        for t in done:
             print t
+
+        if useProofOFile:
+            partFiles = []
+            for t in done:
+                partFiles.append(outFile.replace(".root","")+"_"+t+".root")
+            print "Running hadd"
+            os.system("hadd -f " + outFile + " " + " ".join(partFiles))
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
