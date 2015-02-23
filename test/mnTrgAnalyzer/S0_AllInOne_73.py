@@ -9,9 +9,9 @@ import FWCore.ParameterSet.Config as cms
 
 # we can redo only one type of trigger a time
 # note: auto GT setting at the end
-l1SeedThr = 0
-todo = "legacy"
-#todo = "stage1"
+l1SeedThr = 5
+#todo = "legacy"
+todo = "stage1"
 
 
 if todo == "stage1":
@@ -40,7 +40,8 @@ process.jets = cms.Path( process.HLTBeginSequence + process.HLTAK4CaloJetsSequen
 
 
 process.source.fileNames = cms.untracked.vstring(
-        '/store/mc/Spring14dr/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/GEN-SIM-RAW/Flat0to10_POSTLS170_V5-v1/00000/0002A86F-3408-E411-B90A-E0CB4E19F961.root'
+#        '/store/mc/Spring14dr/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/GEN-SIM-RAW/Flat0to10_POSTLS170_V5-v1/00000/0002A86F-3408-E411-B90A-E0CB4E19F961.root'
+        '/store/mc/Phys14DR/Neutrino_Pt-2to20_gun/GEN-SIM-RAW/Flat20to50BX50_tsg_PHYS14_ST_V1-v1/00000/04BC0DAC-6F8A-E411-BA02-0025905A6084.root'
 )
 
 
