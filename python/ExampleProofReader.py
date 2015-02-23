@@ -113,9 +113,24 @@ class ExampleProofReader( ROOT.TPySelector ):
 
     def SlaveBegin( self, tree ):
         #print 'py: slave beginning'
+        try:
+            self.getVariables() # needed for 
+        except:
+            print "Exception catched during worker configuration. Traceback:"
+            traceback.print_exc(file=sys.stdout)
+            sys.stdout.flush()
+
+        if self.useProofOFile:
+            self.newStyleOutputList = []
+            curPath = ROOT.gDirectory.GetPath()
+            bigFileName = self.outFile.replace(".root","")+"_"+ self.datasetName+".root"
+            self.proofFile=ROOT.TProofOutputFile(bigFileName,"M")
+            self.oFileViaPOF = self.proofFile.OpenFile("RECREATE") 
+            self.outDirViaPOF = self.oFileViaPOF.mkdir(self.datasetName)
+
+            ROOT.gDirectory.cd(curPath)
 
         try:
-            self.getVariables()
             self.init() 
         except:
             print "Exception catched during worker configuration. Traceback:"
@@ -123,9 +138,20 @@ class ExampleProofReader( ROOT.TPySelector ):
             sys.stdout.flush()
             raise Exception("Whooopps!")
 
+    def addToOutput(self, obj):
+        if self.useProofOFile:
+            self.newStyleOutputList.append(obj)
+            # this fixes "inmemory" trees problem
+            if "TTree" in obj.ClassName():
+                obj.SetDirectory(self.outDirViaPOF)
+
+
+        else:
+            self.GetOutputList().Add(obj)
 
     # this method will be overridden in derived class
     def init(self):
+
         self.histograms = {}
         self.ptLeadHisto = ROOT.TH1F("ptLead",   "ptLead",  100, 0, 100)      
         self.ptRatioHisto = ROOT.TH1F("ptRatio", "ptRatio", 100, -0.0001, 10)      
@@ -195,6 +221,18 @@ class ExampleProofReader( ROOT.TPySelector ):
             sys.stdout.flush()
             raise Exception("Whooopps!")
 
+        if self.oFileViaPOF:
+            curPath = ROOT.gDirectory.GetPath()
+            self.outDirViaPOF.cd()
+            for o in self.newStyleOutputList:
+                o.Write()
+            self.oFileViaPOF.cd()
+            self.oFileViaPOF.Write()
+            self.GetOutputList().Add(self.proofFile)
+            ROOT.gDirectory.cd(curPath)
+
+
+
     def finalize(self):
         print "finalize function called from base class. You may want to implement this."
 
@@ -262,20 +300,19 @@ class ExampleProofReader( ROOT.TPySelector ):
 
         #print 'py: terminating' 
         olist =  self.GetOutputList()
-        of = ROOT.TFile(self.outFile, "UPDATE") # TODO - take dir name from Central file
-        outDir = of.mkdir(self.datasetName)
-        outDir.cd()
 
-        #print "XXXX", ROOT.gDirectory.GetPath()
-        for o in olist:
-            o.Write()
-
-        of.Close()
+        if not self.useProofOFile:
+            of = ROOT.TFile(self.outFile, "UPDATE") # TODO - take dir name from Central file
+            outDir = of.mkdir(self.datasetName)
+            outDir.cd()
+            for o in olist:
+                o.Write()
+            of.Close()
 
     @classmethod
     def runAll(cls, treeName, outFile, sampleList = None, \
                 maxFilesMC=None, maxFilesData=None, \
-                slaveParameters = None, nWorkers=None, usePickle=False):
+                slaveParameters = None, nWorkers=None, usePickle=False, useProofOFile = False):
 
 
         if slaveParameters == None: # When default param is used reset contents on every call to runAll
@@ -290,12 +327,15 @@ class ExampleProofReader( ROOT.TPySelector ):
         else:
             todo = sampleList
 
+        slaveParameters["useProofOFile"] = useProofOFile
 
-        of = ROOT.TFile(outFile,"RECREATE")
-        if not of:
-            print "Cannot create outfile:", outFile
-            sys.exit()
-        of.Close() # so we dont mess with file opens during proof ana
+
+        if not useProofOFile:
+            of = ROOT.TFile(outFile,"RECREATE")
+            if not of:
+                print "Cannot create outfile:", outFile
+                sys.exit()
+            of.Close() # so we dont mess with file opens during proof ana
         
         slaveParameters["outFile"] = outFile
 
@@ -379,8 +419,11 @@ class ExampleProofReader( ROOT.TPySelector ):
 
             curPath = ROOT.gDirectory.GetPath()
 
-
-            of = ROOT.TFile(outFile,"UPDATE")
+            if useProofOFile:
+                bigFileName = outFile.replace(".root","")+"_"+t+".root"
+                of = ROOT.TFile(bigFileName,"UPDATE")
+            else:
+                of = ROOT.TFile(outFile,"UPDATE")
 
             # Write norm value and other info
             saveDir = of.Get(t)
@@ -404,19 +447,22 @@ class ExampleProofReader( ROOT.TPySelector ):
                 #print command
                 proof.Exec('gSystem->Unsetenv("'+v+'");')
 
-            
-
-
-
         if len(skipped)>0:
             print "Note: following samples were skipped:"
             for sk in skipped:
                 print "  ",sk
 
         print "Analyzed:"
-
-        for t in set(todo)-set(skipped):
+        done = set(todo)-set(skipped)
+        for t in done:
             print t
+
+        if useProofOFile:
+            partFiles = []
+            for t in done:
+                partFiles.append(outFile.replace(".root","")+"_"+t+".root")
+            print "Running hadd"
+            os.system("hadd -f " + outFile + " " + " ".join(partFiles))
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)

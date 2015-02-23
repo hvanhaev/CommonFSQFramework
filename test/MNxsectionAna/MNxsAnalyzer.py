@@ -23,10 +23,16 @@ import MNTriggerStudies.MNTriggerAna.ExampleProofReader
 from  MNTriggerStudies.MNTriggerAna.BetterJetGetter import BetterJetGetter
 
 from optparse import OptionParser
+
+from HLTMCWeighter import HLTMCWeighter
 #import DiJetBalancePlugin
 
 class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
     def init( self):
+        if not self.isData:
+            #self.hltMCWeighter = HLTMCWeighter("HLT_Jet15U")
+            self.HLTMCWeighterJ15Raw = HLTMCWeighter("HLT_Jet15U_raw")
+            self.HLTMCWeighterJ15L1Raw = HLTMCWeighter("HLT_Jet15U_L1Seeding_raw")
 
         self.normFactor = self.getNormalizationFactor()
 
@@ -84,7 +90,7 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
             self.tree = ROOT.TTree("data", "data")
             for v in self.var:
                 self.tree.Branch(v, self.var[v], v+"/D")
-            self.GetOutputList().Add(self.tree)
+            self.addToOutput(self.tree)
 
         else:
             for h in self.hist:
@@ -94,9 +100,10 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
 
         if self.applyPtHatReweighing and not self.isData:
                 fp = "MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"
-                todo = ["ptHatWeighters_invx_pass1.root_invX", 
-                        "ptHatWeighters_invx_pass2.root_invX",
-                        "ptHatWeighters_invx_pass3.root_invX",]
+                todo = ["ptHatWeighters.root"]
+                #todo = ["ptHatWeighters_invx_pass1.root_invX", 
+                #        "ptHatWeighters_invx_pass2.root_invX",
+                #        "ptHatWeighters_invx_pass3.root_invX",]
                 self.ptHatW = []
                 for t in todo:
                     ptHatFileName = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"+t).fullPath()
@@ -148,6 +155,8 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                 return
             weight = weightBase
         else:
+            if not self.MC_jet15_triggerFired:
+                return
             truePU = self.fChain.puTrueNumInteractions
             puWeight =  self.lumiWeighters["_jet15_central"].weight(truePU)
             weight = weightBase*puWeight
@@ -177,13 +186,26 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
         self.jetGetter.newEvent(self.fChain)
         weightBase = 1. 
         if not self.isData:
+            # TODO: dijet15FB case
+            ev = self.fChain.event
+            rnd4eff = ev%10000/9999.
             weightBase *= self.fChain.genWeight*self.normFactor 
+            self.HLTMCWeighterJ15L1Raw.newEvent(self.fChain)
+            self.HLTMCWeighterJ15Raw.newEvent(self.fChain)
+            w1 = self.HLTMCWeighterJ15L1Raw.getWeight()
+            w2 = self.HLTMCWeighterJ15Raw.getWeight()
+            #print "WTRG", w1, w2
+            #weightBase *= w1*w2
+            self.MC_jet15_triggerFired = w1*w2 > rnd4eff
+            #print ev, w1*w2, rnd4eff, triggerFired
+
 
         if not self.isData and  self.applyPtHatReweighing:
             ptHat = self.fChain.qScale
             w = 1.
             for weighter in self.ptHatW:
                 w*=max(weighter.Eval(ptHat), 0.)
+                #print "W:", ptHat, weighter.Eval(ptHat)
             weightBase *= w
  
 
@@ -271,6 +293,12 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                         gotTrigger = self.fChain.doubleJ15FB > 0.5
                     else:
                         raise Exception("Trigger not known??? "+triggerToUse)
+                else:
+                    gotTrigger = True
+                    if triggerToUse == "_jet15":
+                        gotTrigger = self.MC_jet15_triggerFired
+
+
 
                 if gotTrigger:
                     # calculate weight for MC
@@ -357,11 +385,12 @@ if __name__ == "__main__":
     sampleList.append("METFwd-Run2010B-Apr21ReReco-v1")
     # '''
     # '''
-    maxFilesMC = 48
-    #maxFilesMC = 1
+    #maxFilesMC = 48
+    maxFilesMC = 10
     #maxFilesData = 1
     #nWorkers = 1
     #maxFilesMC = 16
+    #nWorkers = 12
     nWorkers = 12
 
     slaveParams = {}
@@ -378,11 +407,14 @@ if __name__ == "__main__":
 
     if options.ptHatReweighing:
         slaveParams["onlyPtHatReweighing"] = True
-        slaveParams["applyPtHatReweighing"] = True
+        slaveParams["applyPtHatReweighing"] = False
+        slaveParams["threshold"] = 30.
         ofile = "treesForPTHatReweighing.root"
+        sampleList.remove("METFwd-Run2010B-Apr21ReReco-v1")
     else:
         slaveParams["onlyPtHatReweighing"] = False
-        slaveParams["applyPtHatReweighing"] = True
+        #slaveParams["applyPtHatReweighing"] = True
+        slaveParams["applyPtHatReweighing"] = False
         ofile = "plotsMNxs.root"
 
 
@@ -393,6 +425,7 @@ if __name__ == "__main__":
                                maxFilesData = maxFilesData,
                                nWorkers=nWorkers,
                                usePickle = True,
+                               useProofOFile = True,
                                outFile = ofile )
 
     print "TODO: fakes prob vs eta"

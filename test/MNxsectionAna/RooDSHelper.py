@@ -21,6 +21,18 @@ def init():
     #ROOT.gSystem.Load("libFWCoreFWLite.so")
     #AutoLibraryLoader.enable()
 
+# rooFVar - RooFormulaVar, e.g.
+#  ROOT.RooFormulaVar("w", "ww", "1", ROOT.RooArgList()) (switches off weighing)
+# FIXME (?) - input dataset gets modified (new variable is added)
+def reweighDS(ds, newname, rooFVar):
+    ds = ds.Clone()
+    wvar = ds.addColumn(rooFVar)
+    newDS = ROOT.RooDataSet(newname, ds.GetTitle(), ds, ds.get(), "", wvar.GetName() )
+    # should we return the wvar aswell?
+    #del ds
+    ds.IsA().Destructor(ds)
+    return newDS
+
 
 def getSummedRooDS(rootName, infile, samplesToAdd, weight=None):
     init()
@@ -95,11 +107,22 @@ def getSummedRooDS(rootName, infile, samplesToAdd, weight=None):
     print "  create dataset...", weight
     if weight == None:
         ds = ROOT.RooDataSet(rootName, rootName, treeMerged, observables)
+    #ds = ROOT.RooDataSet(rootName, rootName, treeMerged, observables,  "", weight)
     else:
-        ds = ROOT.RooDataSet(rootName, rootName, treeMerged, observables,  "", weight)
+        # note: if we create the RooDS directly with weight there will be problems when we want to 
+        # change weights later using reweighDS function
+        #ds = ROOT.RooDataSet(rootName, rootName, treeMerged, observables,  "", weight)
+        dsInt = ROOT.RooDataSet(rootName+"_Internal", rootName+"_Internal", treeMerged, observables)
+        workaround =  ROOT.RooFormulaVar("weightWorkaround", "weightWorkaround", weight, ROOT.RooArgList(vars[weight]))
+        ds = reweighDS(dsInt, rootName, workaround)
+
     print "        ...done"
 
     print "Dataset:", rootName, ds.numEntries()
+    print "Convert to vectorstore"
+    ds.convertToVectorStore()
+    print "        ...done"
+
 
     #if "central" not in variations:
     #    raise Exception("Central value not found!")
