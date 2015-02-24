@@ -48,7 +48,6 @@ void JetsJEC::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSet
     edm::Handle< std::vector<reco::PFJet> > hJets;
     iEvent.getByLabel(m_todo, hJets);
     for (unsigned int i = 0; i<hJets->size(); ++i) {
-        if (hJets->at(i).pt() <  3) continue; // TODO
         if (std::abs(hJets->at(i).eta()) >  5.) continue; // TODO
         corrector->setJetEta(hJets->at(i).eta());
         corrector->setJetPt(hJets->at(i).pt());
@@ -59,8 +58,6 @@ void JetsJEC::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSet
         if (jec < 0) {
             std::cout << "XXX Warning: correction < 0\n";
             jec = 0;
-        }
-        if (true) {
             std::cout << hJets->at(i).eta()
                     << " pt " << hJets->at(i).pt()
                     << " area " << hJets->at(i).jetArea()
@@ -69,7 +66,8 @@ void JetsJEC::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSet
                     << " ptcor " << (jec*hJets->at(i).p4()).pt()
                     << std::endl;
         }
-        addToP4Vec("L1Jets", jec*hJets->at(i).p4());
+        if (jec*hJets->at(i).pt() <  3) continue; // TODO
+        addToP4Vec("p4", jec*hJets->at(i).p4());
     }
 }
 
