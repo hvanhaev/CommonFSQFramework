@@ -27,6 +27,30 @@ class RateSimple(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofRe
         self.dist.Sumw2()
         self.GetOutputList().Add(self.dist)
 
+        puFile = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/PUhists.root").fullPath()
+        self.newlumiWeighters = {}
+        self.newlumiWeighters["flat2050toPU30"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU30/pileup")
+        self.newlumiWeighters["flat2050toPU25"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU25/pileup")
+        self.newlumiWeighters["flat2050toPU20"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU20/pileup")
+        self.newlumiWeighters["flat2050toPU15"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU15/pileup")
+        self.newlumiWeighters["flat2050toPU10"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU10/pileup")
+        #self.newlumiWeighters["flat010toPU10"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU10/pileup")
+        #self.newlumiWeighters["flat010toPU1"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU1/pileup")
+        #self.newlumiWeighters["PU20toPU20"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU20/pileup")
+
+
+        self.dists = {}
+        for pu in self.newlumiWeighters:
+            dist = ROOT.TH1F(pu, "; jet seed threshold", 21, -0.5,20.5 )
+            dist.Sumw2()
+            self.dists[pu] = dist
+            self.GetOutputList().Add(dist)
+
+
+    def fillRate(self, hist, maxThr, weight):
+        nbins = hist.GetNbinsX()
+
+
 
     def fillRate(self, hist, maxThr, weight):
         nbins = hist.GetNbinsX()
@@ -62,6 +86,11 @@ class RateSimple(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofRe
             maxThr = 0
 
         self.fillRate(self.dist, maxThr, 1.)
+        pu = self.fChain.PUNumInteractions
+        for l in self.newlumiWeighters:
+            wPU = self.newlumiWeighters[l].weight(pu)
+            self.fillRate(self.dists[l], maxThr, wPU)
+
 
 
     def finalizeWhenMerged(self):
@@ -80,22 +109,50 @@ class RateSimple(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofRe
 
         rateScalingFactor = lhcFreq*float(filledBunches)/float(totalBunches)*PU
 
-        eff = histos["dist"].Clone("eff")
-        eff.Scale(1./(eff.GetBinContent(1)))
+        todo = filter(lambda x: "dist" in x or "PU" in x, histos.keys())
+        avoidGC = []
 
-        rate = eff.Clone("rate")
-        rate.Scale(rateScalingFactor)
-        self.GetOutputList().Add(eff)
-        self.GetOutputList().Add(rate)
+        res = {}
+        for t in todo:
+            name =  histos[t].GetName()
+            eff = histos[t].Clone(name+"_eff")
+            eff.Scale(1./(eff.GetBinContent(1)))
+
+            rate = eff.Clone(name+"_rate")
+            rate.Scale(rateScalingFactor)
+            self.GetOutputList().Add(eff)
+            self.GetOutputList().Add(rate)
+            avoidGC.append(eff)
+            avoidGC.append(rate)
+
+            if "PU" in name:
+                puVal = int(name.split("PU")[-1])
+                print puVal, eff.GetBinCenter(15), eff.GetBinContent(15),  eff.GetBinError(15)
+                res[puVal] = eff.GetBinContent(15)
+
+        for p in sorted(res.keys()):
+            print "Prob at PU =",p, res[p]
+'''
+Info/Notes:
+
+    - In case of NeutrinoGun sample this file allows to estimate what is the probability
+        to find given trigger for given PU in ZeroBias
+
+    - MinBias - rate estimation
+
+
+'''
+
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     AutoLibraryLoader.enable()
 
-    sampleList = ["MinBias_TuneZ2star_13TeV_pythia6_162"]
-    maxFilesMC = 1
-    nWorkers = 1
+    #sampleList = ["MinBias_TuneZ2star_13TeV_pythia6_162"]
+    sampleList = ["Neutrino_Pt-2to20_gun"]
+    maxFilesMC = None
+    nWorkers = 4
     slaveParams = {}
 
 
