@@ -43,7 +43,10 @@ sam["Neutrino_Pt-2to20_gun"]["lumiJet15"]='crashMeMC'
 sam["Neutrino_Pt-2to20_gun"]["weightNoPu"]='RooFormulaVar("weight","weight", "xsOverEvents", RooArgList())'
 sam["Neutrino_Pt-2to20_gun"]["json"]=''
 sam["Neutrino_Pt-2to20_gun"]["lumiDiJet15FB"]='crashMeMC'
+sam["Neutrino_Pt-2to20_gun"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/Neutrino_Pt-2to20_gun/DiJet_20150223_Legacy0GeVBX50_Neutrino_Pt-2to20_gun/2245ef43fe96985b6b8017ae3eeb862b//'
 sam["Neutrino_Pt-2to20_gun"]["XS"]=-1
+sam["Neutrino_Pt-2to20_gun"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/Neutrino_Pt-2to20_gun/DiJet_20150223_Legacy0GeVBX50_Neutrino_Pt-2to20_gun/2245ef43fe96985b6b8017ae3eeb862b//'
+sam["Neutrino_Pt-2to20_gun"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/Neutrino_Pt-2to20_gun/DiJet_20150223_Legacy0GeVBX50_Neutrino_Pt-2to20_gun/2245ef43fe96985b6b8017ae3eeb862b/'
 sam["Neutrino_Pt-2to20_gun"]["DS"]='/Neutrino_Pt-2to20_gun/Phys14DR-Flat20to50BX50_tsg_PHYS14_ST_V1-v1/AODSIM'
 
 def icm(sam):

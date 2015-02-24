@@ -44,7 +44,7 @@ sam["Neutrino_Pt-2to20_gun"]["weightNoPu"]='RooFormulaVar("weight","weight", "xs
 sam["Neutrino_Pt-2to20_gun"]["json"]=''
 sam["Neutrino_Pt-2to20_gun"]["lumiDiJet15FB"]='crashMeMC'
 sam["Neutrino_Pt-2to20_gun"]["XS"]=-1
-sam["Neutrino_Pt-2to20_gun"]["DS"]='/Neutrino_Pt-2to20_gun/Phys14DR-Flat20to50BX50_tsg_PHYS14_ST_V1-v1/GEN-SIM-RAW'
+sam["Neutrino_Pt-2to20_gun"]["DS"]='/Neutrino_Pt-2to20_gun/Phys14DR-Flat20to50BX50_tsg_PHYS14_ST_V1-v1/AODSIM'
 
 def icm(sam):
     import socket
