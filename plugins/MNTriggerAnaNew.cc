@@ -41,6 +41,7 @@
 
 #include "MNTriggerStudies/MNTriggerAna/interface/EventIdData.h"
 #include "MNTriggerStudies/MNTriggerAna/interface/JetView.h"
+#include "MNTriggerStudies/MNTriggerAna/interface/JetsJEC.h"
 
 #include "MNTriggerStudies/MNTriggerAna/interface/L1JetsView.h"
 #include "MNTriggerStudies/MNTriggerAna/interface/TriggerResultsView.h"
@@ -99,6 +100,12 @@ MNTriggerAnaNew::MNTriggerAnaNew(const edm::ParameterSet& iConfig)
     m_views.push_back(new EventIdData(iConfig, m_tree));
     //*
     //
+    if (iConfig.exists("recoPFAK4ChsCorrected")){
+        m_views.push_back(new JetsJEC(iConfig.getParameter< edm::ParameterSet >("recoPFAK4ChsCorrected"), m_tree));
+    } else {
+        std::cout << "Disabling recoPFAK4ChsCorrected" << std::endl;
+    }
+
     if (iConfig.exists("JetViewCalo"))
     {
         m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewCalo"), m_tree));
