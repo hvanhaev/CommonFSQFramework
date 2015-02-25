@@ -72,6 +72,10 @@ def getSEDirsCrab2(anaVersion, name):
                 pfnDir = pfnDir.replace(fileName,"")
                 SEDirs.add(pfnDir)
 
+            # in some cases, e.g. job failed, we land with empy SE dir. Handle by
+            if '' in SEDirs:
+                SEDirs.remove('')
+
             if len(SEDirs) > 0: # makes consistency checks above useless, but it;s to long to parse all xml files
                 break
 
