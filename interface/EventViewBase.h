@@ -33,6 +33,12 @@ class EventViewBase {
 
       std::string getPrefix() { return m_branchPrefix;};
 
+
+      // ___Danger Zone__
+      //   TODO: remove this, add sorting using external function_
+      std::vector<reco::Candidate::LorentzVector> & getP4VecStore(const std::string & name) 
+            { return m_vectorBranches.at(m_branchPrefix+name); };
+
    private:
       virtual void fillSpecific(const edm::Event&, const edm::EventSetup&) = 0;
       std::map<std::string, int> m_integerBranches;
