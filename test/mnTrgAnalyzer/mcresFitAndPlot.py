@@ -121,8 +121,8 @@ def main():
     parser.add_option("-w", "--weight", action="store", type="string",  dest="weight" )
     (options, args) = parser.parse_args()
 
-    weight = "weightPU"
-    #weight = "weight"
+    #weight = "weightPU"
+    weight = "weight"
     if options.weight:
         weight = options.weight
 
@@ -255,8 +255,10 @@ def main():
     #maxPt = 100
     #minPt = 10
     #maxPt = 15
-    minPt = 20
-    maxPt = 25
+    #minPt = 20
+    #maxPt = 25
+    minPt = 30
+    maxPt = 40
     #minPt = 30
     #maxPt = 40
     #minPt = 30

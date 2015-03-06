@@ -1,4 +1,4 @@
-anaVersion="DiJet_20150223_Legacy10GeVBX50"
+anaVersion="DiJet_20150225_Stage1_5GeVBX25"
 anaType="DiJet"
 
 cbSmartCommand="smartCopy"
@@ -26,12 +26,12 @@ skimEfficiencyMethod="getSkimEff"
 
 MyVariablesAllEvents="DiJetAnalysis.DiJetAna.ana.BaseVariables"
 
-rootPath="/scratch/scratch0/tfruboes/DATA_dijet/DiJet_20150223_Legacy10GeVBX50/"
+rootPath="/scratch/scratch0/tfruboes/DATA_dijet/DiJet_20150225_Stage1_5GeVBX25/"
 sam = {}
 
 sam["Neutrino_Pt-2to20_gun"]={}
 sam["Neutrino_Pt-2to20_gun"]["sgeJobs"]=50
-sam["Neutrino_Pt-2to20_gun"]["crabJobs"]=115
+sam["Neutrino_Pt-2to20_gun"]["crabJobs"]=460
 sam["Neutrino_Pt-2to20_gun"]["GT"]='START42_V16::All'
 sam["Neutrino_Pt-2to20_gun"]["weightJet15"]='RooFormulaVar("weight","weight", "xsOverEvents*puWeightJet15V4*trgWeightJet15RawTF2*trgWeightJet15L1RawTF2", RooArgList(v["puWeightJet15V4"]["RooVar"],v["trgWeightJet15RawTF2"]["RooVar"],v["trgWeightJet15L1RawTF2"]["RooVar"]))'
 sam["Neutrino_Pt-2to20_gun"]["name"]='Neutrino_Pt-2to20_gun'
@@ -43,11 +43,8 @@ sam["Neutrino_Pt-2to20_gun"]["lumiJet15"]='crashMeMC'
 sam["Neutrino_Pt-2to20_gun"]["weightNoPu"]='RooFormulaVar("weight","weight", "xsOverEvents", RooArgList())'
 sam["Neutrino_Pt-2to20_gun"]["json"]=''
 sam["Neutrino_Pt-2to20_gun"]["lumiDiJet15FB"]='crashMeMC'
-sam["Neutrino_Pt-2to20_gun"]["pathTrees"]='/XXXTMFTTree/store/user/fruboes/Neutrino_Pt-2to20_gun/DiJet_20150223_Legacy10GeVBX50_Neutrino_Pt-2to20_gun/53ff7c28974f2ec8aade14a1090bc322//'
 sam["Neutrino_Pt-2to20_gun"]["XS"]=-1
-sam["Neutrino_Pt-2to20_gun"]["pathPAT"]='/XXXTMFPAT/store/user/fruboes/Neutrino_Pt-2to20_gun/DiJet_20150223_Legacy10GeVBX50_Neutrino_Pt-2to20_gun/53ff7c28974f2ec8aade14a1090bc322//'
-sam["Neutrino_Pt-2to20_gun"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/fruboes/Neutrino_Pt-2to20_gun/DiJet_20150223_Legacy10GeVBX50_Neutrino_Pt-2to20_gun/53ff7c28974f2ec8aade14a1090bc322/'
-sam["Neutrino_Pt-2to20_gun"]["DS"]='/Neutrino_Pt-2to20_gun/Phys14DR-Flat20to50BX50_tsg_PHYS14_ST_V1-v1/AODSIM'
+sam["Neutrino_Pt-2to20_gun"]["DS"]='/Neutrino_Pt-2to20_gun/Phys14DR-AVE20BX25_tsg_PHYS14_25_V3-v1/AODSIM'
 
 def icm(sam):
     import socket

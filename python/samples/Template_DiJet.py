@@ -100,6 +100,7 @@ def crabJobs(ds):
     if "QCD_Pt-15to3000" in dsName and "_V17B-v2" in ds:
         return 1950 
 
+    return 330
     return 115
 
 def numEvents(ds):
@@ -163,6 +164,7 @@ def XS(ds):
     s["QCD_Pt-800to1000_Tune4C_13TeV_pythia8"] = 28.25 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00050
     s["QCD_Pt-1000to1400_Tune4C_13TeV_pythia8"] = 8.195 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00051
     s["QCD_Pt-1400to1800_Tune4C_13TeV_pythia8"] = 0.7346 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-00052
+    s["QCD_Pt-1800_Tune4C_13TeV_pythia8"] = 0.1091
     s["QCD_Pt-5to10_Tune4C_13TeV_pythia8"] = 80710000000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00001
     s["QCD_Pt-10to15_Tune4C_13TeV_pythia8"] = 7528000000.0 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-00002
 

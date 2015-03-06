@@ -27,7 +27,12 @@ class HLTRate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReade
         self.normFactor = self.getNormalizationFactor()
         puFile = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/PUhists.root").fullPath()
         self.newlumiWeighters = {}
-        self.newlumiWeighters["flat2050toPU20"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU20/pileup")
+        self.newlumiWeighters["flat2050toPU10"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU10/pileup")
+        #self.newlumiWeighters["flat2050toPU15"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU15/pileup")
+        #self.newlumiWeighters["flat2050toPU20"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU20/pileup")
+        #self.newlumiWeighters["flat2050toPU30"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU30/pileup")
+        #self.newlumiWeighters["flat2050toPU40"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU40/pileup")
+        #self.newlumiWeighters["flat2050toPU40"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU40/pileup")
         #self.newlumiWeighters["flat010toPU10"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU10/pileup")
         #self.newlumiWeighters["flat010toPU1"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU1/pileup")
         #self.newlumiWeighters["PU20toPU20"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU20/pileup")
@@ -150,16 +155,20 @@ if __name__ == "__main__":
     #maxFilesMC = 12
     #nWorkers = 12
     # '''
-    #maxFilesMC = 32
+    maxFilesMC = 400
+    #maxFilesMC = 999
+    nWorkers = 12
 
     slaveParams = {}
 
     # select hltCollection here (see plugins/MNTriggerAna.cc to learn whats avaliable):
     #slaveParams["hltCollection"] = "hltAK5PFJetL1FastL2L3Corrected"
     #slaveParams["hltCollection"] = "hltPFJetsCorrectedMatchedToL1"
-    slaveParams["hltCollection"] = "hltAK4PFJetsCorrected"
+    #slaveParams["hltCollection"] = "hltAK4PFJetsCorrected"
+    slaveParams["hltCollection"] = "hltAK4PFJetsCorrectedp4"
 
-    slaveParams["recoCollection"] = "PFAK4CHSnewjets"
+    #slaveParams["recoCollection"] = "PFAK4CHSnewjets"
+    slaveParams["recoCollection"] = "recoPFAK4ChsCorrectedMyRhop4"
     
 
 
@@ -169,5 +178,7 @@ if __name__ == "__main__":
                                sampleList=sampleList,
                                maxFilesMC = maxFilesMC,
                                nWorkers=nWorkers,
+                               usePickle = True,
+                               #useProofOFile = True,
                                outFile = "HLTRatePlots.root" )
                                 

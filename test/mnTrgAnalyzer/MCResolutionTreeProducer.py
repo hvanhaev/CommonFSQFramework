@@ -102,10 +102,9 @@ class MCResolutionTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.
         self.var["weightPU"][0] = weight*wPU
         self.var["PU"][0] = pu
 
-
-
-
-        hlt = self.fChain.hlt_EcalMultifit_HCALMethod2
+        hlt = self.fChain.recoPFAK4ChsCorrectedMyRhop4
+        #hlt = self.fChain.recoPFAK4ChsCorrectedp4
+        #hlt = self.fChain.hlt_EcalMultifit_HCALMethod2
         #hlt = self.fChain.PFAK4CHSnewjets
         #hlt = self.fChain.hltAK4PFJetsCorrected
         #hlt = self.fChain.hltAK5PFJetsCorrected
@@ -114,7 +113,8 @@ class MCResolutionTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.
                 jetType = 4
                 isGen = False
                 if jetGetter == "gen4": 
-                    self.getters[jetGetter] = self.fChain.ak4GenJets
+                    #self.getters[jetGetter] = self.fChain.ak4GenJets
+                    self.getters[jetGetter] = self.fChain.ak4GenJetsp4
                     isGen = True
                     jetType = -4
                 elif jetGetter == "gen5": 
@@ -161,7 +161,8 @@ class MCResolutionTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.
                     for jet in self.getters[jetGetter]:
                         ptRec = jet.pt()
                         if ptRec < self.ptMin: 
-                            break # gen jets are pt sorted
+                            continue
+                            #break # gen jets are pt sorted
                         etaRec = abs(jet.eta())
                         if etaRec > self.etaMax: continue
 
@@ -206,10 +207,11 @@ if __name__ == "__main__":
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     ROOT.AutoLibraryLoader.enable()
 
+    sampleList = None
     #sampleList = ["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8",]
     #sampleList = ["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8_Pu20",]
     #sampleList = ["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8_Pu20to50"]
-    sampleList = ["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8_Pu0to10"]
+    #sampleList = ["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8_Pu0to10"]
     maxFilesMC = None
     maxFilesData = None
     nWorkers = None # Use all
@@ -220,7 +222,8 @@ if __name__ == "__main__":
     sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
     maxFilesData = 1
     '''
-    maxFilesMC = 120
+    maxFilesMC = 10
+    #maxFilesMC = 120
     #nWorkers = 1
     #'''
 
@@ -231,8 +234,8 @@ if __name__ == "__main__":
 
 
 
-    #MCResolutionTreeProducer.runAll(treeName="MNTriggerAnaNew",
-    MCResolutionTreeProducer.runAll(treeName="MNTriggerAnaHLTJECOnFly",
+    #MCResolutionTreeProducer.runAll(treeName="MNTriggerAnaHLTJECOnFly",
+    MCResolutionTreeProducer.runAll(treeName="MNTriggerAnaNew",
                                slaveParameters=slaveParams,
                                sampleList=sampleList,
                                maxFilesMC = maxFilesMC,

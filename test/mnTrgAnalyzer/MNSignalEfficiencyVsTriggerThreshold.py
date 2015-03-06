@@ -280,8 +280,8 @@ class MNSignalEfficiencyVsTriggerThreshold(MNTriggerStudies.MNTriggerAna.Example
         #weight = self.newlumiWeighters["flat2050toPU20"].weight(pu)*self.fChain.genWeight
         #weight = self.newlumiWeighters["flat010toPU10"].weight(pu)*self.fChain.genWeight
         #weight = self.newlumiWeighters["flat010toPU1"].weight(pu)*self.fChain.genWeight
-        weight = self.newlumiWeighters["flat010toPU0p5"].weight(pu)*self.fChain.genWeight
-        #weight = self.fChain.genWeight
+        #weight = self.newlumiWeighters["flat010toPU0p5"].weight(pu)*self.fChain.genWeight
+        weight = self.fChain.genWeight
 
         #'''
         pfJetsMomenta = self.fChain.ak4GenJets # TODO: configrable
@@ -350,7 +350,8 @@ if __name__ == "__main__":
     maxFilesMC = None
     nWorkers = 12
 
-    sampleList = ["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8"]
+    sampleList = ["MinBias_TuneZ2star_13TeV_pythia6_162"]
+    #sampleList = ["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8"]
     #sampleList = ["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8_5GeV_Pu20to50"]
     #sampleList = ["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8_10GeV_Pu20to50"]
 
@@ -358,7 +359,7 @@ if __name__ == "__main__":
     #'''
     #sampleList = ["QCD_Pt-30to50_Tune4C_13TeV_pythia8",]
     #sampleList = ["QCD_Pt-10to15_Tune4C_13TeV_pythia8",]
-    #maxFilesMC = 24
+    maxFilesMC = 6*16
     #maxFilesMC = 12
     nWorkers = 12
     #maxFilesMC = 1
