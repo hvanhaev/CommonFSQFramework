@@ -13,6 +13,8 @@ l1SeedThr = 10
 todo = "legacy"
 #todo = "stage1"
 
+doTrigger = False
+
 
 if todo == "stage1":
     filename = "hlt.py"
@@ -32,8 +34,56 @@ for a in dir(process):
 
 process.load("RecoJets.Configuration.GenJetParticles_cff")
 process.load("RecoJets.Configuration.RecoGenJets_cff")
-process.jets = cms.Path( process.HLTBeginSequence + process.HLTAK4CaloJetsSequence + process.HLTAK4PFJetsSequence 
-                       + process.genParticlesForJets + process.ak4GenJets + process.HLTEndSequence )
+
+#process.load("RecoJets.Configuration.RecoPFJets_cff")
+#'''
+process.kt6PFJets = cms.EDProducer("FastjetJetProducer",
+    Active_Area_Repeats = cms.int32(1),
+    doAreaFastjet = cms.bool(True),
+    voronoiRfact = cms.double(0.9),
+    maxBadHcalCells = cms.uint32(9999999),
+    doAreaDiskApprox = cms.bool(False),
+    maxRecoveredEcalCells = cms.uint32(9999999),
+    jetType = cms.string('PFJet'),
+    minSeed = cms.uint32(14327),
+    Ghost_EtaMax = cms.double(5.0),
+    doRhoFastjet = cms.bool(True),
+    jetAlgorithm = cms.string('Kt'),
+    nSigmaPU = cms.double(1.0),
+    GhostArea = cms.double(0.01),
+    Rho_EtaMax = cms.double(4.4),
+    maxBadEcalCells = cms.uint32(9999999),
+    useDeterministicSeed = cms.bool(True),
+    doPVCorrection = cms.bool(False),
+    maxRecoveredHcalCells = cms.uint32(9999999),
+    rParam = cms.double(0.6),
+    maxProblematicHcalCells = cms.uint32(9999999),
+    doOutputJets = cms.bool(True),
+    src = cms.InputTag("particleFlow"),
+    inputEtMin = cms.double(0.0),
+    srcPVs = cms.InputTag(""),
+    jetPtMin = cms.double(3.0),
+    radiusPU = cms.double(0.5),
+    maxProblematicEcalCells = cms.uint32(9999999),
+    doPUOffsetCorr = cms.bool(False),
+    inputEMin = cms.double(0.0)
+)
+# '''
+
+
+
+process.hltSeq = cms.Sequence(process.HLTBeginSequence + process.HLTAK4CaloJetsSequence + process.HLTAK4PFJetsSequence + process.HLTEndSequence )
+
+process.additional = cms.Sequence(process.genParticlesForJets + process.ak4GenJets + process.kt6PFJets)
+
+
+if doTrigger:
+    process.p1 = cms.Path(process.hltSeq+process.additional)
+else:
+    process.p1 = cms.Path(process.additional)
+
+#process.jets = cms.Path( process.HLTBeginSequence + process.HLTAK4CaloJetsSequence + process.HLTAK4PFJetsSequence 
+#                       + process.genParticlesForJets + process.ak4GenJets + process.kt6PFJets+  process.HLTEndSequence )
 
 
 
@@ -58,7 +108,7 @@ del process.DQMOutput
 import MNTriggerStudies.MNTriggerAna.customizePAT
 process = MNTriggerStudies.MNTriggerAna.customizePAT.customize(process)
 
-process = MNTriggerStudies.MNTriggerAna.customizePAT.addPath(process, process.jets)
+process = MNTriggerStudies.MNTriggerAna.customizePAT.addPath(process, process.p1)
 
 #process.MNTriggerAnaHLTJECOnFly = cms.EDAnalyzer("MNTriggerAnaHLTJECOnFly")
 #process = MNTriggerStudies.MNTriggerAna.customizePAT.addTreeProducer(process, process.MNTriggerAnaHLTJECOnFly)
@@ -78,8 +128,34 @@ process.MNTriggerAnaNew.recoPFAK4ChsCorrected = cms.PSet(
     label = cms.string("TMFphys14v3JEC") # note : 25 ns
 )
 
+process.MNTriggerAnaNew.recoPFAK4ChsCorrectedMyRho = cms.PSet(
+    branchPrefix = cms.untracked.string("recoPFAK4ChsCorrectedMyRho"),
+    src =  cms.InputTag("ak4PFJetsCHS"),
+    rho=   cms.InputTag('kt6PFJets', "rho"),
+    label = cms.string("TMFphys14v3JEC") # note : 25 ns
+)
 
-if todo == "legacy":
+if doTrigger:
+    process.MNTriggerAnaNew.hltAK4PFJets = cms.PSet(src = cms.VInputTag(cms.InputTag("hltAK4PFJets")), 
+            branchPrefix = cms.untracked.string("hltAK4PFJets"),
+            ptmin = cms.double(5.)
+    )
+    process.MNTriggerAnaNew.hltAK4PFJetsCorrected = cms.PSet(src = cms.VInputTag(cms.InputTag("hltAK4PFJetsCorrected")),
+            branchPrefix = cms.untracked.string("hltAK4PFJetsCorrected"),
+            ptmin = cms.double(5.)
+    )
+
+process.MNTriggerAnaNew.ak4GenJets = cms.PSet(src = cms.VInputTag(cms.InputTag("ak4GenJets")),
+        branchPrefix = cms.untracked.string("ak4GenJets"),
+        ptmin = cms.double(5.)
+)
+
+if not doTrigger:
+    del process.MNTriggerAnaNew.L1JetsViewStage1
+    del process.MNTriggerAnaNew.L1JetsView
+
+
+if doTrigger and todo == "legacy":
     print "Warning, stage1 disabled"
     del process.MNTriggerAnaNew.L1JetsViewStage1
     process.MNTriggerAnaNew.L1JetsViewRedone = process.MNTriggerAnaNew.L1JetsView.clone()
@@ -92,7 +168,7 @@ if todo == "legacy":
     process.load('L1TriggerConfig.GctConfigProducers.l1GctConfig_cfi')
     process.L1GctConfigProducers.JetFinderCentralJetSeed = cms.double(l1SeedThr)
     process.L1GctConfigProducers.JetFinderForwardJetSeed = cms.double(l1SeedThr)
-elif todo == "stage1":
+elif doTrigger and todo == "stage1":
     process.caloStage1Params.jetSeedThreshold = cms.double(l1SeedThr) 
 
 
@@ -122,7 +198,7 @@ AOD="/store/mc/Phys14DR/Neutrino_Pt-2to20_gun/AODSIM/Flat20to50BX50_tsg_PHYS14_S
 
 
 
-#'''
+'''
 process.source = cms.Source( "PoolSource",
     secondaryFileNames = cms.untracked.vstring(
  #       'file:/nfs/dust/cms/user/fruboest/2014.08.TriggerStudies/CMSSW_7_1_5/src/MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/infiles/BCDF1B07-B212-E411-A99A-00248C55CC9D_QCD_Pt-50to80_Tune4C_13TeV_pythia8_flat0to10_RAW.root',
@@ -142,6 +218,7 @@ process.source = cms.Source( "PoolSource",
 GT= "MCRUN2_72_V4A" # 62 produced 50 ns
 #GT= "MCRUN2_72_V3A::All" # 62 produced 25 ns
 
+# /Neutrino_Pt-2to20_gun/Phys14DR-AVE20BX25_tsg_PHYS14_25_V3-v1/AODSIM
 import os
 if "TMFSampleName" in os.environ:
     sample = os.environ["TMFSampleName"]
@@ -151,11 +228,13 @@ if "TMFSampleName" in os.environ:
     ds = os.environ["TMFDSName"]
     if "PHYS14_ST_V1" in ds:
         GT = "PHYS14_ST_V1"
+    if "PHYS14_25_V3" in ds:
+        GT = "PHYS14_25_V3"
 
     print "XXXX",  sample, GT
 
 #GT = "PHYS14_25_V1"
-GT = "PHYS14_ST_V1"
+#GT = "PHYS14_ST_V1"
 process.GlobalTag.globaltag = cms.string(GT)
 
 #'''
