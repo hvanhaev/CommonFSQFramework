@@ -85,10 +85,11 @@ def main():
         etaRanges.extend(etaProbeFwdWide)
 
 
-    etaRanges = [2.801, 4.999]
-    #etaRanges = [3.139, 5.191]
+    #etaRanges = [2.801, 4.999]
+    etaRanges = [3.139, 5.191]
     
     sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
+    print sampleList.keys()
 
     f = ROOT.TFile(infile, "r")
     lst = f.GetListOfKeys()
@@ -112,7 +113,7 @@ def main():
 
         sampleName = l.GetName()
         if sampleName not in sampleList:
-            raise Exception("Thats confusing...")
+            raise Exception("Thats confusing... sample not found: ", sampleName)
         tree = currentDir.Get("data")
         isData = sampleList[sampleName]["isData"]
         if isData:
@@ -182,8 +183,13 @@ def main():
         #importCMD = RooFit.Import(tree)
         #cutCMD = RooFit.Cut(preselectionString)
         print "  create dataset..."
-        ds[t] = ROOT.RooDataSet(t, t, tree, observables, "", "weight")
+        #ds[t] = ROOT.RooDataSet(t, t, tree, observables, "PU20to20 < 200", "weight")
+        #ds[t] = ROOT.RooDataSet(t, t, tree, observables, "", "weight")
+        #ds[t] = ROOT.RooDataSet(t, t, tree, observables, "", "flat2050toPU20")
+        #ds[t] = ROOT.RooDataSet(t, t, tree, observables, "", "weight")
+        ds[t] = ROOT.RooDataSet(t, t, tree, observables, "", "genW")
         print "        ...done"
+        print "Note: values with ultra high generator weight are filtered out"
 
         print "Dataset:", t, ds[t].numEntries()
 
@@ -227,7 +233,8 @@ def main():
     print "Sum done"
     '''
 
-    
+ 
+    todo = {}   
     for t in ds:
         for v in variations:
 
@@ -248,6 +255,9 @@ def main():
                 cutBase += " && abs(" + vary("probeEta") + ") >  " + str(etaMin)
                 cutBase += " && abs(" + vary("probeEta") + ") <  " + str(etaMax)
                 cutBase += " && " + vary("ptAve") + " > " + str(minPTAve)
+                #if minPTAve < 31:
+                #    cutBase += " && " + vary("ptAve") + " < 40"
+
                 #cutBase += " && weight < 10 "
 
                 cutWithVeto = cutBase + " && "+vary("veto2") + " < 0.2 "
@@ -261,8 +271,8 @@ def main():
                 #histN = ROOT.TH1F("nom", "nom;PUNumInteractions for bx=0;3rd jet veto efficiency", 31, 19.5, 50.5)
                 #histD = ROOT.TH1F("denom", "denom",  31, 19.5, 50.5)
 
-                binL = 13.5
-                binH = 26.5
+                binL = 8.5
+                binH = 30.5
                 nbins = int(binH - binL)
                 histN = ROOT.TH1F("nom", "nom;PUNumInteractions for bx=0;3rd jet veto efficiency", nbins, binL, binH)
                 histD = ROOT.TH1F("denom", "denom",  nbins, binL, binH)
@@ -272,33 +282,88 @@ def main():
                 histN = dsReducedWithVeto.fillHistogram(histN, ROOT.RooArgList(vars[t][puVar]))
                 histD = dsReduced.fillHistogram(histD, ROOT.RooArgList(vars[t][puVar]))
                 
+                
+
+                for r in [(29.5, 61.5), (59.5, 81.5), (79.5, 101.5), (99.5, 121.5), (18.5, 400.5), (119.5, 200.5), (199.5, 300.5), (299.5, 400.5) ]:
+                #for r in [(29.5, 61.5)]:
+                    ptAveMin = r[0]
+                    ptAveMax = r[1]
+                    nbinsAve = int(ptAveMax-ptAveMin)
+                    name = "xsVsPtAvestat_"+str(r[0]).replace(".", "_")
+                    todo[name] = ROOT.TH1F(name, ";ptAve threshold;xs [pb^{-1}]", nbinsAve, ptAveMin, ptAveMax)
+                    todo[name] = dsReduced.fillHistogram(todo[name], ROOT.RooArgList(vars[t][vary("ptAve")]))
+
+                    #todo[name+"_cum"] = todo[name].GetCumulative() 
+                    todo[name+"_cum"] = todo[name].Clone()
+                    todo[name+"_cum"].Reset()
+                    cumSum = 0.
+                    for iBin in xrange(todo[name+"_cum"].GetNbinsX()+1,0,-1): # inc overflow bin
+                        cumSum += todo[name].GetBinContent(iBin)
+                        todo[name+"_cum"].SetBinContent(iBin, cumSum)
+
+
+                
+
                 print "Total before cut:", dsReduced.sumEntries()
                 print "Total after  cut:", dsReducedWithVeto.sumEntries()
 
 
                 histN.Divide(histD)
 
-		todo = {}
-		todo["eff"] = histN
-		#todo["stat"] = histD
+        #todo = {}
+        todo["eff"] = histN
+        #todo["stat"] = histD
         c = ROOT.TCanvas() 
         for t in todo:
-			todo[t].Draw()
-			todo[t].SetMinimum(0.)
-			todo[t].SetMaximum(1.02)
-			if label:
-			    leg = ROOT.TLegend(0.2, 0.95, 1, 1)
-			    leg.SetHeader(label)
-			    leg.SetFillColor(0)
-			    leg.Draw("SAME")
+            todo[t].Draw()
+            if t == "eff":
+                todo[t].SetMinimum(0.)
+                todo[t].SetMaximum(1.02)
 
-			odir = ("~/tmp/vetoEffVsPU_"+str(minPTAve)+"/").replace(".","_")
-			os.system("mkdir -p " + odir)
-			name = (odir+t+"_"+str(etaMin) + "_" + str(etaMax)).replace(".","_")+".png"
-			c.Print(name)
+            if label:
+                leg = ROOT.TLegend(0.2, 0.95, 1, 1)
+                leg.SetHeader(label)
+                leg.SetFillColor(0)
+                leg.Draw("SAME")
+
+            odir = ("~/tmp/vetoEffVsPU_"+str(minPTAve)+"/").replace(".","_")
+            os.system("mkdir -p " + odir)
+            name = (odir+t+"_"+str(etaMin) + "_" + str(etaMax)).replace(".","_")+".png"
+            #name = (odir+t+"_"+str(etaMin) + "_" + str(etaMax)).replace(".","_")+".root"
+
+            if  "18_5" in t and "_cum" in t:
+                
+
+                thrs = {30: 0.1, 60:0.8, 80:0.8, 100:0.8, 160: 0.8, 220: 0.8, 300: 0.8 }
+                print "Needed luminosity vs threshold (note: not corrected for 3rd jet veto efficiency)", t
+                for thr in sorted(thrs.keys()):
+                    print ""
+                    offlineThr = thr * 1.2
+                    bin = todo[t].FindBin(offlineThr)
+                    val = todo[t].GetBinContent(bin)
+                    lumi = 1e4/val
+                    print "Thresholds: HLT="+str(thr), " -> offline="+str(offlineThr)
+                    print "  xs[pb-1]="+str(val), "                // detector level xs using offline jets for ptAve>"+str(offlineThr), "; fwd jet eta",str(etaMin)+".."+str(etaMax)
+                    print "  lumi [pb] to have 1E4 ev =",lumi, "   // not corrected for 3rd jet veto eff"
+                    xsCor = val*thrs[thr]
+                    print "  xs_corrected[pb-1]="+str(xsCor), "    // corrected for 3rd jet veto efficiency @PU30 = ", thrs[thr]
+                    lumiCor = 1e4/xsCor
+                    print "  lumi_corrected to have 1e4 ev [pb]="+str(lumiCor), "  // corrected for 3rd jet veto efficiency @PU30 = ", thrs[thr]
+
+                    prescale = (300./lumiCor)/3.  # 3 - from 3e4
+                    print "  prescale: ", prescale ," ,   // assuming we want to have 3E4 usable events with fwd jet with eta", str(etaMin)+".."+str(etaMax), "after 300 pb-1 of delivered lumi"
+
+                    prescale = (1000./lumiCor)  # 
+                    print "  max possible prescale: ", prescale ," ,   // assuming we want to have 1E4 usable events with fwd jet with eta", str(etaMin)+".."+str(etaMax), "after 1000 pb-1 of delivered lumi"
+
+                    #bin = todo[t].FindBin(thr)
+                    #val = todo[t].GetBinContent(bin)
+                    #lumi = 1e4/val
+                    #print "   optimistic (assuming offline thr equal to HLT): lumi [pb] to have 1E4 ev =", lumi
 
 
 
+            c.Print(name)
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
