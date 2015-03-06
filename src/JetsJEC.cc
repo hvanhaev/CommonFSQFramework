@@ -11,6 +11,8 @@
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 
 #include "DataFormats/PatCandidates/interface/Jet.h"
+#include <algorithm>
+
 JetsJEC::JetsJEC(const edm::ParameterSet& iConfig, TTree * tree):
 EventViewBase(iConfig,  tree)
 {
@@ -20,6 +22,13 @@ EventViewBase(iConfig,  tree)
     m_rho =    iConfig.getParameter< edm::InputTag  >("rho");
     m_label = iConfig.getParameter< std::string >("label");
 
+}
+
+namespace xxx{
+    bool ptSort(const reco::Candidate::LorentzVector & p1, 
+                const reco::Candidate::LorentzVector & p2) {
+        return p1.pt() > p2.pt();
+    }
 }
 
 
@@ -69,5 +78,12 @@ void JetsJEC::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSet
         if (jec*hJets->at(i).pt() <  3) continue; // TODO
         addToP4Vec("p4", jec*hJets->at(i).p4());
     }
+    std::sort(getP4VecStore("p4").begin(), getP4VecStore("p4").end(), xxx::ptSort);
+    /*
+    std::cout << getP4VecStore("p4").at(0).pt()
+              << " " << getP4VecStore("p4").at(1).pt()
+              << std::endl;
+    // */
+    //while (getP4VecStore("p4").size() > 3) getP4VecStore("p4").pop_back();
 }
 
