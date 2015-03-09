@@ -13,7 +13,9 @@ l1SeedThr = 10
 todo = "legacy"
 #todo = "stage1"
 
-doTrigger = False
+#doTrigger = "run"
+#doTrigger = "no" # do not run trigger and do not fill tree
+doTrigger = "read" # trigger was run for us
 
 
 if todo == "stage1":
@@ -77,9 +79,9 @@ process.hltSeq = cms.Sequence(process.HLTBeginSequence + process.HLTAK4CaloJetsS
 process.additional = cms.Sequence(process.genParticlesForJets + process.ak4GenJets + process.kt6PFJets)
 
 
-if doTrigger:
+if doTrigger == "run":
     process.p1 = cms.Path(process.hltSeq+process.additional)
-else:
+elif doTrigger != "read":
     process.p1 = cms.Path(process.additional)
 
 #process.jets = cms.Path( process.HLTBeginSequence + process.HLTAK4CaloJetsSequence + process.HLTAK4PFJetsSequence 
@@ -91,7 +93,8 @@ else:
 
 process.source.fileNames = cms.untracked.vstring(
 #        '/store/mc/Spring14dr/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/GEN-SIM-RAW/Flat0to10_POSTLS170_V5-v1/00000/0002A86F-3408-E411-B90A-E0CB4E19F961.root'
-        '/store/mc/Phys14DR/Neutrino_Pt-2to20_gun/GEN-SIM-RAW/Flat20to50BX50_tsg_PHYS14_ST_V1-v1/00000/04BC0DAC-6F8A-E411-BA02-0025905A6084.root'
+#        '/store/mc/Phys14DR/Neutrino_Pt-2to20_gun/GEN-SIM-RAW/Flat20to50BX50_tsg_PHYS14_ST_V1-v1/00000/04BC0DAC-6F8A-E411-BA02-0025905A6084.root'
+    '/store/user/fruboes/MinBias_TuneZ2star_13TeV_pythia6/20150307_testVDMjets_MB/8184cb58be65d86af7fbc54740be8116/outputFULL_115_1_Ljv.root'
 )
 
 
@@ -108,7 +111,8 @@ del process.DQMOutput
 import MNTriggerStudies.MNTriggerAna.customizePAT
 process = MNTriggerStudies.MNTriggerAna.customizePAT.customize(process)
 
-process = MNTriggerStudies.MNTriggerAna.customizePAT.addPath(process, process.p1)
+if hasattr(process,"p1"):
+    process = MNTriggerStudies.MNTriggerAna.customizePAT.addPath(process, process.p1)
 
 #process.MNTriggerAnaHLTJECOnFly = cms.EDAnalyzer("MNTriggerAnaHLTJECOnFly")
 #process = MNTriggerStudies.MNTriggerAna.customizePAT.addTreeProducer(process, process.MNTriggerAnaHLTJECOnFly)
@@ -135,7 +139,8 @@ process.MNTriggerAnaNew.recoPFAK4ChsCorrectedMyRho = cms.PSet(
     label = cms.string("TMFphys14v3JEC") # note : 25 ns
 )
 
-if doTrigger:
+
+if doTrigger != "no":
     process.MNTriggerAnaNew.hltAK4PFJets = cms.PSet(src = cms.VInputTag(cms.InputTag("hltAK4PFJets")), 
             branchPrefix = cms.untracked.string("hltAK4PFJets"),
             ptmin = cms.double(5.)
@@ -150,12 +155,12 @@ process.MNTriggerAnaNew.ak4GenJets = cms.PSet(src = cms.VInputTag(cms.InputTag("
         ptmin = cms.double(5.)
 )
 
-if not doTrigger:
+if  doTrigger == "no":
     del process.MNTriggerAnaNew.L1JetsViewStage1
     del process.MNTriggerAnaNew.L1JetsView
 
 
-if doTrigger and todo == "legacy":
+if doTrigger == "run" and todo == "legacy":
     print "Warning, stage1 disabled"
     del process.MNTriggerAnaNew.L1JetsViewStage1
     process.MNTriggerAnaNew.L1JetsViewRedone = process.MNTriggerAnaNew.L1JetsView.clone()
@@ -168,7 +173,7 @@ if doTrigger and todo == "legacy":
     process.load('L1TriggerConfig.GctConfigProducers.l1GctConfig_cfi')
     process.L1GctConfigProducers.JetFinderCentralJetSeed = cms.double(l1SeedThr)
     process.L1GctConfigProducers.JetFinderForwardJetSeed = cms.double(l1SeedThr)
-elif doTrigger and todo == "stage1":
+elif doTrigger == "run" and todo == "stage1":
     process.caloStage1Params.jetSeedThreshold = cms.double(l1SeedThr) 
 
 
@@ -262,5 +267,51 @@ process.jec = cms.ESSource("PoolDBESSource",
 #process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
 #'''
 
+
+#print "XXX "*33
+del process.MNTriggerAnaNew.L1JetsView
+del process.MNTriggerAnaNew.L1JetsViewStage1
+del process.MNTriggerAnaNew.recoPFAK4ChsCorrectedMyRho
+del process.MNTriggerAnaNew.recoPFAK4ChsCorrected
+del process.MNTriggerAnaNew.hltAK4PFJets
+
+process.MNTriggerAnaNew.TriggerResultsView = cms.PSet(
+    triggers = cms.vstring(),
+    process = cms.string('TEST'),
+    branchPrefix = cms.untracked.string('trg')
+)
+#cms.PSet(
+#        PFJet20 = cms.vstring('HLT_PFJet20_v1'),
+#        triggers = cms.vstring(),
+#        process = cms.string('TEST'),
+#        branchPrefix = cms.untracked.string('trg'),
+#)
+
+todo=["HLT_DiPFJet15_v1", 
+"HLT_DiPFJet15_FBEta2_v1",
+"HLT_DiPFJet15_FBEta3_v1",
+"HLT_PFJet15_FwdEta2_v1",
+"HLT_PFJet15_FwdEta3_v1",
+"HLT_PFJet15_v1",
+#"HLT_PFJet20_v1",
+"HLT_PFJet25_v1",
+"HLT_PFJet25_FwdEta2_v1",
+"HLT_PFJet25_FwdEta3_v1",
+"HLT_PFJet40_v1",
+"HLT_PFJet40_FwdEta2_v1",
+"HLT_PFJet40_FwdEta3_v1",
+"HLT_DiPFJetAve15_HFJEC_v1",
+"HLT_DiPFJetAve25_HFJEC_v1",
+"HLT_DiPFJetAve35_HFJEC_v1",
+"HLT_DiPFJetAve15_Central_v1",
+"HLT_DiPFJetAve25_Central_v1",
+"HLT_DiPFJetAve35_Central_v1"]
+
+for t in todo:
+    spl = t.split("_")
+    branchName = spl[1]
+    if spl[2]!="v1": branchName+=spl[2]
+    process.MNTriggerAnaNew.TriggerResultsView.triggers.append(branchName)
+    setattr(process.MNTriggerAnaNew.TriggerResultsView, branchName, cms.vstring(t))
 
 
