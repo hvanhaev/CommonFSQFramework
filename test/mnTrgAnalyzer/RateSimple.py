@@ -136,13 +136,70 @@ class RateSimple(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofRe
         #jets  = self.fChain.oldRedoneL1Jets
         #jets  = self.fChain.oldL1Jets
         #jets  = self.fChain.hltAK4PFJets
-        jets = self.fChain.hltAK4PFJetsCorrected
+        #jets = self.fChain.hltAK4PFJetsCorrected
+        jets = self.fChain.hltAK4PFJetsCorrectedp4
         #jets = self.fChain.ak4GenJets
 
         maxThr = 0
         try:
-            #maxThr = self.doubleJet(jets)
+
+            '''
+            #   trgDiPFJet15FBEta2
+            #   trgDiPFJet15FBEta3
             maxThr = self.doubleJet(jets, True)
+            if  maxThr > 15. and self.fChain.trgDiPFJet15FBEta2 == 0:
+                print "AAA", maxThr, self.fChain.trgDiPFJet15FBEta3
+
+            if  maxThr < 15. and self.fChain.trgDiPFJet15FBEta2 == 1:
+                print "BBB", maxThr, self.fChain.trgDiPFJet15FBEta3
+            '''
+
+            '''
+            maxThr = self.doubleJet(jets, False)
+            if  maxThr > 15. and self.fChain.trgDiPFJet15 == 0:
+                print "AAA", maxThr, self.fChain.trgDiPFJet15
+            if  maxThr < 15. and self.fChain.trgDiPFJet15 == 1:
+                print "BBB", maxThr, self.fChain.trgDiPFJet15
+            '''
+
+
+            '''
+            maxThrC = self.doubleJetAve(jets, probeCentral=True)
+            maxThrCF = self.doubleJetAve(jets, probeCentral=False)
+            todoThr = [15,25,35]
+            for t in todoThr:
+                cen = getattr(self.fChain, "trgDiPFJetAve"+str(t)+"Central")
+                hf  = getattr(self.fChain, "trgDiPFJetAve"+str(t)+"HFJEC")
+                #print "AA", cen, hf, maxThrC, maxThrCF
+                if maxThrC > t and cen == 0:
+                    print "AAA"+str(t), maxThrC, cen
+                if maxThrC < t and cen == 1:
+                    print "BBB"+str(t), maxThrC, cen
+                if maxThrCF > t and hf == 0:
+                    print "CCC"+str(t), maxThrCF, hf
+                if maxThrCF < t and hf == 1:
+                    print "DDD"+str(t), maxThrCF, hf
+            '''
+            '''
+            maxThr = self.single(jets)
+            maxThrE2 = self.single(jets, etaMin=2.)
+            maxThrE3 = self.single(jets, etaMin=3.)
+            todoThr = [15,25,40]
+            for t in todoThr:
+                base = getattr(self.fChain, "trgPFJet"+str(t)) == 1
+                eta2 = getattr(self.fChain, "trgPFJet"+str(t)+"FwdEta2") == 1
+                eta3 = getattr(self.fChain, "trgPFJet"+str(t)+"FwdEta3") == 1
+                if base != (maxThr > t):
+                    print "AAA"+str(t), base, maxThr
+                if eta2 != (maxThrE2 > t):
+                    print "BBB"+str(t), eta2, maxThrE2
+                if eta3 != (maxThrE3 > t):
+                    print "CCC"+str(t), eta3, maxThrE3
+            '''
+
+
+                
+            maxThr = self.doubleJet(jets)
             #maxThr = self.doubleJetAve(jets)
             #maxThr = self.doubleJetAve(jets, probeCentral=True)
             #maxThr = self.doubleJetAve(jets, etaProbeLimit=3.139)
@@ -233,12 +290,13 @@ if __name__ == "__main__":
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     AutoLibraryLoader.enable()
 
+    sampleList = ["MinBias_TuneZ2star_13TeV_pythia6"]
     #sampleList = ["MinBias_TuneZ2star_13TeV_pythia6_162"]
     #sampleList = ["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8"]
     #sampleList = ["Neutrino_Pt-2to20_gun"]
-    sampleList = ["Neutrino_Pt-2to20_gun_162"]
-    maxFilesMC = 40
-    nWorkers = 10
+    #sampleList = ["Neutrino_Pt-2to20_gun_162"]
+    maxFilesMC = 20
+    nWorkers = 1
     slaveParams = {}
 
 
