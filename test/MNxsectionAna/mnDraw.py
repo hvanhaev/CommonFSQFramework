@@ -87,21 +87,66 @@ class DrawMNPlots(DrawPlots):
         return True
 
     def setGlobalStyle(self):  # override
-        MNTriggerStudies.MNTriggerAna.Style.setStyle()
+        MNTriggerStudies.MNTriggerAna.Style.setTDRStyle()
 
 
     def decorate(self, canvas, dataHisto, MCStack, errBand): # override
+        
+
+        #ROOT.gROOT.LoadMacro(os.path.dirname(os.path.realpath(__file__))+"/CMS_lumi.C")
+        #ROOT.CMS_lumi( canvas, 1 , 33)
+        #ROOT.CMS_lumi( canvas, 1 , 11)
+
+
+        latex = ROOT.TLatex()
+        latex.SetNDC()
+        latex.SetTextAngle(0)
+        #latex.SetTextColor(kBlack);
+
+        latex.SetTextFont(42)
+        #latex.SetTextAlign(31)
+        latex.SetTextSize(0.04);
+        latex.DrawLatex(0.2,0.95, "CMS Preliminary, pp, 5.xxx pb^{-1}, #sqrt{s}=7 TeV");
+
+
+        xLabels = {}
+        yLabels = {}
+        xLabels["xs"] = "#Delta#eta"
+        yLabels["xs"] = "#sigma [pb]"
+
+
         #canvas.SetLogy()
 
         name = dataHisto.GetName()
+        nameShort = "default"
+
+
         nspl = name.split("_")
         if len(nspl) > 0:
-            dataHisto.GetXaxis().SetTitle(nspl[0])
+            nameShort = nspl[0]
+
+        if nameShort in xLabels:
+            dataHisto.GetXaxis().SetTitle(xLabels[nameShort])
+        else:
+            dataHisto.GetXaxis().SetTitle("TODO:"+ nameShort)
+
+        if nameShort in yLabels:
+            dataHisto.GetYaxis().SetTitle(yLabels[nameShort])
+        else:
+            dataHisto.GetYaxis().SetTitle("TODO:"+ nameShort)
+        dataHisto.GetYaxis().SetTitleOffset(1.8)
 
         #MChistos = MCStack.GetHists()
-        legend = ROOT.TLegend(0.3,0.95,1,1)
+
+
+        legendPos = {}
+        legendPos["default"] = (0.6, 0.7, 0.9, 0.85)
+        if nameShort in legendPos:
+            legend = ROOT.TLegend(*legendPos[nameShort] )
+        else:
+            legend = ROOT.TLegend(*legendPos["default"] )
+        #legend.SetNColumns(3)
         legend.SetFillColor(0)
-        legend.SetNColumns(3)
         legend.AddEntry(dataHisto, "data", "pel")
 
 
@@ -118,7 +163,7 @@ class DrawMNPlots(DrawPlots):
             #h.SetOption("PE hist")
             #print h.GetDrawOption()
         
-        legend.AddEntry(errBand, "MC unc", "f")
+        legend.AddEntry(errBand, "syst. unc.", "f")
 
         dataHisto.SetMarkerSize(0.3)
         dataHisto.SetMarkerStyle(8)
@@ -135,6 +180,7 @@ if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     ROOT.AutoLibraryLoader.enable()
+    MNTriggerStudies.MNTriggerAna.Style.setTDRStyle()
     parser = OptionParser(usage="usage: %prog [options] filename",
                             version="%prog 1.0")
 
