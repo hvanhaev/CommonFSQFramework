@@ -29,6 +29,7 @@ import BaseTrigger
 class HLTBalanceTreeProducer(BalanceTreeProducer.BalanceTreeProducer):
     def init(self):
         BalanceTreeProducer.BalanceTreeProducer.init(self)
+        self.addExternalVar(["genW"])
         self.addExternalVar(["hltPtAve"])
         self.addExternalVar(["hltPtCen"])
         self.addExternalVar(["hltPtFwd"])
@@ -46,7 +47,9 @@ class HLTBalanceTreeProducer(BalanceTreeProducer.BalanceTreeProducer):
         self.addExternalVar(["s1l1SingleJetAny"])
 
         #hltgetter = BaseTrigger.TriggerObjectsGetter(self.fChain, "hltAK4PFJetsCorrected")
-        hltgetter = BaseTrigger.TriggerObjectsGetter(self.fChain, "PFAK4CHSnewjets")
+        #hltgetter = BaseTrigger.TriggerObjectsGetter(self.fChain, "PFAK4CHSnewjets")
+        hltgetter = BaseTrigger.TriggerObjectsGetter(self.fChain, "recoPFAK4ChsCorrectedMyRhop4")
+        #hltgetter = BaseTrigger.TriggerObjectsGetter(self.fChain, "recoPFAK4ChsCorrectedp4")
         print "Note: will go through reco jets and not hlt jets!"
         # note: this file is a mess. Source collection defined in couple of places, so look out
 
@@ -89,12 +92,14 @@ class HLTBalanceTreeProducer(BalanceTreeProducer.BalanceTreeProducer):
         self.newlumiWeighters["flat010toPU10"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU10/pileup")
         #'''
         #'''
-        #self.newlumiWeighters["flat2050toPU20"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU20/pileup")
-        #self.newlumiWeighters["flat2050toPU25"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU25/pileup")
-        #self.newlumiWeighters["flat2050toPU30"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU30/pileup")
+        self.newlumiWeighters["flat2050toPU10"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU10/pileup")
+        self.newlumiWeighters["flat2050toPU15"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU15/pileup")
+        self.newlumiWeighters["flat2050toPU20"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU20/pileup")
+        self.newlumiWeighters["flat2050toPU25"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU25/pileup")
+        self.newlumiWeighters["flat2050toPU30"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU30/pileup")
         #'''
 
-        #'''
+        '''
         self.newlumiWeighters["PU20to15"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU15/pileup")
         self.newlumiWeighters["PU20to18"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU18/pileup")
         self.newlumiWeighters["PU20to19"] = edm.LumiReWeighting(puFile, puFile, "PU20/pileup", "PU19/pileup")
@@ -237,7 +242,7 @@ class HLTBalanceTreeProducer(BalanceTreeProducer.BalanceTreeProducer):
 
         todo = {}
         #todo["hlt"] = self.getHLTTagProbe(self.fChain.hltAK4PFJetsCorrected)
-        todo["hlt"] = self.getHLTTagProbe(self.fChain.PFAK4CHSnewjets)
+        #todo["hlt"] = self.getHLTTagProbe(self.fChain.PFAK4CHSnewjets)
         #todo["hltL1match"] = self.getHLTTagProbe(self.fChain.hltAK4PFJetsCorrected)
         #todo["hltCalo"] = self.getHLTTagProbe(self.fChain.hltAK4CaloJetsCorrected)
         #tag, probe = self.getHLTTagProbe(self.fChain.hltAK4PFJetsCorrected)
@@ -342,6 +347,7 @@ class HLTBalanceTreeProducer(BalanceTreeProducer.BalanceTreeProducer):
 
         pu = self.fChain.PUNumInteractions
         genW = BalanceTreeProducer.BalanceTreeProducer.genWeight(self)
+        self.setExternalVar("genW", genW)
         for l in self.newlumiWeighters:
             w = self.newlumiWeighters[l].weight(pu)
             self.setExternalVar(l, w*genW)
@@ -386,14 +392,16 @@ if __name__ == "__main__":
     #slaveParams["standalone"] = True
     slaveParams["standalone"] = False
 
-
+    # recoPFAK4ChsCorrectedMyRhop4
+    #sampleList=["QCD_Pt-50to80_Tune4C_13TeV_pythia8"]
     #sampleList=["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8"]
-    sampleList=["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8_Pu20"]
-    '''
-    nWorkers = 12
-    maxFilesMC = 12
+    #sampleList=["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8_Pu20"]
+    #'''
+    nWorkers = 10
+    #maxFilesMC = 12
     #'''
     #maxFilesMC = 1
+    maxFilesMC = 10
     #nWorkers=1
     #treeName = "mnTriggerAna"
     slaveParams["ptMin"] = 10
@@ -406,6 +414,8 @@ if __name__ == "__main__":
                            maxFilesMC = maxFilesMC,
                            maxFilesData = maxFilesData,
                            nWorkers=nWorkers,
+                           usePickle = True,
+                           useProofOFile = True,
                            outFile = out )
 
 

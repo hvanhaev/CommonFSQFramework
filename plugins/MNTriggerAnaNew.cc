@@ -41,8 +41,10 @@
 
 #include "MNTriggerStudies/MNTriggerAna/interface/EventIdData.h"
 #include "MNTriggerStudies/MNTriggerAna/interface/JetView.h"
+#include "MNTriggerStudies/MNTriggerAna/interface/JetsJEC.h"
 
 #include "MNTriggerStudies/MNTriggerAna/interface/L1JetsView.h"
+#include "MNTriggerStudies/MNTriggerAna/interface/GenericCandidateViewP4.h"
 #include "MNTriggerStudies/MNTriggerAna/interface/TriggerResultsView.h"
 //
 // class declaration
@@ -99,6 +101,18 @@ MNTriggerAnaNew::MNTriggerAnaNew(const edm::ParameterSet& iConfig)
     m_views.push_back(new EventIdData(iConfig, m_tree));
     //*
     //
+    if (iConfig.exists("recoPFAK4ChsCorrected")){
+        m_views.push_back(new JetsJEC(iConfig.getParameter< edm::ParameterSet >("recoPFAK4ChsCorrected"), m_tree));
+    } else {
+        std::cout << "Disabling recoPFAK4ChsCorrected" << std::endl;
+    }
+    if (iConfig.exists("recoPFAK4ChsCorrectedMyRho")){
+        m_views.push_back(new JetsJEC(iConfig.getParameter< edm::ParameterSet >("recoPFAK4ChsCorrectedMyRho"), m_tree));
+    } else {
+        std::cout << "Disabling recoPFAK4ChsCorrectedMyRho" << std::endl;
+    }
+
+
     if (iConfig.exists("JetViewCalo"))
     {
         m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewCalo"), m_tree));
@@ -122,6 +136,13 @@ MNTriggerAnaNew::MNTriggerAnaNew(const edm::ParameterSet& iConfig)
     } else {
         std::cout << "Disabling L1JetsViewStage1 " << std::endl;
     }
+
+    if (iConfig.exists("L1JetsViewRedone")){
+        m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewRedone"), m_tree));
+    } else {
+        std::cout << "Disabling L1JetsViewRedone " << std::endl;
+    }
+
     //m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewStage1Tau"), m_tree));
     //m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewStage1All"), m_tree));
     if (iConfig.exists("TriggerResultsView")){
@@ -137,58 +158,79 @@ MNTriggerAnaNew::MNTriggerAnaNew(const edm::ParameterSet& iConfig)
     //m_vectorBranches["hltJets"] = std::vector<reco::Candidate::LorentzVector>();
 
     //* XXX
-    std::cout << "Note: ak5 gen jet collections are temporarly disabled" << std::endl;
+    //std::cout << "Note: ak5 gen jet collections are temporarly disabled" << std::endl;
     //m_todoHltCollections["ak5GenJets"] = edm::InputTag("ak5GenJets", "", "SIM");
-    m_todoHltCollections["ak4GenJets"] = edm::InputTag("ak4GenJets");
+    //m_todoHltCollections["ak4GenJets"] = edm::InputTag("ak4GenJets");
 
-    std::cout << "Note: HLT jet collections are temporarly disabled" << std::endl;
+    //std::cout << "Note: HLT jet collections are temporarly disabled" << std::endl;
     //"hltAK5PFJetL1FastL2L3Corrected"   ""                "PAT"
     //m_todoHltCollections["hltAK5PFJetL1FastL2L3Corrected"] = edm::InputTag("hltAK5PFJetL1FastL2L3Corrected", "", "PAT");
     
-    m_todoHltCollections["hltAK4PFJets"] = edm::InputTag("hltAK4PFJets");
-    m_todoHltCollections["hltAK4PFJetsCorrected"]  = edm::InputTag("hltAK4PFJetsCorrected", "", "TEST");
-    //m_todoHltCollections["hltAK5PFJets"] = edm::InputTag("hltAK5PFJets", "", "TEST");
-    //m_todoHltCollections["hltAK5PFJetsCorrected"]  = edm::InputTag("hltAK5PFJetsCorrected", "", "TEST");
-    m_todoHltCollections["hltAK4CaloJets"]  = edm::InputTag("hltAK4CaloJets", "", "TEST");
-    m_todoHltCollections["hltAK4CaloJetsCorrected"]  = edm::InputTag("hltAK4CaloJetsCorrected", "", "TEST");
-    m_todoHltCollections["hltAK4CaloJetsCorrectedIDPassed"]  = edm::InputTag("hltAK4CaloJetsCorrectedIDPassed", "", "TEST");
-
-
-    //#m_todoHltCollections["hltPFJetsCorrectedMatchedToL1"]  = edm::InputTag("hltPFJetsCorrectedMatchedToL1", "", "TEST");
-    //*/
-
-
-    std::map<std::string, edm::InputTag>::iterator it = m_todoHltCollections.begin();
-    for (;it != m_todoHltCollections.end(); ++it){
-        m_vectorBranches[it->first] =  std::vector<reco::Candidate::LorentzVector>();
-    }
-
-    // integer branches auto registration
-    {
-        std::map<std::string, int>::iterator it =  m_integerBranches.begin();
-        std::map<std::string, int>::iterator itE =  m_integerBranches.end();
-        for (;it != itE;++it){
-            m_tree->Branch(it->first.c_str(), &it->second, (it->first+"/I").c_str());
+    std::vector<std::string> todoGeneric;
+    todoGeneric.push_back("hltAK4PFJets");
+    todoGeneric.push_back("hltAK4PFJetsCorrected");
+    todoGeneric.push_back("hltAK5PFJets");
+    todoGeneric.push_back("hltAK5PFJetsCorrected");
+    todoGeneric.push_back("hltAK4CaloJets");
+    todoGeneric.push_back("hltAK4CaloJetsCorrected");
+    todoGeneric.push_back("hltAK4CaloJetsCorrectedIDPassed");
+    todoGeneric.push_back("ak4GenJets");
+    todoGeneric.push_back("ak5GenJets");
+    for (size_t i = 0; i < todoGeneric.size(); ++i){
+        if (iConfig.exists(todoGeneric.at(i))){
+            std::cout << "Enabling " << todoGeneric.at(i) << std::endl;
+            m_views.push_back(new GenericCandidateViewP4(iConfig.getParameter< edm::ParameterSet >(todoGeneric.at(i)), m_tree));
+        } else {
+            std::cout << "Disabling " << todoGeneric.at(i) << std::endl;
         }
     }
 
-    // float branches auto registration
-    {
-        std::map<std::string, float>::iterator it =  m_floatBranches.begin();
-        std::map<std::string, float>::iterator itE =  m_floatBranches.end();
-        for (;it != itE;++it){
-            m_tree->Branch(it->first.c_str(), &it->second, (it->first+"/F").c_str());
+
+        /*
+        m_todoHltCollections["hltAK4PFJets"] = edm::InputTag("hltAK4PFJets");
+        m_todoHltCollections["hltAK4PFJetsCorrected"]  = edm::InputTag("hltAK4PFJetsCorrected", "", "TEST");
+        //m_todoHltCollections["hltAK5PFJets"] = edm::InputTag("hltAK5PFJets", "", "TEST");
+        //m_todoHltCollections["hltAK5PFJetsCorrected"]  = edm::InputTag("hltAK5PFJetsCorrected", "", "TEST");
+        m_todoHltCollections["hltAK4CaloJets"]  = edm::InputTag("hltAK4CaloJets", "", "TEST");
+        m_todoHltCollections["hltAK4CaloJetsCorrected"]  = edm::InputTag("hltAK4CaloJetsCorrected", "", "TEST");
+        m_todoHltCollections["hltAK4CaloJetsCorrectedIDPassed"]  = edm::InputTag("hltAK4CaloJetsCorrectedIDPassed", "", "TEST");*/
+
+
+        //#m_todoHltCollections["hltPFJetsCorrectedMatchedToL1"]  = edm::InputTag("hltPFJetsCorrectedMatchedToL1", "", "TEST");
+        //*/
+
+
+        std::map<std::string, edm::InputTag>::iterator it = m_todoHltCollections.begin();
+        for (;it != m_todoHltCollections.end(); ++it){
+            m_vectorBranches[it->first] =  std::vector<reco::Candidate::LorentzVector>();
         }
 
-    }
+        // integer branches auto registration
+        {
+            std::map<std::string, int>::iterator it =  m_integerBranches.begin();
+            std::map<std::string, int>::iterator itE =  m_integerBranches.end();
+            for (;it != itE;++it){
+                m_tree->Branch(it->first.c_str(), &it->second, (it->first+"/I").c_str());
+            }
+        }
+
+        // float branches auto registration
+        {
+            std::map<std::string, float>::iterator it =  m_floatBranches.begin();
+            std::map<std::string, float>::iterator itE =  m_floatBranches.end();
+            for (;it != itE;++it){
+                m_tree->Branch(it->first.c_str(), &it->second, (it->first+"/F").c_str());
+            }
+
+        }
 
 
-    // vector branches autoreg
-    {   
-        std::map<std::string, std::vector<reco::Candidate::LorentzVector> >::iterator it =  m_vectorBranches.begin();
-        std::map<std::string, std::vector<reco::Candidate::LorentzVector> >::iterator itE =  m_vectorBranches.end();
-        for (;it != itE;++it){
-            m_tree->Branch(it->first.c_str(), &it->second);//#;, (it->first+"/I").c_str());
+        // vector branches autoreg
+        {   
+            std::map<std::string, std::vector<reco::Candidate::LorentzVector> >::iterator it =  m_vectorBranches.begin();
+            std::map<std::string, std::vector<reco::Candidate::LorentzVector> >::iterator itE =  m_vectorBranches.end();
+            for (;it != itE;++it){
+                m_tree->Branch(it->first.c_str(), &it->second);//#;, (it->first+"/I").c_str());
         }
     }
 

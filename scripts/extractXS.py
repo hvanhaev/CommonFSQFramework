@@ -60,10 +60,11 @@ def fetchData(linkBase, minI, maxI, multiplyByFilter=False):
 
 
 if __name__ == "__main__":
+    fetchData("https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-", 52, 53)
     #fetchData("https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-", 29, 53)
     #fetchData("https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/BTV-Fall13-", 41, 45)
     #fetchData("https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-", 1, 26)
-    fetchData("https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-", 3, 9, True)
+    #fetchData("https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get/FSQ-Fall13-", 3, 9, True)
 
 
 

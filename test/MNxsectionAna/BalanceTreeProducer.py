@@ -64,7 +64,8 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
         self.dphi = ROOT.Math.VectorUtil.DeltaPhi
 
         self.tree = ROOT.TTree("data", "data")
-        self.GetOutputList().Add(self.tree)
+        #self.GetOutputList().Add(self.tree)
+        self.addToOutput(self.tree)
 
         self.var = {}
         self.histos = {}
@@ -105,7 +106,8 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
         for t in self.histos:
             #self.histos[t][1] = ROOT.TH1F(name, name, nbins, self.histos[t][2], self.histos[t][3])
             self.histos[t].Sumw2()
-            self.GetOutputList().Add(self.histos[t])
+            #self.GetOutputList().Add(self.histos[t])
+            self.addToOutput(self.histos[t])
 
         self.var["weight"] = array('d', [0])
         for v in self.var:
@@ -132,10 +134,14 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
 
 
         if self.HLT2015TempWorkaround:
-            self.jetGetter = JetGetter("PFAK4CHS")
+            #self.jetGetter = JetGetter("PFAK4CHS", jetColOverride="recoPFAK4ChsCorrectedMyRhop4")
+            #self.jetGetter = JetGetter("PFAK4CHS", jetColOverride="recoPFAK4ChsCorrectedp4")
+            self.jetGetter = JetGetter("PFAK4CHS", jetColOverride="hltAK4PFJetsCorrectedp4")
+            #self.jetGetter = JetGetter("PFAK4CHS")
             #self.jetGetter = JetGetter("PFAK5CHS")
             #self.jetGetter = JetGetter("PF")
             self.jetGetter.disableGenJet()
+            self.jetGetter.disableJetId()
             #self.jetGetter = GenJetProxy()
         else:
             self.jetGetter = JetGetter("PFAK5")
@@ -279,7 +285,9 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
                     if jet == tagJet or probeJet == jet: continue
                     eta = abs(jet.eta())
                     if eta > self.etaMax: continue
-                    veto2 =  jet.pt()/ptAve
+                    vetoCand = jet.pt()/ptAve
+                    if veto2 < vetoCand:
+                        veto2 = vetoCand
 
                 tagEta = abs(tagJet.eta())
                 probeEta = abs(probeJet.eta())
@@ -382,5 +390,6 @@ if __name__ == "__main__":
                                maxFilesData = maxFilesData,
                                nWorkers=nWorkers, 
                                usePickle = True,
+                               useProofOFile = True,
                                outFile = "treeDiJetBalance.root" )
 

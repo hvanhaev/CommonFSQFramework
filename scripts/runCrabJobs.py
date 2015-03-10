@@ -80,6 +80,7 @@ for s in sampleListTodo:
 
   # TODO save old value and set it at exit   
   os.environ["TMFSampleName"]=s
+  os.environ["TMFDSName"]=sampleList[s]["DS"]
 
   # crab is not able to submit more than 500 jobs at once
   # note, there was a limit of ~2000 jobs per task (one could

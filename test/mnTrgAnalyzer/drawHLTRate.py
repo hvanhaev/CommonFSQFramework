@@ -74,9 +74,9 @@ def main():
 
 
     totalBunches = 3564
-    #collidingBunches = 1380 # the highest value from 2012
-    collidingBunches = 2*1380 # take the highest value from 2012, mul x2 (50ns - > 25 ns)
-    avgPU = 20
+    collidingBunches = 1331 # the highest value from 2012
+    #collidingBunches = 2*1380 # take the highest value from 2012, mul x2 (50ns - > 25 ns)
+    avgPU = 10
     #avgPU = 1
     minBiasXS = 78.42 * 1E9 # pb
     #minBiasXS = 69.3 * 1E9 # pb // 8 TeV
@@ -97,11 +97,14 @@ def main():
 
 
     c1 = ROOT.TCanvas()
-    for t in finalMap:
-        fname = "~/tmp/"+t+".png"
+    todo = [30, 60, 80, 100, 160, 220, 300]
 
+
+    ofile = ROOT.TFile("~/tmp/rates/ptAveRate_PU"+str(avgPU)+".root", "recreate")
+    res = {}
+    for t in finalMap:
         rate = finalMap[t]
-        fname = "~/tmp/"+t+"_rate.png"
+        fname = "~/tmp/rates/"+t+"_rate_PU"+str(avgPU) +".png"
         if not doXSInsteadOfRate:
             rate.Scale(rateScaleFactor)
 
@@ -122,9 +125,31 @@ def main():
         else:
             rate.GetYaxis().SetTitle("rate  [Hz]")
         
+        xxx = t.split("Proper")[-1].split("_")
+        low = int(xxx[0])
+        high = int(xxx[1])
+        for t in todo:
+            if t >= low and t < high:
+                bin = rate.FindBin(t)
+                val = rate.GetBinContent(bin)
+                #print "Rate:", t, val
+                if t in res:
+                    ratio = val/res[t]
+                    if ratio < 0.98 or ratio > 1.02:
+                       print "Warning: trg", t, ratio
+                else:
+                    res[t]=val
+                
+        ofile.WriteTObject(rate)
 
         c1.Print(fname)
 
+    with open(os.environ["HOME"]+"/tmp/rates/rates_PU"+str(avgPU)+".txt", "w") as f:
+        print >> f, "Rate table for PU", avgPU, "/ ptAve [GeV], rate [Hz]/"
+        for t in sorted(res.keys()):
+            print >> f, t, res[t]
+
+    os.system("cp HLTRatePlots.root ~/tmp/rates/")
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)

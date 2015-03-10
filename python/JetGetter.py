@@ -60,7 +60,7 @@ class Jet():
 
 
 class JetGetter:
-    def __init__(self, jType):
+    def __init__(self, jType, jetColOverride = None):
 
         # idea store gen-rec as float
         if jType == "PFAK4CHS":
@@ -93,6 +93,11 @@ class JetGetter:
         else:
             raise Exception("Jet collection not known "+jType)
 
+        if jetColOverride != None:
+            print "XXX, setting jet branch to", jetColOverride
+            self.jetcol = jetColOverride
+        
+
         self.cnt = 0
         # TODO: common nameing
         self.knownShifts = {"_central":"", 
@@ -102,9 +107,13 @@ class JetGetter:
                             "_jerDown": "_jerDown"}
 
         self.disableGen = False
+        self.disableId = False
 
     def disableGenJet(self, do=True):
         self.disableGen = do
+
+    def disableJetId(self, do=True):
+        self.disableId = do
 
     def shiftsAvaliable(self):
         return self.knownShifts.keys()
@@ -124,7 +133,8 @@ class JetGetter:
             self.data.setdefault(shift, {}).setdefault("recojets", getattr(self.chain, self.jetcol+self.knownShifts[shift]))
             if not self.disableGen:
                 self.data[shift].setdefault("genjets", getattr(self.chain, self.jetcolGen+self.knownShifts[shift]))
-            self.data[shift].setdefault("jetid", getattr(self.chain, self.jetcolID+self.knownShifts[shift]))
+            if not self.disableId:
+                self.data[shift].setdefault("jetid", getattr(self.chain, self.jetcolID+self.knownShifts[shift]))
 
         while cnt < self.data[shift]["recojets"].size():
             jet = self.data[shift]["recojets"].at(cnt)
@@ -132,6 +142,9 @@ class JetGetter:
                 genjet = self.data[shift]["genjets"].at(cnt)
             else:
                 genjet = None
-            id =   self.data[shift]["jetid"].at(cnt)
+            if not self.disableId:
+                id =   self.data[shift]["jetid"].at(cnt)
+            else:
+                id = None
             yield Jet(jet, genjet, id, cnt)
             cnt += 1 # we could use a single cnt+=1 at the end, but this would be error prone

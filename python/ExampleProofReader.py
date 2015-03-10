@@ -129,6 +129,8 @@ class ExampleProofReader( ROOT.TPySelector ):
             self.outDirViaPOF = self.oFileViaPOF.mkdir(self.datasetName)
 
             ROOT.gDirectory.cd(curPath)
+        else:
+            self.oFileViaPOF = None
 
         try:
             self.init() 

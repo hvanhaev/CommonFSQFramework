@@ -72,6 +72,10 @@ def getSEDirsCrab2(anaVersion, name):
                 pfnDir = pfnDir.replace(fileName,"")
                 SEDirs.add(pfnDir)
 
+            # in some cases, e.g. job failed, we land with empy SE dir. Handle by
+            if '' in SEDirs:
+                SEDirs.remove('')
+
             if len(SEDirs) > 0: # makes consistency checks above useless, but it;s to long to parse all xml files
                 break
 
@@ -79,7 +83,13 @@ def getSEDirsCrab2(anaVersion, name):
 
 
 def main(sam):
-    file=open( edm.FileInPath(dsFile).fullPath())
+    if os.path.isfile(dsFile):
+        file=open(dsFile)
+    else:
+        file=open( edm.FileInPath(dsFile).fullPath())
+
+
+
     for line in file:
 
         if line.find("#") != -1:
@@ -242,6 +252,7 @@ if __name__ == "__main__":
                             
     #parser.add_option("-p", "--plotDefFile",   action="store", type="string", dest="plotDefFile", help="plot using definitions from plot def file" )
     parser.add_option("-d", "--date",   action="store", type="string", dest="date", help="skim date" )
+    parser.add_option("-i", "--inputDSFile",   action="store", type="string", dest="dsFile", help="override dsFile" )
     (options, args) = parser.parse_args()
 
     if not options.date:
@@ -259,6 +270,10 @@ if __name__ == "__main__":
     todo = ["preamble","dsFile","anaType","rootPath","onTheFlyCustomization","fun"]
     for t in todo:
         globals()[t] = getattr(mod,t)
+
+    if options.dsFile:
+        print "Overriding dsFile to ", options.dsFile
+        globals()["dsFile"] = options.dsFile
     
 
     dateTT = options.date#"20140411" ## TODO fixme!

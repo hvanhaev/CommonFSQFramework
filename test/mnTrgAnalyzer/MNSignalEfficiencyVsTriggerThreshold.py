@@ -86,10 +86,11 @@ class MNSignalEfficiencyVsTriggerThreshold(MNTriggerStudies.MNTriggerAna.Example
         puFile = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/PUhists.root").fullPath()
 
         self.newlumiWeighters = {}
+        self.newlumiWeighters["flat010toPU0p5"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU0p5/pileup")
         #self.newlumiWeighters["flat010toPU1"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU1/pileup")
         #self.newlumiWeighters["flat010toPU5"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU5/pileup")
         #self.newlumiWeighters["flat010toPU10"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU10/pileup")
-        self.newlumiWeighters["flat2050toPU20"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU20/pileup")
+        #self.newlumiWeighters["flat2050toPU20"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU20/pileup")
         #self.newlumiWeighters["flat40toPU40"] = edm.LumiReWeighting(puFile, puFile, "Flat40/pileup", "PU40/pileup")
 
 
@@ -115,17 +116,30 @@ class MNSignalEfficiencyVsTriggerThreshold(MNTriggerStudies.MNTriggerAna.Example
         cAve = "-1.4 to 1.4"
         fAve = "-5.2 to -2.7"
         bAve = "2.7 to 5.2"
-        topologies["centralAve"] = cAve
-        topologies["forwardAve"] = fAve + "|" + bAve
-        topologies["forwardAve"] = fAve + "|" + bAve
-        topologies["allHLTjetsForBalanceTrg"] = fAve + "|" + bAve + "|" + cAve
-        topologies["allHLTjets"] = "-5.2 to 5.2"
+        #topologies["centralAve"] = cAve
+        #topologies["forwardAve"] = fAve + "|" + bAve
+        #topologies["forwardAve"] = fAve + "|" + bAve
+        #topologies["allHLTjetsForBalanceTrg"] = fAve + "|" + bAve + "|" + cAve
+        #topologies["allHLTjets"] = "-5.2 to 5.2"
+        etaCen = "-1.4 to 1.4"
+        etaIntM = "-3. to -1.4"
+        etaIntP = "1.4 to 3"
+        etaFwdM = "-5. to -3."
+        etaFwdP = "3. to 5."
+
+        topologies = {}
+        topologies["etaC"] = etaCen
+        topologies["etaI"] = etaIntM + "|" + etaIntP
+        topologies["etaF"] = etaFwdM + "|" + etaFwdP
+        topologies["etaA"] = "-4.7 to 4.7"
+
 
         self.topologies = {} # convert strings to actual representation. Store it
         for t in topologies:
             self.topologies[t] = self.topologyParser(topologies[t])
 
         getter = BaseTrigger.TriggerObjectsGetter(self.fChain, self.hltCollection)
+        getterUncor = BaseTrigger.TriggerObjectsGetter(self.fChain, self.hltCollectionUncor)
         getterL1 = BaseTrigger.TriggerObjectsGetter(self.fChain, self.l1Collection)
         getterL1NoMatch = BaseTrigger.TriggerObjectsGetter(self.fChain, self.l1Collection,  maxDR=-1)
         self.fbTrigger = BaseTrigger.ForwardBackwardTrigger(getter)
@@ -161,20 +175,32 @@ class MNSignalEfficiencyVsTriggerThreshold(MNTriggerStudies.MNTriggerAna.Example
         #'''
         th = self.recoJetPtThreshold
 
+        #self.singleJetTrg = BaseTrigger.SingleJetTrigger(getter)
+        #self.singleJetTrg = BaseTrigger.SingleJetTrigger(getterUncor)
         self.singleJetTrg = BaseTrigger.SingleJetTrigger(getterL1)
         #self.singleJetTrg = BaseTrigger.SingleJetTrigger(getterL1NoMatch)
         #postfix = "hltpfVsL1Stage1"
         postfix = "genVshltpf"
         if th < 31:
-            minBin = int(th/3)-1.5
+            #minBin = int(th/3)-1.5
+            minBin = -0.5
             maxBin = int(th)+1.5
             #self.effHistos["allHLTjetsForBalanceTrg_"+postfix] = ["allHLTjetsForBalanceTrg", self.singleJetTrg,  None, None, minBin, maxBin]
-            self.effHistos["allHLTjetsForBalanceTrg_"+postfix] = ["allHLTjets", self.singleJetTrg,  None, None, minBin, maxBin]
+            #self.effHistos["allHLTjetsForBalanceTrg_"+postfix] = ["allHLTjets", self.singleJetTrg,  None, None, minBin, maxBin]
+            self.effHistos["singleJetEfficiencyC_"+postfix] = ["etaC", self.singleJetTrg,  None, None, minBin, maxBin]
+            self.effHistos["singleJetEfficiencyI_"+postfix] = ["etaI", self.singleJetTrg,  None, None, minBin, maxBin]
+            self.effHistos["singleJetEfficiencyF_"+postfix] = ["etaF", self.singleJetTrg,  None, None, minBin, maxBin]
+            self.effHistos["singleJetEfficiencyA_"+postfix] = ["etaA", self.singleJetTrg,  None, None, minBin, maxBin]
+
         else:
             minBin = int(th/2)-1.5
             maxBin = int(th)+1.5
             #self.effHistos["allHLTjetsForBalanceTrg_"+postfix] = ["allHLTjetsForBalanceTrg", self.singleJetTrg,  None, None, minBin, maxBin]
-            self.effHistos["allHLTjetsForBalanceTrg_"+postfix] = ["allHLTjets", self.singleJetTrg,  None, None, minBin, maxBin]
+            #self.effHistos["allHLTjetsForBalanceTrg_"+postfix] = ["allHLTjets", self.singleJetTrg,  None, None, minBin, maxBin]
+            self.effHistos["singleJetEfficiencyC_"+postfix] = ["etaC", self.singleJetTrg,  None, None, minBin, maxBin]
+            self.effHistos["singleJetEfficiencyI_"+postfix] = ["etaI", self.singleJetTrg,  None, None, minBin, maxBin]
+            self.effHistos["singleJetEfficiencyF_"+postfix] = ["etaF", self.singleJetTrg,  None, None, minBin, maxBin]
+            self.effHistos["singleJetEfficiencyA_"+postfix] = ["etaA", self.singleJetTrg,  None, None, minBin, maxBin]
 
         '''
         elif th == 60:
@@ -244,21 +270,23 @@ class MNSignalEfficiencyVsTriggerThreshold(MNTriggerStudies.MNTriggerAna.Example
 
         
         #self.jetGetter = JetGetter("Calo")
-        self.jetGetter = JetGetter("PFAK5")
+        #self.jetGetter = JetGetter("PFAK5")
         #self.jetGetter = JetGetter("PFAK5CHS")
-        self.jetGetter.disableGenJet()
+        #self.jetGetter.disableGenJet()
 
                             
     def analyze(self):
         pu = self.fChain.PUNumInteractions
-        weight = self.newlumiWeighters["flat2050toPU20"].weight(pu)*self.fChain.genWeight
+        #weight = self.newlumiWeighters["flat2050toPU20"].weight(pu)*self.fChain.genWeight
         #weight = self.newlumiWeighters["flat010toPU10"].weight(pu)*self.fChain.genWeight
-        #weight = self.fChain.genWeight
+        #weight = self.newlumiWeighters["flat010toPU1"].weight(pu)*self.fChain.genWeight
+        #weight = self.newlumiWeighters["flat010toPU0p5"].weight(pu)*self.fChain.genWeight
+        weight = self.fChain.genWeight
 
         #'''
-        #pfJetsMomenta = self.fChain.ak4GenJets # TODO: configrable
+        pfJetsMomenta = self.fChain.ak4GenJets # TODO: configrable
         #pfJetsMomenta = self.fChain.ak5GenJets # TODO: configrable
-        pfJetsMomenta = self.fChain.hltAK4PFJetsCorrected # TODO: configrable
+        #pfJetsMomenta = self.fChain.hltAK4PFJetsCorrected # TODO: configrable
         jetsAbovePtThr = []
         for i in xrange(pfJetsMomenta.size()):
             jet = pfJetsMomenta.at(i)
@@ -275,11 +303,13 @@ class MNSignalEfficiencyVsTriggerThreshold(MNTriggerStudies.MNTriggerAna.Example
         #'''
 
         topologies =  self.getTopologies(jetsAbovePtThr)
+        #print topologies
         for h in self.effHistos:
             topologyName = self.effHistos[h][0]
             if not topologyName in topologies.keys(): continue
             # TODO add option to enable matching
             maxThr = self.effHistos[h][1].getMaxThreshold(topologies[topologyName])
+            #print "AAA", topologyName, maxThr
             #maxThr = self.effHistos[h][1].getMaxThreshold()
 
             fillNom = self.effHistos[h][2].Fill
@@ -320,17 +350,19 @@ if __name__ == "__main__":
     maxFilesMC = None
     nWorkers = 12
 
-    sampleList = ["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8_5GeV_Pu20to50"]
+    sampleList = ["MinBias_TuneZ2star_13TeV_pythia6_162"]
+    #sampleList = ["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8"]
+    #sampleList = ["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8_5GeV_Pu20to50"]
     #sampleList = ["QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8_10GeV_Pu20to50"]
 
 
     #'''
     #sampleList = ["QCD_Pt-30to50_Tune4C_13TeV_pythia8",]
     #sampleList = ["QCD_Pt-10to15_Tune4C_13TeV_pythia8",]
-    #maxFilesMC = 24
+    maxFilesMC = 6*16
     #maxFilesMC = 12
-    #nWorkers = 12
-    #maxFilesMC = 2
+    nWorkers = 12
+    #maxFilesMC = 1
     #nWorkers = 1
     # '''
     #maxFilesMC = 24
@@ -347,14 +379,17 @@ if __name__ == "__main__":
 
     # select hltCollection here (see plugins/MNTriggerAna.cc to learn whats avaliable):
     slaveParams["hltCollection"] = "hltAK4PFJetsCorrected"
+    slaveParams["hltCollectionUncor"] = "hltAK4PFJets"
+
     #slaveParams["hltCollection"] = "hltPFJetsCorrectedMatchedToL1"
     #slaveParams["hltCollection"] = "hltPFJetsCorrectedMatchedToL1"
 
     #slaveParams["l1Collection"] = "l1Jets" # alias for old
-    slaveParams["l1Collection"] = "stage1L1Jets"
+    #slaveParams["l1Collection"] = "stage1L1Jets"
     #slaveParams["l1Collection"] = "stage1allL1Jets"
     #slaveParams["l1Collection"] = "hltAK4CaloJetsCorrected"
     #slaveParams["l1Collection"] = "hltAK4PFJetsCorrected"
+    slaveParams["l1Collection"] = "oldRedoneL1Jets"
 
 
     # note - remove maxFiles parameter in order to run on all files
