@@ -26,7 +26,8 @@ hMCbase = hData.Clone()
 globalMC = None
 
 
-numParams = 4
+#numParams = 4
+numParams = 3
 
 def doMinuitFit(ofile, dsData, dsMC, lumi):
     c = ROOT.TCanvas()
@@ -48,12 +49,13 @@ def doMinuitFit(ofile, dsData, dsMC, lumi):
     #fitF = ROOT.TF1("ptHatW","[0]+[1]/x", 0, 1000000);
     #fitF = ROOT.TF1("ptHatW","[0]+[1]*exp(x/[2])", 0, 1000000);#
     #     linear = ROOT.RooFormulaVar("lin", "lin", "a1+a2*(qScale/a3)", args)
-    fitF = ROOT.TF1("ptHatW","[0]+[1]/([2]*x-[3])", 0, 1000000);
+    #fitF = ROOT.TF1("ptHatW","[0]+[1]/([2]*x-[3])", 0, 1000000);
+    fitF = ROOT.TF1("ptHatW","[0]+1./([1]*x-[2])", 0, 1000000);
 
-    fitF.SetParameter(0, 1.)
-    fitF.SetParameter(1, 0.)
-    fitF.SetParameter(2, 1.) 
-    fitF.SetParameter(3, 0.) 
+    fitF.SetParameter(0, 2.)
+    fitF.SetParameter(1, -1.)
+    fitF.SetParameter(2, 0.) 
+    #fitF.SetParameter(3, 0.) 
     hData2MC.Fit("ptHatW")
     hData2MC.Draw()
     c.Print("~/tmp/steps/start_"+dsMC[0].GetName()+".png")
@@ -62,7 +64,7 @@ def doMinuitFit(ofile, dsData, dsMC, lumi):
     global numParams
     for i in xrange(numParams):
         aStart.append(fitF.GetParameter(i))   
-        aErr.append(fitF.GetParError(i)/10.)   
+        aErr.append(fitF.GetParError(i))   
 
     '''
     a1Start, a1err = fitF.GetParameter(0), fitF.GetParError(0)
@@ -163,7 +165,8 @@ def fcn( npar, gin, f, par, iflag ):
     #linear = ROOT.RooFormulaVar("lin", "lin", "(a0+a1/qScale)*(qScale>0.01)", args)
     #linear = ROOT.RooFormulaVar("lin", "lin", "(a1+a2*(qScale**a3))*(qScale>0.01)", args)
     #linear = ROOT.RooFormulaVar("lin", "lin", "a1+a2*exp(qScale/a3)", args)
-    linear = ROOT.RooFormulaVar("lin", "lin", "(a0+a1/(a2*qScale-a3))*( (a0+a1/(a2*qScale-a3))>0  )", args)
+    #linear = ROOT.RooFormulaVar("lin", "lin", "(a0+a1/(a2*qScale-a3))*( (a0+a1/(a2*qScale-a3))>0  )", args)
+    linear = ROOT.RooFormulaVar("lin", "lin", "(a0+1./(a1*qScale-a2))*( (a0+1./(a1*qScale-a2))>0  )", args)
 
     newweight = ROOT.RooFormulaVar("w"+str(cnt), "ww", baseWeight+"*lin"  , ROOT.RooArgList(vars[baseWeight], linear))
 
@@ -200,7 +203,7 @@ def fcn( npar, gin, f, par, iflag ):
     sinceLast("fcn plots dons, now chi2")
     #'''
     chisq, delta = 0., 0.
-    for i in xrange(1, hMC.GetNbinsX()+1):
+    for i in xrange(1, hMC.GetNbinsX()+2):
         errData = hData.GetBinError(i)
         errMC =   hMC.GetBinError(i)
         #print "B", i, errData, errMC, 
@@ -271,8 +274,8 @@ def main():
     print "Lumi:", lumi
 
     #todoQCDNames = ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6", "QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]
-    #todoQCDNames = ["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp",]
-    todoQCDNames = ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
+    todoQCDNames = ["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp",]
+    #todoQCDNames = ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
 
     outFile = ROOT.TFile("ptHatWeighters.root", "recreate")
     for t in todoQCDNames:
