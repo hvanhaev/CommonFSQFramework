@@ -7,7 +7,6 @@ from ROOT import *
 import os,re,sys,math
 
 import MNTriggerStudies.MNTriggerAna.Util
-import MNTriggerStudies.MNTriggerAna.Style
 
 from array import array
 
@@ -37,13 +36,14 @@ class DrawPlots():
                 raise Exception("Different number of bins - "+ h.GetName())
 
         x = array('d')
-        xZeros = array('d')
 
         y =  array('d')
         yUp = array('d')
         yDown = array('d')
+        xUp = array('d')
+        xDown = array('d')
+
         for i in xrange(1, nbins+1):
-            x.append(histos[0].GetBinCenter(i))
 
             centralValue = hCentral.GetBinContent(i)
             yUpLocal  = 0.
@@ -56,15 +56,20 @@ class DrawPlots():
                 else:
                     yDownLocal += delta*delta
 
+            #print histos[0].GetBinCenter(i), histos[0].GetBinLowEdge(i), histos[0].GetBinLowEdge(i+1)
 
-            xZeros.append(0)
+            xCentral=histos[0].GetBinCenter(i)
+            x.append(xCentral)
+            xDown.append(xCentral-histos[0].GetBinLowEdge(i))
+            xUp.append(histos[0].GetBinLowEdge(i+1)-xCentral)
+
 
             y.append(centralValue)
             yUp.append(sqrt(yUpLocal))
             yDown.append(sqrt(yDownLocal))
 
 
-        ret = ROOT.TGraphAsymmErrors(len(x), x, y, xZeros, xZeros, yDown, yUp)
+        ret = ROOT.TGraphAsymmErrors(len(x), x, y, xDown, xUp, yDown, yUp)
         ret.SetFillStyle(3001);
         #    graphBand.Draw("3") 
 
@@ -336,14 +341,16 @@ class DrawPlots():
                     #hMCCentral.SetLineColor(4)
 
 
-                    unc.SetFillColor(8);
+                    unc.SetFillColor(17);
                     if hData != None:
                         hData.Draw()
-                        unc.Draw("3SAME")
+                        #unc.Draw("3SAME")
+                        unc.Draw("2SAME")
                         MCStack.Draw("SAME")
                     else:
                         MCStack.Draw()
-                        unc.Draw("3SAME")
+                        #unc.Draw("3SAME")
+                        unc.Draw("2SAME")
                         MCStack.Draw("SAME")
 
                     self.decorate(c1, hData, MCStack, unc)
