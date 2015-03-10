@@ -460,11 +460,22 @@ class ExampleProofReader( ROOT.TPySelector ):
             print t
 
         if useProofOFile:
+            '''
             partFiles = []
             for t in done:
                 partFiles.append(outFile.replace(".root","")+"_"+t+".root")
             print "Running hadd"
             os.system("hadd -f " + outFile + " " + " ".join(partFiles))
+            '''
+            # //  note: calling hadd directly is problematic, when there are RooUnfold objects inside
+            # this way RooUnfold library is allready loaded, so objects get merged properly
+            merger  = ROOT.TFileMerger( False, False);
+            merger.OutputFile(outFile, True, 1)
+            for t in done:
+                merger.AddFile(outFile.replace(".root","")+"_"+t+".root")
+
+            status = merger.Merge()
+            print "Merge status: ", status
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
