@@ -2,7 +2,15 @@ import ROOT
 ROOT.gROOT.SetBatch(True)
 from ROOT import TStyle
 
+def setTDRStyle():
+   import os
+   ROOT.gROOT.LoadMacro(os.path.dirname(os.path.realpath(__file__))+"/tdrstyle.C")
+   ROOT.setTDRStyle()
+
+
 def setStyle():
+   setTDRStyle() 
+   return 
    tdrStyle = ROOT.TStyle("tdrStyle","Style for P-TDR")
 
    # For the canvas:
@@ -147,3 +155,8 @@ def setStyle():
    tdrStyle.SetPaintTextFormat("3.2g")
    #tdrStyle.SetPaintTextFormat("4.2f")
    tdrStyle.cd()
+
+
+if __name__ == "__main__":
+    setStyleNew()
+
