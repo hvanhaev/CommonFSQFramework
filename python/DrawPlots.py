@@ -51,7 +51,7 @@ class DrawPlots():
             for h in histos:
                 valLocal = h.GetBinContent(i)
                 delta = centralValue - valLocal
-                if delta > 0:
+                if delta < 0:
                     yUpLocal += delta*delta
                 else:
                     yDownLocal += delta*delta
@@ -68,12 +68,18 @@ class DrawPlots():
             yUp.append(sqrt(yUpLocal))
             yDown.append(sqrt(yDownLocal))
 
+        minY = min(min(y), min( [a-b for a,b in zip(y, yDown)]),  min( [a+b for a,b in zip(y, yUp)]))
+        maxY = max(max(y), max( [a-b for a,b in zip(y, yDown)]),  max( [a+b for a,b in zip(y, yUp)]))
 
         ret = ROOT.TGraphAsymmErrors(len(x), x, y, xDown, xUp, yDown, yUp)
         ret.SetFillStyle(3001);
-        #    graphBand.Draw("3") 
 
-        return ret
+        retD = {}
+        retD["band"] = ret
+        retD["min"] = minY
+        retD["max"] = maxY
+
+        return retD
 
     def getLumi(self, target, samples):
         print "getLumi called for", target, "- please implement me in derived class"
@@ -326,23 +332,23 @@ class DrawPlots():
                     for v in summedVariations:
                         uncHistos.append(summedVariations[v])
 
-                    unc = self.getUncertaintyBand(uncHistos, summedCentral)
+                    uncResult = self.getUncertaintyBand(uncHistos, summedCentral)
+                    unc = uncResult["band"]
 
+
+                    maxima.append(uncResult["max"])
                     maxima.append(unc.GetMaximum())
                     maxima.append(MCStack.GetMaximum())
 
-                    maximum = max(maxima)*1.05
-                    unc.SetMaximum(maximum)
-                    if hData != None:
-                        hData.SetMaximum(maximum)
-                    MCStack.SetMaximum(maximum)
                     #hMCCentral.SetMarkerColor(4)
                     #hMCCentral.SetMarkerSize(2)
                     #hMCCentral.SetLineColor(4)
 
 
+                    maximum = max(maxima)*1.05
                     unc.SetFillColor(17);
                     if hData != None:
+                        hData.SetMaximum(maximum)
                         hData.Draw()
                         #unc.Draw("3SAME")
                         unc.Draw("2SAME")
@@ -352,6 +358,9 @@ class DrawPlots():
                         #unc.Draw("3SAME")
                         unc.Draw("2SAME")
                         MCStack.Draw("SAME")
+
+                    unc.SetMaximum(maximum)
+                    MCStack.SetMaximum(maximum)
 
                     self.decorate(c1, hData, MCStack, unc)
 
