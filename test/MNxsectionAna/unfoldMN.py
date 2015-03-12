@@ -163,6 +163,7 @@ def unfold(action):
 
                 
 
+            hReco.SetName(rawName)
             odir.WriteTObject(hReco, rawName)
             # unfold= RooUnfoldSvd (histos[r], histo, 20)
             # unfold= RooUnfoldTUnfold (histos[r], histo)
