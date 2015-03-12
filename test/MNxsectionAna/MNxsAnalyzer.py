@@ -452,9 +452,9 @@ if __name__ == "__main__":
     # debug config:
     #'''
     sampleList = []
-    sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
+    #sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
 
-    sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
+    #sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
     #'''
     sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
     sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
@@ -463,12 +463,12 @@ if __name__ == "__main__":
     # '''
     # '''
     #maxFilesMC = 48
-    maxFilesMC = None
+    #maxFilesMC = 2
     #maxFilesData = 1
     #nWorkers = 1
     #maxFilesMC = 16
     #nWorkers = 12
-    nWorkers = 12
+    nWorkers = 10
 
     slaveParams = {}
     slaveParams["threshold"] = 35.
@@ -506,7 +506,7 @@ if __name__ == "__main__":
                                outFile = ofile )
 
     print "TODO: fakes prob vs eta"
-    print "TODO: xcheck XXX seen"
-    print "TODO: tree files merging for pythia sample"
+    print "TODO: larger statistics for herwig"
+    print "TODO: better binning for det level plots"
 
 
