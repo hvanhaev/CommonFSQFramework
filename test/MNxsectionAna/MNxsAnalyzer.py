@@ -27,6 +27,7 @@ from optparse import OptionParser
 from HLTMCWeighter import HLTMCWeighter
 #import DiJetBalancePlugin
 
+import math
 class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
     def init( self):
         if not self.isData:
@@ -63,7 +64,13 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                 self.hist["etaLead"+t] =  ROOT.TH1F("etaLead"+t,   "etaLead"+t,  100, -5, 5)
                 self.hist["etaSublead"+t] =  ROOT.TH1F("etaSublead"+t,   "etaSublead"+t,  100, -5, 5)
                 self.hist["xsVsDeltaEta"+t] =  ROOT.TH1F("xs"+t,   "xs"+t, binningDeta[0], binningDeta[1], binningDeta[2])
+
+                self.hist["xsVsDeltaEtaGen"+t] =  ROOT.TH1F("xsGen"+t,   "xsGen"+t, binningDeta[0], binningDeta[1], binningDeta[2])
+                self.hist["xsVsDeltaEtaFake"+t] =  ROOT.TH1F("xsFake"+t,   "xsFake"+t, binningDeta[0], binningDeta[1], binningDeta[2])
+                self.hist["xsVsDeltaEtaMiss"+t] =  ROOT.TH1F("xsMiss"+t,   "xsMiss"+t, binningDeta[0], binningDeta[1], binningDeta[2])
+
                 self.hist["vtx"+t] =  ROOT.TH1F("vtx"+t,   "vtx"+t,  10, -0.5, 9.5)
+
                 if self.unfoldEnabled:
                     self.hist["response"+t]= ROOT.RooUnfoldResponse(binningDeta[0], binningDeta[1], binningDeta[2], "response"+t,"response"+t)
 
@@ -96,7 +103,8 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
             for h in self.hist:
                 if not h.startswith("response"):
                     self.hist[h].Sumw2()
-                self.GetOutputList().Add(self.hist[h])
+                #self.GetOutputList().Add(self.hist[h])
+                self.addToOutput(self.hist[h])
 
         if self.applyPtHatReweighing and not self.isData:
                 fp = "MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"
@@ -140,6 +148,65 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
         #    self.jetGetter.setJecUncertainty(self.jetUncFile)
 
         self.jetGetter = BetterJetGetter("PFAK5") 
+
+
+
+    def dr(self, a,b):
+        de = a.eta()-b.eta()
+        dp = a.phi()-b.phi()
+        pi = 3.1415
+        if dp > pi: dp -= 2*pi
+        if dp < -pi: dp += 2*pi
+        #print  a.phi(), b.phi(), dp
+
+        return math.sqrt(de*de+dp*dp)
+
+
+    def doGri(self, weight, variation):
+        fil = lambda x: x.pt() > self.threshold and abs(x.eta())<4.7
+        genJ = filter(fil, self.fChain.genJets) # 1
+        detJ  =filter(fil, self.jetGetter.get(variation)) #1
+
+        ##print "AAA", len(genJ), len(detJ)
+
+        postfix = variation+"_jet15"
+        if len(genJ)<2: 
+            if len(detJ) < 2:
+                return
+            detJB = min(detJ, key= lambda j: j.eta()  )
+            detJF = max(detJ, key= lambda j: j.eta()  )
+            deta = abs(detJB.eta()-detJF.eta())
+            self.hist["xsVsDeltaEtaFake"+postfix].Fill(deta, weight)
+            return # 2
+
+        gjB = min(genJ, key= lambda j: j.eta()  )
+        gjF = max(genJ, key= lambda j: j.eta()  )
+        detaGen = gjF.eta() - gjB.eta()
+        self.hist["xsVsDeltaEtaGen"+postfix].Fill(detaGen, weight)  # 3
+        if len(detJ)<2:
+            self.hist["xsVsDeltaEtaMiss"+postfix].Fill(detaGen, weight) # 4
+            self.hist["response"+postfix].Miss(detaGen, weight)
+            return
+
+        closestDetJet1 = min(detJ, key = lambda j: self.dr(j, gjB) ) # 5, eta restriction imposed in step 1
+        dr1 = self.dr(closestDetJet1, gjB)
+        if dr1 > 0.3:
+            self.hist["xsVsDeltaEtaMiss"+postfix].Fill(detaGen, weight) # 6
+            self.hist["response"+postfix].Miss(detaGen, weight)
+            return
+        else:
+            closestDetJet2 = min(detJ, key = lambda j: self.dr(j, gjF) ) # 5,
+            dr2 = self.dr(closestDetJet2, gjF)
+            if dr2 > 0.3:
+                self.hist["xsVsDeltaEtaMiss"+postfix].Fill(detaGen, weight) # 6
+                self.hist["response"+postfix].Miss(detaGen, weight)
+                return
+
+        detaDet = abs(closestDetJet1.eta()- closestDetJet2.eta())
+        self.hist["response"+postfix].Fill(detaDet, detaGen, weight) # 7
+
+
+
 
     # note: for the ptHat reweighing we will do only the central variation.
     #       otherwise the changes from the JEC/JER variations would be fixed
@@ -239,6 +306,12 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
 
 
         for shift in self.todoShifts:
+            truePU = self.fChain.puTrueNumInteractions
+            puWeight =  self.lumiWeighters["_jet15_central"].weight(truePU)
+            # Q&D warning: to test this you need to comment out all filling of the response object below
+            #self.doGri(weightBase*puWeight, shift)
+
+
             # find best dijet pair
             mostFwdJet = None
             mostBkgJet = None
@@ -313,12 +386,14 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                     if not self.isData:
                         isMiss = False
                         isCorrectTopo = (triggerToUse == "_jet15") and genTopology == "CF" or (triggerToUse == "_dj15fb") and genTopology == "FB"
+                        #'''
                         if genDEta == None or not isCorrectTopo:    # fake pair, e.g. from bkg or we landed in a wrong category
                             if self.unfoldEnabled:
                                 self.hist["response"+histoName].Fake(deta, weight)
                         else:
                             if self.unfoldEnabled:
                                 self.hist["response"+histoName].Fill(deta, genDEta, weight)
+                        #'''
 
                     # fill also some control plots
                     leadJet = mostBkgJet
@@ -351,8 +426,10 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                     puWeight =  self.lumiWeighters[triggerToUse+"_central"].weight(truePU)
 
                 #print "Miss", triggerToUse, genDEta, shift
+                #'''
                 if self.unfoldEnabled:
                     self.hist["response"+histoName].Miss(genDEta, weight)
+                #'''
 
     def finalize(self):
         print "Finalize:"
@@ -377,8 +454,8 @@ if __name__ == "__main__":
     sampleList = []
     sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
 
-    #'''
     sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
+    #'''
     sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
     sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
     sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
@@ -386,7 +463,7 @@ if __name__ == "__main__":
     # '''
     # '''
     #maxFilesMC = 48
-    maxFilesMC = 10
+    maxFilesMC = None
     #maxFilesData = 1
     #nWorkers = 1
     #maxFilesMC = 16
