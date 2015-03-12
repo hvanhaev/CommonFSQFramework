@@ -1,5 +1,4 @@
 import ROOT
-ROOT.gROOT.SetBatch(True)
 from ROOT import TStyle
 
 def setTDRStyle():
@@ -9,8 +8,6 @@ def setTDRStyle():
 
 
 def setStyle():
-   setTDRStyle() 
-   return 
    tdrStyle = ROOT.TStyle("tdrStyle","Style for P-TDR")
 
    # For the canvas:
@@ -25,7 +22,6 @@ def setStyle():
 
    # For the Pad:
    tdrStyle.SetPadBorderMode(0)
-   # tdrStyle.SetPadBorderSize(Width_t size = 1)
    tdrStyle.SetPadColor(kWhite)
    tdrStyle.SetPadGridX(False)
    tdrStyle.SetPadGridY(False)
@@ -43,9 +39,7 @@ def setStyle():
    tdrStyle.SetFrameLineWidth(1)
 
    # For the histo:
-   # tdrStyle.SetHistFillColor(1)
-   # tdrStyle.SetHistFillStyle(0)
-   tdrStyle.SetHistLineColor(1) 
+   tdrStyle.SetHistLineColor(1)
    tdrStyle.SetHistLineStyle(0)
    tdrStyle.SetHistLineWidth(0) # xxx 1
    # tdrStyle.SetLegoInnerR(Float_t rad = 0.5)
@@ -87,9 +81,9 @@ def setStyle():
 
    # Margins:
    tdrStyle.SetPadTopMargin(0.05)
-   tdrStyle.SetPadBottomMargin(0.13)
-   tdrStyle.SetPadLeftMargin(0.16)
-   tdrStyle.SetPadRightMargin(0.02)
+   tdrStyle.SetPadBottomMargin(0.15)
+   tdrStyle.SetPadLeftMargin(0.18)
+   tdrStyle.SetPadRightMargin(0.06)
 
    # For the Global title:
    
@@ -115,8 +109,8 @@ def setStyle():
    tdrStyle.SetTitleSize(0.06, "XYZ")
    # tdrStyle.SetTitleXSize(Float_t size = 0.02) # Another way to set the size?
    # tdrStyle.SetTitleYSize(Float_t size = 0.02)
-   tdrStyle.SetTitleXOffset(0.9)
-   tdrStyle.SetTitleYOffset(1.25)
+   tdrStyle.SetTitleXOffset(1.2)
+   tdrStyle.SetTitleYOffset(2.0)
    # tdrStyle.SetTitleOffset(1.1, "Y") # Another way to set the Offset
    #*/
    # For the axis labels:
@@ -155,8 +149,8 @@ def setStyle():
    tdrStyle.SetPaintTextFormat("3.2g")
    #tdrStyle.SetPaintTextFormat("4.2f")
    tdrStyle.cd()
-
+   return tdrStyle
 
 if __name__ == "__main__":
-    setStyleNew()
+   setTDRStyle()
 

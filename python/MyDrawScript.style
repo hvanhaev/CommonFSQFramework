@@ -1,0 +1,35 @@
+#
+# use the "hsample" variable to set draw properties per sample that is plotted
+# this will be propagated to all canvases
+# access the histograms with "h"
+# all default ROOT functions can be used here
+#
+
+if hsample == "MinBias_TuneMonash13_13TeV-pythia8":
+    h.SetLineColor(4)
+
+if hsample == "data_MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8":
+    h.SetLineColor(2)
+    h.SetMarkerStyle(20)
+    h.SetMarkerColor(2)
+    h.SetMarkerSize(0.5)
+
+#
+# use the "cname" variable to set draw properties of the histograms per canvas e.g. plot ranges
+# access the histograms with "h"
+# access the canvas with "c"
+# all default ROOT functions can be used here
+#
+
+if cname == "phiRecoTracks_central_minbias":
+    h.GetYaxis().SetRangeUser(0.03,0.05)
+    h.GetYaxis().SetTitle("(1/N_{ev})dN/d#phi")
+    h.GetYaxis().SetTitleOffset(2.0)
+    h.GetXaxis().SetTitle("#phi_{track}")
+    h.GetXaxis().SetTitleOffset(1.2)
+
+if cname == "etaRecoTracks_central_minbias":
+    h.GetYaxis().SetRangeUser(0.03,0.06)
+
+if cname == "ptRecoTracks_central_minbias":
+    c.SetLogy()
