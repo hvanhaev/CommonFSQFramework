@@ -23,6 +23,9 @@ class DrawPlots():
             self.outdir = "./"
         else:
             self.outdir = outdir
+
+        self.outdirOtherFormats = self.outdir+"/other/"
+        os.system("mkdir -p " + self.outdirOtherFormats)
         self.skipFinalMap = skipFinalMap
 
         pass
@@ -365,7 +368,8 @@ class DrawPlots():
                     self.decorate(c1, hData, MCStack, unc)
 
                     c1.Print(self.outdir + "/" + targetCat + "_" + centralName+".png")
-                    c1.Print(self.outdir + "/"+ targetCat + "_" + centralName+".C")
+                    c1.Print(self.outdirOtherFormats + "/"+ targetCat + "_" + centralName+".pdf")
+                    c1.Print(self.outdirOtherFormats + "/"+ targetCat + "_" + centralName+".root")
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
