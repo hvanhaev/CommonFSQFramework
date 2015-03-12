@@ -91,12 +91,9 @@ class DrawMNPlots(DrawPlots):
 
 
     def decorate(self, canvas, dataHisto, MCStack, errBand): # override
-        
-
         #ROOT.gROOT.LoadMacro(os.path.dirname(os.path.realpath(__file__))+"/CMS_lumi.C")
         #ROOT.CMS_lumi( canvas, 1 , 33)
         #ROOT.CMS_lumi( canvas, 1 , 11)
-
 
         latex = ROOT.TLatex()
         latex.SetNDC()
@@ -106,14 +103,12 @@ class DrawMNPlots(DrawPlots):
         latex.SetTextFont(42)
         #latex.SetTextAlign(31)
         latex.SetTextSize(0.04);
-        latex.DrawLatex(0.2,0.95, "CMS Preliminary, pp, 5.xxx pb^{-1}, #sqrt{s}=7 TeV");
-
+        latex.DrawLatex(0.2,0.95, "CMS Preliminary, pp, 5.36 pb^{-1}, #sqrt{s}=7 TeV");
 
         xLabels = {}
         yLabels = {}
         xLabels["xs"] = "#Delta#eta"
         yLabels["xs"] = "#sigma [pb]"
-
 
         #canvas.SetLogy()
 
@@ -158,7 +153,7 @@ class DrawMNPlots(DrawPlots):
             h.SetLineColor(4)
             h.SetMarkerStyle(22)
             h.Draw("SAME*P")
-            legend.AddEntry(h, "MC", "pel")
+            legend.AddEntry(h, self.MCLabel, "pel")
             #print type(h.GetDrawOption())
             #h.SetOption("PE hist")
             #print h.GetDrawOption()
@@ -186,7 +181,7 @@ if __name__ == "__main__":
 
     parser.add_option("-i", "--infile", action="store", type="string",  dest="infile" )
     parser.add_option("-o", "--outdir", action="store", type="string",  dest="outdir" )
-    parser.add_option("-s", "--skip", action="store", type="string",  dest="skip" ) # coma separated list of samples to skip
+    parser.add_option("-v", "--variant", action="store", type="string",  dest="variant" ) # coma separated list of samples to skip
     (options, args) = parser.parse_args()
 
     infile = "plotsMNxs.root"
@@ -200,7 +195,19 @@ if __name__ == "__main__":
         d = DrawMNPlots(infile)
 
     ignoreSamples = None
-    if options.skip:
-        ignoreSamples =options.skip.split(",")
+    if options.variant == "herwig":
+        print "Will draw for herwig"
+        ignoreSamples = ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
+    elif options.variant == "pythia":
+        print "Will draw for pythia"
+        ignoreSamples = ["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]
+    elif options.variant:
+        print "Uknown variant:", options.variant
+        sys.exit(1)
+    else:
+        print "Provide variant (pythia/herwig)"
+        sys.exit(1)
+
+    d.MCLabel = options.variant
     d.draw(ignoreSamples=ignoreSamples)
 

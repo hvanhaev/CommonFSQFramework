@@ -16,6 +16,8 @@ from optparse import OptionParser
 ROOT.gSystem.Load("libRooUnfold.so")
 
 
+alaGri = True
+
 def getHistos(infile):
     f = ROOT.TFile(infile, "r")
     lst = f.GetListOfKeys()
@@ -68,27 +70,27 @@ def unfold(action):
     if action == "herwigOnData":
         baseMC = "QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"
         categories["_jet15"] = ["Jet-Run2010B-Apr21ReReco-v1", "JetMETTau-Run2010A-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1"]
-        categories["_dj15fb"] = ["METFwd-Run2010B-Apr21ReReco-v1", "JetMETTau-Run2010A-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1"]
+        #categories["_dj15fb"] = ["METFwd-Run2010B-Apr21ReReco-v1", "JetMETTau-Run2010A-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1"]
     elif action == "pythiaOnData":
         baseMC = "QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"
         categories["_jet15"] = ["Jet-Run2010B-Apr21ReReco-v1", "JetMETTau-Run2010A-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1"]
-        categories["_dj15fb"] = ["METFwd-Run2010B-Apr21ReReco-v1", "JetMETTau-Run2010A-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1"]
+        #categories["_dj15fb"] = ["METFwd-Run2010B-Apr21ReReco-v1", "JetMETTau-Run2010A-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1"]
     elif action ==  "pythiaOnHerwig":
         baseMC = "QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"
         categories["_jet15"] = ["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]
-        categories["_dj15fb"] = ["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]
+        #categories["_dj15fb"] = ["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]
     elif action ==  "herwigOnPythia":
         baseMC = "QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"
         categories["_jet15"] = ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
-        categories["_dj15fb"] = ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
+        #categories["_dj15fb"] = ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
     elif action ==  "herwigOnHerwig":
         baseMC = "QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"
         categories["_jet15"] = ["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]
-        categories["_dj15fb"] = ["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]
+        #categories["_dj15fb"] = ["QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"]
     elif action ==  "pythiaOnPythia":
         baseMC = "QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"
         categories["_jet15"] = ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
-        categories["_dj15fb"] = ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
+        #categories["_dj15fb"] = ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
 
     
 
@@ -122,6 +124,8 @@ def unfold(action):
                 histo.Add(h)
 
         rawName = "xs_central"+c
+
+        # xsFake
         odir.WriteTObject(histo,rawName)
         for r in knownResponses:
             if c not in r: continue # do not apply dj15fb to jet15 and viceversa
@@ -133,8 +137,70 @@ def unfold(action):
             sys.stdout.flush()
 
             print type(histos[baseMC][r])
-            unfold = ROOT.RooUnfoldBayes(histos[baseMC][r], histo, 4)
+
+            if alaGri:
+                acc = []
+                print "Note: subs.bkg", r
+                genXSHistName =  "xsGen"+r.replace("response","")
+                genH = histos[baseMC][genXSHistName]
+                missXSHistName =  "xsMiss"+r.replace("response","")
+                missH = histos[baseMC][missXSHistName]
+                fakeXSHistName =  "xsFake"+r.replace("response","")
+                fakeXSHistMC = histos[baseMC][fakeXSHistName]  
+
+                detHistName =  "xs"+r.replace("response","")
+                detHistMC =     histos[baseMC][detHistName]  
+
+                sizes = set( [histo.GetNbinsX(), fakeXSHistMC.GetNbinsX(), detHistMC.GetNbinsX(), genH.GetNbinsX(), missH.GetNbinsX() ])
+                if len(sizes)!=1:
+                    raise Exception("Different histogram sizes: " + " ".join(sizes) )
+
+                for iBin in xrange(1, histo.GetNbinsX()+1):
+
+                    valMC = detHistMC.GetBinContent(iBin)
+                    valMCFake = fakeXSHistMC.GetBinContent(iBin)
+                    valMCMiss = missH.GetBinContent(iBin)
+                    valMCGen = genH.GetBinContent(iBin)
+                    #'''
+                    A = 1.
+                    if valMCGen > 0:
+                        A = 1. - valMCMiss/valMCGen
+                    acc.append(A)
+                    B = 0.
+                    if valMC >0:
+                        B =  valMCFake/valMC
+                    
+
+                    scaleingFactor = (1.-B)# /A
+                    #print "XXX", A, B, scaleingFactor
+
+                    valMeas = histo.GetBinContent(iBin)
+                    histo.SetBinContent(iBin, scaleingFactor*valMeas)
+                    #'''
+                    #histo.SetBinContent(iBin, max(0, valMeas-valMCFake))
+
+
+                
+
+
+
+            # histos[baseMC][r] - response object
+            # histo - detector level distribution
+            unfold = ROOT.RooUnfoldBayes(histos[baseMC][r], histo, 10)
             hReco= unfold.Hreco()
+            if hReco.GetNbinsX() != histo.GetNbinsX():
+                raise Exception("Different histogram sizes after unfolding")
+
+            '''
+            if alaGri:
+                for iBin in xrange(1, histo.GetNbinsX()+1):
+                    if acc[iBin-1] == 0: continue
+                    cont = hReco.GetBinContent(iBin)
+                    hReco.SetBinContent(iBin, cont/acc[iBin-1])
+            '''
+
+                
+
             odir.WriteTObject(hReco, rawName)
             # unfold= RooUnfoldSvd (histos[r], histo, 20)
             # unfold= RooUnfoldTUnfold (histos[r], histo)
@@ -162,6 +228,7 @@ def compareMCGentoMCUnfolded(action):
     histos = getHistos("plotsMNxs.root")
     #print histos[unfoldingWasDoneOn].keys()
     todo = ["_jet15", "_dj15fb"]
+    todo = ["_jet15"]
 
     c = ROOT.TCanvas()
     for t in todo:
@@ -186,7 +253,11 @@ def compareMCGentoMCUnfolded(action):
 
 
 def main():
-    possibleActions = getPossibleActions()
+    #possibleActions = getPossibleActions()
+    global alaGri
+    alaGri = False
+
+    possibleActions = ["pythiaOnPythia",  "herwigOnPythia", "pythiaOnHerwig", "herwigOnHerwig"]
     for action in possibleActions:
         unfold(action)
         compareMCGentoMCUnfolded(action)

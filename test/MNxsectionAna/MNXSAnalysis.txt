@@ -22,8 +22,8 @@ export SmallXAnaVersion=MNTriggerStudies.MNTriggerAna.samples.Samples_DiJet_2014
 
 5. Detector level plots
 
-./mnDraw.py -i plotsMNxs.root -o ~/tmp/MNXS_detectorLevel_herwig/ -s QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6
-./mnDraw.py -i plotsMNxs.root -o ~/tmp/MNXS_detectorLevel_pythia/ -s  QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp
+./mnDraw.py -i plotsMNxs.root -o ~/tmp/MNXS_detectorLevel_herwig/ -v herwig
+./mnDraw.py -i plotsMNxs.root -o ~/tmp/MNXS_detectorLevel_pythia/ -v pythia
 
 
 6. Create unfolded plots:
