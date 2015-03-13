@@ -28,6 +28,8 @@ def main():
     for t in todo:
         finalSet[t] = {}
         for hName in histos["herwig"][t]:
+            if hName.startswith("xs_"): continue # skip detector level histogram
+
             hAvg = histos["herwig"][t][hName].Clone()
 
             hAvg.Add(histos["pythia"][t][hName])
