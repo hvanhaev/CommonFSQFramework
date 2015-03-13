@@ -10,6 +10,7 @@ from MNTriggerStudies.MNTriggerAna.DrawPlots import DrawPlots
 import  MNTriggerStudies.MNTriggerAna.Style
 
 from mnDraw import DrawMNPlots 
+from array import array
 
 def main():
     MNTriggerStudies.MNTriggerAna.Style.setTDRStyle()
@@ -93,14 +94,34 @@ def main():
 
     uncResult= DrawPlots.getUncertaintyBand(uncert, central)
     unc = uncResult["band"]
+
+
+    # get GEN level distributions
+    histosFromPyAnalyzer = getHistos("plotsMNxs.root")
+    herwigDir = "QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"
+    pythiaDir =  "QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"
+    genHistoHerwig = histosFromPyAnalyzer[herwigDir]["detaGen_central_jet15"].Clone()
+    genHistoHerwig.Add(histosFromPyAnalyzer[herwigDir]["detaGen_central_dj15fb"])
+    genHistoPythia = histosFromPyAnalyzer[pythiaDir]["detaGen_central_jet15"].Clone()
+    genHistoPythia.Add(histosFromPyAnalyzer[pythiaDir]["detaGen_central_dj15fb"])
+
     maxima = []
     maxima.append(uncResult["max"])
-    maxima.append(unc.GetMaximum())
-    maxima.append(central.GetMaximum())
+    for t in [unc, central, genHistoHerwig, genHistoPythia]:
+        maxima.append(t.GetMaximum())
 
     c = ROOT.TCanvas()
-    c.SetTopMargin(0.1)
-    c.SetRightMargin(0.07)
+    c.Divide(1,2)
+    c.cd(1)
+    split = 0.2
+    margin = 0.005
+    ROOT.gPad.SetPad(.005, split+margin, .995, .995)
+    c.cd(2)
+    ROOT.gPad.SetPad(.005, .005, .995, split)
+    c.cd(1)
+
+    ROOT.gPad.SetTopMargin(0.1)
+    #c.SetRightMargin(0.07)
     central.SetMaximum(max(maxima)*1.05)
     unc.SetFillColor(17);
     central.Draw()
@@ -108,9 +129,75 @@ def main():
     central.GetYaxis().SetTitle("#sigma [pb]")
     central.GetYaxis().SetTitleOffset(1.8)
     unc.Draw("2SAME")
+    central.Draw("SAME")
+
+    genHistoHerwig.Draw("SAME HIST")
+    genHistoHerwig.SetLineColor(2)
+
+    genHistoPythia.Draw("SAME HIST")
+    genHistoPythia.SetLineColor(4)
+
     DrawMNPlots.banner()
+
+
+    legend = ROOT.TLegend(0.6, 0.7, 0.9, 0.85)
+    legend.SetFillColor(0)
+    legend.AddEntry(central, "data", "pel")
+    legend.AddEntry(unc, "syst. unc.", "f")
+    legend.AddEntry(genHistoHerwig, "herwig", "l")
+    legend.AddEntry(genHistoPythia, "pythia", "l")
+    legend.Draw("SAME")    
+
+    c.cd(2)
+    ROOT.gPad.DrawFrame(central.GetXaxis().GetXmin(), 0, central.GetXaxis().GetXmax(), 3)
+
+    yUp = array('d')
+    yDown = array('d')
+    x = array('d')
+    y = array('d')
+    xDown = array('d')
+    xUp = array('d')
+    for iBin in xrange(1, central.GetNbinsX()+1):
+        val =  central.GetBinContent(iBin)
+        if val != 0:
+            valDown = unc.GetErrorYlow(iBin-1)/central.GetBinContent(iBin)
+            valUp =   unc.GetErrorYhigh(iBin-1)/central.GetBinContent(iBin)
+            yDown.append(valDown)
+            yUp.append(valUp)
+            print valDown, valUp
+        else:
+           yUp.append(0)
+           yDown.append(0)
+        #print 
+        x.append(unc.GetX()[iBin-1])
+        y.append(1)
+        xDown.append(unc.GetErrorXlow(iBin-1))
+        xUp.append(unc.GetErrorXhigh(iBin-1))
+
+    #print type(x)
+    uncRatio = ROOT.TGraphAsymmErrors(len(x), x, y, xDown, xUp, yDown, yUp)
+    uncRatio.SetFillStyle(3001)
+    uncRatio.SetFillColor(17)
+    uncRatio.Draw("2SAME")
+
+
+    centralRatio = central.Clone()
+    centralRatio.Divide(central)
+    centralRatio.Draw("SAME")
+
+    herwigRatio = genHistoHerwig.Clone()
+    herwigRatio.Divide(central)
+
+    pythiaRatio = genHistoPythia.Clone()
+    pythiaRatio.Divide(central)
+
+    herwigRatio.Draw("SAME L")
+    pythiaRatio.Draw("SAME L")
+
+
     c.Print("~/tmp/mergedUnfolded.png")
-    c.SetLogy()
+    c.cd(1)
+    ROOT.gPad.SetLogy()
     c.Print("~/tmp/mergedUnfolded_log.png")
 
 
