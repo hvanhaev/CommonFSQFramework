@@ -72,11 +72,19 @@ def unfold(action):
 
     of =  ROOT.TFile("~/tmp/mnxsHistos_unfolded_"+action+".root","RECREATE")
 
+    # Warning: duplicated code for lumi calculation! See mnDraw.py
+    triggerToKey = {}
+    triggerToKey["_jet15"] = "lumiJet15"
+    triggerToKey["_dj15fb"] = "lumiDiJet15FB"
+
     for c in categories:
         odir = of.mkdir(c)
 
         centralHistoName = "xs_central"+c # in fact we should not find any other histogram in data than "central"
         histo = None
+
+        sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
+        lumi = 0.
         for ds in categories[c]:
             h = histos[ds][centralHistoName]
             if not histo:
@@ -85,9 +93,17 @@ def unfold(action):
             else:
                 histo.Add(h)
 
+            if "Data" in action: # 
+                lumiKeyName = triggerToKey[c]
+                lumi += sampleList[ds][lumiKeyName]
+
+
+        if "Data" in action:
+            histo.Scale(1./lumi)
+
+        print "Lumi", c, action, lumi
         rawName = "xs_central"+c
 
-        # xsFake
         odir.WriteTObject(histo,rawName)
         for r in knownResponses:
             if c not in r: continue # do not apply dj15fb to jet15 and viceversa
