@@ -48,6 +48,7 @@ def main():
     # note: histo binning should be the same from beginning!
     finalSet["merged"] = {}
     for t in finalSet["_jet15"]:
+        newName = t.replace("_jet15", "_jet15andDJ15FB")
         finalHisto = finalSet["_jet15"][t].Clone()
         finalHisto.Add(finalSet["_dj15fb"][t.replace("_jet15", "_dj15fb")].Clone())
         finalSet["merged"][t] = finalHisto
