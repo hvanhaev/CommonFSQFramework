@@ -6,6 +6,8 @@ ROOT.gROOT.SetBatch(True)
 from HistosHelper import getHistos
 
 def main():
+
+    lumiUncertainty = 0.04
     herwigIn="~/tmp/mnxsHistos_unfolded_herwigOnData.root"
     pythiaIn="~/tmp/mnxsHistos_unfolded_pythiaOnData.root"
     ofileName = "~/tmp/mnxsHistos_unfolded_onData_merged.root"
@@ -43,6 +45,17 @@ def main():
                 newNamePythia = hName.replace("_central_", "_modelDown_")
                 finalSet[t][newNameHerwig] = histos["herwig"][t][hName].Clone(newNameHerwig)
                 finalSet[t][newNamePythia] = histos["pythia"][t][hName].Clone(newNamePythia)
+
+                # at the same point - use the averaged histogram to add lumi uncertainy
+                #  BTW: should we do it here??
+                newNameAvgUp = hName.replace("_central_", "_lumiUp_")
+                newNameAvgDown = hName.replace("_central_", "_lumiDown_")
+                finalSet[t][newNameAvgUp] = hAvg.Clone(newNameAvgUp)
+                finalSet[t][newNameAvgDown] = hAvg.Clone(newNameAvgDown)
+                finalSet[t][newNameAvgUp].Scale(1.+lumiUncertainty)
+                finalSet[t][newNameAvgDown].Scale(1.-lumiUncertainty)
+
+
 
     # add jet15 and dj15 histos
     # note: histo binning should be the same from beginning!
