@@ -306,9 +306,9 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
 
 
         for shift in self.todoShifts:
-            truePU = self.fChain.puTrueNumInteractions
-            puWeight =  self.lumiWeighters["_jet15_central"].weight(truePU)
             # Q&D warning: to test this you need to comment out all filling of the response object below
+            #truePU = self.fChain.puTrueNumInteractions
+            #puWeight =  self.lumiWeighters["_jet15_central"].weight(truePU)
             #self.doGri(weightBase*puWeight, shift)
 
 

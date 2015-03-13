@@ -17,6 +17,8 @@ from array import array
 from optparse import OptionParser
 
 class DrawMNPlots(DrawPlots):
+
+    # warning: duplicated code for lumi calculation: see unfoldMN.py
     def getLumi(self, target, samples): # override
         if "data_" not in target:
             raise Exception("getLumi called for "+ target )

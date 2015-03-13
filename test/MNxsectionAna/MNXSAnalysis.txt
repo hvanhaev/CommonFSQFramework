@@ -41,3 +41,8 @@ Part of them are MConMC tests
 the png files of MConMC are also save in ~/tmp
 
 
+7. Add/merge unfolded results
+
+./mergeUnfoldedResult.py
+
+
