@@ -91,12 +91,8 @@ class DrawMNPlots(DrawPlots):
     def setGlobalStyle(self):  # override
         MNTriggerStudies.MNTriggerAna.Style.setTDRStyle()
 
-
-    def decorate(self, canvas, dataHisto, MCStack, errBand): # override
-        #ROOT.gROOT.LoadMacro(os.path.dirname(os.path.realpath(__file__))+"/CMS_lumi.C")
-        #ROOT.CMS_lumi( canvas, 1 , 33)
-        #ROOT.CMS_lumi( canvas, 1 , 11)
-
+    @staticmethod
+    def banner():
         latex = ROOT.TLatex()
         latex.SetNDC()
         latex.SetTextAngle(0)
@@ -106,6 +102,14 @@ class DrawMNPlots(DrawPlots):
         #latex.SetTextAlign(31)
         latex.SetTextSize(0.04);
         latex.DrawLatex(0.2,0.95, "CMS Preliminary, pp, 5.36 pb^{-1}, #sqrt{s}=7 TeV");
+
+
+
+    def decorate(self, canvas, dataHisto, MCStack, errBand): # override
+        #ROOT.gROOT.LoadMacro(os.path.dirname(os.path.realpath(__file__))+"/CMS_lumi.C")
+        #ROOT.CMS_lumi( canvas, 1 , 33)
+        #ROOT.CMS_lumi( canvas, 1 , 11)
+        self.banner()
 
         xLabels = {}
         yLabels = {}

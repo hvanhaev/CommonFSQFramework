@@ -30,7 +30,8 @@ class DrawPlots():
 
         pass
 
-    def getUncertaintyBand(self, histos, hCentral):
+    @staticmethod
+    def getUncertaintyBand(histos, hCentral):
         if len(histos) == 0:
             raise Exception("Empty histogram list")
         nbins = hCentral.GetNbinsX()
