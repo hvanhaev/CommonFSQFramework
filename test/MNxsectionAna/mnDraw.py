@@ -103,20 +103,51 @@ class DrawMNPlots(DrawPlots):
         latex.SetTextSize(0.04);
         latex.DrawLatex(0.2,0.95, "CMS Preliminary, pp, 5.36 pb^{-1}, #sqrt{s}=7 TeV");
 
+    @staticmethod
+    def xLabels():
+        xLabels = {}
+        xLabels["xs"] = "#Delta#eta"
+        gev = " [GeV]"
+        xLabels["etaSublead"] = "#eta^{subleading jet}"
+        xLabels["etaLead"] = "#eta^{leading jet}"
+        xLabels["ptSublead"] = "p_{T}^{subleading jet}"+gev
+        xLabels["ptLead"] = "p_{T}^{leading jet}"+gev
+        xLabels["vtx"] = "N_{good vertices}"
+        return xLabels
+
+    @staticmethod
+    def xRangeUser():
+        ret = {}
+        ret["vtx"] = (0.5, 6.5)
+        ret["ptLead"] = (34.5, 99.5)
+        ret["ptSublead"] = (34.5, 99.5)
+        return ret
+
+    @staticmethod
+    def yLabels():
+        yLabels = {}
+
+        yLabels["xs"] = "#sigma [pb]"
+        au = "events [a.u.]"
+        for l in DrawMNPlots.xLabels():
+            if l not in yLabels:
+                yLabels[l] = au
+
+        '''
+        yLabels["ptSublead"] = au
+        yLabels["etaSublead"] = au
+        yLabels["ptLead"] = au
+        yLabels["ptLead"] = au
+        yLabels["vtx"] = au
+        '''
+        return yLabels
 
 
     def decorate(self, canvas, dataHisto, MCStack, errBand): # override
-        #ROOT.gROOT.LoadMacro(os.path.dirname(os.path.realpath(__file__))+"/CMS_lumi.C")
-        #ROOT.CMS_lumi( canvas, 1 , 33)
-        #ROOT.CMS_lumi( canvas, 1 , 11)
         self.banner()
 
-        xLabels = {}
-        yLabels = {}
-        xLabels["xs"] = "#Delta#eta"
-        yLabels["xs"] = "#sigma [pb]"
-
-        #canvas.SetLogy()
+        xLabels = self.xLabels()
+        yLabels = self.yLabels()
 
         name = dataHisto.GetName()
         nameShort = "default"
@@ -135,7 +166,14 @@ class DrawMNPlots(DrawPlots):
             dataHisto.GetYaxis().SetTitle(yLabels[nameShort])
         else:
             dataHisto.GetYaxis().SetTitle("TODO:"+ nameShort)
+
+        ranges = self.xRangeUser()
+        if nameShort in ranges:
+            r = ranges[nameShort]
+            dataHisto.GetXaxis().SetRangeUser(r[0], r[1])
+
         dataHisto.GetYaxis().SetTitleOffset(1.8)
+        dataHisto.GetXaxis().SetTitleOffset(1.5)
 
         #MChistos = MCStack.GetHists()
 
