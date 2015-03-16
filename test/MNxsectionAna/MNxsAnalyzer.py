@@ -34,6 +34,8 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
             #self.hltMCWeighter = HLTMCWeighter("HLT_Jet15U")
             self.HLTMCWeighterJ15Raw = HLTMCWeighter("HLT_Jet15U_raw")
             self.HLTMCWeighterJ15L1Raw = HLTMCWeighter("HLT_Jet15U_L1Seeding_raw")
+            self.HLTMCWeighterJ15FBL1Raw = HLTMCWeighter("HLT_DoubleJet15U_ForwardBackward_L1Seeding_raw")
+            self.HLTMCWeighterJ15FBRaw = HLTMCWeighter("HLT_DoubleJet15U_ForwardBackward_raw")
 
         self.normFactor = self.getNormalizationFactor()
 
@@ -222,7 +224,7 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                 return
             weight = weightBase
         else:
-            if not self.MC_jet15_triggerFired:
+            if not self.triggerFired("_jet15")
                 return
             truePU = self.fChain.puTrueNumInteractions
             puWeight =  self.lumiWeighters["_jet15_central"].weight(truePU)
@@ -247,23 +249,46 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
             self.var["qScale"][0] = self.fChain.qScale
         self.tree.Fill()
 
+        
+    def triggerFired(self, case):
+        if case == "_jet15" and self.MC_jet15_triggerFired_cached != None:
+            return self.MC_jet15_triggerFired_cached
+        if case == "_dj15fb" and self.MC_dj15fb_triggerFired_cached != None:
+            return self.MC_dj15fb_triggerFired_cached
+
+        ev = self.fChain.event
+        rnd4eff = ev%10000/9999.
+
+        if case == "_jet15":
+            self.HLTMCWeighterJ15L1Raw.newEvent(self.fChain)
+            self.HLTMCWeighterJ15Raw.newEvent(self.fChain)
+            w1 = self.HLTMCWeighterJ15L1Raw.getWeight()
+            w2 = self.HLTMCWeighterJ15Raw.getWeight()
+            self.MC_jet15_triggerFired_cached = w1*w2 > rnd4eff
+            return self.MC_jet15_triggerFired_cached
+        elif case == "_dj15fb":
+            self.HLTMCWeighterJ15FBL1Raw.newEvent(self.fChain)
+            self.HLTMCWeighterJ15FBRaw.newEvent(self.fChain)
+            w1 = self.HLTMCWeighterJ15FBL1Raw.getWeight()
+            w2 = self.HLTMCWeighterJ15FBRaw.getWeight()
+            self.MC_dj15fb_triggerFired_cached = w1*w2 > rnd4eff
+            return self.MC_dj15fb_triggerFired_cached
+        else:
+            raise Excecption("triggerFired: case not known: "+str(case))
+        
+           
+
     def analyze(self):
+        self.MC_jet15_triggerFired_cached = None
+        self.MC_dj15fb_triggerFired_cached = None
+
         self.hist["evcnt"].Fill(0)
         if self.fChain.ngoodVTX == 0: return
         self.jetGetter.newEvent(self.fChain)
         weightBase = 1. 
         if not self.isData:
-            # TODO: dijet15FB case
-            ev = self.fChain.event
-            rnd4eff = ev%10000/9999.
             weightBase *= self.fChain.genWeight*self.normFactor 
-            self.HLTMCWeighterJ15L1Raw.newEvent(self.fChain)
-            self.HLTMCWeighterJ15Raw.newEvent(self.fChain)
-            w1 = self.HLTMCWeighterJ15L1Raw.getWeight()
-            w2 = self.HLTMCWeighterJ15Raw.getWeight()
-            #print "WTRG", w1, w2
-            #weightBase *= w1*w2
-            self.MC_jet15_triggerFired = w1*w2 > rnd4eff
+
             #print ev, w1*w2, rnd4eff, triggerFired
 
 
@@ -367,9 +392,7 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                     else:
                         raise Exception("Trigger not known??? "+triggerToUse)
                 else:
-                    gotTrigger = True
-                    if triggerToUse == "_jet15":
-                        gotTrigger = self.MC_jet15_triggerFired
+                    gotTrigger = self.triggerFired(triggerToUse)
 
 
 
