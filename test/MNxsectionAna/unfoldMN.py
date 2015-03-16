@@ -17,6 +17,8 @@ ROOT.gSystem.Load("libRooUnfold.so")
 from HistosHelper import getHistos
 
 
+from mnDraw import DrawMNPlots 
+
 alaGri = True
 
 def getPossibleActions():
@@ -216,6 +218,10 @@ def compareMCGentoMCUnfolded(action):
         unfoldedHisto = fileWithUnfoldedPlots.Get(unfoldedHistoName)
         #print unfoldedHistoName, type(unfoldedHisto), unfoldedHisto.ClassName()
         genHisto.Draw()
+        genHisto.GetXaxis().SetTitle(DrawMNPlots.xLabels()["xs"])
+        genHisto.GetYaxis().SetTitleOffset(1.8)
+        genHisto.GetYaxis().SetTitle(DrawMNPlots.yLabels()["xs"])
+
         genHisto.SetMarkerColor(2)
         genHisto.SetLineColor(2)
         unfoldedHisto.Draw("SAME")
@@ -232,6 +238,7 @@ def compareMCGentoMCUnfolded(action):
 
 
 def main():
+    MNTriggerStudies.MNTriggerAna.Style.setTDRStyle()
     possibleActions = getPossibleActions()
     global alaGri
     alaGri = False
