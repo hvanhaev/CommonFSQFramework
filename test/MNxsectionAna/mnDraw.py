@@ -127,23 +127,16 @@ class DrawMNPlots(DrawPlots):
     def yLabels():
         yLabels = {}
 
-        yLabels["xs"] = "#sigma [pb]"
+        yLabels["xsAsPB"] = "#sigma [pb]"
         au = "events [a.u.]"
         for l in DrawMNPlots.xLabels():
             if l not in yLabels:
                 yLabels[l] = au
 
-        '''
-        yLabels["ptSublead"] = au
-        yLabels["etaSublead"] = au
-        yLabels["ptLead"] = au
-        yLabels["ptLead"] = au
-        yLabels["vtx"] = au
-        '''
         return yLabels
 
 
-    def decorate(self, canvas, dataHisto, MCStack, errBand): # override
+    def decorate(self, canvas, dataHisto, MCStack, errBand, extra): # override
         self.banner()
 
         xLabels = self.xLabels()
@@ -171,6 +164,7 @@ class DrawMNPlots(DrawPlots):
         if nameShort in ranges:
             r = ranges[nameShort]
             dataHisto.GetXaxis().SetRangeUser(r[0], r[1])
+            extra["frame"].GetXaxis().SetRangeUser(r[0], r[1])
 
         dataHisto.GetYaxis().SetTitleOffset(1.8)
         dataHisto.GetXaxis().SetTitleOffset(1.5)
@@ -178,12 +172,30 @@ class DrawMNPlots(DrawPlots):
         #MChistos = MCStack.GetHists()
 
 
+        category = dataHisto.GetName().split("_")[-1]
+        #print 
         legendPos = {}
-        legendPos["default"] = (0.6, 0.7, 0.9, 0.85)
-        if nameShort in legendPos:
-            legend = ROOT.TLegend(*legendPos[nameShort] )
+        legendPos["dj15fb"] = {}
+        legendPos["jet15"] = {}
+        legendPos["jet15"]["default"] = (0.6, 0.7, 0.9, 0.85)
+        legendPos["dj15fb"]["default"] = legendPos["jet15"]["default"]
+        off = 0.2
+        legendPos["dj15fb"]["etaLead"] = (0.6-off, 0.7, 0.9-off, 0.85)
+        legendPos["dj15fb"]["etaSublead"] = legendPos["dj15fb"]["etaLead"]
+        off = 0.3
+        legendPos["dj15fb"]["xs"] = (0.6-off, 0.7, 0.9-off, 0.85)
+
+        off = 0.2
+        offY=0.55
+        legendPos["jet15"]["etaLead"] = (0.6-off, 0.7-offY, 0.9-off, 0.85-offY)
+        legendPos["jet15"]["etaSublead"] = legendPos["jet15"]["etaLead"]
+
+        if nameShort in legendPos[category]:
+            legend = ROOT.TLegend(*legendPos[category][nameShort] )
+            print "X"*1000, dataHisto.GetName()
+
         else:
-            legend = ROOT.TLegend(*legendPos["default"] )
+            legend = ROOT.TLegend(*legendPos[category]["default"] )
         #legend.SetNColumns(3)
         legend.SetFillColor(0)
         legend.AddEntry(dataHisto, "data", "pel")
@@ -207,8 +219,8 @@ class DrawMNPlots(DrawPlots):
         dataHisto.SetMarkerSize(0.3)
         dataHisto.SetMarkerStyle(8)
 
-        canvas.SetTopMargin(0.1)
-        canvas.SetRightMargin(0.07)
+        ROOT.gPad.SetTopMargin(0.1)
+        #ROOT.gPad.SetRightMargin(0.07)
 
         legend.Draw("SAME")
         self.keep.append(legend)
@@ -253,5 +265,5 @@ if __name__ == "__main__":
         sys.exit(1)
 
     d.MCLabel = options.variant
-    d.draw(ignoreSamples=ignoreSamples)
+    d.draw(ignoreSamples=ignoreSamples, doRatio = True)
 
