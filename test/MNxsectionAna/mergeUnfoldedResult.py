@@ -91,6 +91,7 @@ def main():
     central = central[0]
 
     uncert  = [finalSet["merged"][hName] for hName in finalSet["merged"].keys() if "_central_" not in hName ]
+    #uncert  = [finalSet["merged"][hName] for hName in finalSet["merged"].keys() if "_model" in hName ]
 
     uncResult= DrawPlots.getUncertaintyBand(uncert, central)
     unc = uncResult["band"]
@@ -125,6 +126,9 @@ def main():
     central.SetMaximum(max(maxima)*1.05)
     unc.SetFillColor(17);
     central.Draw()
+    #central.GetXaxis().SetRangeUser(5,8)
+    #central.GetYaxis().SetRangeUser(0,250000)
+
     central.GetXaxis().SetTitle("#Delta#eta")
     central.GetYaxis().SetTitle("#sigma [pb]")
     central.GetYaxis().SetTitleOffset(1.8)
@@ -149,7 +153,8 @@ def main():
     legend.Draw("SAME")    
 
     c.cd(2)
-    ROOT.gPad.DrawFrame(central.GetXaxis().GetXmin(), 0, central.GetXaxis().GetXmax(), 3)
+    frame = ROOT.gPad.DrawFrame(central.GetXaxis().GetXmin(), 0, central.GetXaxis().GetXmax(), 3)
+    #frame.GetXaxis().SetRangeUser(5,8)
 
     yUp = array('d')
     yDown = array('d')
@@ -164,7 +169,7 @@ def main():
             valUp =   unc.GetErrorYhigh(iBin-1)/central.GetBinContent(iBin)
             yDown.append(valDown)
             yUp.append(valUp)
-            print valDown, valUp
+            #print valDown, valUp
         else:
            yUp.append(0)
            yDown.append(0)

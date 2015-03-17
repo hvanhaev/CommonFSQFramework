@@ -220,7 +220,7 @@ def compareMCGentoMCUnfolded(action):
         genHisto.Draw()
         genHisto.GetXaxis().SetTitle(DrawMNPlots.xLabels()["xs"])
         genHisto.GetYaxis().SetTitleOffset(1.8)
-        genHisto.GetYaxis().SetTitle(DrawMNPlots.yLabels()["xs"])
+        genHisto.GetYaxis().SetTitle(DrawMNPlots.yLabels()["xsAsPB"])
 
         genHisto.SetMarkerColor(2)
         genHisto.SetLineColor(2)
