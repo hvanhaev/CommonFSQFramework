@@ -31,6 +31,17 @@ class DrawPlots():
         pass
 
     @staticmethod
+    def splitCanvas(c):
+        c.Divide(1,2)
+        c.cd(1)
+        split = 0.2
+        margin = 0.005
+        ROOT.gPad.SetPad(.005, split+margin, .995, .995)
+        c.cd(2)
+        ROOT.gPad.SetPad(.005, .005, .995, split)
+        c.cd(1)
+
+    @staticmethod
     def getUncertaintyBand(histos, hCentral):
         if len(histos) == 0:
             raise Exception("Empty histogram list")
@@ -98,10 +109,10 @@ class DrawPlots():
 
     def setGlobalStyle(self):  # override
         pass
-    def decorate(self, canvas, dataHisto, MCStack, errBand): # override
+    def decorate(self, canvas, dataHisto, MCStack, errBand, extra = None): # override
         pass
 
-    def draw(self, ignoreSamples = None): # core function
+    def draw(self, ignoreSamples = None, doRatio = False): # core function
         self.setGlobalStyle()
         sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
         parser = OptionParser(usage="usage: %prog [options] filename",
@@ -260,6 +271,8 @@ class DrawPlots():
                 histos.add(histname)
 
         c1 = ROOT.TCanvas()
+        if doRatio: self.splitCanvas(c1)
+
         for targetCat in targetCategories:
 
             targetData = None
@@ -365,8 +378,61 @@ class DrawPlots():
 
                     unc.SetMaximum(maximum)
                     MCStack.SetMaximum(maximum)
+                    extra = {}
+                    if doRatio: 
+                        c1.cd(2)
+                        MChistos = MCStack.GetStack()
+                        hSum = None
+                        for h in MChistos:
+                            if hSum == None: hSum = h.Clone()
+                            else: hSum.Add(h)
 
-                    self.decorate(c1, hData, MCStack, unc)
+
+                        central = hData
+                        centralRatio = hData.Clone()
+                        centralRatio.Divide(central)
+                        hSumRatio = hSum.Clone()
+                        hSumRatio.Divide(central)
+
+                        frame = ROOT.gPad.DrawFrame(central.GetXaxis().GetXmin(), 0, central.GetXaxis().GetXmax(), 3)
+                        extra["frame"] = frame
+                        ##
+                        yUp = array('d')
+                        yDown = array('d')
+                        x = array('d')
+                        y = array('d')
+                        xDown = array('d')
+                        xUp = array('d')
+                        for iBin in xrange(1, central.GetNbinsX()+1):
+                            val =  central.GetBinContent(iBin)
+                            if val != 0:
+                                valDown = unc.GetErrorYlow(iBin-1)/central.GetBinContent(iBin)
+                                valUp =   unc.GetErrorYhigh(iBin-1)/central.GetBinContent(iBin)
+                                yDown.append(valDown)
+                                yUp.append(valUp)
+                                #print valDown, valUp
+                                x.append(unc.GetX()[iBin-1])
+                                y.append(hSum.GetBinContent(iBin)/central.GetBinContent(iBin))
+                                xDown.append(unc.GetErrorXlow(iBin-1))
+                                xUp.append(unc.GetErrorXhigh(iBin-1))
+
+                            #else:
+                            #   yUp.append(0)
+                            #   yDown.append(0)
+
+                        if len(x) > 0:
+                            uncRatio = ROOT.TGraphAsymmErrors(len(x), x, y, xDown, xUp, yDown, yUp)
+                            uncRatio.SetFillStyle(3001)
+                            uncRatio.SetFillColor(17)
+                            uncRatio.Draw("2SAME")
+                            centralRatio.Draw("SAME")
+                            hSumRatio.Draw("SAME")
+
+                        
+                        c1.cd(1)
+
+
+                    self.decorate(c1, hData, MCStack, unc, extra)
 
                     c1.Print(self.outdir + "/" + targetCat + "_" + centralName+".png")
                     c1.Print(self.outdirOtherFormats + "/"+ targetCat + "_" + centralName+".pdf")
