@@ -56,7 +56,7 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
         self.hist = {}
         todoTrg = ["_jet15", "_dj15fb"]
 
-        binningDeta = (20, 0, 9.4)
+        binningDeta = (19, 0, 9.5)
 
         for shift in self.todoShifts:
             for trg in todoTrg:
@@ -224,7 +224,7 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                 return
             weight = weightBase
         else:
-            if not self.triggerFired("_jet15")
+            if not self.triggerFired("_jet15"):
                 return
             truePU = self.fChain.puTrueNumInteractions
             puWeight =  self.lumiWeighters["_jet15_central"].weight(truePU)
@@ -416,6 +416,9 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                         else:
                             if self.unfoldEnabled:
                                 self.hist["response"+histoName].Fill(deta, genDEta, weight)
+
+                        if genDEta != None and not isCorrectTopo:
+                            isMiss = True
                         #'''
 
                     # fill also some control plots
@@ -486,7 +489,7 @@ if __name__ == "__main__":
     # '''
     # '''
     #maxFilesMC = 48
-    #maxFilesMC = 2
+    #maxFilesMC = 1
     #maxFilesData = 1
     #nWorkers = 1
     #maxFilesMC = 16
