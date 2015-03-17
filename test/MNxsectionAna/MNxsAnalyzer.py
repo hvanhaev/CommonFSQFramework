@@ -56,7 +56,10 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
         self.hist = {}
         todoTrg = ["_jet15", "_dj15fb"]
 
-        binningDeta = (19, 0, 9.5)
+        binsEta = [x/10. for x in xrange(0, 61, 5)]
+        binsEta.extend([7.0, 8.0, 9.4])
+        print "xs vs eta: gonna use binning: ", binsEta
+        binsNew = array('d',binsEta)
 
         for shift in self.todoShifts:
             for trg in todoTrg:
@@ -65,29 +68,30 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                 self.hist["ptSublead"+t] =  ROOT.TH1F("ptSublead"+t,   "ptSublead"+t,  100, 0, 100)
                 self.hist["etaLead"+t] =  ROOT.TH1F("etaLead"+t,   "etaLead"+t,  100, -5, 5)
                 self.hist["etaSublead"+t] =  ROOT.TH1F("etaSublead"+t,   "etaSublead"+t,  100, -5, 5)
-                self.hist["xsVsDeltaEta"+t] =  ROOT.TH1F("xs"+t,   "xs"+t, binningDeta[0], binningDeta[1], binningDeta[2])
+                self.hist["xsVsDeltaEta"+t] =  ROOT.TH1F("xs"+t,   "xs"+t, len(binsEta)-1, binsNew)
 
-                self.hist["xsVsDeltaEtaGen"+t] =  ROOT.TH1F("xsGen"+t,   "xsGen"+t, binningDeta[0], binningDeta[1], binningDeta[2])
-                self.hist["xsVsDeltaEtaFake"+t] =  ROOT.TH1F("xsFake"+t,   "xsFake"+t, binningDeta[0], binningDeta[1], binningDeta[2])
-                self.hist["xsVsDeltaEtaMiss"+t] =  ROOT.TH1F("xsMiss"+t,   "xsMiss"+t, binningDeta[0], binningDeta[1], binningDeta[2])
+                self.hist["xsVsDeltaEtaGen"+t] =  ROOT.TH1F("xsGen"+t,   "xsGen"+t, len(binsEta)-1, binsNew)
+                self.hist["xsVsDeltaEtaFake"+t] =  ROOT.TH1F("xsFake"+t,   "xsFake"+t, len(binsEta)-1, binsNew)
+                self.hist["xsVsDeltaEtaMiss"+t] =  ROOT.TH1F("xsMiss"+t,   "xsMiss"+t, len(binsEta)-1, binsNew)
 
                 self.hist["vtx"+t] =  ROOT.TH1F("vtx"+t,   "vtx"+t,  10, -0.5, 9.5)
 
                 if self.unfoldEnabled:
-                    self.hist["response"+t]= ROOT.RooUnfoldResponse(binningDeta[0], binningDeta[1], binningDeta[2], "response"+t,"response"+t)
+                    dummy = ROOT.TH2F("dummy"+t, "dummy"+t, len(binsEta)-1, binsNew, len(binsEta)-1, binsNew)
+                    self.hist["response"+t]= ROOT.RooUnfoldResponse(self.hist["xsVsDeltaEta"+t], 
+                                                                    self.hist["xsVsDeltaEta"+t], 
+                                                                    dummy,
+                                                                    "response"+t,"response"+t)
 
 
         self.hist["evcnt"] =  ROOT.TH1F("evcnt_central_jet15", "evcnt_central_jet15",  1, -0.5, 0.5)
-        #self.hist["detaGen"] =  ROOT.TH1F("detaGen_central_sum", "detaGen_central_sum",  binningDeta[0], binningDeta[1], binningDeta[2])
 
         # in principle trigger does not applies to gen plots. We keep consistent naming though, so the unfolded result to gen level plots is possible
         # in each category
-        self.hist["detaGen_jet15"] =  ROOT.TH1F("detaGen_central_jet15", "detaGen_central_jet15",  binningDeta[0], binningDeta[1], binningDeta[2])
-        self.hist["detaGen_dj15fb"] =  ROOT.TH1F("detaGen_central_dj15fb", "detaGen_central_dj15fb",  binningDeta[0], binningDeta[1], binningDeta[2])
-        self.hist["detaGenVsRec"] =  ROOT.TH2F("detaGenVsRec_central_jet15", "detaGenVsRec_central_jet15",\
-                                               binningDeta[0]*20, binningDeta[1], binningDeta[2],\
-                                               binningDeta[0]*20, binningDeta[1], binningDeta[2])
-
+        self.hist["detaGen_jet15"] =  ROOT.TH1F("detaGen_central_jet15", "detaGen_central_jet15",
+                                                len(binsEta)-1, binsNew)
+        self.hist["detaGen_dj15fb"] =  ROOT.TH1F("detaGen_central_dj15fb", "detaGen_central_dj15fb",  
+                                                len(binsEta)-1, binsNew)
 
         if self.onlyPtHatReweighing:
             self.var = {}
@@ -145,13 +149,7 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
         self.lumiWeighters["_dj15fb_puUp"] = edm.LumiReWeighting(jet15FileV2, puFiles["dj15_1_05"], "MC", "pileup")
         self.lumiWeighters["_dj15fb_puDown"] = edm.LumiReWeighting(jet15FileV2, puFiles["dj15_0_95"], "MC", "pileup")
 
-        #self.jetGetter = JetGetter("PF")
-        #if hasattr(self, "jetUncFile"):
-        #    self.jetGetter.setJecUncertainty(self.jetUncFile)
-
         self.jetGetter = BetterJetGetter("PFAK5") 
-
-
 
     def dr(self, a,b):
         de = a.eta()-b.eta()
@@ -163,13 +161,10 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
 
         return math.sqrt(de*de+dp*dp)
 
-
     def doGri(self, weight, variation):
         fil = lambda x: x.pt() > self.threshold and abs(x.eta())<4.7
         genJ = filter(fil, self.fChain.genJets) # 1
         detJ  =filter(fil, self.jetGetter.get(variation)) #1
-
-        ##print "AAA", len(genJ), len(detJ)
 
         postfix = variation+"_jet15"
         if len(genJ)<2: 
@@ -206,9 +201,6 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
 
         detaDet = abs(closestDetJet1.eta()- closestDetJet2.eta())
         self.hist["response"+postfix].Fill(detaDet, detaGen, weight) # 7
-
-
-
 
     # note: for the ptHat reweighing we will do only the central variation.
     #       otherwise the changes from the JEC/JER variations would be fixed
@@ -275,8 +267,6 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
             return self.MC_dj15fb_triggerFired_cached
         else:
             raise Excecption("triggerFired: case not known: "+str(case))
-        
-           
 
     def analyze(self):
         self.MC_jet15_triggerFired_cached = None
@@ -304,9 +294,8 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
         if self.onlyPtHatReweighing:
             self.doPtHatReweighing(weightBase)
             return
-           
 
-        # fill the roounfoldresponse
+        # fill the gen level distribution (needed for closure tests)
         if not self.isData:
             genDEta = None
             genTopology = None
@@ -335,7 +324,6 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
             #truePU = self.fChain.puTrueNumInteractions
             #puWeight =  self.lumiWeighters["_jet15_central"].weight(truePU)
             #self.doGri(weightBase*puWeight, shift)
-
 
             # find best dijet pair
             mostFwdJet = None
@@ -367,15 +355,14 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
             if mostFwdJet != None and mostBkgJet != mostFwdJet:
                 pairFound = True
 
-
             isMiss = True # mark if dijet pair was not found (needed to correctly fill response)
             # A dijet pair was found. Check trigger for data
             # fill histograms
             if pairFound:
                 deta = abs(mostFwdJetEta - mostBkgJetEta)
-                if not self.isData and genDEta:
-                    if shift == "_central":
-                        self.hist["detaGenVsRec"].Fill(genDEta, deta, weightBase)
+                #if not self.isData and genDEta:
+                    #if shift == "_central":
+                    #    self.hist["detaGenVsRec"].Fill(genDEta, deta, weightBase)
                 # detaGenVsRec
 
                 triggerToUse = "_jet15"
@@ -393,8 +380,6 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                         raise Exception("Trigger not known??? "+triggerToUse)
                 else:
                     gotTrigger = self.triggerFired(triggerToUse)
-
-
 
                 if gotTrigger:
                     # calculate weight for MC
@@ -416,9 +401,9 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                         else:
                             if self.unfoldEnabled:
                                 self.hist["response"+histoName].Fill(deta, genDEta, weight)
-
                         if genDEta != None and not isCorrectTopo:
                             isMiss = True
+
                         #'''
 
                     # fill also some control plots
@@ -451,7 +436,6 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                     truePU = self.fChain.puTrueNumInteractions
                     puWeight =  self.lumiWeighters[triggerToUse+"_central"].weight(truePU)
 
-                #print "Miss", triggerToUse, genDEta, shift
                 #'''
                 if self.unfoldEnabled:
                     self.hist["response"+histoName].Miss(genDEta, weight)
@@ -478,9 +462,8 @@ if __name__ == "__main__":
     # debug config:
     #'''
     sampleList = []
-    #sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
-
-    #sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
+    sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
+    sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
     #'''
     sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
     sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
@@ -489,7 +472,7 @@ if __name__ == "__main__":
     # '''
     # '''
     #maxFilesMC = 48
-    #maxFilesMC = 1
+    #maxFilesMC = 2
     #maxFilesData = 1
     #nWorkers = 1
     #maxFilesMC = 16
