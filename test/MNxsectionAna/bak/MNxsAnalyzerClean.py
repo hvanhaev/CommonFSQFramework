@@ -68,11 +68,6 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
                 self.hist["etaLead"+t] =  ROOT.TH1F("etaLead"+t,   "etaLead"+t,  100, -5, 5)
                 self.hist["etaSublead"+t] =  ROOT.TH1F("etaSublead"+t,   "etaSublead"+t,  100, -5, 5)
                 self.hist["xsVsDeltaEta"+t] =  ROOT.TH1F("xs"+t,   "xs"+t, len(binsEta)-1, binsNew)
-
-                self.hist["xsVsDeltaEtaGen"+t] =  ROOT.TH1F("xsGen"+t,   "xsGen"+t, len(binsEta)-1, binsNew)
-                self.hist["xsVsDeltaEtaFake"+t] =  ROOT.TH1F("xsFake"+t,   "xsFake"+t, len(binsEta)-1, binsNew)
-                self.hist["xsVsDeltaEtaMiss"+t] =  ROOT.TH1F("xsMiss"+t,   "xsMiss"+t, len(binsEta)-1, binsNew)
-
                 self.hist["vtx"+t] =  ROOT.TH1F("vtx"+t,   "vtx"+t,  10, -0.5, 9.5)
 
                 if self.unfoldEnabled:
@@ -82,6 +77,12 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
                                                                     dummy,
                                                                     "response"+t,"response"+t)
 
+        # in principle trigger does not applies to gen plots. We keep consistent naming though, so the unfolded result to gen level plots is possible
+        # in each category
+        self.hist["detaGen_jet15"] =  ROOT.TH1F("detaGen_central_jet15", "detaGen_central_jet15",
+                                                len(binsEta)-1, binsNew)
+        self.hist["detaGen_dj15fb"] =  ROOT.TH1F("detaGen_central_dj15fb", "detaGen_central_dj15fb",  
+                                                len(binsEta)-1, binsNew)
 
 
         if self.onlyPtHatReweighing:
@@ -232,7 +233,6 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
             puWeightJ15 =  self.lumiWeighters["_jet15_central"].weight(truePU)
             puWeightDJ15FB = self.lumiWeighters["_dj15fb_central"].weight(truePU)
 
-
         if not self.isData and  self.applyPtHatReweighing:
             ptHat = self.fChain.qScale
             w = 1.
@@ -262,45 +262,56 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
                     if self.isData:
                         if topology == "_jet15":
                             hasTrigger = self.fChain.jet15 > 0.5
-                            weight = puWeightJ15*weightBase    
+                            weight = 1
                         else:
                             hasTrigger = self.fChain.doubleJ15FB > 0.5
-                            weight = puWeightDJ15FB*weightBase    
+                            weight = 1
                     else:
                         hasTrigger = self.triggerFired(topology)
-                        weight = 1
+                        if topology == "_jet15":
+                            weight = puWeightJ15*weightBase    
+                        else:
+                            weight = puWeightDJ15FB*weightBase    
 
                     if not hasTrigger: continue
 
                     detaDet = abs(j1.eta()-j2.eta())
+                    ptSorted = sorted( [j1, j2], key = lambda j: -j.pt())
+                    self.hist["ptLead"+histoName].Fill(ptSorted[0].pt(), weight)
+                    self.hist["etaLead"+histoName].Fill(ptSorted[0].eta(), weight)
+                    self.hist["ptSublead"+histoName].Fill(ptSorted[1].pt(), weight)
+                    self.hist["etaSublead"+histoName].Fill(ptSorted[1].eta(), weight)
+                    self.hist["xsVsDeltaEta"+histoName].Fill(detaDet, weight)
+                    self.hist["vtx"+histoName].Fill(self.fChain.ngoodVTX, weight)
+
                     # todo: fill detLevel Histograms
                     # for MC - check if there is a matching pair, save result inside matchedPairs set
-                    if not self.isData and len(goodGenJets) > 1:
-                        closestGenJetI1 = min(xrange(len(goodGenJets)), key = lambda i: self.dr(j1, goodGenJets[i]) )
-                        closestGenJetI2 = min(xrange(len(goodGenJets)), key = lambda i: self.dr(j2, goodGenJets[i]) )
-                        dr1 = self.dr(j1, goodGenJets[closestGenJetI1])
-                        dr2 = self.dr(j2, goodGenJets[closestGenJetI2])
+                    if not self.isData: # and len(goodGenJets) > 1:
                         matched=() # empty tuple
-                        if max(dr1, dr2) < 0.3:
-                            if closestGenJetI1 != closestGenJetI2:
-                                # check the topology is correct
-                                genTopology = self.topology(goodGenJets[closestGenJetI1], goodGenJets[closestGenJetI2])
-                                if genTopology == topology:
-                                    matchCand=(min(closestGenJetI1,closestGenJetI2), max(closestGenJetI1,closestGenJetI2))    
-                                    if not matchCand in matchedPairs:
-                                        matched=matchCand
-                                        matchedPairs.add(matchCand)
-                            else:
-                                pass
-                                #print "XXX Warning, matched to same genJet"
-                                #print  j1.pt(), j1.eta(), j1.phi()
-                                #print  j2.pt(), j2.eta(), j2.phi()
-                                #def pr(x): print x
-                                #map(lambda x: pr("Gen: {0} {1} {2}".format(x.pt(), x.eta() , x.phi())),  goodGenJets  )
-                        
+                        if len(goodGenJets) > 1:
+                            closestGenJetI1 = min(xrange(len(goodGenJets)), key = lambda i: self.dr(j1, goodGenJets[i]) )
+                            closestGenJetI2 = min(xrange(len(goodGenJets)), key = lambda i: self.dr(j2, goodGenJets[i]) )
+                            dr1 = self.dr(j1, goodGenJets[closestGenJetI1])
+                            dr2 = self.dr(j2, goodGenJets[closestGenJetI2])
+                            if max(dr1, dr2) < 0.3:
+                                if closestGenJetI1 != closestGenJetI2:
+                                    # check the topology is correct
+                                    genTopology = self.topology(goodGenJets[closestGenJetI1], goodGenJets[closestGenJetI2])
+                                    if genTopology == topology:
+                                        matchCand=(min(closestGenJetI1,closestGenJetI2), max(closestGenJetI1,closestGenJetI2))    
+                                        if not matchCand in matchedPairs:
+                                            matched=matchCand
+                                            matchedPairs.add(matchCand)
+                                else:
+                                    pass
+                                    #print "XXX Warning, matched to same genJet"
+                                    #print  j1.pt(), j1.eta(), j1.phi()
+                                    #print  j2.pt(), j2.eta(), j2.phi()
+                                    #def pr(x): print x
+                                    #map(lambda x: pr("Gen: {0} {1} {2}".format(x.pt(), x.eta() , x.phi())),  goodGenJets  )
 
                         # add this point we know, if this is
-                        #   a fake: no matched genJetPair
+                        #   a fake: no matched genJetPair (or genJet pair from different category)
                         #   a fill: matched genJetPai
                         #fill the response matrix
                         if len(matched)>0:
@@ -315,17 +326,24 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
             if self.unfoldEnabled and not self.isData:
                 for i1 in xrange(len(goodGenJets)):
                     for i2 in xrange(i1+1, len(goodGenJets)):
+                        genTopology = None
+                        detaGen = None
+                        if shift == "_central":
+                            genTopology = self.topology(goodGenJets[i1], goodGenJets[i2])
+                            detaGen = abs(goodGenJets[i1].eta()-goodGenJets[i2].eta())
+                            self.hist["detaGen"+genTopology].Fill(detaGen, weightBase)
+
                         if (i1, i2) in matchedPairs: continue
-                        genTopology = self.topology(goodGenJets[i1], goodGenJets[i2])
+                        if genTopology == None:
+                            genTopology = self.topology(goodGenJets[i1], goodGenJets[i2])
                         if genTopology == "_jet15":
                             weight = puWeightJ15*weightBase    
                         else:
                             weight = puWeightDJ15FB*weightBase    
                         histoName = shift + genTopology
-                        detaGen = abs(goodGenJets[i1].eta()-goodGenJets[i2].eta())
+                        if detaGen == None:
+                            detaGen = abs(goodGenJets[i1].eta()-goodGenJets[i2].eta())
                         self.hist["response"+histoName].Miss(detaGen, weight)
-
-
 
     def finalize(self):
         print "Finalize:"
@@ -349,8 +367,8 @@ if __name__ == "__main__":
     #'''
     sampleList = []
     sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
-    #sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
     #'''
+    sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
     #sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
     #sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
     #sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
@@ -358,7 +376,7 @@ if __name__ == "__main__":
     # '''
     # '''
     #maxFilesMC = 48
-    maxFilesMC = 1
+    #maxFilesMC = 1
     #maxFilesData = 1
     nWorkers = 10
     #maxFilesMC = 16
