@@ -39,7 +39,6 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
 
         self.normFactor = self.getNormalizationFactor()
 
-
         #sys.stdout = sys.stderr
         #self.pr = cProfile.Profile()
         print "XXX init - MNxsAnalyzerClean", self.datasetName, self.isData
@@ -84,14 +83,6 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
                                                                     "response"+t,"response"+t)
 
 
-        self.hist["evcnt"] =  ROOT.TH1F("evcnt_central_jet15", "evcnt_central_jet15",  1, -0.5, 0.5)
-
-        # in principle trigger does not applies to gen plots. We keep consistent naming though, so the unfolded result to gen level plots is possible
-        # in each category
-        self.hist["detaGen_jet15"] =  ROOT.TH1F("detaGen_central_jet15", "detaGen_central_jet15",
-                                                len(binsEta)-1, binsNew)
-        self.hist["detaGen_dj15fb"] =  ROOT.TH1F("detaGen_central_dj15fb", "detaGen_central_dj15fb",  
-                                                len(binsEta)-1, binsNew)
 
         if self.onlyPtHatReweighing:
             self.var = {}
@@ -115,16 +106,11 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
         if self.applyPtHatReweighing and not self.isData:
                 fp = "MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"
                 todo = ["ptHatWeighters.root"]
-                #todo = ["ptHatWeighters_invx_pass1.root_invX", 
-                #        "ptHatWeighters_invx_pass2.root_invX",
-                #        "ptHatWeighters_invx_pass3.root_invX",]
                 self.ptHatW = []
                 for t in todo:
                     ptHatFileName = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"+t).fullPath()
                     ptHatFile = ROOT.TFile(ptHatFileName)
                     self.ptHatW.append(ptHatFile.Get(self.datasetName+"/ptHatW"))
-                    #print "PTHat weighter set to", self.datasetName+"/ptHatW"
-                    #print "PTHat test@30:", self.ptHatW.Eval(30)
 
 
 
@@ -150,57 +136,6 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
         self.lumiWeighters["_dj15fb_puDown"] = edm.LumiReWeighting(jet15FileV2, puFiles["dj15_0_95"], "MC", "pileup")
 
         self.jetGetter = BetterJetGetter("PFAK5") 
-
-    def dr(self, a,b):
-        de = a.eta()-b.eta()
-        dp = a.phi()-b.phi()
-        pi = 3.1415
-        if dp > pi: dp -= 2*pi
-        if dp < -pi: dp += 2*pi
-        #print  a.phi(), b.phi(), dp
-
-        return math.sqrt(de*de+dp*dp)
-
-    def doGri(self, weight, variation):
-        fil = lambda x: x.pt() > self.threshold and abs(x.eta())<4.7
-        genJ = filter(fil, self.fChain.genJets) # 1
-        detJ  =filter(fil, self.jetGetter.get(variation)) #1
-
-        postfix = variation+"_jet15"
-        if len(genJ)<2: 
-            if len(detJ) < 2:
-                return
-            detJB = min(detJ, key= lambda j: j.eta()  )
-            detJF = max(detJ, key= lambda j: j.eta()  )
-            deta = abs(detJB.eta()-detJF.eta())
-            self.hist["xsVsDeltaEtaFake"+postfix].Fill(deta, weight)
-            return # 2
-
-        gjB = min(genJ, key= lambda j: j.eta()  )
-        gjF = max(genJ, key= lambda j: j.eta()  )
-        detaGen = gjF.eta() - gjB.eta()
-        self.hist["xsVsDeltaEtaGen"+postfix].Fill(detaGen, weight)  # 3
-        if len(detJ)<2:
-            self.hist["xsVsDeltaEtaMiss"+postfix].Fill(detaGen, weight) # 4
-            self.hist["response"+postfix].Miss(detaGen, weight)
-            return
-
-        closestDetJet1 = min(detJ, key = lambda j: self.dr(j, gjB) ) # 5, eta restriction imposed in step 1
-        dr1 = self.dr(closestDetJet1, gjB)
-        if dr1 > 0.3:
-            self.hist["xsVsDeltaEtaMiss"+postfix].Fill(detaGen, weight) # 6
-            self.hist["response"+postfix].Miss(detaGen, weight)
-            return
-        else:
-            closestDetJet2 = min(detJ, key = lambda j: self.dr(j, gjF) ) # 5,
-            dr2 = self.dr(closestDetJet2, gjF)
-            if dr2 > 0.3:
-                self.hist["xsVsDeltaEtaMiss"+postfix].Fill(detaGen, weight) # 6
-                self.hist["response"+postfix].Miss(detaGen, weight)
-                return
-
-        detaDet = abs(closestDetJet1.eta()- closestDetJet2.eta())
-        self.hist["response"+postfix].Fill(detaDet, detaGen, weight) # 7
 
     # note: for the ptHat reweighing we will do only the central variation.
     #       otherwise the changes from the JEC/JER variations would be fixed
@@ -268,18 +203,34 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
         else:
             raise Excecption("triggerFired: case not known: "+str(case))
 
+    def topology(self, j1, j2):
+        eta1=j1.eta()
+        eta2=j2.eta()
+        if min(abs(eta1), abs(eta2)) > 3. and eta1*eta2<0: return "_dj15fb"
+        return "_jet15"
+
+    def dr(self, a,b):
+        de = a.eta()-b.eta()
+        dp = a.phi()-b.phi()
+        pi = 3.1415
+        if dp > pi: dp -= 2*pi
+        if dp < -pi: dp += 2*pi
+        return math.sqrt(de*de+dp*dp)
+
     def analyze(self):
         self.MC_jet15_triggerFired_cached = None
         self.MC_dj15fb_triggerFired_cached = None
 
-        self.hist["evcnt"].Fill(0)
         if self.fChain.ngoodVTX == 0: return
         self.jetGetter.newEvent(self.fChain)
         weightBase = 1. 
+        puWeightJ15 = 1
+        puWeightDJ15FB = 1
         if not self.isData:
             weightBase *= self.fChain.genWeight*self.normFactor 
-
-            #print ev, w1*w2, rnd4eff, triggerFired
+            truePU = self.fChain.puTrueNumInteractions
+            puWeightJ15 =  self.lumiWeighters["_jet15_central"].weight(truePU)
+            puWeightDJ15FB = self.lumiWeighters["_dj15fb_central"].weight(truePU)
 
 
         if not self.isData and  self.applyPtHatReweighing:
@@ -290,156 +241,91 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
                 #print "W:", ptHat, weighter.Eval(ptHat)
             weightBase *= w
  
-
         if self.onlyPtHatReweighing:
             self.doPtHatReweighing(weightBase)
             return
 
-        # fill the gen level distribution (needed for closure tests)
         if not self.isData:
-            genDEta = None
-            genTopology = None
-            etas = []
-            for j in self.fChain.genJets:
-                if j.pt() < self.threshold: continue
-                eta = j.eta()
-                if abs(j.eta())>4.7: continue
-                etas.append(eta)
-            if len(etas)>1:
-                fwd = max(etas)
-                bkw = min(etas)
-                genTopology = "CF"
-                if fwd > 3 and bkw < -3:
-                    genTopology = "FB"
-                genDEta = fwd - bkw
-                #self.hist["detaGen"].Fill(genDEta, weightBase) # basic gen level distribution shouldnt be PU dependent
-                if genTopology == "FB":
-                    self.hist["detaGen_dj15fb"].Fill(genDEta, weightBase) # basic gen level distribution shouldnt be PU dependent
-                else:
-                    self.hist["detaGen_jet15"].Fill(genDEta, weightBase) # basic gen level distribution shouldnt be PU dependent
-
+            goodGenJets = [j for j in self.fChain.genJets if j.pt()>self.threshold and abs(j.eta()) < 4.7 ]
 
         for shift in self.todoShifts:
-            # Q&D warning: to test this you need to comment out all filling of the response object below
-            #truePU = self.fChain.puTrueNumInteractions
-            #puWeight =  self.lumiWeighters["_jet15_central"].weight(truePU)
-            #self.doGri(weightBase*puWeight, shift)
+            matchedPairs = set()
 
-            # find best dijet pair
-            mostFwdJet = None
-            mostBkgJet = None
-            mostFwdJetEta = None
-            mostBkgJetEta = None
-            mostFwdJetPt = None
-            mostBkgJetPt = None
-
-            for jet in self.jetGetter.get(shift):
-                #if jetID.at(i) < 0.5: continue
-                if not jet.jetid(): continue
-                eta =  jet.eta()
-                if abs(eta) > 4.7: continue
-
-                ptShifted = jet.pt()
-                if ptShifted < self.threshold: continue
-
-                if  mostFwdJet == None or mostFwdJetEta < eta:
-                    mostFwdJet = jet
-                    mostFwdJetEta = eta
-                    mostFwdJetPt = ptShifted
-                if  mostBkgJet == None or mostBkgJetEta > eta:
-                    mostBkgJet = jet
-                    mostBkgJetEta = eta
-                    mostBkgJetPt = ptShifted
-
-            pairFound = False
-            if mostFwdJet != None and mostBkgJet != mostFwdJet:
-                pairFound = True
-
-            isMiss = True # mark if dijet pair was not found (needed to correctly fill response)
-            # A dijet pair was found. Check trigger for data
-            # fill histograms
-            if pairFound:
-                deta = abs(mostFwdJetEta - mostBkgJetEta)
-                #if not self.isData and genDEta:
-                    #if shift == "_central":
-                    #    self.hist["detaGenVsRec"].Fill(genDEta, deta, weightBase)
-                # detaGenVsRec
-
-                triggerToUse = "_jet15"
-                if abs(mostFwdJetEta) > 3 and abs(mostBkgJetEta) > 3 and mostFwdJetEta*mostBkgJetEta<0:
-                    triggerToUse = "_dj15fb"
-
-                # TODO: we need to separate gen level categories!!
-                gotTrigger = True
-                if self.isData: # check trigger
-                    if triggerToUse == "_jet15":
-                        gotTrigger = self.fChain.jet15 > 0.5
-                    elif triggerToUse == "_dj15fb":
-                        gotTrigger = self.fChain.doubleJ15FB > 0.5
+            # todo: j.jetID() > 0.5
+            goodRecoJets = [j for j in self.jetGetter.get(shift) if  j.pt()>self.threshold and abs(j.eta()) < 4.7 and  j.jetid() ]
+            for i1 in xrange(len(goodRecoJets)):
+                for i2 in xrange(i1+1, len(goodRecoJets)):
+                    j1 = goodRecoJets[i1]
+                    j2 = goodRecoJets[i2]
+                    topology = self.topology(j1, j2)
+                    histoName = shift + topology
+                    if self.isData:
+                        if topology == "_jet15":
+                            hasTrigger = self.fChain.jet15 > 0.5
+                            weight = puWeightJ15*weightBase    
+                        else:
+                            hasTrigger = self.fChain.doubleJ15FB > 0.5
+                            weight = puWeightDJ15FB*weightBase    
                     else:
-                        raise Exception("Trigger not known??? "+triggerToUse)
-                else:
-                    gotTrigger = self.triggerFired(triggerToUse)
+                        hasTrigger = self.triggerFired(topology)
+                        weight = 1
 
-                if gotTrigger:
-                    # calculate weight for MC
-                    weight = weightBase
-                    if not self.isData:
-                        truePU = self.fChain.puTrueNumInteractions
-                        puWeight =  self.lumiWeighters[triggerToUse+"_central"].weight(truePU)
-                        weight *= puWeight
+                    if not hasTrigger: continue
 
-                    histoName = shift +triggerToUse
-                    self.hist["xsVsDeltaEta"+histoName].Fill(deta, weight)
-                    if not self.isData:
-                        isMiss = False
-                        isCorrectTopo = (triggerToUse == "_jet15") and genTopology == "CF" or (triggerToUse == "_dj15fb") and genTopology == "FB"
-                        #'''
-                        if genDEta == None or not isCorrectTopo:    # fake pair, e.g. from bkg or we landed in a wrong category
+                    detaDet = abs(j1.eta()-j2.eta())
+                    # todo: fill detLevel Histograms
+                    # for MC - check if there is a matching pair, save result inside matchedPairs set
+                    if not self.isData and len(goodGenJets) > 1:
+                        closestGenJetI1 = min(xrange(len(goodGenJets)), key = lambda i: self.dr(j1, goodGenJets[i]) )
+                        closestGenJetI2 = min(xrange(len(goodGenJets)), key = lambda i: self.dr(j2, goodGenJets[i]) )
+                        dr1 = self.dr(j1, goodGenJets[closestGenJetI1])
+                        dr2 = self.dr(j2, goodGenJets[closestGenJetI2])
+                        matched=() # empty tuple
+                        if max(dr1, dr2) < 0.3:
+                            if closestGenJetI1 != closestGenJetI2:
+                                # check the topology is correct
+                                genTopology = self.topology(goodGenJets[closestGenJetI1], goodGenJets[closestGenJetI2])
+                                if genTopology == topology:
+                                    matchCand=(min(closestGenJetI1,closestGenJetI2), max(closestGenJetI1,closestGenJetI2))    
+                                    if not matchCand in matchedPairs:
+                                        matched=matchCand
+                                        matchedPairs.add(matchCand)
+                            else:
+                                pass
+                                #print "XXX Warning, matched to same genJet"
+                                #print  j1.pt(), j1.eta(), j1.phi()
+                                #print  j2.pt(), j2.eta(), j2.phi()
+                                #def pr(x): print x
+                                #map(lambda x: pr("Gen: {0} {1} {2}".format(x.pt(), x.eta() , x.phi())),  goodGenJets  )
+                        
+
+                        # add this point we know, if this is
+                        #   a fake: no matched genJetPair
+                        #   a fill: matched genJetPai
+                        #fill the response matrix
+                        if len(matched)>0:
                             if self.unfoldEnabled:
-                                self.hist["response"+histoName].Fake(deta, weight)
+                                detaGen = abs(goodGenJets[matched[0]].eta()-goodGenJets[matched[1]].eta())
+                                self.hist["response"+histoName].Fill(detaDet, detaGen, weight)
                         else:
                             if self.unfoldEnabled:
-                                self.hist["response"+histoName].Fill(deta, genDEta, weight)
-                        if genDEta != None and not isCorrectTopo:
-                            isMiss = True
+                                self.hist["response"+histoName].Fake(detaDet, weight)
 
-                        #'''
+            # Now: fill miss cateogory
+            if self.unfoldEnabled and not self.isData:
+                for i1 in xrange(len(goodGenJets)):
+                    for i2 in xrange(i1+1, len(goodGenJets)):
+                        if (i1, i2) in matchedPairs: continue
+                        genTopology = self.topology(goodGenJets[i1], goodGenJets[i2])
+                        if genTopology == "_jet15":
+                            weight = puWeightJ15*weightBase    
+                        else:
+                            weight = puWeightDJ15FB*weightBase    
+                        histoName = shift + genTopology
+                        detaGen = abs(goodGenJets[i1].eta()-goodGenJets[i2].eta())
+                        self.hist["response"+histoName].Miss(detaGen, weight)
 
-                    # fill also some control plots
-                    leadJet = mostBkgJet
-                    subleadJet = mostFwdJet
-                    ptLead =  mostBkgJetPt 
-                    ptSublead = mostFwdJetPt
-                    etaLead = mostBkgJetEta
-                    etaSublead = mostFwdJetEta
 
-                    if ptSublead > ptLead:
-                        leadJet, subleadJet = subleadJet, leadJet
-                        ptLead, ptSublead = ptSublead, ptLead
-                        etaLead, etaSublead = etaSublead, etaLead
-
-                    self.hist["vtx"+histoName].Fill(self.fChain.ngoodVTX, weight)
-                    self.hist["ptLead"+histoName].Fill(ptLead, weight)
-                    self.hist["ptSublead"+histoName].Fill(ptSublead, weight)
-                    self.hist["etaLead"+histoName].Fill(etaLead, weight)
-                    self.hist["etaSublead"+histoName].Fill(etaSublead, weight)
-
-            if not self.isData and genDEta and isMiss:
-                if genTopology == "CF":
-                    triggerToUse = "_jet15"
-                else:
-                    triggerToUse = "_dj15fb"
-                histoName = shift +triggerToUse
-                weight = weightBase
-                if not self.isData:
-                    truePU = self.fChain.puTrueNumInteractions
-                    puWeight =  self.lumiWeighters[triggerToUse+"_central"].weight(truePU)
-
-                #'''
-                if self.unfoldEnabled:
-                    self.hist["response"+histoName].Miss(genDEta, weight)
-                #'''
 
     def finalize(self):
         print "Finalize:"
@@ -474,7 +360,7 @@ if __name__ == "__main__":
     #maxFilesMC = 48
     maxFilesMC = 1
     #maxFilesData = 1
-    nWorkers = 2
+    nWorkers = 10
     #maxFilesMC = 16
     #nWorkers = 12
     #nWorkers = 10
