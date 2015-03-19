@@ -21,6 +21,25 @@ from mnDraw import DrawMNPlots
 
 alaGri = True
 
+def scale(h, s):
+    #h.Scale(s)
+    #return
+    for i in xrange(0, h.GetNbinsX()+2):
+        val = h.GetBinContent(i)*s
+        err = h.GetBinError(i)*s
+        h.SetBinContent(i, val)
+        h.SetBinError(i, err)
+
+def scale2d(h, s):
+    for i in xrange(0, h.GetNbinsX()+2):
+        for j in xrange(0, h.GetNbinsY()+2):
+            val = h.GetBinContent(i,j)*s
+            err = h.GetBinError(i, j)*s
+            h.SetBinContent(i, j, val)
+            h.SetBinError(i, j, err)
+
+
+
 def getPossibleActions():
     return set(["pythiaOnData", "herwigOnData", "pythiaOnHerwig", "herwigOnPythia", "herwigOnHerwig", "pythiaOnPythia"])
 
@@ -180,22 +199,6 @@ def unfold(action):
                 scalingFactor = histo.Integral()/meas.Integral()
 
                 # Note: simple call to h.Scale() is not enough
-                def scale(h, s):
-                    #h.Scale(s)
-                    #return
-                    for i in xrange(0, h.GetNbinsX()+1):
-                        val = h.GetBinContent(i)*s
-                        err = h.GetBinError(i)*s
-                        h.SetBinContent(i, val)
-                        h.SetBinError(i, err)
-
-                def scale2d(h, s):
-                    for i in xrange(0, h.GetNbinsX()+1):
-                        for j in xrange(0, h.GetNbinsY()+1):
-                            val = h.GetBinContent(i,j)*s
-                            err = h.GetBinError(i, j)*s
-                            h.SetBinContent(i, j, val)
-                            h.SetBinError(i, j, err)
 
                 for i in xrange(0, h.GetNbinsX()+1):
                     denom = meas.GetBinContent(i)
@@ -246,7 +249,26 @@ def unfold(action):
                 #unfold = ROOT.RooUnfoldBayes(histos[baseMC][r], histo, 10)
                 unfold = ROOT.RooUnfoldBayes(newResponse, histo, 10)
 
+            #orgResponse = histos[baseMC][r]
+            #meas  =  orgResponse.Hmeasured().Clone()
+            #meas.Scale(0.5, "width")
+            #scale(meas,0.5)
+            #truth =  orgResponse.Htruth().Clone()
+            #truth.Scale(0.5)
+            #scale(truth,0.5)
+            #resp =   orgResponse.Hresponse().Clone()
+            #resp.Scale(0.5, "width")
+            #scale2d(resp, 0.5)
+            #map(lambda h: h.SetEntries(h.GetEntries()/2.), [meas,truth,resp])        
+            #map(lambda h: h.Scale(0.5), [meas,truth,resp])        
+            #map(lambda h: h.ComputeIntegral(), [meas,truth,resp])        
+
+            #response = ROOT.RooUnfoldResponse(meas, truth, resp)
+            #histo.Scale(0.5)
             unfold = ROOT.RooUnfoldBayes(histos[baseMC][r], histo, 10)
+            
+            #responseNew = histos[baseMC][r].Clone()
+            #responseNew.Hfakes().Scale(0.5)
             hReco= unfold.Hreco()
             if hReco.GetNbinsX() != histo.GetNbinsX():
                 raise Exception("Different histogram sizes after unfolding")
