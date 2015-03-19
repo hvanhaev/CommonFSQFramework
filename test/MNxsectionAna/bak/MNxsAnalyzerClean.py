@@ -137,6 +137,7 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
         self.lumiWeighters["_dj15fb_puDown"] = edm.LumiReWeighting(jet15FileV2, puFiles["dj15_0_95"], "MC", "pileup")
 
         self.jetGetter = BetterJetGetter("PFAK5") 
+        self.getterForTriggerModelling = BetterJetGetter("CaloRaw")
 
     # note: for the ptHat reweighing we will do only the central variation.
     #       otherwise the changes from the JEC/JER variations would be fixed
@@ -187,16 +188,34 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
         ev = self.fChain.event
         rnd4eff = ev%10000/9999.
 
+
         if case == "_jet15":
-            self.HLTMCWeighterJ15L1Raw.newEvent(self.fChain)
-            self.HLTMCWeighterJ15Raw.newEvent(self.fChain)
+            if self.MC_dj15fb_triggerFired_cached == None and self.MC_jet15_triggerFired_cached == None:
+                self.getterForTriggerModelling.newEvent(self.fChain)
+                self.jetsForTRG = list(self.getterForTriggerModelling.get("_central"))
+
+            # calls needed to reset cached values
+            self.HLTMCWeighterJ15L1Raw.setJets(self.jetsForTRG)
+            self.HLTMCWeighterJ15Raw.setJets(self.jetsForTRG)
+            #self.HLTMCWeighterJ15L1Raw.setGetter(self.getterForTriggerModelling)
+            #self.HLTMCWeighterJ15Raw.setGetter(self.getterForTriggerModelling)
+            #self.HLTMCWeighterJ15L1Raw.newEvent(self.fChain)
+            #self.HLTMCWeighterJ15Raw.newEvent(self.fChain)
             w1 = self.HLTMCWeighterJ15L1Raw.getWeight()
             w2 = self.HLTMCWeighterJ15Raw.getWeight()
             self.MC_jet15_triggerFired_cached = w1*w2 > rnd4eff
             return self.MC_jet15_triggerFired_cached
         elif case == "_dj15fb":
-            self.HLTMCWeighterJ15FBL1Raw.newEvent(self.fChain)
-            self.HLTMCWeighterJ15FBRaw.newEvent(self.fChain)
+            if self.MC_dj15fb_triggerFired_cached == None and self.MC_jet15_triggerFired_cached == None:
+                self.getterForTriggerModelling.newEvent(self.fChain)
+                self.jetsForTRG = list(self.getterForTriggerModelling.get("_central"))
+            # calls needed to reset cached values
+            self.HLTMCWeighterJ15FBL1Raw.setJets(self.jetsForTRG)
+            self.HLTMCWeighterJ15FBRaw.setJets(self.jetsForTRG)
+            #self.HLTMCWeighterJ15FBL1Raw.setGetter(self.getterForTriggerModelling)
+            #self.HLTMCWeighterJ15FBRaw.setGetter(self.getterForTriggerModelling)
+            #self.HLTMCWeighterJ15FBL1Raw.newEvent(self.fChain)
+            #self.HLTMCWeighterJ15FBRaw.newEvent(self.fChain)
             w1 = self.HLTMCWeighterJ15FBL1Raw.getWeight()
             w2 = self.HLTMCWeighterJ15FBRaw.getWeight()
             self.MC_dj15fb_triggerFired_cached = w1*w2 > rnd4eff
@@ -218,6 +237,13 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
         if dp < -pi: dp += 2*pi
         return math.sqrt(de*de+dp*dp)
 
+    '''
+    def analyze(self):
+        self.pr.enable()
+        self.analyzeTT()
+        self.pr.disable()
+    #'''
+    #def analyzeTT(self):
     def analyze(self):
         self.MC_jet15_triggerFired_cached = None
         self.MC_dj15fb_triggerFired_cached = None
@@ -245,14 +271,17 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
             self.doPtHatReweighing(weightBase)
             return
 
+        def mostFB(l):
+            if len(l) < 2: return []
+            return [min(l, key=lambda j: j.eta()), max(l, key=lambda j: j.eta())]
+
         if not self.isData:
-            goodGenJets = [j for j in self.fChain.genJets if j.pt()>self.threshold and abs(j.eta()) < 4.7 ]
+            goodGenJets = mostFB([j for j in self.fChain.genJets if j.pt()>self.threshold and abs(j.eta()) < 4.7 ])
 
         for shift in self.todoShifts:
             matchedPairs = set()
-
             # todo: j.jetID() > 0.5
-            goodRecoJets = [j for j in self.jetGetter.get(shift) if  j.pt()>self.threshold and abs(j.eta()) < 4.7 and  j.jetid() ]
+            goodRecoJets = mostFB([j for j in self.jetGetter.get(shift) if j.pt()>self.threshold and abs(j.eta()) < 4.7 and  j.jetid()])
             for i1 in xrange(len(goodRecoJets)):
                 for i2 in xrange(i1+1, len(goodRecoJets)):
                     j1 = goodRecoJets[i1]
@@ -347,6 +376,10 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
 
     def finalize(self):
         print "Finalize:"
+        if hasattr(self, "pr"):
+            dname = "/nfs/dust/cms/user/fruboest/2015.01.MN/slc6/CMSSW_7_0_5/src/MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/bak/"
+            profName = dname + "stats"
+            self.pr.dump_stats(profName)
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
@@ -369,14 +402,14 @@ if __name__ == "__main__":
     sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
     #'''
     sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
-    #sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
-    #sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
-    #sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
-    #sampleList.append("METFwd-Run2010B-Apr21ReReco-v1")
+    sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
+    sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
+    sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
+    sampleList.append("METFwd-Run2010B-Apr21ReReco-v1")
     # '''
     # '''
     #maxFilesMC = 48
-    #maxFilesMC = 1
+    #maxFilesMC = 2
     #maxFilesData = 1
     nWorkers = 10
     #maxFilesMC = 16
