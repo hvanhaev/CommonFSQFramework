@@ -188,10 +188,20 @@ class HLTMCWeighter:
         biny = self.efficiencyHisto.GetYaxis().FindBin(eta)
         return self.efficiencyHisto.GetBinContent(binx,biny)
 
+    def setGetter(self, getter):
+        self.getter = getter
+        self.cached = None
+        self.jets = None
+
+    def setJets(self, jets):
+        self.cached = None
+        self.jets = jets
+
     def newEvent(self, ev):
         self.cached = None
         self.ev = ev
         self.getter.newEvent(self.ev)
+        self.jets = None
 
     # etaHalf = 0 - both
     # etaHalf = + - positive
@@ -202,7 +212,10 @@ class HLTMCWeighter:
         if etaHalf==0 and self.cached != None:
             return self.cached
 
-        jets = self.getter.get("_central")
+        if self.jets != None:
+            jets = self.jets
+        else:
+            jets = self.getter.get("_central")
         plus = 0
         minus = 0
         '''
