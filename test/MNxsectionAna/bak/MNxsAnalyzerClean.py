@@ -27,9 +27,56 @@ from optparse import OptionParser
 from HLTMCWeighter import HLTMCWeighter
 #import DiJetBalancePlugin
 
+class BasicVariant:
+    def filterPair(self, j1, j2):
+        return True
+    def filterCol(self, l):
+        return l
+
+class MostFBVariant:
+    def filterPair(self, j1, j2):
+        return True
+    def filterCol(self, l):
+        if len(l) < 2: return []
+        return [min(l, key=lambda j: j.eta()), max(l, key=lambda j: j.eta())]
+
+class AtLeastOneAbove:
+    def filterPair(self, j1, j2):
+        return max(j1.pt(), j2.pt()) > 45
+
+    def filterCol(self, l):
+        if len(l) < 2: return []
+        if max(l, key=lambda j: j.pt()).pt() < 45: return []
+        return l
+
+class BothBelow:
+    def filterPair(self, j1, j2):
+        return True
+
+    def filterCol(self, l):
+        return [j for j in l if j.pt()  < 55]
+
+
 import math
 class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
     def init( self):
+
+        if self.variant == "basic":
+            self.variantFilter = BasicVariant()
+        elif self.variant == "mostFB":
+            self.variantFilter = MostFBVariant()
+        elif self.variant == "atLeastOneAbove":
+            self.variantFilter = AtLeastOneAbove()
+
+        elif self.variant == "bothBelow":
+            self.variantFilter = BothBelow()
+
+        else:
+            raise Exception("Variant not known: "+self.variant)
+
+
+
+
         if not self.isData:
             #self.hltMCWeighter = HLTMCWeighter("HLT_Jet15U")
             self.HLTMCWeighterJ15Raw = HLTMCWeighter("HLT_Jet15U_raw")
@@ -271,21 +318,22 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
             self.doPtHatReweighing(weightBase)
             return
 
-        def mostFB(l):
-            if len(l) < 2: return []
-            return [min(l, key=lambda j: j.eta()), max(l, key=lambda j: j.eta())]
 
         if not self.isData:
-            goodGenJets = mostFB([j for j in self.fChain.genJets if j.pt()>self.threshold and abs(j.eta()) < 4.7 ])
+            goodGenJets = self.variantFilter.filterCol([j for j in self.fChain.genJets \
+                                                        if j.pt()>self.threshold and abs(j.eta()) < 4.7 ])
 
         for shift in self.todoShifts:
             matchedPairs = set()
             # todo: j.jetID() > 0.5
-            goodRecoJets = mostFB([j for j in self.jetGetter.get(shift) if j.pt()>self.threshold and abs(j.eta()) < 4.7 and  j.jetid()])
+            goodRecoJets = self.variantFilter.filterCol([j for j in self.jetGetter.get(shift) \
+                                                        if j.pt()>self.threshold and abs(j.eta()) < 4.7 and  j.jetid()])
+
             for i1 in xrange(len(goodRecoJets)):
                 for i2 in xrange(i1+1, len(goodRecoJets)):
                     j1 = goodRecoJets[i1]
                     j2 = goodRecoJets[i2]
+                    if not self.variantFilter.filterPair(j1, j2): continue
                     topology = self.topology(j1, j2)
                     histoName = shift + topology
                     if self.isData:
@@ -320,24 +368,25 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
                         if len(goodGenJets) > 1:
                             closestGenJetI1 = min(xrange(len(goodGenJets)), key = lambda i: self.dr(j1, goodGenJets[i]) )
                             closestGenJetI2 = min(xrange(len(goodGenJets)), key = lambda i: self.dr(j2, goodGenJets[i]) )
-                            dr1 = self.dr(j1, goodGenJets[closestGenJetI1])
-                            dr2 = self.dr(j2, goodGenJets[closestGenJetI2])
-                            if max(dr1, dr2) < 0.3:
-                                if closestGenJetI1 != closestGenJetI2:
-                                    # check the topology is correct
-                                    genTopology = self.topology(goodGenJets[closestGenJetI1], goodGenJets[closestGenJetI2])
-                                    if genTopology == topology:
-                                        matchCand=(min(closestGenJetI1,closestGenJetI2), max(closestGenJetI1,closestGenJetI2))    
-                                        if not matchCand in matchedPairs:
-                                            matched=matchCand
-                                            matchedPairs.add(matchCand)
-                                else:
-                                    pass
-                                    #print "XXX Warning, matched to same genJet"
-                                    #print  j1.pt(), j1.eta(), j1.phi()
-                                    #print  j2.pt(), j2.eta(), j2.phi()
-                                    #def pr(x): print x
-                                    #map(lambda x: pr("Gen: {0} {1} {2}".format(x.pt(), x.eta() , x.phi())),  goodGenJets  )
+                            if self.variantFilter.filterPair(goodGenJets[closestGenJetI1], goodGenJets[closestGenJetI2]):
+                                dr1 = self.dr(j1, goodGenJets[closestGenJetI1])
+                                dr2 = self.dr(j2, goodGenJets[closestGenJetI2])
+                                if max(dr1, dr2) < 0.3:
+                                    if closestGenJetI1 != closestGenJetI2:
+                                        # check the topology is correct
+                                        genTopology = self.topology(goodGenJets[closestGenJetI1], goodGenJets[closestGenJetI2])
+                                        if genTopology == topology:
+                                            matchCand=(min(closestGenJetI1,closestGenJetI2), max(closestGenJetI1,closestGenJetI2))    
+                                            if not matchCand in matchedPairs:
+                                                matched=matchCand
+                                                matchedPairs.add(matchCand)
+                                    else:
+                                        pass
+                                        #print "XXX Warning, matched to same genJet"
+                                        #print  j1.pt(), j1.eta(), j1.phi()
+                                        #print  j2.pt(), j2.eta(), j2.phi()
+                                        #def pr(x): print x
+                                        #map(lambda x: pr("Gen: {0} {1} {2}".format(x.pt(), x.eta() , x.phi())),  goodGenJets  )
 
                         # add this point we know, if this is
                         #   a fake: no matched genJetPair (or genJet pair from different category)
@@ -355,6 +404,7 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
             if self.unfoldEnabled and not self.isData:
                 for i1 in xrange(len(goodGenJets)):
                     for i2 in xrange(i1+1, len(goodGenJets)):
+                        if not self.variantFilter.filterPair(goodGenJets[i1], goodGenJets[i2]): continue
                         genTopology = None
                         detaGen = None
                         if shift == "_central":
@@ -440,6 +490,10 @@ if __name__ == "__main__":
         slaveParams["applyPtHatReweighing"] = False
         ofile = "plotsMNxs.root"
 
+
+    slaveParams["variant"] = "mostFB"  # highest delta eta separation
+    #slaveParams["variant"] = "atLeastOneAbove"
+    slaveParams["variant"] = "bothBelow"
 
     MNxsAnalyzerClean.runAll(treeName="mnXS",
                                slaveParameters=slaveParams,
