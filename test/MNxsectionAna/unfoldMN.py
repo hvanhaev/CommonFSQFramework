@@ -140,65 +140,17 @@ def unfold(action):
             sys.stdout.flush()
 
             if alaGri:
-                acc = []
-                print "Note: subs.bkg", r
-                genXSHistName =  "xsGen"+r.replace("response","")
-                genH = histos[baseMC][genXSHistName]
-                missXSHistName =  "xsMiss"+r.replace("response","")
-                missH = histos[baseMC][missXSHistName]
-                fakeXSHistName =  "xsFake"+r.replace("response","")
-                fakeXSHistMC = histos[baseMC][fakeXSHistName]  
-
-                detHistName =  "xs"+r.replace("response","")
-                detHistMC =     histos[baseMC][detHistName]  
-
-                sizes = set( [histo.GetNbinsX(), fakeXSHistMC.GetNbinsX(), detHistMC.GetNbinsX(), genH.GetNbinsX(), missH.GetNbinsX() ])
-                if len(sizes)!=1:
-                    raise Exception("Different histogram sizes: " + " ".join(sizes) )
-
-                for iBin in xrange(1, histo.GetNbinsX()+1):
-
-                    valMC = detHistMC.GetBinContent(iBin)
-                    valMCFake = fakeXSHistMC.GetBinContent(iBin)
-                    valMCMiss = missH.GetBinContent(iBin)
-                    valMCGen = genH.GetBinContent(iBin)
-                    #'''
-                    A = 1.
-                    if valMCGen > 0:
-                        A = 1. - valMCMiss/valMCGen
-                    acc.append(A)
-                    B = 0.
-                    if valMC >0:
-                        B =  valMCFake/valMC
-                    
-
-                    scaleingFactor = (1.-B)# /A
-                    #print "XXX", A, B, scaleingFactor
-
-                    valMeas = histo.GetBinContent(iBin)
-                    histo.SetBinContent(iBin, scaleingFactor*valMeas)
-                    #'''
-                    #histo.SetBinContent(iBin, max(0, valMeas-valMCFake))
-
-
-                
-
-
-            if False: # second approach to alaGri
                 # histos[baseMC][r] - response object
                 # histo - detector level distribution
                 #histo.Scale(0.5)
+
+                histoCopy = histo.Clone()
                 responseWithBrokenFakesNorm = histos[baseMC][r]
                 #   RooUnfoldResponse(const TH1* measured, const TH1* truth, const TH2* response
                 meas  =  responseWithBrokenFakesNorm.Hmeasured().Clone()
                 truth =  responseWithBrokenFakesNorm.Htruth().Clone()
                 fake =  responseWithBrokenFakesNorm.Hfakes().Clone()
-                fakeScaled =  responseWithBrokenFakesNorm.Hfakes().Clone()
                 resp= responseWithBrokenFakesNorm.Hresponse().Clone()
-                #scalingFactor = histo.Integral()/histos[baseMC][centralHistoName].Integral()
-                scalingFactor = histo.Integral()/meas.Integral()
-
-                # Note: simple call to h.Scale() is not enough
 
                 for i in xrange(0, h.GetNbinsX()+1):
                     denom = meas.GetBinContent(i)
@@ -207,65 +159,16 @@ def unfold(action):
                     if nom > denom:
                         print "AAAA", nom, denom
                     factor = 1.-nom/denom
-                    val = histo.GetBinContent(i)*factor
-                    err = histo.GetBinError(i)*factor
-                    histo.SetBinContent(i, val)
-                    histo.SetBinError(i, err)
+                    val = histoCopy.GetBinContent(i)*factor
+                    err = histoCopy.GetBinError(i)*factor
+                    histoCopy.SetBinContent(i, val)
+                    histoCopy.SetBinError(i, err)
 
-
-                #meas.Add(fake,-1)
-                #print "AAAAA", r, fake.Integral()
-                #scale(fakeScaled, scalingFactor)
-                #histo.Add(fakeScaled, -1)
-                #meas.Add(fakeScaled)
-                #scale(meas, scalingFactor)
-                #scale(truth, scalingFactor)
-                #scale2d(resp, scalingFactor)
-                meas.Reset()
-                newResponseTmp = ROOT.RooUnfoldResponse(meas, truth, resp)
-
-                measNew = newResponseTmp.Hfakes()
-                scale(measNew, scalingFactor)
-                scale(truth, scalingFactor)
-                scale2d(resp, scalingFactor)
-                newResponse = ROOT.RooUnfoldResponse(measNew, truth, resp)
-
-                #newResponse = ROOT.RooUnfoldResponse(meas, truth, resp)
-                #newResponse.Hfakes().Scale(0)
-                #print "AAA",r, newResponse.Hfakes().Integral()
-
-                '''
-                # 
-                newFakes = newResponse.Hfakes() 
-                scalingFactor = histo.Integral()/meas.Integral()
-                #scalingFactor = meas.Integral()/histo.Integral()
-                newFakes.Scale(scalingFactor)
-                deltaFakes = newFakes.Clone()
-                deltaFakes.Add(responseWithBrokenFakesNorm.Hfakes(), -1)
-                newMeas = newResponse.Hmeasured()
-                newMeas.Add(deltaFakes, -1)
-                '''
-
-                #unfold = ROOT.RooUnfoldBayes(histos[baseMC][r], histo, 10)
-                unfold = ROOT.RooUnfoldBayes(newResponse, histo, 10)
-
-            #orgResponse = histos[baseMC][r]
-            #meas  =  orgResponse.Hmeasured().Clone()
-            #meas.Scale(0.5, "width")
-            #scale(meas,0.5)
-            #truth =  orgResponse.Htruth().Clone()
-            #truth.Scale(0.5)
-            #scale(truth,0.5)
-            #resp =   orgResponse.Hresponse().Clone()
-            #resp.Scale(0.5, "width")
-            #scale2d(resp, 0.5)
-            #map(lambda h: h.SetEntries(h.GetEntries()/2.), [meas,truth,resp])        
-            #map(lambda h: h.Scale(0.5), [meas,truth,resp])        
-            #map(lambda h: h.ComputeIntegral(), [meas,truth,resp])        
-
-            #response = ROOT.RooUnfoldResponse(meas, truth, resp)
-            #histo.Scale(0.5)
-            unfold = ROOT.RooUnfoldBayes(histos[baseMC][r], histo, 10)
+                meas.Add(fake, -1)
+                newResponse = ROOT.RooUnfoldResponse(meas, truth, resp)
+                unfold = ROOT.RooUnfoldBayes(newResponse, histoCopy, 10)
+            else:
+                unfold = ROOT.RooUnfoldBayes(histos[baseMC][r], histo, 10)
             
             #responseNew = histos[baseMC][r].Clone()
             #responseNew.Hfakes().Scale(0.5)
