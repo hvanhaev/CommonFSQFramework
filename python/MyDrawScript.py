@@ -1,4 +1,9 @@
 # here you can write down the draw functions/sequence/stuff you want to be executed with the main DrawTool.py program.
+# For a complete list of all available functions and options
+# please visit: https://twiki.cern.ch/twiki/bin/viewauth/CMS/CFFDrawTool
+
+# specify if you want to run ROOT in batch mode (this will not show any canvases):
+#setBatchMode()
 
 # Set the wanted input file and load all available histograms in this file in the memory:
 setInput("../test/CSA14/plotsCSA14_dndeta.root")
@@ -19,15 +24,27 @@ draw(["RecoTrack"],"int")
 # you can optionally normalise them to their integrals (int) or to their maxima (max):
 #draw(["RecoTrack"],"max")
 
-# with this command you can perform an update action to all the ROOT canvases currently open:
-#updateCanvas()
+# you can also specify which samples you want to plot
+# draw all GenTrack histograms normalised to their integral for only one MC sample:
+#draw(["GenTrack"],"int",["MinBias_TuneMonash13_13TeV-pythia8"])
 
+
+# add "CMS" or "CMS Preliminary" labels to all open canvases
+printCMSPreliminary()
+# add the centre-of-mass energy label to all open canvases
+# by default this is 13 TeV
+printCMEnergy()
+# add the integrated luminosity to all open canvases
+printLumi("3 nb^{-1}")
+
+# update all open canvases to display the changes
+updateCanvas()
 
 # after drawing one can save the plots as files
 # by default the PDF format is chosen to save a plot
 # by default they are saved in the current directory
 # save all open canvases to pdf files:
-saveCanvas()
+#saveCanvas()
 
 # save all canvases with the string "etaRecoTrack" in their names:
 #saveCanvas("./",["etaRecoTrack"])

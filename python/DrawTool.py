@@ -25,6 +25,9 @@ def resetCanvas():
         c = GlobalCanvasList.pop()
         if type(c) is TCanvas: c.Close()
 
+def setBatchMode():
+    ROOT.gROOT.SetBatch(True)
+
 def saveCanvas(outdir="./",tosave=[],formats=["pdf"]):
     global GlobalCanvasList
     for c in GlobalCanvasList:
@@ -91,7 +94,7 @@ def getAllHistos():
 
             curObj = c.ReadObj()
             if not curObj.InheritsFrom("TH1"):
-                print "Dont know how to merge", curObj.GetName(), curObj.ClassName()
+                print "Dont know how to load", curObj.GetName(), curObj.ClassName()
                 continue
         
             curObjClone = curObj.Clone()
@@ -102,7 +105,7 @@ def getAllHistos():
     print "All histograms from ", GlobalIn, " loaded. In total: ", len(GlobalHistoList), " in the memory"
     # end getAllHistos function
 
-def draw(localHistoList=[],normMeth=""):
+def draw(localHistoList=[],normMeth="",localSampleList=[]):
     
     global GlobalCanvasList
     global GlobalLegendList
@@ -129,14 +132,15 @@ def draw(localHistoList=[],normMeth=""):
         isData = GlobalSampleList[hsample]["isData"]
 
         exists = False
-        for i in GlobalCanvasList:
-            if i.GetName() == hname: exists = True
+        for c in GlobalCanvasList:
+            if type(c) is not TCanvas: continue
+            if c.GetName() == hname: exists = True
         
         if not exists:
             c = TCanvas(hname,hname)
             GlobalCanvasList.append(c)
             # define legend with default style
-            leg = TLegend(0.52,0.73,0.82,0.91)
+            leg = TLegend(0.52,0.73,0.82,0.92)
             leg.SetMargin(0.2)
             leg.SetFillColor(kWhite)
             leg.SetBorderSize(0)
@@ -150,10 +154,23 @@ def draw(localHistoList=[],normMeth=""):
         print " We are going to plot ", len(GlobalCanvasList)-startCL, " canvases for you..."
 
     # loop over canvases you want
-    icanvas = 0
-    for c in GlobalCanvasList:
+    for icanvas, c in enumerate(GlobalCanvasList):
+        if type(c) is not TCanvas: continue
         cname = c.GetName()
+        
+        # check if we still need to plot this canvas
+        plotit = False
+        if len(localHistoList) > 0:
+            for n in localHistoList:
+                if n in cname: plotit = True
+        else:
+            plotit = True
+        if not plotit: continue
+        
         c.cd()
+        
+        # start with a clean legend
+        GlobalLegendList[icanvas].Clear()
     
         # loop over histograms in the list for all samples
         ihisto = 0
@@ -162,13 +179,19 @@ def draw(localHistoList=[],normMeth=""):
                 # get sample name
                 spltstr = h.GetTitle().split("/")
                 hsample = spltstr[0]
+                if len(localSampleList) > 0:
+                    if hsample not in localSampleList: continue
+                
                 # set normalisation
                 if normMeth == "int":
                     if h.Integral() != 0: h.Scale(1./h.Integral())
                 if normMeth == "max":
                     if h.GetBinContent(h.GetMaximumBin()) != 0: h.Scale(1./h.GetBinContent(h.GetMaximumBin()))
-                # execute style options
-                execfile(sys.path[0]+"/"+GlobalScriptFile+".style")
+            
+                # execute style options if there are
+                if os.path.isfile(sys.path[0]+"/"+GlobalScriptFile+".style"):
+                    execfile(sys.path[0]+"/"+GlobalScriptFile+".style")
+                
                 # draw the stuff
                 if ihisto == 0:
                     h.Draw()
@@ -182,13 +205,10 @@ def draw(localHistoList=[],normMeth=""):
 
         # draw legend
         GlobalLegendList[icanvas].Draw()
-        icanvas+=1
 
     
     #for s in GlobalSampleList:
     #    print "normfactor for sample: ", s, " = ", GlobalNormFactorList[s]
-    
-    #raw_input("\n\nPress the enter key to exit.")
 
     updateCanvas()
 
@@ -198,10 +218,69 @@ def setLineColor(hn="",color=1):
 
 def updateCanvas():
     for c in GlobalCanvasList:
-        c.Update()
+        if type(c) is TCanvas:
+            c.Update()
 
 def setLegend(sample="",legend=""):
     GlobalSampleDic[sample] = legend
+
+def printCMS(localHistoList=[]):
+    for c in GlobalCanvasList:
+        if type(c) is not TCanvas: continue
+        plotit = False
+        if len(localHistoList) > 0:
+            for n in localHistoList:
+                if n in c.GetName(): plotit = True
+        else:
+            plotit = True
+
+        if not plotit: continue
+        c.cd()
+        GlobalCMSLabel.Draw()
+
+def printCMSPreliminary(localHistoList=[]):
+    for c in GlobalCanvasList:
+        if type(c) is not TCanvas: continue
+        plotit = False
+        if len(localHistoList) > 0:
+            for n in localHistoList:
+                if n in c.GetName(): plotit = True
+        else:
+            plotit = True
+        
+        if not plotit: continue
+        c.cd()
+        GlobalCMSPreLabel.Draw()
+
+def printCMEnergy(localHistoList=[],cm="13"):
+    GlobalCMEnergyLabel.AddText("#sqrt{s} = "+cm+" TeV")
+    for c in GlobalCanvasList:
+        if type(c) is not TCanvas: continue
+        plotit = False
+        if len(localHistoList) > 0:
+            for n in localHistoList:
+                if n in c.GetName(): plotit = True
+        else:
+            plotit = True
+        
+        if not plotit: continue
+        c.cd()
+        GlobalCMEnergyLabel.Draw()
+
+def printLumi(lumi="",localHistoList=[]):
+    GlobalLumiLabel.AddText("L = "+lumi)
+    for c in GlobalCanvasList:
+        if type(c) is not TCanvas: continue
+        plotit = False
+        if len(localHistoList) > 0:
+            for n in localHistoList:
+                if n in c.GetName(): plotit = True
+        else:
+            plotit = True
+        
+        if not plotit: continue
+        c.cd()
+        GlobalLumiLabel.Draw()
 
 
 if __name__ == "__main__":
@@ -215,6 +294,40 @@ if __name__ == "__main__":
     GlobalLegendList = []
     GlobalNormFactorList = {}
     GlobalSampleDic = {}
+    
+    GlobalLumiLabel = TPaveText(0.22,0.76,0.52,0.82,"NDC")
+    GlobalLumiLabel.SetTextColor(kBlack)
+    GlobalLumiLabel.SetFillColor(kWhite)
+    GlobalLumiLabel.SetBorderSize(0)
+    GlobalLumiLabel.SetTextAlign(12)
+    GlobalLumiLabel.SetTextSize(0.035)
+    #GlobalLumiLabel.SetTextFont(42)
+    
+    GlobalCMEnergyLabel = TPaveText(0.22,0.81,0.52,0.87,"NDC")
+    GlobalCMEnergyLabel.SetTextColor(kBlack)
+    GlobalCMEnergyLabel.SetFillColor(kWhite)
+    GlobalCMEnergyLabel.SetBorderSize(0)
+    GlobalCMEnergyLabel.SetTextAlign(12)
+    GlobalCMEnergyLabel.SetTextSize(0.035)
+    #GlobalCMEnergyLabel.SetTextFont(42)
+    
+    GlobalCMSLabel = TPaveText(0.22,0.86,0.52,0.92,"NDC")
+    GlobalCMSLabel.SetTextColor(kBlack)
+    GlobalCMSLabel.SetFillColor(kWhite)
+    GlobalCMSLabel.SetBorderSize(0)
+    GlobalCMSLabel.SetTextAlign(12)
+    GlobalCMSLabel.SetTextSize(0.035)
+    #GlobalCMSLabel.SetTextFont(42)
+    GlobalCMSLabel.AddText("CMS")
+    
+    GlobalCMSPreLabel = TPaveText(0.22,0.86,0.52,0.92,"NDC")
+    GlobalCMSPreLabel.SetTextColor(kBlack)
+    GlobalCMSPreLabel.SetFillColor(kWhite)
+    GlobalCMSPreLabel.SetBorderSize(0)
+    GlobalCMSPreLabel.SetTextAlign(12)
+    GlobalCMSPreLabel.SetTextSize(0.035)
+    #GlobalCMSPreLabel.SetTextFont(42)
+    GlobalCMSPreLabel.AddText("CMS Preliminary")
     
     GlobalSampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
     GlobalStyle = MNTriggerStudies.MNTriggerAna.Style.setStyle()
