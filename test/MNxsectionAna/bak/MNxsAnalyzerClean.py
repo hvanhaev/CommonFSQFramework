@@ -298,10 +298,12 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
         if self.fChain.ngoodVTX == 0: return
         self.jetGetter.newEvent(self.fChain)
         weightBase = 1. 
+        weightBaseNoMCNorm = 1. 
         puWeightJ15 = 1
         puWeightDJ15FB = 1
         if not self.isData:
             weightBase *= self.fChain.genWeight*self.normFactor 
+            weightBaseNoMCNorm *= self.fChain.genWeight
             truePU = self.fChain.puTrueNumInteractions
             puWeightJ15 =  self.lumiWeighters["_jet15_central"].weight(truePU)
             puWeightDJ15FB = self.lumiWeighters["_dj15fb_central"].weight(truePU)
@@ -313,7 +315,8 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
                 w*=max(weighter.Eval(ptHat), 0.)
                 #print "W:", ptHat, weighter.Eval(ptHat)
             weightBase *= w
- 
+            weightBaseNoMCNorm*= w 
+
         if self.onlyPtHatReweighing:
             self.doPtHatReweighing(weightBase)
             return
@@ -347,8 +350,10 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
                         hasTrigger = self.triggerFired(topology)
                         if topology == "_jet15":
                             weight = puWeightJ15*weightBase    
+                            weightNoNorm = puWeightJ15*weightBaseNoMCNorm    
                         else:
                             weight = puWeightDJ15FB*weightBase    
+                            weightNoNorm = puWeightDJ15FB*weightBaseNoMCNorm    
 
                     if not hasTrigger: continue
 
@@ -395,10 +400,10 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
                         if len(matched)>0:
                             if self.unfoldEnabled:
                                 detaGen = abs(goodGenJets[matched[0]].eta()-goodGenJets[matched[1]].eta())
-                                self.hist["response"+histoName].Fill(detaDet, detaGen, weight)
+                                self.hist["response"+histoName].Fill(detaDet, detaGen, weightNoNorm)
                         else:
                             if self.unfoldEnabled:
-                                self.hist["response"+histoName].Fake(detaDet, weight)
+                                self.hist["response"+histoName].Fake(detaDet, weightNoNorm)
 
             # Now: fill miss cateogory
             if self.unfoldEnabled and not self.isData:
@@ -416,13 +421,15 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
                         if genTopology == None:
                             genTopology = self.topology(goodGenJets[i1], goodGenJets[i2])
                         if genTopology == "_jet15":
-                            weight = puWeightJ15*weightBase    
+                            #weight = puWeightJ15*weightBase    
+                            weightNoNorm = puWeightJ15*weightBaseNoMCNorm    
                         else:
-                            weight = puWeightDJ15FB*weightBase    
+                            #weight = puWeightDJ15FB*weightBase    
+                            weightNoNorm = puWeightDJ15FB*weightBaseNoMCNorm    
                         histoName = shift + genTopology
                         if detaGen == None:
                             detaGen = abs(goodGenJets[i1].eta()-goodGenJets[i2].eta())
-                        self.hist["response"+histoName].Miss(detaGen, weight)
+                        self.hist["response"+histoName].Miss(detaGen, weightNoNorm)
 
     def finalize(self):
         print "Finalize:"
@@ -450,8 +457,8 @@ if __name__ == "__main__":
     #'''
     sampleList = []
     sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
-    #'''
     sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
+    '''
     sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
     sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
     sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
@@ -493,7 +500,7 @@ if __name__ == "__main__":
 
     slaveParams["variant"] = "mostFB"  # highest delta eta separation
     #slaveParams["variant"] = "atLeastOneAbove"
-    slaveParams["variant"] = "bothBelow"
+    #slaveParams["variant"] = "bothBelow"
 
     MNxsAnalyzerClean.runAll(treeName="mnXS",
                                slaveParameters=slaveParams,
