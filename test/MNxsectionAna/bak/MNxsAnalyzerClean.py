@@ -99,6 +99,14 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
             self.todoShifts.append("_jerUp")
             self.todoShifts.append("_jerDown")
 
+        # since shifts for PU are in fact changes in weight
+        # there is no sense to repeat whole analaysis
+        # we will use the central value
+        self.shiftsPU = ["_central"]
+        if not self.isData and self.doShiftsPU:
+            self.shiftsPU.append("_puUp")
+            self.shiftsPU.append("_puDown")
+
         self.hist = {}
         todoTrg = ["_jet15", "_dj15fb"]
 
@@ -299,14 +307,20 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
         self.jetGetter.newEvent(self.fChain)
         weightBase = 1. 
         weightBaseNoMCNorm = 1. 
-        puWeightJ15 = 1
-        puWeightDJ15FB = 1
+        puWeights = {}
+        puWeights["_jet15"] = {}
+        puWeights["_dj15fb"] = {}
+
+
         if not self.isData:
             weightBase *= self.fChain.genWeight*self.normFactor 
             weightBaseNoMCNorm *= self.fChain.genWeight
             truePU = self.fChain.puTrueNumInteractions
-            puWeightJ15 =  self.lumiWeighters["_jet15_central"].weight(truePU)
-            puWeightDJ15FB = self.lumiWeighters["_dj15fb_central"].weight(truePU)
+            for lw in self.lumiWeighters:
+                spl = lw.split("_")
+                trgName = "_"+spl[1]
+                variationName = "_"+spl[2]
+                puWeights[trgName][variationName] = self.lumiWeighters[lw].weight(truePU)
 
         if not self.isData and  self.applyPtHatReweighing:
             ptHat = self.fChain.qScale
@@ -348,12 +362,9 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
                             weight = 1
                     else:
                         hasTrigger = self.triggerFired(topology)
-                        if topology == "_jet15":
-                            weight = puWeightJ15*weightBase    
-                            weightNoNorm = puWeightJ15*weightBaseNoMCNorm    
-                        else:
-                            weight = puWeightDJ15FB*weightBase    
-                            weightNoNorm = puWeightDJ15FB*weightBaseNoMCNorm    
+                        weightPU = puWeights[topology]["_central"]
+                        weight = weightPU*weightBase    
+                        weightNoNorm = weightPU*weightBaseNoMCNorm    
 
                     if not hasTrigger: continue
 
@@ -420,12 +431,9 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
                         if (i1, i2) in matchedPairs: continue
                         if genTopology == None:
                             genTopology = self.topology(goodGenJets[i1], goodGenJets[i2])
-                        if genTopology == "_jet15":
-                            #weight = puWeightJ15*weightBase    
-                            weightNoNorm = puWeightJ15*weightBaseNoMCNorm    
-                        else:
-                            #weight = puWeightDJ15FB*weightBase    
-                            weightNoNorm = puWeightDJ15FB*weightBaseNoMCNorm    
+
+                        weightPU = puWeights[genTopology]["_central"]
+                        weightNoNorm = weightPU*weightBaseNoMCNorm    
                         histoName = shift + genTopology
                         if detaGen == None:
                             detaGen = abs(goodGenJets[i1].eta()-goodGenJets[i2].eta())
@@ -466,7 +474,7 @@ if __name__ == "__main__":
     # '''
     # '''
     #maxFilesMC = 48
-    #maxFilesMC = 2
+    maxFilesMC = 2
     #maxFilesData = 1
     nWorkers = 10
     #maxFilesMC = 16
@@ -480,6 +488,7 @@ if __name__ == "__main__":
 
     #slaveParams["doPtShiftsJER"] = False
     slaveParams["doPtShiftsJER"] = True
+    slaveParams["doShiftsPU"] = True
 
     #slaveParams["jetID"] = "pfJets_jetID" # TODO
 
