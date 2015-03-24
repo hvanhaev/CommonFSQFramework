@@ -74,9 +74,6 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
         else:
             raise Exception("Variant not known: "+self.variant)
 
-
-
-
         if not self.isData:
             #self.hltMCWeighter = HLTMCWeighter("HLT_Jet15U")
             self.HLTMCWeighterJ15Raw = HLTMCWeighter("HLT_Jet15U_raw")
@@ -115,7 +112,8 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
         print "xs vs eta: gonna use binning: ", binsEta
         binsNew = array('d',binsEta)
 
-        for shift in self.todoShifts:
+        # note: set gives as unique items, since _central is repeated
+        for shift in set(self.todoShifts+self.shiftsPU):
             for trg in todoTrg:
                 t = shift+trg
                 self.hist["ptLead"+t] =  ROOT.TH1F("ptLead"+t,   "ptLead"+t,  100, 0, 100)
@@ -352,30 +350,40 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
                     j2 = goodRecoJets[i2]
                     if not self.variantFilter.filterPair(j1, j2): continue
                     topology = self.topology(j1, j2)
-                    histoName = shift + topology
+                    weight = {}
                     if self.isData:
                         if topology == "_jet15":
                             hasTrigger = self.fChain.jet15 > 0.5
-                            weight = 1
+                            weight["_central"] = 1
                         else:
                             hasTrigger = self.fChain.doubleJ15FB > 0.5
-                            weight = 1
+                            weight["_central"] = 1
                     else:
                         hasTrigger = self.triggerFired(topology)
-                        weightPU = puWeights[topology]["_central"]
-                        weight = weightPU*weightBase    
-                        weightNoNorm = weightPU*weightBaseNoMCNorm    
+                        weightNoNorm = {}
+                        if shift == "_central":
+                            for s in self.shiftsPU: # note: shifts pu contains central, puUp and puDown
+                                weightPU = puWeights[topology][s]
+                                weight[s] = weightPU*weightBase    
+                                weightNoNorm[s] = weightPU*weightBaseNoMCNorm    
+                        else:
+                            weightPU = puWeights[topology]["_central"]
+                            weight[shift] = weightPU*weightBase    
+                            weightNoNorm[shift] = weightPU*weightBaseNoMCNorm    
 
                     if not hasTrigger: continue
 
                     detaDet = abs(j1.eta()-j2.eta())
                     ptSorted = sorted( [j1, j2], key = lambda j: -j.pt())
-                    self.hist["ptLead"+histoName].Fill(ptSorted[0].pt(), weight)
-                    self.hist["etaLead"+histoName].Fill(ptSorted[0].eta(), weight)
-                    self.hist["ptSublead"+histoName].Fill(ptSorted[1].pt(), weight)
-                    self.hist["etaSublead"+histoName].Fill(ptSorted[1].eta(), weight)
-                    self.hist["xsVsDeltaEta"+histoName].Fill(detaDet, weight)
-                    self.hist["vtx"+histoName].Fill(self.fChain.ngoodVTX, weight)
+
+                    for w in weight:
+                        histoName = w + topology
+                        self.hist["ptLead"+histoName].Fill(ptSorted[0].pt(), weight[w])
+                        self.hist["etaLead"+histoName].Fill(ptSorted[0].eta(), weight[w])
+                        self.hist["ptSublead"+histoName].Fill(ptSorted[1].pt(), weight[w])
+                        self.hist["etaSublead"+histoName].Fill(ptSorted[1].eta(), weight[w])
+                        self.hist["xsVsDeltaEta"+histoName].Fill(detaDet, weight[w])
+                        self.hist["vtx"+histoName].Fill(self.fChain.ngoodVTX, weight[w])
 
                     # todo: fill detLevel Histograms
                     # for MC - check if there is a matching pair, save result inside matchedPairs set
@@ -411,12 +419,17 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
                         if len(matched)>0:
                             if self.unfoldEnabled:
                                 detaGen = abs(goodGenJets[matched[0]].eta()-goodGenJets[matched[1]].eta())
-                                self.hist["response"+histoName].Fill(detaDet, detaGen, weightNoNorm)
+                                for w in weightNoNorm:
+                                    histoName = w + topology
+                                    self.hist["response"+histoName].Fill(detaDet, detaGen, weightNoNorm[w])
                         else:
                             if self.unfoldEnabled:
-                                self.hist["response"+histoName].Fake(detaDet, weightNoNorm)
+                                for w in weightNoNorm:
+                                    histoName = w + topology
+                                    self.hist["response"+histoName].Fake(detaDet, weightNoNorm[w])
 
             # Now: fill miss cateogory
+            # note: this is still happening in "shift" loop
             if self.unfoldEnabled and not self.isData:
                 for i1 in xrange(len(goodGenJets)):
                     for i2 in xrange(i1+1, len(goodGenJets)):
@@ -431,13 +444,23 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
                         if (i1, i2) in matchedPairs: continue
                         if genTopology == None:
                             genTopology = self.topology(goodGenJets[i1], goodGenJets[i2])
+   
+                        # note: code repeated here, see above defintion of weightNoNorm
+                        weightNoNorm = {}
+                        if shift == "_central":
+                            for s in self.shiftsPU: # note: shifts pu contains central, puUp and puDown
+                                weightPU = puWeights[genTopology][s]
+                                weightNoNorm[s] = weightPU*weightBaseNoMCNorm    
+                        else:
+                            weightPU = puWeights[genTopology]["_central"]
+                            weightNoNorm[shift] = weightPU*weightBaseNoMCNorm    
 
-                        weightPU = puWeights[genTopology]["_central"]
-                        weightNoNorm = weightPU*weightBaseNoMCNorm    
-                        histoName = shift + genTopology
                         if detaGen == None:
                             detaGen = abs(goodGenJets[i1].eta()-goodGenJets[i2].eta())
-                        self.hist["response"+histoName].Miss(detaGen, weightNoNorm)
+
+                        for w in weightNoNorm:
+                            histoName = w + genTopology
+                            self.hist["response"+histoName].Miss(detaGen, weightNoNorm[w])
 
     def finalize(self):
         print "Finalize:"
@@ -453,6 +476,8 @@ if __name__ == "__main__":
 
     parser.add_option("-p", "--ptHatReweighing",   action="store_true", dest="ptHatReweighing", \
                                 help="produce tree for ptHat reweighing")
+    parser.add_option("-v", "--variant",   action="store", dest="variant", type="string", \
+                                help="choose analysis variant")
 
     (options, args) = parser.parse_args()
 
@@ -466,7 +491,7 @@ if __name__ == "__main__":
     sampleList = []
     sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
     sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
-    '''
+    #'''
     sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
     sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
     sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
@@ -474,7 +499,7 @@ if __name__ == "__main__":
     # '''
     # '''
     #maxFilesMC = 48
-    maxFilesMC = 2
+    #maxFilesMC = 2
     #maxFilesData = 1
     nWorkers = 10
     #maxFilesMC = 16
@@ -506,10 +531,20 @@ if __name__ == "__main__":
         slaveParams["applyPtHatReweighing"] = False
         ofile = "plotsMNxs.root"
 
+    knownVariants = ["basic", "mostFB", "atLeastOneAbove", "bothBelow"]
+    if options.variant:
+        if options.variant not in knownVariants:
+            print "Variant not known. Choose from: " + " ".join(knownVariants)
+            sys.exit()
+        slaveParams["variant"] = options.variant
+    else:
+        slaveParams["variant"] = "mostFB"  # highest delta eta separation
 
-    slaveParams["variant"] = "mostFB"  # highest delta eta separation
+    #slaveParams["variant"] = "basic"  
     #slaveParams["variant"] = "atLeastOneAbove"
     #slaveParams["variant"] = "bothBelow"
+
+    ofile = "plotsMNxs_{}.root".format(slaveParams["variant"])
 
     MNxsAnalyzerClean.runAll(treeName="mnXS",
                                slaveParameters=slaveParams,
