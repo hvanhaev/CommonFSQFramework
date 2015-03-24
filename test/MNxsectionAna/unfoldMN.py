@@ -19,7 +19,9 @@ from HistosHelper import getHistos
 
 from mnDraw import DrawMNPlots 
 
-alaGri = True
+alaGri = False
+normalize = False
+odir = ""
 
 def scale(h, s):
     #h.Scale(s)
@@ -43,7 +45,7 @@ def scale2d(h, s):
 def getPossibleActions():
     return set(["pythiaOnData", "herwigOnData", "pythiaOnHerwig", "herwigOnPythia", "herwigOnHerwig", "pythiaOnPythia"])
 
-def unfold(action):
+def unfold(action, infileName):
     possibleActions = getPossibleActions()
     if action not in possibleActions:
         print "Action", action, "not known. Possible actions "+ " ".join(possibleActions)
@@ -82,7 +84,7 @@ def unfold(action):
     
 
 
-    histos = getHistos("plotsMNxs.root")
+    histos = getHistos(infileName)
     #print histos.keys()
     #print histos["JetMET-Run2010A-Apr21ReReco-v1"].keys()
 
@@ -95,7 +97,7 @@ def unfold(action):
     # _dj15fb', 
     #'response_jecDown_jet15
 
-    of =  ROOT.TFile("~/tmp/mnxsHistos_unfolded_"+action+".root","RECREATE")
+    of =  ROOT.TFile(odir+"/mnxsHistos_unfolded_"+action+".root","RECREATE")
 
     # Warning: duplicated code for lumi calculation! See mnDraw.py
     triggerToKey = {}
@@ -103,7 +105,7 @@ def unfold(action):
     triggerToKey["_dj15fb"] = "lumiDiJet15FB"
 
     for c in categories:
-        odir = of.mkdir(c)
+        odirROOTfile = of.mkdir(c)
 
         centralHistoName = "xs_central"+c # in fact we should not find any other histogram in data than "central"
         histo = None
@@ -129,7 +131,7 @@ def unfold(action):
         print "Lumi", c, action, lumi
         rawName = "xs_central"+c
 
-        odir.WriteTObject(histo,rawName)
+        odirROOTfile.WriteTObject(histo,rawName)
         for r in knownResponses:
             if c not in r: continue # do not apply dj15fb to jet15 and viceversa
             variation = r.split("_")[1]
@@ -168,7 +170,11 @@ def unfold(action):
                 newResponse = ROOT.RooUnfoldResponse(meas, truth, resp)
                 unfold = ROOT.RooUnfoldBayes(newResponse, histoCopy, 10)
             else:
-                unfold = ROOT.RooUnfoldBayes(histos[baseMC][r], histo, 10)
+                histoCopy = histo.Clone()
+                #histoCopy.Scale(0.5)
+                respo = histos[baseMC][r].Clone()
+                #respo.Hfakes().Scale(0.5)
+                unfold = ROOT.RooUnfoldBayes(respo, histoCopy, 10)
             
             #responseNew = histos[baseMC][r].Clone()
             #responseNew.Hfakes().Scale(0.5)
@@ -176,18 +182,8 @@ def unfold(action):
             if hReco.GetNbinsX() != histo.GetNbinsX():
                 raise Exception("Different histogram sizes after unfolding")
 
-            '''
-            if alaGri:
-                for iBin in xrange(1, histo.GetNbinsX()+1):
-                    if acc[iBin-1] == 0: continue
-                    cont = hReco.GetBinContent(iBin)
-                    hReco.SetBinContent(iBin, cont/acc[iBin-1])
-            '''
-
-                
-
             hReco.SetName(rawName)
-            odir.WriteTObject(hReco, rawName)
+            odirROOTfile.WriteTObject(hReco, rawName)
             # unfold= RooUnfoldSvd (histos[r], histo, 20)
             # unfold= RooUnfoldTUnfold (histos[r], histo)
 
@@ -206,7 +202,7 @@ def compareMCGentoMCUnfolded(action):
         return
 
     # detaGen_central_jet15
-    fileWithUnfoldedPlotsName = "~/tmp/mnxsHistos_unfolded_"+action +".root"
+    fileWithUnfoldedPlotsName = odir+"/mnxsHistos_unfolded_"+action +".root"
     fileWithUnfoldedPlots = ROOT.TFile(fileWithUnfoldedPlotsName)
 
 
@@ -234,19 +230,38 @@ def compareMCGentoMCUnfolded(action):
         trueMax = max(genHisto.GetMaximum(), unfoldedHisto.GetMaximum())
         genHisto.SetMaximum(trueMax*1.07)
 
-        c.Print("~/tmp/MConMCunfoldingTest_"+action+t+".png")
+        c.Print(odir+"/MConMCunfoldingTest_"+action+t+".png")
 
 def main():
     MNTriggerStudies.MNTriggerAna.Style.setTDRStyle()
     possibleActions = getPossibleActions()
     global alaGri
     alaGri = False
+    global normalize
+    normalize = False
 
-    possibleActions = ["pythiaOnPythia",  "herwigOnPythia", "pythiaOnHerwig", "herwigOnHerwig"]
+    
+    parser = OptionParser(usage="usage: %prog [options] filename",
+                            version="%prog 1.0")
+
+    parser.add_option("-v", "--variant",   action="store", dest="variant", type="string", \
+                                help="choose analysis variant")
+
+
+    (options, args) = parser.parse_args()
+    if not options.variant:
+        print "Provide analysis variant"
+        sys.exit()
+
+    infileName = "plotsMNxs_{}.root".format(options.variant)
+    global odir
+    odir = "~/tmp/unfolded_{}/".format(options.variant)
+    os.system("mkdir -p "+odir)
+
+    #possibleActions = ["pythiaOnPythia",  "herwigOnPythia", "pythiaOnHerwig", "herwigOnHerwig"]
     for action in possibleActions:
-        unfold(action)
+        unfold(action, infileName)
         compareMCGentoMCUnfolded(action)
-
 
 if __name__ == "__main__":
     main()

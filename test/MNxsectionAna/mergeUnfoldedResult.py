@@ -11,14 +11,31 @@ import  MNTriggerStudies.MNTriggerAna.Style
 
 from mnDraw import DrawMNPlots 
 from array import array
+from optparse import OptionParser
 
 def main():
     MNTriggerStudies.MNTriggerAna.Style.setTDRStyle()
 
+
+    parser = OptionParser(usage="usage: %prog [options] filename",
+                            version="%prog 1.0")
+
+    parser.add_option("-v", "--variant",   action="store", dest="variant", type="string", \
+                                help="choose analysis variant")
+
+
+    (options, args) = parser.parse_args()
+    if not options.variant:
+        print "Provide analysis variant"
+        sys.exit()
+
+    indir = "~/tmp/unfolded_{}/".format(options.variant)
+
+
     lumiUncertainty = 0.04
-    herwigIn="~/tmp/mnxsHistos_unfolded_herwigOnData.root"
-    pythiaIn="~/tmp/mnxsHistos_unfolded_pythiaOnData.root"
-    ofileName = "~/tmp/mnxsHistos_unfolded_onData_merged.root"
+    herwigIn=indir+"/mnxsHistos_unfolded_herwigOnData.root"
+    pythiaIn=indir+"/mnxsHistos_unfolded_pythiaOnData.root"
+    ofileName = indir+"/mnxsHistos_unfolded_onData_merged.root"
 
 
     histos = {}
@@ -200,10 +217,10 @@ def main():
     pythiaRatio.Draw("SAME L")
 
 
-    c.Print("~/tmp/mergedUnfolded.png")
+    c.Print(indir+"/mergedUnfolded.png")
     c.cd(1)
     ROOT.gPad.SetLogy()
-    c.Print("~/tmp/mergedUnfolded_log.png")
+    c.Print(indir+"/mergedUnfolded_log.png")
 
 
 
