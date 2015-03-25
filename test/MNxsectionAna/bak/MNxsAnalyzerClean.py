@@ -27,20 +27,38 @@ from optparse import OptionParser
 from HLTMCWeighter import HLTMCWeighter
 #import DiJetBalancePlugin
 
-class BasicVariant:
+class EtaBinning:
+    def bins(self):
+        binsEta = [x/10. for x in xrange(0, 61, 5)]
+        binsEta.extend([7.0, 8.0, 9.4])
+        print "xs vs eta: gonna use binning: ", binsEta
+        binsNew = array('d',binsEta)
+        return binsNew
+
+class PtBinning:
+    def bins(self):
+        bins = [x*10. for x in xrange(0, 10)]
+        print "xs vs eta: gonna use binning: ", bins
+        binsNew = array('d',bins)
+        return binsNew
+
+class BaseDijetAna:
+    def xsVariable(self, j1, j2):
+        return abs(j1.eta()-j2.eta())
     def filterPair(self, j1, j2):
         return True
     def filterCol(self, l):
         return l
 
-class MostFBVariant:
-    def filterPair(self, j1, j2):
-        return True
+class BasicVariant(BaseDijetAna, EtaBinning):
+    def __init__(self): pass
+
+class MostFBVariant(BaseDijetAna, EtaBinning):
     def filterCol(self, l):
         if len(l) < 2: return []
         return [min(l, key=lambda j: j.eta()), max(l, key=lambda j: j.eta())]
 
-class AtLeastOneAbove:
+class AtLeastOneAbove(BaseDijetAna, EtaBinning):
     def filterPair(self, j1, j2):
         return max(j1.pt(), j2.pt()) > 45
 
@@ -49,13 +67,21 @@ class AtLeastOneAbove:
         if max(l, key=lambda j: j.pt()).pt() < 45: return []
         return l
 
-class BothBelow:
-    def filterPair(self, j1, j2):
-        return True
-
+class BothBelow(BaseDijetAna, EtaBinning):
     def filterCol(self, l):
         return [j for j in l if j.pt()  < 55]
 
+# TODO (?) - filter mid eta jets
+class FWD11_01(BaseDijetAna, PtBinning):
+    def xsVariable(self, j1, j2):
+        ret = j1.pt() if abs(j1.eta()) < abs(j2.eta()) else j2.pt()
+        return ret
+    def filterPair(self, j1, j2):
+        eta1 = abs(j1.eta())
+        eta2 = abs(j2.eta())
+        if max(eta1, eta2) < 3: return False # no FWD jet
+        if min(eta1, eta2) > 1.3: return False # no central Jet
+        return True
 
 import math
 class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
@@ -107,10 +133,7 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
         self.hist = {}
         todoTrg = ["_jet15", "_dj15fb"]
 
-        binsEta = [x/10. for x in xrange(0, 61, 5)]
-        binsEta.extend([7.0, 8.0, 9.4])
-        print "xs vs eta: gonna use binning: ", binsEta
-        binsNew = array('d',binsEta)
+        binsNew = self.variantFilter.bins()
 
         # note: set gives as unique items, since _central is repeated
         for shift in set(self.todoShifts+self.shiftsPU):
@@ -120,11 +143,11 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
                 self.hist["ptSublead"+t] =  ROOT.TH1F("ptSublead"+t,   "ptSublead"+t,  100, 0, 100)
                 self.hist["etaLead"+t] =  ROOT.TH1F("etaLead"+t,   "etaLead"+t,  100, -5, 5)
                 self.hist["etaSublead"+t] =  ROOT.TH1F("etaSublead"+t,   "etaSublead"+t,  100, -5, 5)
-                self.hist["xsVsDeltaEta"+t] =  ROOT.TH1F("xs"+t,   "xs"+t, len(binsEta)-1, binsNew)
+                self.hist["xsVsDeltaEta"+t] =  ROOT.TH1F("xs"+t,   "xs"+t, len(binsNew)-1, binsNew)
                 self.hist["vtx"+t] =  ROOT.TH1F("vtx"+t,   "vtx"+t,  10, -0.5, 9.5)
 
                 if self.unfoldEnabled:
-                    dummy = ROOT.TH2F("dummy"+t, "dummy"+t, len(binsEta)-1, binsNew, len(binsEta)-1, binsNew)
+                    dummy = ROOT.TH2F("dummy"+t, "dummy"+t, len(binsNew)-1, binsNew, len(binsNew)-1, binsNew)
                     self.hist["response"+t]= ROOT.RooUnfoldResponse(self.hist["xsVsDeltaEta"+t], 
                                                                     self.hist["xsVsDeltaEta"+t], 
                                                                     dummy,
@@ -133,9 +156,9 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
         # in principle trigger does not applies to gen plots. We keep consistent naming though, so the unfolded result to gen level plots is possible
         # in each category
         self.hist["detaGen_jet15"] =  ROOT.TH1F("detaGen_central_jet15", "detaGen_central_jet15",
-                                                len(binsEta)-1, binsNew)
+                                                len(binsNew)-1, binsNew)
         self.hist["detaGen_dj15fb"] =  ROOT.TH1F("detaGen_central_dj15fb", "detaGen_central_dj15fb",  
-                                                len(binsEta)-1, binsNew)
+                                                len(binsNew)-1, binsNew)
 
 
         if self.onlyPtHatReweighing:
@@ -373,7 +396,7 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
 
                     if not hasTrigger: continue
 
-                    detaDet = abs(j1.eta()-j2.eta())
+                    detaDeta = self.variantFilter.xsVariable(j1, j2) # note: we should rename this...
                     ptSorted = sorted( [j1, j2], key = lambda j: -j.pt())
 
                     for w in weight:
@@ -418,7 +441,7 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
                         #fill the response matrix
                         if len(matched)>0:
                             if self.unfoldEnabled:
-                                detaGen = abs(goodGenJets[matched[0]].eta()-goodGenJets[matched[1]].eta())
+                                detaGen = self.variantFilter.xsVariable(goodGenJets[matched[0]],goodGenJets[matched[1]])
                                 for w in weightNoNorm:
                                     histoName = w + topology
                                     self.hist["response"+histoName].Fill(detaDet, detaGen, weightNoNorm[w])
@@ -438,7 +461,7 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
                         detaGen = None
                         if shift == "_central":
                             genTopology = self.topology(goodGenJets[i1], goodGenJets[i2])
-                            detaGen = abs(goodGenJets[i1].eta()-goodGenJets[i2].eta())
+                            detaGen = self.variantFilter.xsVariable(goodGenJets[i1], goodGenJets[i2])
                             self.hist["detaGen"+genTopology].Fill(detaGen, weightBase)
 
                         if (i1, i2) in matchedPairs: continue
@@ -456,7 +479,7 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
                             weightNoNorm[shift] = weightPU*weightBaseNoMCNorm    
 
                         if detaGen == None:
-                            detaGen = abs(goodGenJets[i1].eta()-goodGenJets[i2].eta())
+                            detaGen = self.variantFilter.xsVariable(goodGenJets[i1], goodGenJets[i2])
 
                         for w in weightNoNorm:
                             histoName = w + genTopology
@@ -489,17 +512,17 @@ if __name__ == "__main__":
     # debug config:
     #'''
     sampleList = []
-    sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
+    #sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
     sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
     #'''
-    sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
-    sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
-    sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
-    sampleList.append("METFwd-Run2010B-Apr21ReReco-v1")
+    #sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
+    #sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
+    #sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
+    #sampleList.append("METFwd-Run2010B-Apr21ReReco-v1")
     # '''
     # '''
     #maxFilesMC = 48
-    #maxFilesMC = 2
+    maxFilesMC = 1
     #maxFilesData = 1
     nWorkers = 10
     #maxFilesMC = 16
@@ -544,7 +567,7 @@ if __name__ == "__main__":
     #slaveParams["variant"] = "atLeastOneAbove"
     #slaveParams["variant"] = "bothBelow"
 
-    ofile = "plotsMNxs_{}.root".format(slaveParams["variant"])
+    ofile = "test_plotsMNxs_{}.root".format(slaveParams["variant"])
 
     MNxsAnalyzerClean.runAll(treeName="mnXS",
                                slaveParameters=slaveParams,
