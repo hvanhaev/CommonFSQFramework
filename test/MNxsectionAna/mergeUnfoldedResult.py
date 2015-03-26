@@ -13,6 +13,7 @@ from mnDraw import DrawMNPlots
 from array import array
 from optparse import OptionParser
 
+import sys
 def main():
     MNTriggerStudies.MNTriggerAna.Style.setTDRStyle()
 
@@ -24,8 +25,17 @@ def main():
                                 help="choose analysis variant")
     parser.add_option("-n", "--normalization",   action="store", dest="normalization", type="string", \
                                 help="how should I normalize the plots?")
+    parser.add_option("-b", "--normalizeToBinWidth",   action="store_true", dest="normalizeToBinWidth")
+    parser.add_option("-s", type="float", dest="scaleExtra")   
 
     (options, args) = parser.parse_args()
+    scaleExtra = 1.
+    if options.scaleExtra:
+        scaleExtra = 1./options.scaleExtra
+
+    if options.normalizeToBinWidth:
+        normalizeToBinWidth = True
+
     if not options.variant:
         print "Provide analysis variant"
         sys.exit()
@@ -66,8 +76,8 @@ def main():
     # ['xsunfolded_central_jet15', 'xsunfolded_jecDown_jet15', 'xs_central_jet15', 'xsunfolded_jerDown_jet15', 'xsunfolded_jecUp_jet15', 'xsunfolded_jerUp_jet15']
     finalSet = {}
 
-    # TODO: lumi unc
-    todo = ["_jet15", "_dj15fb"]
+    #todo = ["_jet15", "_dj15fb"]
+    todo = ["_jet15"]
     for t in todo:
         finalSet[t] = {}
         for hName in histos["herwig"][t]:
@@ -108,9 +118,13 @@ def main():
     for t in finalSet["_jet15"]:
         newName = t.replace("_jet15", "_jet15andDJ15FB")
         finalHisto = finalSet["_jet15"][t].Clone(newName)
-        finalHisto.Add(finalSet["_dj15fb"][t.replace("_jet15", "_dj15fb")].Clone())
+        #finalHisto.Add(finalSet["_dj15fb"][t.replace("_jet15", "_dj15fb")].Clone())
         if options.normalization == "area":
             finalHisto.Scale(1./finalHisto.Integral())
+        if normalizeToBinWidth:
+            finalHisto.Scale(1., "width")
+
+        finalHisto.Scale(scaleExtra)
 
         finalSet["merged"][newName] = finalHisto
             
@@ -149,6 +163,9 @@ def main():
 
     if options.normalization == "area":
         map(lambda h: h.Scale(1./h.Integral()), [genHistoPythia, genHistoHerwig] )
+    if normalizeToBinWidth:
+        map(lambda h: h.Scale(1, "width"), [genHistoPythia, genHistoHerwig] )
+    map(lambda h: h.Scale(scaleExtra), [genHistoPythia, genHistoHerwig] )
 
     maxima = []
     maxima.append(uncResult["max"])

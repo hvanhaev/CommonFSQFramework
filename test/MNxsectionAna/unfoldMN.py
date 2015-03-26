@@ -20,7 +20,6 @@ from HistosHelper import getHistos
 from mnDraw import DrawMNPlots 
 
 alaGri = False
-normalize = False
 odir = ""
 
 def scale(h, s):
@@ -183,6 +182,9 @@ def unfold(action, infileName):
                 raise Exception("Different histogram sizes after unfolding")
 
             hReco.SetName(rawName)
+
+
+
             odirROOTfile.WriteTObject(hReco, rawName)
             # unfold= RooUnfoldSvd (histos[r], histo, 20)
             # unfold= RooUnfoldTUnfold (histos[r], histo)
@@ -237,15 +239,13 @@ def main():
     possibleActions = getPossibleActions()
     global alaGri
     alaGri = False
-    global normalize
-    normalize = False
-
     
     parser = OptionParser(usage="usage: %prog [options] filename",
                             version="%prog 1.0")
 
     parser.add_option("-v", "--variant",   action="store", dest="variant", type="string", \
                                 help="choose analysis variant")
+
 
 
     (options, args) = parser.parse_args()
