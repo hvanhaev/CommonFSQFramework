@@ -37,8 +37,8 @@ class EtaBinning:
 
 class PtBinning:
     def bins(self):
-        bins = [x*10. for x in xrange(0, 10)]
-        print "xs vs eta: gonna use binning: ", bins
+        bins = [35,45,57,72,90,120,150]
+        print "xs vs pt: gonna use binning: ", bins
         binsNew = array('d',bins)
         return binsNew
 
@@ -49,16 +49,26 @@ class BaseDijetAna:
         return True
     def filterCol(self, l):
         return l
+    @staticmethod
+    def variant(v):
+        r = {}
+        r["InclusiveBasic"]=InclusiveBasic()
+        r["InclusiveAsym"]=InclusiveAsym()
+        r["InclusiveWindow"]=InclusiveWindow()
+        r["MNBasic"]=MNBasic()
+        r["MNAsym"]=MNAsym()
+        r["MNWindow"]=MNWindow()
+        r["FWD11_002"]=FWD11_002()
+        if v not in r:
+            raise Exception("Variant not known! Known variants are: " + " ".join(r.keys()))
+        return r[v]
+    
 
-class BasicVariant(BaseDijetAna, EtaBinning):
+# inclusive, pt > 35
+class InclusiveBasic(BaseDijetAna, EtaBinning):
     def __init__(self): pass
 
-class MostFBVariant(BaseDijetAna, EtaBinning):
-    def filterCol(self, l):
-        if len(l) < 2: return []
-        return [min(l, key=lambda j: j.eta()), max(l, key=lambda j: j.eta())]
-
-class AtLeastOneAbove(BaseDijetAna, EtaBinning):
+class InclusiveAsym(BaseDijetAna, EtaBinning):
     def filterPair(self, j1, j2):
         return max(j1.pt(), j2.pt()) > 45
 
@@ -67,38 +77,73 @@ class AtLeastOneAbove(BaseDijetAna, EtaBinning):
         if max(l, key=lambda j: j.pt()).pt() < 45: return []
         return l
 
-class BothBelow(BaseDijetAna, EtaBinning):
+class InclusiveWindow(BaseDijetAna, EtaBinning):
     def filterCol(self, l):
         return [j for j in l if j.pt()  < 55]
 
+class MNBasic(BaseDijetAna, EtaBinning):
+    def filterCol(self, l):
+        if len(l) < 2: return []
+        return [min(l, key=lambda j: j.eta()), max(l, key=lambda j: j.eta())]
+
+class MNAsym(BaseDijetAna, EtaBinning):
+    def filterCol(self, l):
+        if len(l) < 2: return []
+        bestPair = []
+        bestDeta = -1
+        for i1 in xrange(len(l)):
+            for i2 in xrange(i1+1, len(l)):
+                if max(  l[i1].pt(), l[i2].pt()) < 45: continue
+                aeta = abs(l[i1].eta()-l[i2].eta())
+                if aeta > bestDeta:
+                    bestDeta = aeta
+                    bestPair = [i1, i2]
+        if len(bestPair) == 0: return []
+        return [l[bestPair[0]], l[bestPair[1]]]
+
+class MNWindow(BaseDijetAna, EtaBinning):
+    def filterCol(self, l):
+        if len(l) < 2: return []
+        window = [j for j in l if j.pt()  < 55]
+        return [min(window, key=lambda j: j.eta()), max(window, key=lambda j: j.eta())]
+
 # TODO (?) - filter mid eta jets
-class FWD11_01(BaseDijetAna, PtBinning):
+# https://rivet.hepforge.org/code/dev/a00636_source.html#l00018
+# acording to rivet - we take strongest cen/fwd jet
+class FWD11_002(BaseDijetAna, PtBinning):
     def xsVariable(self, j1, j2):
-        ret = j1.pt() if abs(j1.eta()) < abs(j2.eta()) else j2.pt()
+        ret = j1.pt() if abs(j1.eta()) < abs(j2.eta()) else j2.pt() # pt of central jet
         return ret
     def filterPair(self, j1, j2):
         eta1 = abs(j1.eta())
         eta2 = abs(j2.eta())
-        if max(eta1, eta2) < 3: return False # no FWD jet
-        if min(eta1, eta2) > 1.3: return False # no central Jet
+        if max(eta1, eta2) < 3.2: return False # no FWD jet
+        if min(eta1, eta2) > 2.8: return False # no central Jet
         return True
+
+    def filterCol(self, l):
+        if len(l) < 2: return []
+        bestCen = None
+        bestCenPt = -1
+        bestFwd = None
+        bestFwdPt = -1
+        for i in xrange(len(l)):
+            aeta = abs(l[i].eta())
+            pt = l[i].pt()
+            if aeta > 3.2  and pt > bestFwdPt:
+                bestFwdPt = pt
+                bestFwd = i
+            elif aeta < 2.8 and pt > bestCenPt:
+                bestCenPt = pt
+                bestCen = i
+        if bestCen == None or bestFwd == None: return []   
+        return [l[bestCen], l[bestFwd]]
 
 import math
 class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
     def init( self):
 
-        if self.variant == "basic":
-            self.variantFilter = BasicVariant()
-        elif self.variant == "mostFB":
-            self.variantFilter = MostFBVariant()
-        elif self.variant == "atLeastOneAbove":
-            self.variantFilter = AtLeastOneAbove()
-
-        elif self.variant == "bothBelow":
-            self.variantFilter = BothBelow()
-
-        else:
-            raise Exception("Variant not known: "+self.variant)
+        self.variantFilter = BaseDijetAna.variant(self.variant)
 
         if not self.isData:
             #self.hltMCWeighter = HLTMCWeighter("HLT_Jet15U")
@@ -396,7 +441,7 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
 
                     if not hasTrigger: continue
 
-                    detaDeta = self.variantFilter.xsVariable(j1, j2) # note: we should rename this...
+                    detaDet = self.variantFilter.xsVariable(j1, j2) # note: we should rename this...
                     ptSorted = sorted( [j1, j2], key = lambda j: -j.pt())
 
                     for w in weight:
@@ -512,17 +557,17 @@ if __name__ == "__main__":
     # debug config:
     #'''
     sampleList = []
-    #sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
+    sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
     sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
     #'''
-    #sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
-    #sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
-    #sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
-    #sampleList.append("METFwd-Run2010B-Apr21ReReco-v1")
+    sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
+    sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
+    sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
+    sampleList.append("METFwd-Run2010B-Apr21ReReco-v1")
     # '''
     # '''
     #maxFilesMC = 48
-    maxFilesMC = 1
+    #maxFilesMC = 4
     #maxFilesData = 1
     nWorkers = 10
     #maxFilesMC = 16
@@ -554,6 +599,11 @@ if __name__ == "__main__":
         slaveParams["applyPtHatReweighing"] = False
         ofile = "plotsMNxs.root"
 
+    if not options.variant:
+        print "Provide variant"
+        sys.exit()
+    slaveParams["variant"] = options.variant
+    '''
     knownVariants = ["basic", "mostFB", "atLeastOneAbove", "bothBelow"]
     if options.variant:
         if options.variant not in knownVariants:
@@ -562,12 +612,13 @@ if __name__ == "__main__":
         slaveParams["variant"] = options.variant
     else:
         slaveParams["variant"] = "mostFB"  # highest delta eta separation
+    '''
 
     #slaveParams["variant"] = "basic"  
     #slaveParams["variant"] = "atLeastOneAbove"
     #slaveParams["variant"] = "bothBelow"
 
-    ofile = "test_plotsMNxs_{}.root".format(slaveParams["variant"])
+    ofile = "plotsMNxs_{}.root".format(slaveParams["variant"])
 
     MNxsAnalyzerClean.runAll(treeName="mnXS",
                                slaveParameters=slaveParams,
