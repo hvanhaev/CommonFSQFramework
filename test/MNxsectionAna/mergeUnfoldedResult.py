@@ -22,6 +22,24 @@ def main():
 
     parser.add_option("-v", "--variant",   action="store", dest="variant", type="string", \
                                 help="choose analysis variant")
+    parser.add_option("-n", "--normalization",   action="store", dest="normalization", type="string", \
+                                help="how should I normalize the plots?")
+
+    (options, args) = parser.parse_args()
+    if not options.variant:
+        print "Provide analysis variant"
+        sys.exit()
+
+    if not options.normalization:
+        print "Provide normalization variant"
+        sys.exit()
+
+    norms = ["xs", "area"]
+    if options.normalization not in norms:
+        print "Normalization not known. Possible choices: " + " ".join(norms)
+        sys.exit()
+
+    indir = "~/tmp/unfolded_{}/".format(options.variant)
 
 
     (options, args) = parser.parse_args()
@@ -91,7 +109,13 @@ def main():
         newName = t.replace("_jet15", "_jet15andDJ15FB")
         finalHisto = finalSet["_jet15"][t].Clone(newName)
         finalHisto.Add(finalSet["_dj15fb"][t.replace("_jet15", "_dj15fb")].Clone())
+        if options.normalization == "area":
+            finalHisto.Scale(1./finalHisto.Integral())
+
         finalSet["merged"][newName] = finalHisto
+            
+
+
 
     # save all to file
     ofile = ROOT.TFile(ofileName, "RECREATE")
@@ -122,6 +146,9 @@ def main():
     genHistoHerwig.Add(histosFromPyAnalyzer[herwigDir]["detaGen_central_dj15fb"])
     genHistoPythia = histosFromPyAnalyzer[pythiaDir]["detaGen_central_jet15"].Clone()
     genHistoPythia.Add(histosFromPyAnalyzer[pythiaDir]["detaGen_central_dj15fb"])
+
+    if options.normalization == "area":
+        map(lambda h: h.Scale(1./h.Integral()), [genHistoPythia, genHistoHerwig] )
 
     maxima = []
     maxima.append(uncResult["max"])
@@ -217,10 +244,10 @@ def main():
     pythiaRatio.Draw("SAME L")
 
 
-    c.Print(indir+"/mergedUnfolded.png")
+    c.Print(indir+"/mergedUnfolded_{}.png".format(options.normalization))
     c.cd(1)
     ROOT.gPad.SetLogy()
-    c.Print(indir+"/mergedUnfolded_log.png")
+    c.Print(indir+"/mergedUnfolded_{}_log.png".format(options.normalization))
 
 
 
