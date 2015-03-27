@@ -140,43 +140,29 @@ def unfold(action, infileName):
             rawName = "xsunfolded_" + variation+ c
             sys.stdout.flush()
 
+            histoCopy = histo.Clone()
+            clonedResponse = responseWithBrokenFakesNorm = histos[baseMC][r]
             if alaGri:
                 # histos[baseMC][r] - response object
                 # histo - detector level distribution
-                #histo.Scale(0.5)
-
-                histoCopy = histo.Clone()
-                responseWithBrokenFakesNorm = histos[baseMC][r]
                 #   RooUnfoldResponse(const TH1* measured, const TH1* truth, const TH2* response
-                meas  =  responseWithBrokenFakesNorm.Hmeasured().Clone()
-                truth =  responseWithBrokenFakesNorm.Htruth().Clone()
-                fake =  responseWithBrokenFakesNorm.Hfakes().Clone()
-                resp= responseWithBrokenFakesNorm.Hresponse().Clone()
-
                 for i in xrange(0, h.GetNbinsX()+1):
-                    denom = meas.GetBinContent(i)
+                    denom = clonedResponse.Hmeasured().GetBinContent(i)
                     if denom == 0: continue
-                    nom = fake.GetBinContent(i)
+                    nom = clonedResponse.Hfakes().GetBinContent(i)
                     if nom > denom:
-                        print "AAAA", nom, denom
+                        print "Warning! More fakes than meas", nom, denom
                     factor = 1.-nom/denom
                     val = histoCopy.GetBinContent(i)*factor
                     err = histoCopy.GetBinError(i)*factor
                     histoCopy.SetBinContent(i, val)
                     histoCopy.SetBinError(i, err)
 
-                meas.Add(fake, -1)
-                newResponse = ROOT.RooUnfoldResponse(meas, truth, resp)
-                unfold = ROOT.RooUnfoldBayes(newResponse, histoCopy, 10)
-            else:
-                histoCopy = histo.Clone()
-                #histoCopy.Scale(0.5)
-                respo = histos[baseMC][r].Clone()
-                #respo.Hfakes().Scale(0.5)
-                unfold = ROOT.RooUnfoldBayes(respo, histoCopy, 10)
+                clonedResponse.Hmeasured().Add(clonedResponse.Hfakes(), -1)
+                clonedResponse.Hfakes().Add(clonedResponse.Hfakes(), -1)
+
+            unfold = ROOT.RooUnfoldBayes(clonedResponse, histoCopy, 10)
             
-            #responseNew = histos[baseMC][r].Clone()
-            #responseNew.Hfakes().Scale(0.5)
             hReco= unfold.Hreco()
             if hReco.GetNbinsX() != histo.GetNbinsX():
                 raise Exception("Different histogram sizes after unfolding")
@@ -238,7 +224,7 @@ def main():
     MNTriggerStudies.MNTriggerAna.Style.setTDRStyle()
     possibleActions = getPossibleActions()
     global alaGri
-    alaGri = False
+    alaGri = True
     
     parser = OptionParser(usage="usage: %prog [options] filename",
                             version="%prog 1.0")
