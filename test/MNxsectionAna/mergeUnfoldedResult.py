@@ -33,6 +33,7 @@ def main():
     if options.scaleExtra:
         scaleExtra = 1./options.scaleExtra
 
+    normalizeToBinWidth = False
     if options.normalizeToBinWidth:
         normalizeToBinWidth = True
 
@@ -76,8 +77,8 @@ def main():
     # ['xsunfolded_central_jet15', 'xsunfolded_jecDown_jet15', 'xs_central_jet15', 'xsunfolded_jerDown_jet15', 'xsunfolded_jecUp_jet15', 'xsunfolded_jerUp_jet15']
     finalSet = {}
 
-    #todo = ["_jet15", "_dj15fb"]
-    todo = ["_jet15"]
+    todo = ["_jet15", "_dj15fb"]
+    #todo = ["_jet15"]
     for t in todo:
         finalSet[t] = {}
         for hName in histos["herwig"][t]:
@@ -118,7 +119,7 @@ def main():
     for t in finalSet["_jet15"]:
         newName = t.replace("_jet15", "_jet15andDJ15FB")
         finalHisto = finalSet["_jet15"][t].Clone(newName)
-        #finalHisto.Add(finalSet["_dj15fb"][t.replace("_jet15", "_dj15fb")].Clone())
+        finalHisto.Add(finalSet["_dj15fb"][t.replace("_jet15", "_dj15fb")].Clone())
         if options.normalization == "area":
             finalHisto.Scale(1./finalHisto.Integral())
         if normalizeToBinWidth:
@@ -262,6 +263,7 @@ def main():
 
 
     c.Print(indir+"/mergedUnfolded_{}.png".format(options.normalization))
+    c.Print(indir+"/mergedUnfolded_{}.root".format(options.normalization))
     c.cd(1)
     ROOT.gPad.SetLogy()
     c.Print(indir+"/mergedUnfolded_{}_log.png".format(options.normalization))
