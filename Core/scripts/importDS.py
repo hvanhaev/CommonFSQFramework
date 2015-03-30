@@ -7,7 +7,7 @@ ROOT.gROOT.SetBatch(True)
 from ROOT import *
 
 import pprint
-import MNTriggerStudies.MNTriggerAna.Util
+import CommonFSQFramework.Core.Util
 
 try:
     from elementtree import ElementTree
@@ -115,7 +115,7 @@ def main(sam):
             if value != None:
                 sam[name][f] = value
 
-        crabVersion = MNTriggerStudies.MNTriggerAna.Util.getCrabVersion()
+        crabVersion = CommonFSQFramework.Core.Util.getCrabVersion()
         if crabVersion == 2:
             SEDirs = getSEDirsCrab2(anaVersion, name)
         elif crabVersion == 3:

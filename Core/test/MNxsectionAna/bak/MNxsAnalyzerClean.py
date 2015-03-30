@@ -19,8 +19,8 @@ import cProfile
 
 # you have to run this file from directory where it is saved
 
-import MNTriggerStudies.MNTriggerAna.ExampleProofReader
-from  MNTriggerStudies.MNTriggerAna.BetterJetGetter import BetterJetGetter
+import CommonFSQFramework.Core.ExampleProofReader
+from  CommonFSQFramework.Core.BetterJetGetter import BetterJetGetter
 
 from optparse import OptionParser
 
@@ -141,7 +141,7 @@ class FWD11_002(BaseDijetAna, PtBinning):
         return [l[bestCen], l[bestFwd]]
 
 import math
-class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
+class MNxsAnalyzerClean(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader):
     def init( self):
 
         self.variantFilter = BaseDijetAna.variant(self.variant)
@@ -227,11 +227,11 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
                 self.addToOutput(self.hist[h])
 
         if self.applyPtHatReweighing and not self.isData:
-                fp = "MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"
+                fp = "CommonFSQFramework.Core/test/MNxsectionAna/"
                 todo = ["ptHatWeighters.root"]
                 self.ptHatW = []
                 for t in todo:
-                    ptHatFileName = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"+t).fullPath()
+                    ptHatFileName = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/"+t).fullPath()
                     ptHatFile = ROOT.TFile(ptHatFileName)
                     self.ptHatW.append(ptHatFile.Get(self.datasetName+"/ptHatW"))
 
@@ -239,15 +239,15 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
 
 
         puFiles = {}
-        # MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/
-        jet15FileV2 = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/PUJet15V2.root").fullPath()   # MC gen distribution
+        # CommonFSQFramework.Core/test/MNxsectionAna/
+        jet15FileV2 = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/PUJet15V2.root").fullPath()   # MC gen distribution
 
-        puFiles["dj15_1"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_dj15_1_0.root").fullPath()
-        puFiles["dj15_1_05"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_dj15_1_05.root").fullPath()
-        puFiles["dj15_0_95"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_dj15_0_95.root").fullPath()
-        puFiles["j15_1"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_j15_1_0.root").fullPath()
-        puFiles["j15_1_05"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_j15_1_05.root").fullPath()
-        puFiles["j15_0_95"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_j15_0_95.root").fullPath()
+        puFiles["dj15_1"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_dj15_1_0.root").fullPath()
+        puFiles["dj15_1_05"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_dj15_1_05.root").fullPath()
+        puFiles["dj15_0_95"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_dj15_0_95.root").fullPath()
+        puFiles["j15_1"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_j15_1_0.root").fullPath()
+        puFiles["j15_1_05"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_j15_1_05.root").fullPath()
+        puFiles["j15_0_95"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_j15_0_95.root").fullPath()
 
         self.lumiWeighters = {}
         self.lumiWeighters["_jet15_central"] = edm.LumiReWeighting(jet15FileV2, puFiles["j15_1"], "MC", "pileup")
@@ -534,7 +534,7 @@ class MNxsAnalyzerClean(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Example
     def finalize(self):
         print "Finalize:"
         if hasattr(self, "pr"):
-            dname = "/nfs/dust/cms/user/fruboest/2015.01.MN/slc6/CMSSW_7_0_5/src/MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/bak/"
+            dname = "/nfs/dust/cms/user/fruboest/2015.01.MN/slc6/CMSSW_7_0_5/src/CommonFSQFramework.Core/test/MNxsectionAna/bak/"
             profName = dname + "stats"
             self.pr.dump_stats(profName)
 

@@ -4,7 +4,7 @@
 # http://cdsweb.cern.ch/record/1421692?ln=en
 # http://arxiv.org/abs/arXiv:1202.0704
 # http://rivet.hepforge.org/code/2.1.0/a00543_source.html
-import MNTriggerStudies.MNTriggerAna.ExampleProofReader
+import CommonFSQFramework.Core.ExampleProofReader
 
 import sys, os, time
 sys.path.append(os.path.dirname(__file__))
@@ -19,9 +19,9 @@ from array import *
 # should be consistent with this file name (CMS_FWD_11_002.py)
 # you have to run this file from directory where it is saved
 
-from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
+from CommonFSQFramework.Core.JetGetter import JetGetter
 
-class CMS_FWD_11_002(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
+class CMS_FWD_11_002(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader):
     def init( self):
         print "XXX init - CMS_FWD_11_002", self.datasetName, self.isData
 
@@ -59,14 +59,14 @@ class CMS_FWD_11_002(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExamplePro
             self.GetOutputList().Add(self.hist[h])
 
         puFiles = {}
-        # MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/
-        jet15FileV2 = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/PUJet15V2.root").fullPath()   # MC gen distribution
-        puFiles["dj15_1"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_dj15_1_0.root").fullPath()
-        puFiles["dj15_1_05"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_dj15_1_05.root").fullPath()
-        puFiles["dj15_0_95"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_dj15_0_95.root").fullPath()
-        puFiles["j15_1"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_j15_1_0.root").fullPath()
-        puFiles["j15_1_05"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_j15_1_05.root").fullPath()
-        puFiles["j15_0_95"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_j15_0_95.root").fullPath()
+        # CommonFSQFramework.Core/test/MNxsectionAna/
+        jet15FileV2 = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/PUJet15V2.root").fullPath()   # MC gen distribution
+        puFiles["dj15_1"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_dj15_1_0.root").fullPath()
+        puFiles["dj15_1_05"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_dj15_1_05.root").fullPath()
+        puFiles["dj15_0_95"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_dj15_0_95.root").fullPath()
+        puFiles["j15_1"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_j15_1_0.root").fullPath()
+        puFiles["j15_1_05"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_j15_1_05.root").fullPath()
+        puFiles["j15_0_95"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_j15_0_95.root").fullPath()
 
         self.lumiWeighters = {}
         self.lumiWeighters["_jet15_central"] = edm.LumiReWeighting(jet15FileV2, puFiles["j15_1"], "MC", "pileup")
@@ -231,7 +231,7 @@ if __name__ == "__main__":
     jetUncFile = "START41_V0_AK5PF_Uncertainty.txt"
 
 
-    slaveParams["jetUncFile"] =  edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"+jetUncFile).fullPath()
+    slaveParams["jetUncFile"] =  edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/"+jetUncFile).fullPath()
 
 
     CMS_FWD_11_002.runAll(treeName="mnXS",

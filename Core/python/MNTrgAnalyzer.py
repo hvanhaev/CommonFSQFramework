@@ -1,5 +1,5 @@
 import FWCore.ParameterSet.Config as cms
-import MNTriggerStudies.MNTriggerAna.customizePAT
+import CommonFSQFramework.Core.customizePAT
 
 def addTreeProducer(process, **kwargs):
     stage1extralabel = "hltL1extraParticles"
@@ -124,5 +124,5 @@ def addTreeProducer(process, **kwargs):
         del process.MNTriggerAnaNew.L1JetsViewStage1
 
 
-    process = MNTriggerStudies.MNTriggerAna.customizePAT.addTreeProducer(process, process.MNTriggerAnaNew)
+    process = CommonFSQFramework.Core.customizePAT.addTreeProducer(process, process.MNTriggerAnaNew)
     return process

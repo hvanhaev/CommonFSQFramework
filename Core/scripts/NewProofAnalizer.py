@@ -3,7 +3,7 @@ import sys, os
 from optparse import OptionParser
 
 template='''#!/usr/bin/env python
-import MNTriggerStudies.MNTriggerAna.ExampleProofReader
+import CommonFSQFramework.Core.ExampleProofReader
 
 import sys, os, time
 sys.path.append(os.path.dirname(__file__))
@@ -14,7 +14,7 @@ from ROOT import edm
 
 from array import *
 
-class XXXXX(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
+class XXXXX(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader):
     def init( self):
 
         self.hist = {}

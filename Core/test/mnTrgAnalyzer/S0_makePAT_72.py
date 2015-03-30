@@ -116,11 +116,11 @@ from PhysicsTools.PatAlgos.tools.trigTools import *
 triggerProcess = "HLT"
 #switchOnTrigger( process, hltProcess=triggerProcess )
 
-import MNTriggerStudies.MNTriggerAna.customizePAT
-process = MNTriggerStudies.MNTriggerAna.customizePAT.customize(process)
+import CommonFSQFramework.Core.customizePAT
+process = CommonFSQFramework.Core.customizePAT.customize(process)
 
-import MNTriggerStudies.MNTriggerAna.MNTrgAnalyzer
-process = MNTriggerStudies.MNTriggerAna.MNTrgAnalyzer.addTreeProducer(process, triggerResults=triggerProcess, disable = ["hlt", "l1"])
+import CommonFSQFramework.Core.MNTrgAnalyzer
+process = CommonFSQFramework.Core.MNTrgAnalyzer.addTreeProducer(process, triggerResults=triggerProcess, disable = ["hlt", "l1"])
 
 for p in process.MNTriggerAnaNew.__dict__:
     if hasattr(getattr(process.MNTriggerAnaNew, p), "variations"):
@@ -129,7 +129,7 @@ for p in process.MNTriggerAnaNew.__dict__:
 
 
 
-process = MNTriggerStudies.MNTriggerAna.customizePAT.removeEdmOutput(process)
+process = CommonFSQFramework.Core.customizePAT.removeEdmOutput(process)
 process.GlobalTag.globaltag = "PHYS14_25_V2::All"
 
 # /QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/Phys14DR-PU20bx25_trkalmb_PHYS14_25_V1-v1/AODSIM

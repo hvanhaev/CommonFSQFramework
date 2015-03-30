@@ -1,4 +1,4 @@
-#include "MNTriggerStudies/MNTriggerAna/interface/L1JetsView.h"
+#include "CommonFSQFramework/Core/interface/L1JetsView.h"
 #include "DataFormats/L1Trigger/interface/L1JetParticle.h"
 
 L1JetsView::L1JetsView(const edm::ParameterSet& iConfig, TTree * tree):

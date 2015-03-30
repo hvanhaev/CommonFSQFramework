@@ -22,9 +22,9 @@ if "TMFSampleName" not in os.environ:
 else:
     s = os.environ["TMFSampleName"]
     print "Customizing to: ", s
-    import MNTriggerStudies.MNTriggerAna.Util
-    sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
-    anaVersion=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("anaVersion")
+    import CommonFSQFramework.Core.Util
+    sampleList=CommonFSQFramework.Core.Util.getAnaDefinition("sam")
+    anaVersion=CommonFSQFramework.Core.Util.getAnaDefinition("anaVersion")
     print anaVersion
     knownJEC = ["V17TFFull", "V17TFPart", "V16TFFull", "V16TFPart"]
     ver = None
@@ -305,7 +305,7 @@ if not runOnMC:
 ### TODO
 #'''
 process.load("CommonTools.ParticleFlow.ParticleSelectors.pfCandsForIsolation_cff")
-process.load("MNTriggerStudies.MNTriggerAna.muonPFIsolation_cff")
+process.load("CommonFSQFramework.Core.muonPFIsolation_cff")
 process.patMuons.isoDeposits = cms.PSet(
         particle         = cms.InputTag("muPFIsoDepositChargedAll"),
         pfChargedHadrons = cms.InputTag("muPFIsoDepositCharged"),

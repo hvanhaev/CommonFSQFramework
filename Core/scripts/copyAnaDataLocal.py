@@ -5,8 +5,8 @@ import ROOT
 ROOT.gROOT.SetBatch(True)
 from ROOT import *
 
-from MNTriggerStudies.MNTriggerAna.GetDatasetInfo import getTreeFilesAndNormalizations
-import MNTriggerStudies.MNTriggerAna.Util
+from CommonFSQFramework.Core.GetDatasetInfo import getTreeFilesAndNormalizations
+import CommonFSQFramework.Core.Util
 
 from optparse import OptionParser
 

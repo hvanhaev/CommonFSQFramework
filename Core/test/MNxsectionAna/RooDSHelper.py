@@ -6,7 +6,7 @@ from ROOT import *
 
 import os,re,sys,math
 
-import MNTriggerStudies.MNTriggerAna.Util
+import CommonFSQFramework.Core.Util
 
 from array import array
 import resource

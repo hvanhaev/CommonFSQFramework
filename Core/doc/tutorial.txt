@@ -28,16 +28,16 @@ export SmallXAnaDefFile=~/MyAnalisys.py
 
 3. Another shell environment variable (SmallXAnaVersion) contains path to a
 file with skim definition. You can set this variable by sourcing selected
-file from MNTriggerStudies/MNTriggerAna/env/ directory:
+file from CommonFSQFramework.Core/env/ directory:
 
-cd MNTriggerStudies/MNTriggerAna/env/
+cd CommonFSQFramework.Core/env/
 source do_DiJet_20140509.sh
 
 4. (xcheck) See your framework env related variables
 
 env | grep Small
     SmallXAnaDefFile=/home/8/tfruboes/MyAnalisys.py
-    SmallXAnaVersion=MNTriggerStudies.MNTriggerAna.samples.Samples_DiJet_20140509
+    SmallXAnaVersion=CommonFSQFramework.Core.samples.Samples_DiJet_20140509
 
 5. Copy data:
 
@@ -52,7 +52,7 @@ variable from MyAnalisys.py
 6. You can see example how to automatically get file list for every dataset
 and corresponding normalization factors inside
 
-MNTriggerStudies/MNTriggerAna/python/GetDatasetInfo.py
+CommonFSQFramework.Core/python/GetDatasetInfo.py
 
 above module is runable, it will show info on datasets defined by file from
 SmallXAnaVersion variable (in the example above - Samples_DiJet_20140509)
@@ -68,9 +68,9 @@ Currently the only fully working analysis chain is for MN trigger studies.
 
     env | grep Small
     SmallXAnaDefFile=/home/8/tfruboes/MyAnalisys.py
-    SmallXAnaVersion=MNTriggerStudies.MNTriggerAna.samples.Samples_DiJet_20140509
+    SmallXAnaVersion=CommonFSQFramework.Core.samples.Samples_DiJet_20140509
 
-1. Go to MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/ directory. Run
+1. Go to CommonFSQFramework.Core/test/mnTrgAnalyzer/ directory. Run
 
      ./MNTrgAnaProofReader.py
     
@@ -89,12 +89,12 @@ wrong):
  Notes:
   - Running tha analyzer from a different directory will fail. Ie you should not try:
 
-        cd MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/
+        cd CommonFSQFramework.Core/test/mnTrgAnalyzer/
         ./mnTrgAnalyzer/MNTrgAnaProofReader.py # wont work
 
     the correct way is: 
 
-        cd MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/mnTrgAnalyzer/
+        cd CommonFSQFramework.Core/test/mnTrgAnalyzer/mnTrgAnalyzer/
         ./MNTrgAnaProofReader.py # YAY!
 
   - by default it will run only on 10 treefiles from each dataset. You can run
@@ -148,7 +148,7 @@ wrong):
 
     where <veryLongNameCorrespondingToRunningDirectory> in my case is
 
-      scratch-scratch0-tfruboes-2014.04.HLT-CMSSW_6_2_8-src-MNTriggerStudies-MNTriggerAna-test-mnTrgAnalyzer
+      scratch-scratch0-tfruboes-2014.04.HLT-CMSSW_6_2_8-src-CommonFSQFramework.Core-test-mnTrgAnalyzer
 
     error messages may be hard to identify. Here you can find one example:
 

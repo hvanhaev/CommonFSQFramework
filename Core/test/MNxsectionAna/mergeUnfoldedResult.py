@@ -5,9 +5,9 @@ ROOT.gROOT.SetBatch(True)
 
 from HistosHelper import getHistos
 
-from MNTriggerStudies.MNTriggerAna.DrawPlots import DrawPlots
+from CommonFSQFramework.Core.DrawPlots import DrawPlots
 
-import  MNTriggerStudies.MNTriggerAna.Style
+import  CommonFSQFramework.Core.Style
 
 from mnDraw import DrawMNPlots 
 from array import array
@@ -15,7 +15,7 @@ from optparse import OptionParser
 
 import sys
 def main():
-    MNTriggerStudies.MNTriggerAna.Style.setTDRStyle()
+    CommonFSQFramework.Core.Style.setTDRStyle()
 
 
     parser = OptionParser(usage="usage: %prog [options] filename",

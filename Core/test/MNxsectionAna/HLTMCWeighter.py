@@ -3,7 +3,7 @@ import pickle
 import ROOT
 ROOT.gROOT.SetBatch(True)
 from ROOT import *
-from  MNTriggerStudies.MNTriggerAna.BetterJetGetter import BetterJetGetter
+from  CommonFSQFramework.Core.BetterJetGetter import BetterJetGetter
 
 
 from array import array 
@@ -84,16 +84,16 @@ class HLTMCWeighter:
             self.etaRangeHighForMax = 5.1
 
         # hltEffHistos.root  prescales_Jet15U.p  
-        # MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/trgEfficiency
-        fPrescales = edm.FileInPath( "MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/trgEfficiency/prescales_" + shortName2+".p").fullPath()
+        # CommonFSQFramework.Core/test/MNxsectionAna/trgEfficiency
+        fPrescales = edm.FileInPath( "CommonFSQFramework.Core/test/MNxsectionAna/trgEfficiency/prescales_" + shortName2+".p").fullPath()
         prescales = pickle.load( open( fPrescales, "rb" ) )
 
-        fLumi      = edm.FileInPath( "MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/trgEfficiency/runLumi_" + shortName2+".p").fullPath()
+        fLumi      = edm.FileInPath( "CommonFSQFramework.Core/test/MNxsectionAna/trgEfficiency/runLumi_" + shortName2+".p").fullPath()
         runLumi = pickle.load( open( fLumi, "rb" ) )
 
         # hltEffHistos_DoubleJet15U_ForwardBackward.root  hltEffHistos_Jet15U.root
 
-        fName =  "MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/trgEfficiency/hltEffHistos_"+ shortName1 + ".root"
+        fName =  "CommonFSQFramework.Core/test/MNxsectionAna/trgEfficiency/hltEffHistos_"+ shortName1 + ".root"
         print self.label, "- using", fName
         filePath = edm.FileInPath( fName ).fullPath()
         curPath = ROOT.gDirectory.GetPath()

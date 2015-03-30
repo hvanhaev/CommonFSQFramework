@@ -1,7 +1,7 @@
 #ifndef JetsJEC_h
 #define JetsJEC_h
 
-#include "MNTriggerStudies/MNTriggerAna/interface/EventViewBase.h"
+#include "CommonFSQFramework/Core/interface/EventViewBase.h"
 
 class JetsJEC: public EventViewBase{
     public:

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import MNTriggerStudies.MNTriggerAna.ExampleProofReader
+import CommonFSQFramework.Core.ExampleProofReader
 
 import sys, os, time
 sys.path.append(os.path.dirname(__file__))
@@ -10,7 +10,7 @@ from ROOT import edm, JetCorrectionUncertainty
 
 from array import *
 
-class CSA14_UEAna(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
+class CSA14_UEAna(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader):
     def init( self):
 
         self.hist = {}

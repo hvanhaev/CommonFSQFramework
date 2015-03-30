@@ -48,10 +48,10 @@
 #include "PhysicsTools/SelectorUtils/interface/JetIDSelectionFunctor.h"
 #include <DataFormats/Math/interface/deltaR.h>
 
-#include "MNTriggerStudies/MNTriggerAna/interface/JetView.h"
-#include "MNTriggerStudies/MNTriggerAna/interface/EventIdData.h"
-#include "MNTriggerStudies/MNTriggerAna/interface/TriggerResultsView.h"
-#include "MNTriggerStudies/MNTriggerAna/interface/GenericCandidateView.h"
+#include "CommonFSQFramework/Core/interface/JetView.h"
+#include "CommonFSQFramework/Core/interface/EventIdData.h"
+#include "CommonFSQFramework/Core/interface/TriggerResultsView.h"
+#include "CommonFSQFramework/Core/interface/GenericCandidateView.h"
 
 //
 // class declaration

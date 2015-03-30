@@ -15,14 +15,14 @@ from array import *
 
 # you have to run this file from directory where it is saved
 
-import MNTriggerStudies.MNTriggerAna.ExampleProofReader 
-import MNTriggerStudies.MNTriggerAna.Style
+import CommonFSQFramework.Core.ExampleProofReader 
+import CommonFSQFramework.Core.Style
 
-class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
+class L1Rate(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader):
     def init(self):
 
         # run MNTriggerAna/test/mnTrgAnalyzer/utils/GetFlatPUDist.py
-        puFile = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/PUhists.root").fullPath()
+        puFile = edm.FileInPath("CommonFSQFramework.Core/test/mnTrgAnalyzer/PUhists.root").fullPath()
 
         self.newlumiWeighters = {}
         #'''
@@ -304,7 +304,7 @@ class L1Rate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader
             self.GetOutputList().Add(hist)
 
         olist =  self.GetOutputList()
-        MNTriggerStudies.MNTriggerAna.Style.setStyle()
+        CommonFSQFramework.Core.Style.setStyle()
 
 
         curPath = ROOT.gDirectory.GetPath()

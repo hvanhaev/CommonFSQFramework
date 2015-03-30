@@ -29,12 +29,12 @@ skimEfficiencyMethod="getSkimEff"
 MyVariablesAllEvents="DiJetAnalysis.DiJetAna.ana.BaseVariables"
 '''
 # /scratch/scratch0/tfruboes/2013.05.DiJetNewGit/CMSSW_4_2_8_patch7/src/DiJetAnalysis/DiJetAna/python/samples
-#dsFile="MNTriggerStudies/MNTriggerAna/python/samples/dsBase.txt"
-#dsFile="MNTriggerStudies/MNTriggerAna/python/samples/ds70TriggerStudies.txt"
-#dsFile="MNTriggerStudies/MNTriggerAna/python/samples/ds72TriggerStudies.txt"
-#dsFile="MNTriggerStudies/MNTriggerAna/python/samples/ds73dijethltstudies.txt"
-#dsFile="MNTriggerStudies/MNTriggerAna/python/samples/dsFwdQCD70PU20.txt"
-dsFile="MNTriggerStudies/MNTriggerAna/python/samples/dsHLT1Step.txt"
+#dsFile="CommonFSQFramework.Core/python/samples/dsBase.txt"
+#dsFile="CommonFSQFramework.Core/python/samples/ds70TriggerStudies.txt"
+#dsFile="CommonFSQFramework.Core/python/samples/ds72TriggerStudies.txt"
+#dsFile="CommonFSQFramework.Core/python/samples/ds73dijethltstudies.txt"
+#dsFile="CommonFSQFramework.Core/python/samples/dsFwdQCD70PU20.txt"
+dsFile="CommonFSQFramework.Core/python/samples/dsHLT1Step.txt"
 
 # define the util decorator. Functions marked with this wont turn into ds attribute
 def util(func):

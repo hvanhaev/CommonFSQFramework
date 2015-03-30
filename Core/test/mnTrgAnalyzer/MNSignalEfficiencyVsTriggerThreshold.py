@@ -15,11 +15,11 @@ from array import *
 
 # you have to run this file from directory where it is saved
 
-import MNTriggerStudies.MNTriggerAna.ExampleProofReader 
+import CommonFSQFramework.Core.ExampleProofReader 
 import BaseTrigger
-from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
+from CommonFSQFramework.Core.JetGetter import JetGetter
 
-class MNSignalEfficiencyVsTriggerThreshold(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
+class MNSignalEfficiencyVsTriggerThreshold(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader):
 
     def topologyParser(self, topo):
         ''' see getTopologies for topology definition 
@@ -83,7 +83,7 @@ class MNSignalEfficiencyVsTriggerThreshold(MNTriggerStudies.MNTriggerAna.Example
         return ret
 
     def init(self):
-        puFile = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/PUhists.root").fullPath()
+        puFile = edm.FileInPath("CommonFSQFramework.Core/test/mnTrgAnalyzer/PUhists.root").fullPath()
 
         self.newlumiWeighters = {}
         self.newlumiWeighters["flat010toPU0p5"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU0p5/pileup")

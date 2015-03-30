@@ -15,10 +15,10 @@ from array import *
 # should be consistent with this file name (MCResolutionTreeProducer.py)
 
 # you have to run this file from directory where it is saved
-import MNTriggerStudies.MNTriggerAna.ExampleProofReader 
-from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
+import CommonFSQFramework.Core.ExampleProofReader 
+from CommonFSQFramework.Core.JetGetter import JetGetter
 
-class MCResolutionTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
+class MCResolutionTreeProducer(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader):
     def init(self):
 
         print "Params:", self.etaMax, self.ptMin
@@ -28,7 +28,7 @@ class MCResolutionTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.
         self.tree = ROOT.TTree("data", "data")
         self.GetOutputList().Add(self.tree)
 
-        puFile = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/PUhists.root").fullPath()
+        puFile = edm.FileInPath("CommonFSQFramework.Core/test/mnTrgAnalyzer/PUhists.root").fullPath()
         self.newlumiWeighters = {}
         self.newlumiWeighters["flat010toPU1"] = edm.LumiReWeighting(puFile, puFile, "Flat0to10/pileup", "PU1/pileup")
         #self.newlumiWeighters["flat2050toPU20"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU20/pileup")

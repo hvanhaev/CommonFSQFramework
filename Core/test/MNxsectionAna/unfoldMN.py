@@ -6,8 +6,8 @@ from ROOT import *
 
 import os,re,sys,math
 
-import MNTriggerStudies.MNTriggerAna.Util
-import MNTriggerStudies.MNTriggerAna.Style
+import CommonFSQFramework.Core.Util
+import CommonFSQFramework.Core.Style
 
 from array import array
 
@@ -109,7 +109,7 @@ def unfold(action, infileName):
         centralHistoName = "xs_central"+c # in fact we should not find any other histogram in data than "central"
         histo = None
 
-        sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
+        sampleList=CommonFSQFramework.Core.Util.getAnaDefinition("sam")
         lumi = 0.
         for ds in categories[c]:
             h = histos[ds][centralHistoName]
@@ -221,7 +221,7 @@ def compareMCGentoMCUnfolded(action, infileName):
         c.Print(odir+"/MConMCunfoldingTest_"+action+t+".png")
 
 def main():
-    MNTriggerStudies.MNTriggerAna.Style.setTDRStyle()
+    CommonFSQFramework.Core.Style.setTDRStyle()
     possibleActions = getPossibleActions()
     global alaGri
     alaGri = True

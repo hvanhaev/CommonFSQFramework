@@ -1,7 +1,7 @@
 #ifndef GenericCandidateView_h
 #define GenericCandidateView_h
 
-#include "MNTriggerStudies/MNTriggerAna/interface/EventViewBase.h"
+#include "CommonFSQFramework/Core/interface/EventViewBase.h"
 
 class GenericCandidateView: public EventViewBase{
     public:

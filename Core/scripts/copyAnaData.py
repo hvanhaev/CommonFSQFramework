@@ -11,7 +11,7 @@ AutoLibraryLoader.enable()
 from optparse import OptionParser
 import subprocess
 
-import MNTriggerStudies.MNTriggerAna.Util
+import CommonFSQFramework.Core.Util
 
 
 def getFileListLcgLs(path):
@@ -127,7 +127,7 @@ def checkRootFile(fp):
 
 def checkDataIntegrity(remove = False, checkFilesWithRoot = False):
 
-    sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
+    sampleList=CommonFSQFramework.Core.Util.getAnaDefinition("sam")
     for s in sampleList:
         todo = []
         if "pathTrees" in sampleList[s]:
@@ -214,7 +214,7 @@ def checkDataIntegrity(remove = False, checkFilesWithRoot = False):
 
 
 def main():
-    sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
+    sampleList=CommonFSQFramework.Core.Util.getAnaDefinition("sam")
 
     parser = OptionParser(usage="usage: %prog [options] filename",
                             version="%prog 1.0")

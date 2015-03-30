@@ -1,7 +1,7 @@
 #ifndef L1JetsView_h
 #define L1JetsView_h
 
-#include "MNTriggerStudies/MNTriggerAna/interface/EventViewBase.h"
+#include "CommonFSQFramework/Core/interface/EventViewBase.h"
 
 class L1JetsView: public EventViewBase{
     public:

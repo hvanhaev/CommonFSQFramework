@@ -4,8 +4,8 @@ from optparse import OptionParser
 import subprocess
 
 # TODO: voms-proxy-init --voms cms --valid 168:00
-import MNTriggerStudies.MNTriggerAna.Util
-if MNTriggerStudies.MNTriggerAna.Util.getCrabVersion() != 3:
+import CommonFSQFramework.Core.Util
+if CommonFSQFramework.Core.Util.getCrabVersion() != 3:
     print "This is a crab3 utility. You are trying to use it with crab2. Exiting."
     sys.exit()
 

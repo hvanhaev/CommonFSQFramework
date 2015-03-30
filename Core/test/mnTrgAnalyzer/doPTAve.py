@@ -4,7 +4,7 @@ import os
 import ROOT
 ROOT.gROOT.SetBatch(True)
 
-import MNTriggerStudies.MNTriggerAna.Style
+import CommonFSQFramework.Core.Style
 
 outDir = "~/tmp/balanceHLT_TodoXXX_recoAVGYYY_ZZZ/"
 infile = "treeDiJetBalance.root"
@@ -141,7 +141,7 @@ def plot(todo, ptAveReco, weight, plotName, plotType):
 
 
 def main():
-    MNTriggerStudies.MNTriggerAna.Style.setStyle()
+    CommonFSQFramework.Core.Style.setStyle()
 
     todo = {}
 

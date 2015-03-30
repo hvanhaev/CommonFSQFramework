@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-import MNTriggerStudies.MNTriggerAna.ExampleProofReader
-from  MNTriggerStudies.MNTriggerAna.RecoTracksGetter import RecoTracksGetter
-from  MNTriggerStudies.MNTriggerAna.RecoVertexGetter import RecoVertexGetter
-from  MNTriggerStudies.MNTriggerAna.GenTracksGetter import GenTracksGetter
+import CommonFSQFramework.Core.ExampleProofReader
+from  CommonFSQFramework.Core.RecoTracksGetter import RecoTracksGetter
+from  CommonFSQFramework.Core.RecoVertexGetter import RecoVertexGetter
+from  CommonFSQFramework.Core.GenTracksGetter import GenTracksGetter
 
 import sys, os, time, math
 sys.path.append(os.path.dirname(__file__))
@@ -10,7 +10,7 @@ sys.path.append(os.path.dirname(__file__))
 import ROOT
 ROOT.gROOT.SetBatch(True)
 
-class CSA14_dndeta(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
+class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader):
     def init( self):
         self.triggers   = ["minbias"]
         self.variations = ["central"] # only a central value now

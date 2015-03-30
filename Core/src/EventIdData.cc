@@ -1,4 +1,4 @@
-#include "MNTriggerStudies/MNTriggerAna/interface/EventIdData.h"
+#include "CommonFSQFramework/Core/interface/EventIdData.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 

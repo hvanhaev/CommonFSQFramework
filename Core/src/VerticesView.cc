@@ -1,4 +1,4 @@
-#include "MNTriggerStudies/MNTriggerAna/interface/VerticesView.h"
+#include "CommonFSQFramework/Core/interface/VerticesView.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 
 

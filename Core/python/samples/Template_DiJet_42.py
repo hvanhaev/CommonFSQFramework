@@ -29,7 +29,7 @@ skimEfficiencyMethod="getSkimEff"
 MyVariablesAllEvents="DiJetAnalysis.DiJetAna.ana.BaseVariables"
 '''
 # /scratch/scratch0/tfruboes/2013.05.DiJetNewGit/CMSSW_4_2_8_patch7/src/DiJetAnalysis/DiJetAna/python/samples
-dsFile="MNTriggerStudies/MNTriggerAna/python/samples/ds2010_42.txt"
+dsFile="CommonFSQFramework.Core/python/samples/ds2010_42.txt"
 
 # define the util decorator. Functions marked with this wont turn into ds attribute
 def util(func):
@@ -68,7 +68,7 @@ def json(ds):
         return "DiJetAnalysis/DiJetAna/lumi//Cert_160404-180252_7TeV_PromptReco_Collisions11_JSON.txt"
     '''
     if realData:
-        return "MNTriggerStudies/MNTriggerAna/lumi/Cert_136033-149442_7TeV_Apr21ReReco_Collisions10_JSON_v2.txt"
+        return "CommonFSQFramework.Core/lumi/Cert_136033-149442_7TeV_Apr21ReReco_Collisions10_JSON_v2.txt"
     else:
         return ""
 

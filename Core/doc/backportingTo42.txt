@@ -23,7 +23,7 @@ git cms-init
 git remote add tomasz git@github.com:fruboes/cmssw.git
 git fetch tomasz
 git config core.sparseCheckout true
-echo MNTriggerStudies/MNTriggerAna >> .git/info/sparse-checkout
+echo CommonFSQFramework.Core >> .git/info/sparse-checkout
 git checkout -b MNTriggerStudies_42BPort tomasz/MNTriggerStudies
 
 # <Optional part for working within cmssw_4_2>

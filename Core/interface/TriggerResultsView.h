@@ -1,7 +1,7 @@
 #ifndef TriggerResultsView_h
 #define TriggerResultsView_h
 
-#include "MNTriggerStudies/MNTriggerAna/interface/EventViewBase.h"
+#include "CommonFSQFramework/Core/interface/EventViewBase.h"
 
 class TriggerResultsView: public EventViewBase{
     public:

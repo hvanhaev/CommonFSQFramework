@@ -5,7 +5,7 @@ ROOT.gROOT.SetBatch(True)
 from ROOT import TFile
 from ROOT import gDirectory
 
-from MNTriggerStudies.MNTriggerAna.GetDatasetInfo import getTreeFilesAndNormalizations
+from CommonFSQFramework.Core.GetDatasetInfo import getTreeFilesAndNormalizations
 
 maxFiles = None
 

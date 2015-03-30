@@ -3,7 +3,7 @@
 // Package:    MNTriggerAnaHLTJECOnFly
 // Class:      MNTriggerAnaHLTJECOnFly
 // 
-/**\class MNTriggerAnaHLTJECOnFly MNTriggerAnaHLTJECOnFly.cc MNTriggerStudies/MNTriggerAnaHLTJECOnFly/plugins/MNTriggerAnaHLTJECOnFly.cc
+/**\class MNTriggerAnaHLTJECOnFly MNTriggerAnaHLTJECOnFly.cc CommonFSQFramework/CoreHLTJECOnFly/plugins/MNTriggerAnaHLTJECOnFly.cc
 
  Description: [one line class summary]
 
@@ -42,11 +42,11 @@
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include <DataFormats/PatCandidates/interface/TriggerEvent.h>
 
-#include "MNTriggerStudies/MNTriggerAna/interface/EventIdData.h"
-#include "MNTriggerStudies/MNTriggerAna/interface/JetView.h"
+#include "CommonFSQFramework/Core/interface/EventIdData.h"
+#include "CommonFSQFramework/Core/interface/JetView.h"
 
-#include "MNTriggerStudies/MNTriggerAna/interface/L1JetsView.h"
-#include "MNTriggerStudies/MNTriggerAna/interface/TriggerResultsView.h"
+#include "CommonFSQFramework/Core/interface/L1JetsView.h"
+#include "CommonFSQFramework/Core/interface/TriggerResultsView.h"
 
 
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"

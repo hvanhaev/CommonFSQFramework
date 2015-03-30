@@ -7,7 +7,7 @@ ROOT.gROOT.SetBatch(True)
 from ROOT import *
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 AutoLibraryLoader.enable()
-import MNTriggerStudies.MNTriggerAna.Util
+import CommonFSQFramework.Core.Util
 import time
 from multiprocessing import Process, Queue
 
@@ -139,7 +139,7 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
     localBasePathTrees = mod.TTreeBasePATH
     if not hasattr(mod, "ROOTPrefix"):
         raise Exception("Please note you need to provide a (new) ROOTPrefix  parameter inside SmallXAnaDefFile. " \
-                         +"See MNTriggerStudies/MNTriggerAna/doc/SmallXAnaDefFile.txt for details")
+                         +"See CommonFSQFramework.Core/doc/SmallXAnaDefFile.txt for details")
 
     localROOTPrefix = mod.ROOTPrefix
     isXrootdAccess = "xrootd" in localROOTPrefix
@@ -149,9 +149,9 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
             raise Exception("Cannot find lcg-ls executable. Check your grid environment!")
 
 
-    samplesFileDir = os.path.dirname(MNTriggerStudies.MNTriggerAna.Util.getFullPathToAnaDefinitionFile())+"/"
+    samplesFileDir = os.path.dirname(CommonFSQFramework.Core.Util.getFullPathToAnaDefinitionFile())+"/"
 
-    sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
+    sampleList=CommonFSQFramework.Core.Util.getAnaDefinition("sam")
     if samplesToProcess != None:
         newList = {}
         for s in samplesToProcess:
@@ -160,7 +160,7 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
             newList[s]=sampleList[s]
         sampleList = newList
 
-    anaVersion=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("anaVersion")
+    anaVersion=CommonFSQFramework.Core.Util.getAnaDefinition("anaVersion")
 
     if not quiet: print "printing info for: ",  anaVersion
 

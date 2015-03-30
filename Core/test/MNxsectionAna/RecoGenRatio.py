@@ -21,10 +21,10 @@ from array import array
 # you have to run this file from directory where it is saved
 
 
-import MNTriggerStudies.MNTriggerAna.ExampleProofReader
-from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
+import CommonFSQFramework.Core.ExampleProofReader
+from CommonFSQFramework.Core.JetGetter import JetGetter
 
-class RecoGenRatio(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
+class RecoGenRatio(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader):
     def init( self):
 
         self.tree = ROOT.TTree("data", "data")
@@ -60,14 +60,14 @@ class RecoGenRatio(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
         for v in self.var:
             self.tree.Branch(v, self.var[v], v+"/D")
         
-        jet15FileV2 = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/PUJet15V2.root").fullPath()   # MC gen distribution
+        jet15FileV2 = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/PUJet15V2.root").fullPath()   # MC gen distribution
         puFiles = {}
-        puFiles["dj15_1"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_dj15_1_0.root").fullPath()
-        puFiles["dj15_1_05"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_dj15_1_05.root").fullPath()
-        puFiles["dj15_0_95"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_dj15_0_95.root").fullPath()
-        puFiles["j15_1"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_j15_1_0.root").fullPath()
-        puFiles["j15_1_05"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_j15_1_05.root").fullPath()
-        puFiles["j15_0_95"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_j15_0_95.root").fullPath()
+        puFiles["dj15_1"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_dj15_1_0.root").fullPath()
+        puFiles["dj15_1_05"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_dj15_1_05.root").fullPath()
+        puFiles["dj15_0_95"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_dj15_0_95.root").fullPath()
+        puFiles["j15_1"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_j15_1_0.root").fullPath()
+        puFiles["j15_1_05"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_j15_1_05.root").fullPath()
+        puFiles["j15_0_95"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_j15_0_95.root").fullPath()
 
         self.lumiWeighters = {}
         self.lumiWeighters["_jet15_central"] = edm.LumiReWeighting(jet15FileV2, puFiles["j15_1"], "MC", "pileup")
@@ -174,7 +174,7 @@ if __name__ == "__main__":
     jetUncFile = "START41_V0_AK5PF_Uncertainty.txt"
 
 
-    slaveParams["jetUncFile"] =  edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"+jetUncFile).fullPath()
+    slaveParams["jetUncFile"] =  edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/"+jetUncFile).fullPath()
 
     slaveParams["etaMin"] = 3
     slaveParams["etaMax"] = 5

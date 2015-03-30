@@ -3,7 +3,7 @@
 #include "FWCore/Framework/interface/EventSetup.h"
 
 
-#include "MNTriggerStudies/MNTriggerAna/interface/JetView.h"
+#include "CommonFSQFramework/Core/interface/JetView.h"
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
 #include <cmath>

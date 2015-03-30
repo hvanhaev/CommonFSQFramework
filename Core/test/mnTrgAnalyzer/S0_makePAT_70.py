@@ -132,8 +132,8 @@ switchOnTrigger( process, hltProcess="TEST" )
 
 
 
-import MNTriggerStudies.MNTriggerAna.customizePAT
-process = MNTriggerStudies.MNTriggerAna.customizePAT.customize(process)
+import CommonFSQFramework.Core.customizePAT
+process = CommonFSQFramework.Core.customizePAT.customize(process)
 
 
 
@@ -310,9 +310,9 @@ process.MNTriggerAnaNew = cms.EDAnalyzer("MNTriggerAnaNew",
 
 
 
-process = MNTriggerStudies.MNTriggerAna.customizePAT.addTreeProducer(process, process.MNTriggerAnaNew)
-#process = MNTriggerStudies.MNTriggerAna.customizePAT.addTreeProducer(process, process.BFJecTreeProducer)
-#process = MNTriggerStudies.MNTriggerAna.customizePAT.addTreeProducer(process, process.BFJecTreeProducerHighPT)
+process = CommonFSQFramework.Core.customizePAT.addTreeProducer(process, process.MNTriggerAnaNew)
+#process = CommonFSQFramework.Core.customizePAT.addTreeProducer(process, process.BFJecTreeProducer)
+#process = CommonFSQFramework.Core.customizePAT.addTreeProducer(process, process.BFJecTreeProducerHighPT)
 
 prefix='root://xrootd.ba.infn.it/'
 sec1=prefix+"/store/mc/Spring14dr/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/AODSIM/Flat20to50_POSTLS170_V5-v1/00000/9480AA58-E3DD-E311-8FE3-002590D0AFEC.root"
@@ -324,7 +324,7 @@ primary = "file:/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_Tune4
 
 primary="file:/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/20140902_HLTJetsPu0to10_withL1Stage1/dc64037346fa4f0c87471d40dfb5e9cf/outputFULL_99_1_Py7.root"
 primary="file:/nfs/dust/cms/user/fruboest/2014.09.TestL1Stage1/CMSSW_7_1_5/src/ProduceHLTAndL1/outputFULL.root"
-primary="file:/nfs/dust/cms/user/fruboest/2014.09.TestL1Stage1/CMSSW_7_1_5/src/MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/HLTObjectsProduction_testMyPath/outputFULL.root"
+primary="file:/nfs/dust/cms/user/fruboest/2014.09.TestL1Stage1/CMSSW_7_1_5/src/CommonFSQFramework.Core/test/mnTrgAnalyzer/HLTObjectsProduction_testMyPath/outputFULL.root"
 
 
 #'''
@@ -332,8 +332,8 @@ primary = 'file:/nfs/dust/cms/user/fruboest/2014.09.L1Stage1With72/CMSSW_7_2_0_p
 primary = 'file:/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/20140919_HLTJetsPu20to50_withL1Stage1_TRGJECMN_72pre6A/22e6fbeb4962d1fd2d06350795e9100e/outputFULL_1_1_VsT.root'
 primary = 'file:/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/20140919_HLTJetsPu20to50_withL1Stage1_715hats/cdce4465565d0fe93d53b358060cc01e/outputFULL_1_1_mB7.root'
 
-primary = 'file:/nfs/dust/cms/user/fruboest/2014.09.TestL1Stage1/CMSSW_7_1_5/src/MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/HLTObjectsProduction_20140917DoubleJetForJEC_V10/outputFULL.root'
-primary = 'file:/nfs/dust/cms/user/fruboest/2014.09.TestL1Stage1/CMSSW_7_1_5/src/MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/HLTObjectsProduction_20140917DoubleJetForJEC_V14/outputFULL.root'
+primary = 'file:/nfs/dust/cms/user/fruboest/2014.09.TestL1Stage1/CMSSW_7_1_5/src/CommonFSQFramework.Core/test/mnTrgAnalyzer/HLTObjectsProduction_20140917DoubleJetForJEC_V10/outputFULL.root'
+primary = 'file:/nfs/dust/cms/user/fruboest/2014.09.TestL1Stage1/CMSSW_7_1_5/src/CommonFSQFramework.Core/test/mnTrgAnalyzer/HLTObjectsProduction_20140917DoubleJetForJEC_V14/outputFULL.root'
 primary = 'file:/nfs/dust/cms/user/fruboest/2014.09.L1Stage1With72/CMSSW_7_2_0_pre6/src/test/outputFULL.root'
 primary = 'file:/pnfs/desy.de/cms/tier2/store/user/fruboes/QCD_Pt-15to3000_Tune4C_Flat_13TeV_pythia8/20141020_HLTJetsPu20to50_720pre8/ab4d935ec80dcf1194b09139dbb3a385/outputFULL_10_1_GMu.root'
 

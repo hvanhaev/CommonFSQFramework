@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-# to be used with SmallXAnaVersion=MNTriggerStudies.MNTriggerAna.samples.Samples_DiJet_20140122_MN2010
-import MNTriggerStudies.MNTriggerAna.ExampleProofReader
+# to be used with SmallXAnaVersion=CommonFSQFramework.Core.samples.Samples_DiJet_20140122_MN2010
+import CommonFSQFramework.Core.ExampleProofReader
 
 import sys, os, time
 sys.path.append(os.path.dirname(__file__))
@@ -12,7 +12,7 @@ from ROOT import edm
 
 from array import *
 
-class SingleJet(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
+class SingleJet(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader):
     def init( self):
         self.hist = {}
         self.hist["numGenTracks"] =  ROOT.TH1F("numGenTracks",   "numGenTracks",  100, -0.5, 99.5)

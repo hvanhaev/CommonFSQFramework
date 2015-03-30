@@ -6,7 +6,7 @@ from ROOT import *
 
 import os,re,sys,math
 
-import MNTriggerStudies.MNTriggerAna.Util
+import CommonFSQFramework.Core.Util
 
 from array import array
 import resource
@@ -14,11 +14,11 @@ import time
 
 from optparse import OptionParser
 
-import MNTriggerStudies.MNTriggerAna.Style
+import CommonFSQFramework.Core.Style
 
 
 def main():
-    MNTriggerStudies.MNTriggerAna.Style.setStyle()
+    CommonFSQFramework.Core.Style.setStyle()
 
     parser = OptionParser(usage="usage: %prog [options] filename",
                             version="%prog 1.0")
@@ -108,7 +108,7 @@ def main():
 
     os.system("mkdir -p "+odir)
 
-    sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
+    sampleList=CommonFSQFramework.Core.Util.getAnaDefinition("sam")
 
     f = ROOT.TFile(infile, "r")
     lst = f.GetListOfKeys()
@@ -304,7 +304,7 @@ if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     AutoLibraryLoader.enable()
-    MNTriggerStudies.MNTriggerAna.Style.setStyle()
+    CommonFSQFramework.Core.Style.setStyle()
     main()
 
 

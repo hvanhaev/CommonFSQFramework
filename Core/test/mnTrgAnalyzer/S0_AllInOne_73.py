@@ -108,19 +108,19 @@ del process.DQMOutput
 #'''
 #del process.hltOutputA.outputCommands
 
-import MNTriggerStudies.MNTriggerAna.customizePAT
-process = MNTriggerStudies.MNTriggerAna.customizePAT.customize(process)
+import CommonFSQFramework.Core.customizePAT
+process = CommonFSQFramework.Core.customizePAT.customize(process)
 
 if hasattr(process,"p1"):
-    process = MNTriggerStudies.MNTriggerAna.customizePAT.addPath(process, process.p1)
+    process = CommonFSQFramework.Core.customizePAT.addPath(process, process.p1)
 
 #process.MNTriggerAnaHLTJECOnFly = cms.EDAnalyzer("MNTriggerAnaHLTJECOnFly")
-#process = MNTriggerStudies.MNTriggerAna.customizePAT.addTreeProducer(process, process.MNTriggerAnaHLTJECOnFly)
+#process = CommonFSQFramework.Core.customizePAT.addTreeProducer(process, process.MNTriggerAnaHLTJECOnFly)
 
-import MNTriggerStudies.MNTriggerAna.MNTrgAnalyzer
+import CommonFSQFramework.Core.MNTrgAnalyzer
 triggerProcess = "TEST"
-#process = MNTriggerStudies.MNTriggerAna.MNTrgAnalyzer.addTreeProducer(process, triggerResults=triggerProcess, disable = ["hlt", "l1"])
-process = MNTriggerStudies.MNTriggerAna.MNTrgAnalyzer.addTreeProducer(process, triggerResults=triggerProcess)
+#process = CommonFSQFramework.Core.MNTrgAnalyzer.addTreeProducer(process, triggerResults=triggerProcess, disable = ["hlt", "l1"])
+process = CommonFSQFramework.Core.MNTrgAnalyzer.addTreeProducer(process, triggerResults=triggerProcess)
 del process.MNTriggerAnaNew.JetViewPF
 del process.MNTriggerAnaNew.JetViewCalo
 del process.MNTriggerAnaNew.JetViewPFAK4CHS
@@ -177,7 +177,7 @@ elif doTrigger == "run" and todo == "stage1":
     process.caloStage1Params.jetSeedThreshold = cms.double(l1SeedThr) 
 
 
-process = MNTriggerStudies.MNTriggerAna.customizePAT.removeEdmOutput(process)
+process = CommonFSQFramework.Core.customizePAT.removeEdmOutput(process)
 #process.GlobalTag.globaltag = "PHYS14_25_V2::All"
 
 '''
@@ -206,13 +206,13 @@ AOD="/store/mc/Phys14DR/Neutrino_Pt-2to20_gun/AODSIM/Flat20to50BX50_tsg_PHYS14_S
 '''
 process.source = cms.Source( "PoolSource",
     secondaryFileNames = cms.untracked.vstring(
- #       'file:/nfs/dust/cms/user/fruboest/2014.08.TriggerStudies/CMSSW_7_1_5/src/MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/infiles/BCDF1B07-B212-E411-A99A-00248C55CC9D_QCD_Pt-50to80_Tune4C_13TeV_pythia8_flat0to10_RAW.root',
+ #       'file:/nfs/dust/cms/user/fruboest/2014.08.TriggerStudies/CMSSW_7_1_5/src/CommonFSQFramework.Core/test/mnTrgAnalyzer/infiles/BCDF1B07-B212-E411-A99A-00248C55CC9D_QCD_Pt-50to80_Tune4C_13TeV_pythia8_flat0to10_RAW.root',
     #xrootd+RAW
     "file:nuRAW.root"
     ),
     #secondaryFileNames = cms.untracked.vstring(
     fileNames = cms.untracked.vstring(
- #       'file:/nfs/dust/cms/user/fruboest/2014.08.TriggerStudies/CMSSW_7_1_5/src/MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/infiles/363D5394-CF12-E411-A75C-002590596484.root_AODSIM'
+ #       'file:/nfs/dust/cms/user/fruboest/2014.08.TriggerStudies/CMSSW_7_1_5/src/CommonFSQFramework.Core/test/mnTrgAnalyzer/infiles/363D5394-CF12-E411-A75C-002590596484.root_AODSIM'
     #xrootd+AOD
     "file:nuAOD.root"
     )

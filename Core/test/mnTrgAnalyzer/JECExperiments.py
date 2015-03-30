@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-import MNTriggerStudies.MNTriggerAna.ExampleProofReader
-from  MNTriggerStudies.MNTriggerAna.GenericGetter import GenericGetter
+import CommonFSQFramework.Core.ExampleProofReader
+from  CommonFSQFramework.Core.GenericGetter import GenericGetter
 
 import sys, os, time
 sys.path.append(os.path.dirname(__file__))
@@ -47,7 +47,7 @@ class FancyCorrector:
         return ptSignalAndPU+PUcorrection
 
 
-class JECExperiments(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
+class JECExperiments(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader):
     def init( self):
         self.correctors = []
         with open(self.jecDefPath)  as inf:

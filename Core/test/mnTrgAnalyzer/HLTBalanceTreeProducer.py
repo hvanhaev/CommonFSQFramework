@@ -21,7 +21,7 @@ from ROOT import edm, JetCorrectionUncertainty
 # ln -s ../MNxsectionAna/drawBalance.py
 # ln -s ../MNxsectionAna/HLTMCWeighter.py
 import BalanceTreeProducer 
-from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
+from CommonFSQFramework.Core.JetGetter import JetGetter
 
 import BaseTrigger
 
@@ -79,7 +79,7 @@ class HLTBalanceTreeProducer(BalanceTreeProducer.BalanceTreeProducer):
 
         # for the PU file run
         # utils/GetFlatPUDist.py
-        puFile = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/PUhists.root").fullPath()
+        puFile = edm.FileInPath("CommonFSQFramework.Core/test/mnTrgAnalyzer/PUhists.root").fullPath()
 
         self.newlumiWeighters = {}
         '''

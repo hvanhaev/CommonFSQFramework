@@ -7,7 +7,7 @@
 #include <vector>
 #define constexpr static const
 #include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
-#include "MNTriggerStudies/MNTriggerAna/interface/TestTrackData.h"
+#include "CommonFSQFramework/Core/interface/TestTrackData.h"
 
 
 namespace {

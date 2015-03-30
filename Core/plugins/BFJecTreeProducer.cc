@@ -39,8 +39,8 @@
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include <DataFormats/PatCandidates/interface/TriggerEvent.h>
 
-#include "MNTriggerStudies/MNTriggerAna/interface/EventIdData.h"
-#include "MNTriggerStudies/MNTriggerAna/interface/BFJecView.h"
+#include "CommonFSQFramework/Core/interface/EventIdData.h"
+#include "CommonFSQFramework/Core/interface/BFJecView.h"
 
 //
 // class declaration

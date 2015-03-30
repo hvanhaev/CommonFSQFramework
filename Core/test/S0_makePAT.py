@@ -244,9 +244,9 @@ if "TMFSampleName" not in os.environ:
 else:
     s = os.environ["TMFSampleName"]
     print "Customizing to: ", s
-    import MNTriggerStudies.MNTriggerAna.Util
-    sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
-    anaVersion=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("anaVersion")
+    import CommonFSQFramework.Core.Util
+    sampleList=CommonFSQFramework.Core.Util.getAnaDefinition("sam")
+    anaVersion=CommonFSQFramework.Core.Util.getAnaDefinition("anaVersion")
     XS = sampleList[s]["XS"]
     isData =  sampleList[s]["isData"]
     

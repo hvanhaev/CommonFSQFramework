@@ -1,8 +1,8 @@
 #ifndef RecoTrackView_h
 #define RecoTrackView_h
 
-#include "MNTriggerStudies/MNTriggerAna/interface/EventViewBase.h"
-#include "MNTriggerStudies/MNTriggerAna/interface/TestTrackData.h"
+#include "CommonFSQFramework/Core/interface/EventViewBase.h"
+#include "CommonFSQFramework/Core/interface/TestTrackData.h"
 
 class RecoTrackView: public EventViewBase{
     public:

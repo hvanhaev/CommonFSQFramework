@@ -1,7 +1,7 @@
 #ifndef JetView_h
 #define JetView_h
 
-#include "MNTriggerStudies/MNTriggerAna/interface/EventViewBase.h"
+#include "CommonFSQFramework/Core/interface/EventViewBase.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
 #include "PhysicsTools/SelectorUtils/interface/JetIDSelectionFunctor.h"

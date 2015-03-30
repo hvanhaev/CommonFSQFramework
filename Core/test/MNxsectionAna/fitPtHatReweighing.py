@@ -8,7 +8,7 @@ ROOT.gROOT.SetBatch(True)
 import os,sys, math
 from array import array
 
-import MNTriggerStudies.MNTriggerAna.Util
+import CommonFSQFramework.Core.Util
 
 from  RooDSHelper import getSummedRooDS, reweighDS
 
@@ -267,7 +267,7 @@ def main():
     dataDSNames = ["JetMETTau-Run2010A-Apr21ReReco-v1", "Jet-Run2010B-Apr21ReReco-v1", "JetMET-Run2010A-Apr21ReReco-v1"]
     data = getSummedRooDS("data", "treesForPTHatReweighing.root", dataDSNames)
     lumi = 0.
-    sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
+    sampleList=CommonFSQFramework.Core.Util.getAnaDefinition("sam")
     for s in dataDSNames:
         lumi += sampleList[s]["lumiJet15"]
 

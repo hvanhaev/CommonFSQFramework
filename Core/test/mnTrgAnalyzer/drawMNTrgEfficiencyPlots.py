@@ -5,11 +5,11 @@ ROOT.gROOT.SetBatch(True)
 from ROOT import *
 
 import os,re,sys,math
-import MNTriggerStudies.MNTriggerAna.Style
+import CommonFSQFramework.Core.Style
 
 from optparse import OptionParser
 def main():
-    MNTriggerStudies.MNTriggerAna.Style.setStyle()
+    CommonFSQFramework.Core.Style.setStyle()
     parser = OptionParser()
     (options, args) = parser.parse_args()
     if len(args) == 0:

@@ -1,1 +1,1 @@
-export SmallXAnaVersion="MNTriggerStudies.MNTriggerAna.samples.Samples_DiJet_20140920_PU2050_wTrgStage171"
+export SmallXAnaVersion="CommonFSQFramework.Core.samples.Samples_DiJet_20140920_PU2050_wTrgStage171"

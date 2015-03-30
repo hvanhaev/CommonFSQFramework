@@ -39,10 +39,10 @@
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include <DataFormats/PatCandidates/interface/TriggerEvent.h>
 
-#include "MNTriggerStudies/MNTriggerAna/interface/EventIdData.h"
-#include "MNTriggerStudies/MNTriggerAna/interface/GenTrackView.h"
-#include "MNTriggerStudies/MNTriggerAna/interface/RecoTrackView.h"
-#include "MNTriggerStudies/MNTriggerAna/interface/VerticesView.h"
+#include "CommonFSQFramework/Core/interface/EventIdData.h"
+#include "CommonFSQFramework/Core/interface/GenTrackView.h"
+#include "CommonFSQFramework/Core/interface/RecoTrackView.h"
+#include "CommonFSQFramework/Core/interface/VerticesView.h"
 
 //
 // class declaration

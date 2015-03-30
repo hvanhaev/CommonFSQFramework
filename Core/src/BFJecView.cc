@@ -1,4 +1,4 @@
-#include "MNTriggerStudies/MNTriggerAna/interface/BFJecView.h"
+#include "CommonFSQFramework/Core/interface/BFJecView.h"
 #include "DataFormats/JetReco/interface/Jet.h"
 #include <DataFormats/Math/interface/deltaR.h>
 

@@ -6,7 +6,7 @@ from ROOT import *
 
 import os,re,sys,math
 
-import MNTriggerStudies.MNTriggerAna.Util
+import CommonFSQFramework.Core.Util
 
 from array import array
 
@@ -114,7 +114,7 @@ class DrawPlots():
 
     def draw(self, ignoreSamples = None, doRatio = False): # core function
         self.setGlobalStyle()
-        sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
+        sampleList=CommonFSQFramework.Core.Util.getAnaDefinition("sam")
         parser = OptionParser(usage="usage: %prog [options] filename",
                                 version="%prog 1.0")
 

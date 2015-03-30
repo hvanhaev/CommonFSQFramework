@@ -15,11 +15,11 @@ from array import *
 
 # you have to run this file from directory where it is saved
 
-import MNTriggerStudies.MNTriggerAna.ExampleProofReader 
+import CommonFSQFramework.Core.ExampleProofReader 
 
 import BaseTrigger
 
-class RateSimple(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
+class RateSimple(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader):
     def init(self):
         self.cnt = 0
 
@@ -31,7 +31,7 @@ class RateSimple(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofRe
         self.dist.Sumw2()
         self.GetOutputList().Add(self.dist)
 
-        puFile = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/PUhists.root").fullPath()
+        puFile = edm.FileInPath("CommonFSQFramework.Core/test/mnTrgAnalyzer/PUhists.root").fullPath()
         self.newlumiWeighters = {}
         '''
         self.newlumiWeighters["flat2050toPU40"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU40/pileup")

@@ -6,7 +6,7 @@ from ROOT import *
 
 import os,re,sys,math
 
-import MNTriggerStudies.MNTriggerAna.Util
+import CommonFSQFramework.Core.Util
 
 from array import array
 import resource
@@ -14,7 +14,7 @@ import time
 
 from optparse import OptionParser
 
-import MNTriggerStudies.MNTriggerAna.Style
+import CommonFSQFramework.Core.Style
 
 
 def main():
@@ -88,7 +88,7 @@ def main():
     #etaRanges = [2.801, 4.999]
     etaRanges = [3.139, 5.191]
     
-    sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
+    sampleList=CommonFSQFramework.Core.Util.getAnaDefinition("sam")
     print sampleList.keys()
 
     f = ROOT.TFile(infile, "r")
@@ -369,7 +369,7 @@ if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     AutoLibraryLoader.enable()
-    MNTriggerStudies.MNTriggerAna.Style.setStyle()
+    CommonFSQFramework.Core.Style.setStyle()
     main()
 
 

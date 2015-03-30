@@ -6,10 +6,10 @@ ROOT.gSystem.Load("libRooUnfold.so")
 
 import os,re,sys,math
 
-import MNTriggerStudies.MNTriggerAna.Util
-import MNTriggerStudies.MNTriggerAna.Style
+import CommonFSQFramework.Core.Util
+import CommonFSQFramework.Core.Style
 
-from MNTriggerStudies.MNTriggerAna.DrawPlots import DrawPlots
+from CommonFSQFramework.Core.DrawPlots import DrawPlots
 
 from array import array
 
@@ -39,7 +39,7 @@ class DrawMNPlots(DrawPlots):
         triggerToKey["jet15"] = "lumiJet15"
         triggerToKey["dj15fb"] = "lumiDiJet15FB"
 
-        sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
+        sampleList=CommonFSQFramework.Core.Util.getAnaDefinition("sam")
         #print "-----"
         lumi = 0.
         for s in samples:
@@ -62,7 +62,7 @@ class DrawMNPlots(DrawPlots):
                 - part before underscore should start with string "data" or "MC"
                 -- to distinguish different MC use descriptive names eg MCqcd or MCdymumu
         '''
-        sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
+        sampleList=CommonFSQFramework.Core.Util.getAnaDefinition("sam")
 
         trgSplt = histoName.split("_")
         if len(trgSplt) < 1:
@@ -89,7 +89,7 @@ class DrawMNPlots(DrawPlots):
         return True
 
     def setGlobalStyle(self):  # override
-        MNTriggerStudies.MNTriggerAna.Style.setTDRStyle()
+        CommonFSQFramework.Core.Style.setTDRStyle()
 
     @staticmethod
     def banner():
@@ -231,7 +231,7 @@ if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     ROOT.AutoLibraryLoader.enable()
-    MNTriggerStudies.MNTriggerAna.Style.setTDRStyle()
+    CommonFSQFramework.Core.Style.setTDRStyle()
     parser = OptionParser(usage="usage: %prog [options] filename",
                             version="%prog 1.0")
 

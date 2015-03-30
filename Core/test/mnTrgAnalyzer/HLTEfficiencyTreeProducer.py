@@ -14,11 +14,11 @@ from ROOT import edm, JetCorrectionUncertainty
 
 # you have to run this file from directory where it is saved
 
-import MNTriggerStudies.MNTriggerAna.ExampleProofReader
-from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
+import CommonFSQFramework.Core.ExampleProofReader
+from CommonFSQFramework.Core.JetGetter import JetGetter
 from array import *
 
-class HLTEfficiencyTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
+class HLTEfficiencyTreeProducer(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader):
     def init(self):
         self.jetGetter = JetGetter("PFAK4CHS")
         self.dr = ROOT.Math.VectorUtil.DeltaR
@@ -40,7 +40,7 @@ class HLTEfficiencyTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader
 
         # for the PU file run
         # utils/GetFlatPUDist.py
-        puFile = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/PUhists.root").fullPath()
+        puFile = edm.FileInPath("CommonFSQFramework.Core/test/mnTrgAnalyzer/PUhists.root").fullPath()
 
         self.newlumiWeighters = {}
         #'''

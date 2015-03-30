@@ -1,7 +1,7 @@
 #ifndef GenTrackView_h
 #define GenTrackView_h
 
-#include "MNTriggerStudies/MNTriggerAna/interface/EventViewBase.h"
+#include "CommonFSQFramework/Core/interface/EventViewBase.h"
 
 class GenTrackView: public EventViewBase{
     public:

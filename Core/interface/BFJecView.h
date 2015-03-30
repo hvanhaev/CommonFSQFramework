@@ -1,7 +1,7 @@
 #ifndef BFJecView_h
 #define BFJecView_h
 
-#include "MNTriggerStudies/MNTriggerAna/interface/EventViewBase.h"
+#include "CommonFSQFramework/Core/interface/EventViewBase.h"
 
 class BFJecView: public EventViewBase{
     public:

@@ -6,8 +6,8 @@ import ROOT
 
 sys.path.append('/Users/hans/Physics/CSA14/CommonFSQFramework')
 
-import MNTriggerStudies.MNTriggerAna.Util
-import MNTriggerStudies.MNTriggerAna.Style
+import CommonFSQFramework.Core.Util
+import CommonFSQFramework.Core.Style
 
 def setInput(inputfile):
     global GlobalIn
@@ -329,8 +329,8 @@ if __name__ == "__main__":
     #GlobalCMSPreLabel.SetTextFont(42)
     GlobalCMSPreLabel.AddText("CMS Preliminary")
     
-    GlobalSampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
-    GlobalStyle = MNTriggerStudies.MNTriggerAna.Style.setStyle()
+    GlobalSampleList=CommonFSQFramework.Core.Util.getAnaDefinition("sam")
+    GlobalStyle = CommonFSQFramework.Core.Style.setStyle()
     for s in GlobalSampleList:
         GlobalSampleDic[s] = s
     

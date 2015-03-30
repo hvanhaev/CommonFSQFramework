@@ -6,7 +6,7 @@ from ROOT import *
 
 import os,re,sys,math
 
-import MNTriggerStudies.MNTriggerAna.Util
+import CommonFSQFramework.Core.Util
 
 from array import array
 import resource
@@ -142,7 +142,7 @@ def main():
 
     etaRanges = [x/10. for x in xrange(0,51,5) ]
 
-    sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
+    sampleList=CommonFSQFramework.Core.Util.getAnaDefinition("sam")
 
     f = ROOT.TFile(infile, "r")
     lst = f.GetListOfKeys()

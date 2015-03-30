@@ -45,7 +45,7 @@ git cms-init
 git remote add tomasz git@github.com:fruboes/cmssw.git
 git fetch tomasz
 git config core.sparseCheckout true
-echo MNTriggerStudies/MNTriggerAna >> .git/info/sparse-checkout
+echo CommonFSQFramework.Core >> .git/info/sparse-checkout
 
 # Following command will create a new branch (here named MyMNTriggerStudiesBranch,
 # you can use other name) in your repo - basing on MNTriggerStudies from repository 
@@ -109,9 +109,9 @@ git merge tomasz/MNTriggerStudies_42BPort
 
 # A conflict between your changes and done by others may occur during merge:
 git merge tomasz/MNTriggerStudies
-  Auto-merging MNTriggerStudies/MNTriggerAna/doc/backportingTo42.txt
+  Auto-merging CommonFSQFramework.Core/doc/backportingTo42.txt
   CONFLICT (content): Merge conflict in
-  MNTriggerStudies/MNTriggerAna/doc/backportingTo42.txt
+  CommonFSQFramework.Core/doc/backportingTo42.txt
   Automatic merge failed; fix conflicts and then commit the result.
 
 

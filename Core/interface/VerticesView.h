@@ -1,7 +1,7 @@
 #ifndef VerticesView_h
 #define VerticesView_h
 
-#include "MNTriggerStudies/MNTriggerAna/interface/EventViewBase.h"
+#include "CommonFSQFramework/Core/interface/EventViewBase.h"
 
 class VerticesView: public EventViewBase{
     public:

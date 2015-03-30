@@ -50,8 +50,8 @@ ROOT.gROOT.SetBatch(True)
 
 from array import *
 
-from MNTriggerStudies.MNTriggerAna.GetDatasetInfo import getTreeFilesAndNormalizations
-import MNTriggerStudies.MNTriggerAna.Util
+from CommonFSQFramework.Core.GetDatasetInfo import getTreeFilesAndNormalizations
+import CommonFSQFramework.Core.Util
 
 
 # please note that python selector class name (here: ExampleProofReader) 
@@ -345,7 +345,7 @@ class ExampleProofReader( ROOT.TPySelector ):
 
         skipped = []
 
-        sampleListFullInfo = MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
+        sampleListFullInfo = CommonFSQFramework.Core.Util.getAnaDefinition("sam")
         sampleCnt = 0
         for t in todo:
             sampleCnt += 1

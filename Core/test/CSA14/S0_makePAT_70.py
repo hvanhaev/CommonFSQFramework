@@ -112,10 +112,10 @@ process.source.fileNames = [
 ]
 
 
-import MNTriggerStudies.MNTriggerAna.customizePAT
-process = MNTriggerStudies.MNTriggerAna.customizePAT.customize(process)
+import CommonFSQFramework.Core.customizePAT
+process = CommonFSQFramework.Core.customizePAT.customize(process)
 process.exampleTree = cms.EDAnalyzer("ExampleTreeProducer")
-process = MNTriggerStudies.MNTriggerAna.customizePAT.addTreeProducer(process, process.exampleTree)
+process = CommonFSQFramework.Core.customizePAT.addTreeProducer(process, process.exampleTree)
 process.tracksTree = cms.EDAnalyzer("TracksTreeProducer",
     EventData = cms.PSet(),
     GenTrackView = cms.PSet(
@@ -145,8 +145,8 @@ process.tracksTree = cms.EDAnalyzer("TracksTreeProducer",
 )
 
 
-process = MNTriggerStudies.MNTriggerAna.customizePAT.addTreeProducer(process, process.tracksTree)
-process = MNTriggerStudies.MNTriggerAna.customizePAT.removeEdmOutput(process)
+process = CommonFSQFramework.Core.customizePAT.addTreeProducer(process, process.tracksTree)
+process = CommonFSQFramework.Core.customizePAT.removeEdmOutput(process)
 
 #process.pexampleTree = cms.Path(process.exampleTree)
 #process.schedule.insert(-1, process.pexampleTree)

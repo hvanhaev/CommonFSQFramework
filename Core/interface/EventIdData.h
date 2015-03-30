@@ -1,7 +1,7 @@
 #ifndef EventIdData_h
 #define EventIdData_h
 
-#include "MNTriggerStudies/MNTriggerAna/interface/EventViewBase.h"
+#include "CommonFSQFramework/Core/interface/EventViewBase.h"
 
 class EventIdData: public EventViewBase{
    public:

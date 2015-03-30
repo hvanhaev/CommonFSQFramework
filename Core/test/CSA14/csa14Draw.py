@@ -5,10 +5,10 @@ ROOT.gROOT.SetBatch(True)
 
 import os,re,sys,math
 
-import MNTriggerStudies.MNTriggerAna.Util
-import MNTriggerStudies.MNTriggerAna.Style
+import CommonFSQFramework.Core.Util
+import CommonFSQFramework.Core.Style
 
-from MNTriggerStudies.MNTriggerAna.DrawPlots import DrawPlots
+from CommonFSQFramework.Core.DrawPlots import DrawPlots
 
 from array import array
 
@@ -47,7 +47,7 @@ class DrawCSA14Plots(DrawPlots):
         triggerToKey["minbias"] = "lumiMinBias"
         #triggerToKey["zerobias"] = "lumiMinBias"
 
-        sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
+        sampleList=CommonFSQFramework.Core.Util.getAnaDefinition("sam")
         #print "-----"
         lumi = 0.
         for s in samples:
@@ -70,7 +70,7 @@ class DrawCSA14Plots(DrawPlots):
                 - part before underscore should start with string "data" or "MC"
                 -- to distinguish different MC use descriptive names eg MCqcd or MCdymumu
         '''
-        sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
+        sampleList=CommonFSQFramework.Core.Util.getAnaDefinition("sam")
 
         trgSplt = histoName.split("_")
         if len(trgSplt) < 1:
@@ -91,7 +91,7 @@ class DrawCSA14Plots(DrawPlots):
         return True
 
     def setGlobalStyle(self):  # override
-        MNTriggerStudies.MNTriggerAna.Style.setStyle()
+        CommonFSQFramework.Core.Style.setStyle()
 
 
     def decorate(self, canvas, dataHisto, MCStack, errBand): # override

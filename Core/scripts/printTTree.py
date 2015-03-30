@@ -7,8 +7,8 @@ ROOT.gROOT.SetBatch(True)
 import os,re
 from optparse import OptionParser
 
-from MNTriggerStudies.MNTriggerAna.GetDatasetInfo import getTreeFilesAndNormalizations
-from MNTriggerStudies.MNTriggerAna.Util import getAnaDefinition
+from CommonFSQFramework.Core.GetDatasetInfo import getTreeFilesAndNormalizations
+from CommonFSQFramework.Core.Util import getAnaDefinition
 
 
 def main():

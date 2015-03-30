@@ -7,8 +7,8 @@ ROOT.gROOT.SetBatch(True)
 import os,re, subprocess
 from optparse import OptionParser
 
-from MNTriggerStudies.MNTriggerAna.GetDatasetInfo import getTreeFilesAndNormalizations, validateRootFiles
-from MNTriggerStudies.MNTriggerAna.Util import getAnaDefinition
+from CommonFSQFramework.Core.GetDatasetInfo import getTreeFilesAndNormalizations, validateRootFiles
+from CommonFSQFramework.Core.Util import getAnaDefinition
 
 # note: this script is likely to fail on slc5
 

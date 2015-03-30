@@ -1,4 +1,4 @@
-#include "MNTriggerStudies/MNTriggerAna/interface/JetsJEC.h"
+#include "CommonFSQFramework/Core/interface/JetsJEC.h"
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"

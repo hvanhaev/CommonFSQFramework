@@ -1,4 +1,4 @@
-#include "MNTriggerStudies/MNTriggerAna/interface/GenericCandidateViewP4.h"
+#include "CommonFSQFramework/Core/interface/GenericCandidateViewP4.h"
 #include "DataFormats/L1Trigger/interface/L1JetParticle.h"
 
 GenericCandidateViewP4::GenericCandidateViewP4(const edm::ParameterSet& iConfig, TTree * tree):

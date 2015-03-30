@@ -1,7 +1,7 @@
-#include "MNTriggerStudies/MNTriggerAna/interface/RecoTrackView.h"
+#include "CommonFSQFramework/Core/interface/RecoTrackView.h"
 #include <DataFormats/TrackReco/interface/Track.h>
 #include <DataFormats/VertexReco/interface/Vertex.h>
-#include "MNTriggerStudies/MNTriggerAna/interface/TestTrackData.h"
+#include "CommonFSQFramework/Core/interface/TestTrackData.h"
 
 
 

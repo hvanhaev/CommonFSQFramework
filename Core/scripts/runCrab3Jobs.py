@@ -12,11 +12,11 @@ from ROOT import *
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 AutoLibraryLoader.enable()
 
-import MNTriggerStudies.MNTriggerAna.Util
+import CommonFSQFramework.Core.Util
 
-sampleList=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("sam")
-anaVersion=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("anaVersion")
-blacklist=MNTriggerStudies.MNTriggerAna.Util.getAnaDefinition("cbSmartBlackList")
+sampleList=CommonFSQFramework.Core.Util.getAnaDefinition("sam")
+anaVersion=CommonFSQFramework.Core.Util.getAnaDefinition("anaVersion")
+blacklist=CommonFSQFramework.Core.Util.getAnaDefinition("cbSmartBlackList")
 
 def dumpEnvVariable(var):
     ret = "# "+var+"="

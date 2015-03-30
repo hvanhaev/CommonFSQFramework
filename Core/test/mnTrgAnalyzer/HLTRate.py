@@ -15,17 +15,17 @@ from array import *
 
 # you have to run this file from directory where it is saved
 
-import MNTriggerStudies.MNTriggerAna.ExampleProofReader 
+import CommonFSQFramework.Core.ExampleProofReader 
 
 import BaseTrigger
 
-class HLTRate(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
+class HLTRate(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader):
     def init(self):
         self.avgW = 0.
         self.cnt = 0
 
         self.normFactor = self.getNormalizationFactor()
-        puFile = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/mnTrgAnalyzer/PUhists.root").fullPath()
+        puFile = edm.FileInPath("CommonFSQFramework.Core/test/mnTrgAnalyzer/PUhists.root").fullPath()
         self.newlumiWeighters = {}
         self.newlumiWeighters["flat2050toPU10"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU10/pileup")
         #self.newlumiWeighters["flat2050toPU15"] = edm.LumiReWeighting(puFile, puFile, "Flat20to50/pileup", "PU15/pileup")

@@ -15,9 +15,9 @@ from array import *
 # should be consistent with this file name (BalanceTreeProducer.py)
 
 # you have to run this file from directory where it is saved
-import MNTriggerStudies.MNTriggerAna.ExampleProofReader 
-from MNTriggerStudies.MNTriggerAna.JetGetter import JetGetter
-from  MNTriggerStudies.MNTriggerAna.BetterJetGetter import BetterJetGetter
+import CommonFSQFramework.Core.ExampleProofReader 
+from CommonFSQFramework.Core.JetGetter import JetGetter
+from  CommonFSQFramework.Core.BetterJetGetter import BetterJetGetter
 
 
 from HLTMCWeighter import HLTMCWeighter
@@ -47,7 +47,7 @@ class GenJetProxy():
 
 
 
-class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
+class BalanceTreeProducer(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader):
     def init(self):
         #self.pr = cProfile.Profile()
 
@@ -113,14 +113,14 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
         for v in self.var:
             self.tree.Branch(v, self.var[v], v+"/D")
         
-        jet15FileV2 = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/PUJet15V2.root").fullPath()   # MC gen distribution
+        jet15FileV2 = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/PUJet15V2.root").fullPath()   # MC gen distribution
         puFiles = {}
-        puFiles["dj15_1"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_dj15_1_0.root").fullPath()
-        puFiles["dj15_1_05"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_dj15_1_05.root").fullPath()
-        puFiles["dj15_0_95"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_dj15_0_95.root").fullPath()
-        puFiles["j15_1"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_j15_1_0.root").fullPath()
-        puFiles["j15_1_05"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_j15_1_05.root").fullPath()
-        puFiles["j15_0_95"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_j15_0_95.root").fullPath()
+        puFiles["dj15_1"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_dj15_1_0.root").fullPath()
+        puFiles["dj15_1_05"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_dj15_1_05.root").fullPath()
+        puFiles["dj15_0_95"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_dj15_0_95.root").fullPath()
+        puFiles["j15_1"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_j15_1_0.root").fullPath()
+        puFiles["j15_1_05"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_j15_1_05.root").fullPath()
+        puFiles["j15_0_95"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_j15_0_95.root").fullPath()
 
         self.lumiWeighters = {}
         self.lumiWeighters["_jet15_central"] = edm.LumiReWeighting(jet15FileV2, puFiles["j15_1"], "MC", "pileup")
@@ -324,7 +324,7 @@ class BalanceTreeProducer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.Examp
     def finalize(self):
         print "Finalize:"
         if hasattr(self, "pr"):
-            dname = "/nfs/dust/cms/user/fruboest/2014.11.MN2010/CMSSW_4_2_8_lowpupatch1/src/MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"
+            dname = "/nfs/dust/cms/user/fruboest/2014.11.MN2010/CMSSW_4_2_8_lowpupatch1/src/CommonFSQFramework.Core/test/MNxsectionAna/"
             profName = dname + "stats"
             self.pr.dump_stats(profName)
 

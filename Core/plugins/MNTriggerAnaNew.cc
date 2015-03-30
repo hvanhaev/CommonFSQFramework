@@ -3,7 +3,7 @@
 // Package:    MNTriggerAnaNew
 // Class:      MNTriggerAnaNew
 // 
-/**\class MNTriggerAnaNew MNTriggerAnaNew.cc MNTriggerStudies/MNTriggerAnaNew/plugins/MNTriggerAnaNew.cc
+/**\class MNTriggerAnaNew MNTriggerAnaNew.cc CommonFSQFramework/CoreNew/plugins/MNTriggerAnaNew.cc
 
  Description: [one line class summary]
 
@@ -39,13 +39,13 @@
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include <DataFormats/PatCandidates/interface/TriggerEvent.h>
 
-#include "MNTriggerStudies/MNTriggerAna/interface/EventIdData.h"
-#include "MNTriggerStudies/MNTriggerAna/interface/JetView.h"
-#include "MNTriggerStudies/MNTriggerAna/interface/JetsJEC.h"
+#include "CommonFSQFramework/Core/interface/EventIdData.h"
+#include "CommonFSQFramework/Core/interface/JetView.h"
+#include "CommonFSQFramework/Core/interface/JetsJEC.h"
 
-#include "MNTriggerStudies/MNTriggerAna/interface/L1JetsView.h"
-#include "MNTriggerStudies/MNTriggerAna/interface/GenericCandidateViewP4.h"
-#include "MNTriggerStudies/MNTriggerAna/interface/TriggerResultsView.h"
+#include "CommonFSQFramework/Core/interface/L1JetsView.h"
+#include "CommonFSQFramework/Core/interface/GenericCandidateViewP4.h"
+#include "CommonFSQFramework/Core/interface/TriggerResultsView.h"
 //
 // class declaration
 //

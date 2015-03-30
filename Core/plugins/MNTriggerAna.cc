@@ -3,7 +3,7 @@
 // Package:    MNTriggerAna
 // Class:      MNTriggerAna
 // 
-/**\class MNTriggerAna MNTriggerAna.cc MNTriggerStudies/MNTriggerAna/plugins/MNTriggerAna.cc
+/**\class MNTriggerAna MNTriggerAna.cc CommonFSQFramework/Core/plugins/MNTriggerAna.cc
 
  Description: [one line class summary]
 

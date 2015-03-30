@@ -111,14 +111,14 @@ process.maxEvents.input = 100
 #   process.options.wantSummary = False   ##  (to suppress the long output at the end of the job)
 
 
-import MNTriggerStudies.MNTriggerAna.customizePAT
-process = MNTriggerStudies.MNTriggerAna.customizePAT.customize(process)
+import CommonFSQFramework.Core.customizePAT
+process = CommonFSQFramework.Core.customizePAT.customize(process)
 
 process.MNTriggerAnaHLTJECOnFly = cms.EDAnalyzer("MNTriggerAnaHLTJECOnFly")
-process = MNTriggerStudies.MNTriggerAna.customizePAT.addTreeProducer(process, process.MNTriggerAnaHLTJECOnFly)
+process = CommonFSQFramework.Core.customizePAT.addTreeProducer(process, process.MNTriggerAnaHLTJECOnFly)
 
 
-process = MNTriggerStudies.MNTriggerAna.customizePAT.removeEdmOutput(process)
+process = CommonFSQFramework.Core.customizePAT.removeEdmOutput(process)
 process.GlobalTag.globaltag = "PHYS14_25_V2::All"
 
 primary = "file:/nfs/dust/cms/user/fruboest/2015.01.ProduceAndTestJECFromFeng/CMSSW_7_3_0/src/outputA.root"

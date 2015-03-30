@@ -21,7 +21,7 @@ def getCrabVersion():
 def getVariant():
     if  "SmallXAnaVersion" not in  os.environ:
         m = " Cannot get ana variant from env. Set SmallXAnaVersion "
-        m += "to desired value (e.g. by sourcing one of files from MNTriggerStudies/MNTriggerAna/env/ directory) "
+        m += "to desired value (e.g. by sourcing one of files from CommonFSQFramework.Core/env/ directory) "
         raise Exception(m)
 
     variant = os.environ["SmallXAnaVersion"]

@@ -1,4 +1,4 @@
-#include "MNTriggerStudies/MNTriggerAna/interface/GenTrackView.h"
+#include "CommonFSQFramework/Core/interface/GenTrackView.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
 GenTrackView::GenTrackView(const edm::ParameterSet& iConfig, TTree * tree):

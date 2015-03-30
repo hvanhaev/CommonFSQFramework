@@ -5,10 +5,10 @@ ROOT.gROOT.SetBatch(True)
 from ROOT import *
 
 import os,re,sys,math
-import MNTriggerStudies.MNTriggerAna.Style
+import CommonFSQFramework.Core.Style
 
 def main():
-    MNTriggerStudies.MNTriggerAna.Style.setStyle()
+    CommonFSQFramework.Core.Style.setStyle()
 
     infile = "HLTRatePlots.root"
     f = ROOT.TFile(infile, "r")

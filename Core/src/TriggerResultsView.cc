@@ -1,4 +1,4 @@
-#include "MNTriggerStudies/MNTriggerAna/interface/TriggerResultsView.h"
+#include "CommonFSQFramework/Core/interface/TriggerResultsView.h"
 #include "FWCore/Common/interface/TriggerResultsByName.h"
 
 TriggerResultsView::TriggerResultsView(const edm::ParameterSet& iConfig, TTree * tree):

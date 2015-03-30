@@ -19,8 +19,8 @@ import cProfile
 
 # you have to run this file from directory where it is saved
 
-import MNTriggerStudies.MNTriggerAna.ExampleProofReader
-from  MNTriggerStudies.MNTriggerAna.BetterJetGetter import BetterJetGetter
+import CommonFSQFramework.Core.ExampleProofReader
+from  CommonFSQFramework.Core.BetterJetGetter import BetterJetGetter
 
 from optparse import OptionParser
 
@@ -28,7 +28,7 @@ from HLTMCWeighter import HLTMCWeighter
 #import DiJetBalancePlugin
 
 import math
-class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
+class MNxsAnalyzer(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader):
     def init( self):
         if not self.isData:
             #self.hltMCWeighter = HLTMCWeighter("HLT_Jet15U")
@@ -113,14 +113,14 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
                 self.addToOutput(self.hist[h])
 
         if self.applyPtHatReweighing and not self.isData:
-                fp = "MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"
+                fp = "CommonFSQFramework.Core/test/MNxsectionAna/"
                 todo = ["ptHatWeighters.root"]
                 #todo = ["ptHatWeighters_invx_pass1.root_invX", 
                 #        "ptHatWeighters_invx_pass2.root_invX",
                 #        "ptHatWeighters_invx_pass3.root_invX",]
                 self.ptHatW = []
                 for t in todo:
-                    ptHatFileName = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/"+t).fullPath()
+                    ptHatFileName = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/"+t).fullPath()
                     ptHatFile = ROOT.TFile(ptHatFileName)
                     self.ptHatW.append(ptHatFile.Get(self.datasetName+"/ptHatW"))
                     #print "PTHat weighter set to", self.datasetName+"/ptHatW"
@@ -130,15 +130,15 @@ class MNxsAnalyzer(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProof
 
 
         puFiles = {}
-        # MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/
-        jet15FileV2 = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/PUJet15V2.root").fullPath()   # MC gen distribution
+        # CommonFSQFramework.Core/test/MNxsectionAna/
+        jet15FileV2 = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/PUJet15V2.root").fullPath()   # MC gen distribution
 
-        puFiles["dj15_1"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_dj15_1_0.root").fullPath()
-        puFiles["dj15_1_05"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_dj15_1_05.root").fullPath()
-        puFiles["dj15_0_95"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_dj15_0_95.root").fullPath()
-        puFiles["j15_1"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_j15_1_0.root").fullPath()
-        puFiles["j15_1_05"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_j15_1_05.root").fullPath()
-        puFiles["j15_0_95"] = edm.FileInPath("MNTriggerStudies/MNTriggerAna/test/MNxsectionAna/data/pu_j15_0_95.root").fullPath()
+        puFiles["dj15_1"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_dj15_1_0.root").fullPath()
+        puFiles["dj15_1_05"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_dj15_1_05.root").fullPath()
+        puFiles["dj15_0_95"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_dj15_0_95.root").fullPath()
+        puFiles["j15_1"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_j15_1_0.root").fullPath()
+        puFiles["j15_1_05"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_j15_1_05.root").fullPath()
+        puFiles["j15_0_95"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_j15_0_95.root").fullPath()
 
         self.lumiWeighters = {}
         self.lumiWeighters["_jet15_central"] = edm.LumiReWeighting(jet15FileV2, puFiles["j15_1"], "MC", "pileup")

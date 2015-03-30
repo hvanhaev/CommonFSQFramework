@@ -9,8 +9,8 @@ skimEfficiencyMethod="getSkimEff"
 MyVariablesAllEvents="DiJetAnalysis.DiJetAna.ana.BaseVariables"
 '''
 
-#dsFile="MNTriggerStudies/MNTriggerAna/python/samples/ds_csa14.txt"
-dsFile="MNTriggerStudies/MNTriggerAna/python/samples/ds_csa14_lowpu.txt"
+#dsFile="CommonFSQFramework.Core/python/samples/ds_csa14.txt"
+dsFile="CommonFSQFramework.Core/python/samples/ds_csa14_lowpu.txt"
 
 # define the util decorator. Functions marked with this wont turn into ds attribute
 def util(func):
