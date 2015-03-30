@@ -180,7 +180,7 @@ def unfold(action, infileName):
     # centralResponsesFromPythia =  filter(lambda x: x.startswith("response_"), histos["QCD_Pt-15to1000_XXX_pythiap"].keys())
     # rename central to pythia, add to responsesVariations
 
-def compareMCGentoMCUnfolded(action):
+def compareMCGentoMCUnfolded(action, infileName):
     if action == "herwigOnPythia" or action == "pythiaOnPythia":
         unfoldingWasDoneOn = "QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"
     elif action == "pythiaOnHerwig" or action == "herwigOnHerwig":
@@ -195,7 +195,7 @@ def compareMCGentoMCUnfolded(action):
 
 
     #mnxsHistos_unfolded_pythiaOnHerwig.root
-    histos = getHistos("plotsMNxs.root")
+    histos = getHistos(infileName)
     #print histos[unfoldingWasDoneOn].keys()
     todo = ["_jet15", "_dj15fb"]
     #todo = ["_jet15"]
@@ -247,7 +247,7 @@ def main():
     #possibleActions = ["pythiaOnPythia",  "herwigOnPythia", "pythiaOnHerwig", "herwigOnHerwig"]
     for action in possibleActions:
         unfold(action, infileName)
-        compareMCGentoMCUnfolded(action)
+        compareMCGentoMCUnfolded(action, infileName)
 
 if __name__ == "__main__":
     main()

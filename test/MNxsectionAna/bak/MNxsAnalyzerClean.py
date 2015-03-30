@@ -105,6 +105,7 @@ class MNWindow(BaseDijetAna, EtaBinning):
     def filterCol(self, l):
         if len(l) < 2: return []
         window = [j for j in l if j.pt()  < 55]
+        if len(window) < 2: return []
         return [min(window, key=lambda j: j.eta()), max(window, key=lambda j: j.eta())]
 
 # TODO (?) - filter mid eta jets
@@ -557,7 +558,7 @@ if __name__ == "__main__":
     # debug config:
     #'''
     sampleList = []
-    sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
+    #sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
     sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
     #'''
     sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
@@ -567,7 +568,7 @@ if __name__ == "__main__":
     # '''
     # '''
     #maxFilesMC = 48
-    #maxFilesMC = 4
+    #maxFilesMC = 1
     #maxFilesData = 1
     nWorkers = 10
     #maxFilesMC = 16

@@ -59,6 +59,7 @@ def main():
         sys.exit()
 
     indir = "~/tmp/unfolded_{}/".format(options.variant)
+    histofile = "plotsMNxs_{}.root".format(options.variant)
 
 
     lumiUncertainty = 0.04
@@ -154,7 +155,7 @@ def main():
 
 
     # get GEN level distributions
-    histosFromPyAnalyzer = getHistos("plotsMNxs.root")
+    histosFromPyAnalyzer = getHistos(histofile)
     herwigDir = "QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp"
     pythiaDir =  "QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"
     genHistoHerwig = histosFromPyAnalyzer[herwigDir]["detaGen_central_jet15"].Clone()
@@ -263,10 +264,12 @@ def main():
 
 
     c.Print(indir+"/mergedUnfolded_{}.png".format(options.normalization))
+    c.Print(indir+"/mergedUnfolded_{}.pdf".format(options.normalization))
     c.Print(indir+"/mergedUnfolded_{}.root".format(options.normalization))
     c.cd(1)
     ROOT.gPad.SetLogy()
     c.Print(indir+"/mergedUnfolded_{}_log.png".format(options.normalization))
+    c.Print(indir+"/mergedUnfolded_{}_log.pdf".format(options.normalization))
 
 
 

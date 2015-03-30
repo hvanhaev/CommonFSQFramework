@@ -11,9 +11,9 @@ todoCat = ["InclusiveBasic", "InclusiveAsym", "InclusiveWindow", "MNBasic", "MNA
 #todoCat = ["InclusiveBasic"]
 todoSteps = []
 #todoSteps.append("proof")
-todoSteps.append("hadd")
-todoSteps.append("draw")
-todoSteps.append("unfold")
+#todoSteps.append("hadd")
+#todoSteps.append("draw")
+#todoSteps.append("unfold")
 todoSteps.append("merge")
 
 for cat in todoCat:
