@@ -227,11 +227,11 @@ class MNxsAnalyzerClean(CommonFSQFramework.Core.ExampleProofReader.ExampleProofR
                 self.addToOutput(self.hist[h])
 
         if self.applyPtHatReweighing and not self.isData:
-                fp = "CommonFSQFramework.Core/test/MNxsectionAna/"
+                fp = "CommonFSQFramework/Core/test/MNxsectionAna/"
                 todo = ["ptHatWeighters.root"]
                 self.ptHatW = []
                 for t in todo:
-                    ptHatFileName = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/"+t).fullPath()
+                    ptHatFileName = edm.FileInPath("CommonFSQFramework/Core/test/MNxsectionAna/"+t).fullPath()
                     ptHatFile = ROOT.TFile(ptHatFileName)
                     self.ptHatW.append(ptHatFile.Get(self.datasetName+"/ptHatW"))
 
@@ -240,14 +240,14 @@ class MNxsAnalyzerClean(CommonFSQFramework.Core.ExampleProofReader.ExampleProofR
 
         puFiles = {}
         # CommonFSQFramework.Core/test/MNxsectionAna/
-        jet15FileV2 = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/PUJet15V2.root").fullPath()   # MC gen distribution
+        jet15FileV2 = edm.FileInPath("CommonFSQFramework/Core/test/MNxsectionAna/data/PUJet15V2.root").fullPath()   # MC gen distribution
 
-        puFiles["dj15_1"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_dj15_1_0.root").fullPath()
-        puFiles["dj15_1_05"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_dj15_1_05.root").fullPath()
-        puFiles["dj15_0_95"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_dj15_0_95.root").fullPath()
-        puFiles["j15_1"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_j15_1_0.root").fullPath()
-        puFiles["j15_1_05"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_j15_1_05.root").fullPath()
-        puFiles["j15_0_95"] = edm.FileInPath("CommonFSQFramework.Core/test/MNxsectionAna/data/pu_j15_0_95.root").fullPath()
+        puFiles["dj15_1"] = edm.FileInPath("CommonFSQFramework/Core/test/MNxsectionAna/data/pu_dj15_1_0.root").fullPath()
+        puFiles["dj15_1_05"] = edm.FileInPath("CommonFSQFramework/Core/test/MNxsectionAna/data/pu_dj15_1_05.root").fullPath()
+        puFiles["dj15_0_95"] = edm.FileInPath("CommonFSQFramework/Core/test/MNxsectionAna/data/pu_dj15_0_95.root").fullPath()
+        puFiles["j15_1"] = edm.FileInPath("CommonFSQFramework/Core/test/MNxsectionAna/data/pu_j15_1_0.root").fullPath()
+        puFiles["j15_1_05"] = edm.FileInPath("CommonFSQFramework/Core/test/MNxsectionAna/data/pu_j15_1_05.root").fullPath()
+        puFiles["j15_0_95"] = edm.FileInPath("CommonFSQFramework/Core/test/MNxsectionAna/data/pu_j15_0_95.root").fullPath()
 
         self.lumiWeighters = {}
         self.lumiWeighters["_jet15_central"] = edm.LumiReWeighting(jet15FileV2, puFiles["j15_1"], "MC", "pileup")
@@ -534,7 +534,7 @@ class MNxsAnalyzerClean(CommonFSQFramework.Core.ExampleProofReader.ExampleProofR
     def finalize(self):
         print "Finalize:"
         if hasattr(self, "pr"):
-            dname = "/nfs/dust/cms/user/fruboest/2015.01.MN/slc6/CMSSW_7_0_5/src/CommonFSQFramework.Core/test/MNxsectionAna/bak/"
+            dname = "/nfs/dust/cms/user/fruboest/2015.01.MN/slc6/CMSSW_7_0_5/src/CommonFSQFramework/Core/test/MNxsectionAna/bak/"
             profName = dname + "stats"
             self.pr.dump_stats(profName)
 
@@ -558,7 +558,7 @@ if __name__ == "__main__":
     # debug config:
     #'''
     sampleList = []
-    #sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
+    sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
     sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
     #'''
     sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
@@ -568,8 +568,8 @@ if __name__ == "__main__":
     # '''
     # '''
     #maxFilesMC = 48
-    #maxFilesMC = 1
-    #maxFilesData = 1
+    maxFilesMC = 1
+    maxFilesData = 1
     nWorkers = 10
     #maxFilesMC = 16
     #nWorkers = 12
@@ -631,6 +631,7 @@ if __name__ == "__main__":
                                useProofOFile = True,
                                outFile = ofile )
 
+    # export SmallXAnaVersion=CommonFSQFramework.Core.samples.Samples_DiJet_20140122_MN2010
     print "TODO: fakes prob vs eta"
     print "TODO: larger statistics for herwig"
     print "TODO: better binning for det level plots"
