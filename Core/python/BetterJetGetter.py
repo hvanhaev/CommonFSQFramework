@@ -50,8 +50,9 @@ class BetterJetGetter(BaseGetter.BaseGetter):
         #self.knownVariations = set(["_central"])
         self.knownVariations = set(["_central", "_jecDown", "_jecUp", "_jerDown", "_jerUp"])
         self.srcBranch = branchPrefix+"pt"
-        self.dphiHelper = ROOT.Math.VectorUtil.DeltaPhi
-        self.drHelper = ROOT.Math.VectorUtil.DeltaR
+        # TODO: fixme!
+        #self.dphiHelper = ROOT.Math.VectorUtil.DeltaPhi
+        #self.drHelper = ROOT.Math.VectorUtil.DeltaR
 
     def getSize(self):
         return getattr(self.chain, self.srcBranch).size()
