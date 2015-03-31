@@ -12,6 +12,10 @@ from ROOT import edm
 
 from array import *
 
+# EX 8.0
+from  CommonFSQFramework.Core.BetterJetGetter import BetterJetGetter
+
+
 class SingleJet(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader):
     def init( self):
         self.hist = {}
@@ -20,9 +24,16 @@ class SingleJet(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader):
         # EX3
         self.hist["numVtx"] =  ROOT.TH1F("numVtx",   "numVtx",  5, -0.5, 4.5)
         self.hist["jetPT"] =  ROOT.TH1F("jetPT",   "jetPT",  100, 0, 100)
+
+        # EX9 
+        self.hist["jetBelowEta3PT"] =  ROOT.TH1F("jetBelowEta3PT", "jetBelowEta3PT",  100, 0, 100)
+        self.hist["jetBelowEta3Eta"] =  ROOT.TH1F("jetBelowEta3Eta",   "jetBelowEta3Eta" ,  100, -5, 5)
         for h in self.hist:
             self.hist[h].Sumw2()
             self.GetOutputList().Add(self.hist[h])
+
+        # EX 8.0
+        self.jetGetter = BetterJetGetter("PFAK5") 
 
     def analyze(self):
         # ex 4.5
@@ -54,7 +65,21 @@ class SingleJet(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader):
             if pt < 35: continue
             self.hist["jetPT"].Fill(pt, weight)
 
-    
+        # EX 8.0
+        self.jetGetter.newEvent(self.fChain)
+        #print "New event!"
+        for j in self.jetGetter.get("_central"):
+             if j.pt()<35.: continue
+             #print "A jet: ", j.pt(), j.eta()
+
+
+        # EX 9.0
+        for j in self.jetGetter.get("_central"):
+             if j.pt()<35.: continue
+             if abs(j.eta())>3.: continue
+             self.hist["jetBelowEta3Eta"].Fill(j.eta(), weight)
+             self.hist["jetBelowEta3PT"].Fill(j.pt(), weight)
+
 
         return 1
 
@@ -80,7 +105,7 @@ if __name__ == "__main__":
     #sampleList = []
     #sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
     maxFilesMC = 1
-    #maxFilesData = 1
+    maxFilesData = 1
     nWorkers = 4
 
 
