@@ -7,18 +7,22 @@ import fnmatch
 
 #todoSteps = ["proof", "hadd", "draw", "unfold", "merge"]
 #todoCat = ["InclusiveBasic", "InclusiveAsym", "InclusiveWindow", "MNBasic", "MNAsym", "MNWindow"]
-todoCat = ["InclusiveBasic", "InclusiveAsym", "InclusiveWindow", "MNBasic", "MNAsym", "MNWindow"]
+#todoCat = ["InclusiveBasic", "InclusiveAsym", "InclusiveWindow", "MNBasic", "MNAsym", "MNWindow"]
+todoCat = ["FWD11_002"]
 #todoCat = ["InclusiveBasic"]
 todoSteps = []
-#todoSteps.append("proof")
-#todoSteps.append("hadd")
+todoSteps.append("proof")
+todoSteps.append("hadd")
 #todoSteps.append("draw")
 #todoSteps.append("unfold")
-todoSteps.append("merge")
+#todoSteps.append("merge")
 
 for cat in todoCat:
     for step in todoSteps:
-        if step == "draw":
+        if step == "proof":
+            os.system("./MNxsAnalyzerClean.py -v {}".format(cat))
+
+        elif step == "draw":
             command="../mnDraw.py -i plotsMNxs_XXS.root -o ~/tmp/MNXS_XXS_detectorLevel_XXM/ -v XXM"
             os.system(command.replace("XXS", cat).replace("XXM", "herwig"))
             os.system(command.replace("XXS", cat).replace("XXM", "pythia"))
