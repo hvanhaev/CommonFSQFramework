@@ -227,10 +227,11 @@ def unfold(action, infileName):
             #todo = ["truth"]
             global ntoys
             if variation == "central":
+                badToys = 0
                 for t in todo:
                     #   TProfile(const char* name, const char* title, Int_t nbinsx, const Double_t* xbins, Option_t* option = "")
                     bins = hReco.GetXaxis().GetXbins()
-                    profile =  TProfile("prof_"+rawName, "", bins.GetSize()-1, bins.GetArray())
+                    profile =  TProfile("prof_{}_{}".format(rawName, t), "", bins.GetSize()-1, bins.GetArray())
                     for i in xrange(0, ntoys):
                         clonedResponse = histos[baseMC][r].Clone()
                         if t == "truth":
@@ -239,14 +240,25 @@ def unfold(action, infileName):
                             vary(clonedResponse.Hfakes())
                         elif t == "response":
                             vary(clonedResponse.Hresponse())
+                            # TODO: wiezy!!
+
                         else:
                             raise Exception("dont know what to do")
 
                         hRecoVaried = doUnfold(histo.Clone(), clonedResponse)
                         #print "TTT", hReco.Integral(), hRecoVaried.Integral()
+                        binv1 =  hRecoVaried.GetBinContent(1)
+                        if math.isnan(binv1) or math.isinf(binv1): 
+                            badToys += 1
+                            continue
+
                         for ix in xrange(0, hRecoVaried.GetNbinsX()+2):
                             binCenter = hRecoVaried.GetBinCenter(ix)
                             val = hRecoVaried.GetBinContent(ix)
+                            if math.isnan(val) or math.isinf(val): 
+                                print "TOYmc Error: nan/inf value found"
+                                continue
+                            # what to do??
                             profile.Fill(binCenter, val)
 
                     #print "Var: ", variation
@@ -267,7 +279,7 @@ def unfold(action, infileName):
                         hDown.SetBinContent(i, val1-errProf)
                     odirROOTfile.WriteTObject(hUp, rawNameUp)
                     odirROOTfile.WriteTObject(hDown, rawNameDown)
-
+                    print "TOYmc done for", r, " bad toys:", badToys
 
                     #ccc = hReco.Clone()
                     #varied = vary(ccc)
