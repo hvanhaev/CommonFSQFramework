@@ -225,7 +225,12 @@ def main():
     parser.add_option("-d", "--deleteBadFiles", action="store_true",  dest="remove")
     parser.add_option("-r", "--rootCheck", action="store_true",  dest="checkFilesWithRoot")
     parser.add_option("-s", "--srmls", action="store_true",  dest="usesrmls")
+    parser.add_option("-m", "--maxFilesMC", action="store",  type="int", dest="maxFilesMC")
     (options, args) = parser.parse_args()
+
+    maxFilesMC = -1
+    if options.maxFilesMC:
+        maxFilesMC = options.maxFilesMC
 
 
     if options.check:
@@ -296,6 +301,8 @@ def main():
             if not doCopy: continue
             cnt += 1
             targetFile = targetDir + "/" + fname
+            if not sampleList[s]["isData"] and maxFilesMC >= 0 and cnt >= maxFilesMC:
+                continue
 
 
             cpCommand = ['lcg-cp', srcFile, targetFile]
