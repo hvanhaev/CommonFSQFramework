@@ -22,6 +22,33 @@ from mnDraw import DrawMNPlots
 alaGri = False
 odir = ""
 
+def doUnfold(measured, rooresponse):
+    if alaGri:
+        # histos[baseMC][r] - response object
+        # histo - detector level distribution
+        #   RooUnfoldResponse(const TH1* measured, const TH1* truth, const TH2* response
+        for i in xrange(0, measured.GetNbinsX()+1):
+            denom = rooresponse.Hmeasured().GetBinContent(i)
+            if denom == 0: continue
+            nom = rooresponse.Hfakes().GetBinContent(i)
+            if nom > denom:
+                print "Warning! More fakes than meas", nom, denom
+            factor = 1.-nom/denom
+            val = measured.GetBinContent(i)*factor
+            err = measured.GetBinError(i)*factor
+            measured.SetBinContent(i, val)
+            measured.SetBinError(i, err)
+
+        rooresponse.Hmeasured().Add(rooresponse.Hfakes(), -1)
+        rooresponse.Hfakes().Add(rooresponse.Hfakes(), -1)
+
+    unfold = ROOT.RooUnfoldBayes(rooresponse, measured, 10)
+    hReco= unfold.Hreco()
+    if hReco.GetNbinsX() != measured.GetNbinsX():
+        raise Exception("Different histogram sizes after unfolding")
+
+    return hReco
+
 def scale(h, s):
     #h.Scale(s)
     #return
@@ -140,45 +167,11 @@ def unfold(action, infileName):
             rawName = "xsunfolded_" + variation+ c
             sys.stdout.flush()
 
-            histoCopy = histo.Clone()
-            clonedResponse = responseWithBrokenFakesNorm = histos[baseMC][r]
-            if alaGri:
-                # histos[baseMC][r] - response object
-                # histo - detector level distribution
-                #   RooUnfoldResponse(const TH1* measured, const TH1* truth, const TH2* response
-                for i in xrange(0, h.GetNbinsX()+1):
-                    denom = clonedResponse.Hmeasured().GetBinContent(i)
-                    if denom == 0: continue
-                    nom = clonedResponse.Hfakes().GetBinContent(i)
-                    if nom > denom:
-                        print "Warning! More fakes than meas", nom, denom
-                    factor = 1.-nom/denom
-                    val = histoCopy.GetBinContent(i)*factor
-                    err = histoCopy.GetBinError(i)*factor
-                    histoCopy.SetBinContent(i, val)
-                    histoCopy.SetBinError(i, err)
-
-                clonedResponse.Hmeasured().Add(clonedResponse.Hfakes(), -1)
-                clonedResponse.Hfakes().Add(clonedResponse.Hfakes(), -1)
-
-            unfold = ROOT.RooUnfoldBayes(clonedResponse, histoCopy, 10)
-            
-            hReco= unfold.Hreco()
-            if hReco.GetNbinsX() != histo.GetNbinsX():
-                raise Exception("Different histogram sizes after unfolding")
-
+            # http://hepunx.rl.ac.uk/~adye/software/unfold/htmldoc/src/RooUnfold.cxx.html#718
+            hReco = doUnfold(histo.Clone(), histos[baseMC][r].Clone())
             hReco.SetName(rawName)
-
-
-
             odirROOTfile.WriteTObject(hReco, rawName)
-            # unfold= RooUnfoldSvd (histos[r], histo, 20)
-            # unfold= RooUnfoldTUnfold (histos[r], histo)
 
-        # 1 create central histogram
-
-    # centralResponsesFromPythia =  filter(lambda x: x.startswith("response_"), histos["QCD_Pt-15to1000_XXX_pythiap"].keys())
-    # rename central to pythia, add to responsesVariations
 
 def compareMCGentoMCUnfolded(action, infileName):
     if action == "herwigOnPythia" or action == "pythiaOnPythia":
