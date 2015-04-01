@@ -7,12 +7,13 @@ import fnmatch
 
 #todoSteps = ["proof", "hadd", "draw", "unfold", "merge"]
 #todoCat = ["InclusiveBasic", "InclusiveAsym", "InclusiveWindow", "MNBasic", "MNAsym", "MNWindow"]
-#todoCat = ["InclusiveBasic", "InclusiveAsym", "InclusiveWindow", "MNBasic", "MNAsym", "MNWindow"]
-todoCat = ["FWD11_002"]
+#todoCat = ["InclusiveBasic", "InclusiveAsym", "InclusiveWindow", "MNBasic", "MNAsym", "MNWindow", "FWD11_002"]
+todoCat = ["InclusiveBasic"]
+#todoCat = ["FWD11_002"]
 #todoCat = ["InclusiveBasic"]
 todoSteps = []
 todoSteps.append("proof")
-todoSteps.append("hadd")
+#todoSteps.append("hadd")
 #todoSteps.append("draw")
 #todoSteps.append("unfold")
 #todoSteps.append("merge")
@@ -37,5 +38,8 @@ for cat in todoCat:
         elif step == "unfold":
             os.system("../unfoldMN.py -v {}".format(cat))
         elif step == "merge":
-            os.system("../mergeUnfoldedResult.py -v {} -n xs".format(cat))
-            os.system("../mergeUnfoldedResult.py -v {} -n area".format(cat))
+            if cat == "FWD11_002":
+                os.system("../mergeUnfoldedResult.py -v {} -n xs  -b -s 5.6".format(cat))
+            else:
+                os.system("../mergeUnfoldedResult.py -v {} -n xs".format(cat))
+                os.system("../mergeUnfoldedResult.py -v {} -n area".format(cat))
