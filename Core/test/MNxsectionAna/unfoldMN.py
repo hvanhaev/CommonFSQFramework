@@ -10,7 +10,6 @@ import CommonFSQFramework.Core.Util
 import CommonFSQFramework.Core.Style
 
 from array import array
-import numpy
 
 from optparse import OptionParser
 
@@ -22,7 +21,7 @@ from mnDraw import DrawMNPlots
 
 alaGri = False
 odir = ""
-ntoys = 10
+ntoys = 1000
 
 # note: this function should modify the histogram and return a pointer to it
 # its user responsibility to clone histograms before the modifications
@@ -53,7 +52,7 @@ def vary2d(h):
             if err == 0: 
                 print "Warning: err=0 in {} bin {},{} with val={}".format(histo.GetName(), ix, iy, val)
             mod = ROOT.gRandom.Gaus(0, err)
-            print mod
+            #print mod
             newVal = val+mod
             newErr = err # should we scale here?
             if newVal <= 0: newVal, newErr = 0,0
@@ -232,10 +231,6 @@ def unfold(action, infileName):
                     #   TProfile(const char* name, const char* title, Int_t nbinsx, const Double_t* xbins, Option_t* option = "")
                     bins = hReco.GetXaxis().GetXbins()
                     profile =  TProfile("prof_"+rawName, "", bins.GetSize()-1, bins.GetArray())
-                    #nbins =  hReco.GetNbinsX()
-                    #binning = numpy.zeros(nbins, dtype=float)
-                    #hReco.GetLowEdge()
-                    #print "AAA", type(hReco.GetLowEdge())
                     for i in xrange(0, ntoys):
                         clonedResponse = histos[baseMC][r].Clone()
                         if t == "truth":
@@ -252,10 +247,14 @@ def unfold(action, infileName):
                         for ix in xrange(0, hRecoVaried.GetNbinsX()+2):
                             binCenter = hRecoVaried.GetBinCenter(ix)
                             val = hRecoVaried.GetBinContent(ix)
-                            print "Fill", binCenter, val
                             profile.Fill(binCenter, val)
 
-                    print "Var: ", variation
+                    #print "Var: ", variation
+                    #rawName = "xsunfolded_" + variation+ c
+                    rawNameUp = rawName.replace("central", "toyMC{}Up".format(t) )
+                    rawNameDown = rawName.replace("central", "toyMC{}Down".format(t) )
+                    hUp = hReco.Clone(rawNameUp)
+                    hDown = hReco.Clone(rawNameDown)
                     for i in xrange(1, hReco.GetNbinsX()+1):
                         binc1 =  hReco.GetBinCenter(i)
                         binc2 =  profile.GetBinCenter(i)
@@ -263,7 +262,11 @@ def unfold(action, infileName):
                         val2 =  profile.GetBinContent(i)
                         if val1 <= 0: continue
                         errProf =  profile.GetBinError(i)
-                        #print "binc: {} {}, vals {} {}, error: {}".format(binc1, binc2, val1, val2, errProf/val1)
+                        print "binc: {} {}, vals ratio {}, error: {}".format(binc1, binc2, val1/val2, errProf/val1)
+                        hUp.SetBinContent(i, val1+errProf)
+                        hDown.SetBinContent(i, val1-errProf)
+                    odirROOTfile.WriteTObject(hUp, rawNameUp)
+                    odirROOTfile.WriteTObject(hDown, rawNameDown)
 
 
                     #ccc = hReco.Clone()
