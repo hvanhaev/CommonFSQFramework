@@ -10,6 +10,7 @@ import CommonFSQFramework.Core.Util
 import CommonFSQFramework.Core.Style
 
 from array import array
+import numpy
 
 from optparse import OptionParser
 
@@ -22,6 +23,9 @@ from mnDraw import DrawMNPlots
 alaGri = False
 odir = ""
 ntoys = 10
+
+# note: this function should modify the histogram and return a pointer to it
+# its user responsibility to clone histograms before the modifications
 def vary1d(h):
     for ix in xrange(0, h.GetNbinsX()+2): # vary also over/under flow bins
             val = h.GetBinContent(ix)
@@ -30,7 +34,6 @@ def vary1d(h):
             if err == 0: 
                 print "Warning: err=0 in {} bin {} with val={}".format(histo.GetName(), ix, val)
             mod = ROOT.gRandom.Gaus(0, err)
-            print mod
             newVal = val+mod
             newErr = err # should we scale here?
             if newVal <= 0: newVal, newErr = 0,0
@@ -39,6 +42,8 @@ def vary1d(h):
     return h
 
 # TODO: what with over flows here?
+# note: this function should modify the histogram and return a pointer to it
+# its user responsibility to clone histograms before the modifications
 def vary2d(h):
     for ix in xrange(0, h.GetNbinsX()+2): # vary also over/under flow bins
         for iy in xrange(0, h.GetNbinsY()+2): # vary also over/under flow bins
@@ -57,7 +62,8 @@ def vary2d(h):
 
     return h
 
-
+# note: this function should modify the histogram and return a pointer to it
+# its user responsibility to clone histograms before the modifications
 def vary(histo):
     #print "RAN", ROOT.gRandom.Gaus(0, 1)
     if "TH1" in histo.ClassName():
@@ -217,13 +223,53 @@ def unfold(action, infileName):
             hReco.SetName(rawName)
             odirROOTfile.WriteTObject(hReco, rawName)
 
-            # http://hepunx.rl.ac.uk/~adye/software/unfold/htmldoc/src/RooUnfold.cxx.html#718
             # now - toyMC approac to limited MC statistics
+            todo = ["response", "fakes", "truth"]
+            #todo = ["truth"]
+            global ntoys
             if variation == "central":
-                global ntoys
-                for i in xrange(0, ntoys):
-                    varied = vary(hReco.Clone())
+                for t in todo:
+                    #   TProfile(const char* name, const char* title, Int_t nbinsx, const Double_t* xbins, Option_t* option = "")
+                    bins = hReco.GetXaxis().GetXbins()
+                    profile =  TProfile("prof_"+rawName, "", bins.GetSize()-1, bins.GetArray())
+                    #nbins =  hReco.GetNbinsX()
+                    #binning = numpy.zeros(nbins, dtype=float)
+                    #hReco.GetLowEdge()
+                    #print "AAA", type(hReco.GetLowEdge())
+                    for i in xrange(0, ntoys):
+                        clonedResponse = histos[baseMC][r].Clone()
+                        if t == "truth":
+                            vary(clonedResponse.Htruth())
+                        elif t == "fakes":
+                            vary(clonedResponse.Hfakes())
+                        elif t == "response":
+                            vary(clonedResponse.Hresponse())
+                        else:
+                            raise Exception("dont know what to do")
+
+                        hRecoVaried = doUnfold(histo.Clone(), clonedResponse)
+                        #print "TTT", hReco.Integral(), hRecoVaried.Integral()
+                        for ix in xrange(0, hRecoVaried.GetNbinsX()+2):
+                            binCenter = hRecoVaried.GetBinCenter(ix)
+                            val = hRecoVaried.GetBinContent(ix)
+                            print "Fill", binCenter, val
+                            profile.Fill(binCenter, val)
+
+                    print "Var: ", variation
+                    for i in xrange(1, hReco.GetNbinsX()+1):
+                        binc1 =  hReco.GetBinCenter(i)
+                        binc2 =  profile.GetBinCenter(i)
+                        val1 =  hReco.GetBinContent(i)
+                        val2 =  profile.GetBinContent(i)
+                        if val1 <= 0: continue
+                        errProf =  profile.GetBinError(i)
+                        #print "binc: {} {}, vals {} {}, error: {}".format(binc1, binc2, val1, val2, errProf/val1)
+
+
+                    #ccc = hReco.Clone()
+                    #varied = vary(ccc)
                     #print "TEST: ", hReco.Integral(), varied.Integral()
+                    #print "TEST: ", ccc.Integral(), varied.Integral()
                 #sys.stdout.flush()
 
 
