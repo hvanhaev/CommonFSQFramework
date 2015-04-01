@@ -568,8 +568,8 @@ if __name__ == "__main__":
     # '''
     # '''
     #maxFilesMC = 48
-    maxFilesMC = 1
-    maxFilesData = 1
+    maxFilesMC = 2
+    #maxFilesData = 1
     nWorkers = 10
     #maxFilesMC = 16
     #nWorkers = 12
