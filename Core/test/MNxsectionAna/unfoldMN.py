@@ -234,18 +234,26 @@ def unfold(action, infileName):
                     profile =  TProfile("prof_{}_{}".format(rawName, t), "", bins.GetSize()-1, bins.GetArray())
                     for i in xrange(0, ntoys):
                         clonedResponse = histos[baseMC][r].Clone()
+                        htruth = clonedResponse.Htruth()
+                        hfakes = clonedResponse.Hfakes()
+                        hresponse = clonedResponse.Hresponse()
+                        hmeas = clonedResponse.Hmeasured()
                         if t == "truth":
-                            vary(clonedResponse.Htruth())
+                            vary(htruth)
                         elif t == "fakes":
-                            vary(clonedResponse.Hfakes())
+                            fakesOrg = hfakes.Clone()
+                            vary(hfakes)
+                            fakesDiff = hfakes.Clone()
+                            fakesDiff.Add(fakesOrg, -1)
+                            hmeas.Add(fakesDiff)
                         elif t == "response":
-                            vary(clonedResponse.Hresponse())
-                            # TODO: wiezy!!
-
+                            vary(hresponse)
                         else:
                             raise Exception("dont know what to do")
 
-                        hRecoVaried = doUnfold(histo.Clone(), clonedResponse)
+                        newResponse = ROOT.RooUnfoldResponse(hmeas, htruth, hresponse, \
+                                                             "resp_{}_{}_{}".format(rawName, t,i)) 
+                        hRecoVaried = doUnfold(histo.Clone(), newResponse)
                         #print "TTT", hReco.Integral(), hRecoVaried.Integral()
                         binv1 =  hRecoVaried.GetBinContent(1)
                         if math.isnan(binv1) or math.isinf(binv1): 
