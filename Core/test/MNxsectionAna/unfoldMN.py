@@ -21,6 +21,84 @@ from mnDraw import DrawMNPlots
 
 alaGri = False
 odir = ""
+ntoys = 1000
+
+# note: this function should modify the histogram and return a pointer to it
+# its user responsibility to clone histograms before the modifications
+def vary1d(h):
+    for ix in xrange(0, h.GetNbinsX()+2): # vary also over/under flow bins
+            val = h.GetBinContent(ix)
+            if val == 0: continue
+            err = h.GetBinError(ix)
+            if err == 0: 
+                print "Warning: err=0 in {} bin {} with val={}".format(histo.GetName(), ix, val)
+            mod = ROOT.gRandom.Gaus(0, err)
+            newVal = val+mod
+            newErr = err # should we scale here?
+            if newVal <= 0: newVal, newErr = 0,0
+            h.SetBinContent(ix, newVal)
+            h.SetBinError(ix, newErr)
+    return h
+
+# TODO: what with over flows here?
+# note: this function should modify the histogram and return a pointer to it
+# its user responsibility to clone histograms before the modifications
+def vary2d(h):
+    for ix in xrange(0, h.GetNbinsX()+2): # vary also over/under flow bins
+        for iy in xrange(0, h.GetNbinsY()+2): # vary also over/under flow bins
+            val = h.GetBinContent(ix, iy)
+            if val == 0: continue
+            err = h.GetBinError(ix, iy)
+            if err == 0: 
+                print "Warning: err=0 in {} bin {},{} with val={}".format(histo.GetName(), ix, iy, val)
+            mod = ROOT.gRandom.Gaus(0, err)
+            #print mod
+            newVal = val+mod
+            newErr = err # should we scale here?
+            if newVal <= 0: newVal, newErr = 0,0
+            h.SetBinContent(ix, iy, newVal)
+            h.SetBinError(ix, iy, newErr)
+
+    return h
+
+# note: this function should modify the histogram and return a pointer to it
+# its user responsibility to clone histograms before the modifications
+def vary(histo):
+    #print "RAN", ROOT.gRandom.Gaus(0, 1)
+    if "TH1" in histo.ClassName():
+        return vary1d(histo)
+    elif "TH2" in histo.ClassName():
+        return vary2d(histo)
+    else:
+        raise Exception("vary: unsupported object {} {}".format(histo.ClassName(), histo.GetName()))
+
+
+def doUnfold(measured, rooresponse):
+    if alaGri:
+        # histos[baseMC][r] - response object
+        # histo - detector level distribution
+        #   RooUnfoldResponse(const TH1* measured, const TH1* truth, const TH2* response
+        for i in xrange(0, measured.GetNbinsX()+1):
+            denom = rooresponse.Hmeasured().GetBinContent(i)
+            if denom == 0: continue
+            nom = rooresponse.Hfakes().GetBinContent(i)
+            if nom > denom:
+                print "Warning! More fakes than meas", nom, denom
+            factor = 1.-nom/denom
+            val = measured.GetBinContent(i)*factor
+            err = measured.GetBinError(i)*factor
+            measured.SetBinContent(i, val)
+            measured.SetBinError(i, err)
+
+        rooresponse.Hmeasured().Add(rooresponse.Hfakes(), -1)
+        rooresponse.Hfakes().Add(rooresponse.Hfakes(), -1)
+
+    unfold = ROOT.RooUnfoldBayes(rooresponse, measured, 10)
+    hReco= unfold.Hreco()
+    if hReco.GetNbinsX() != measured.GetNbinsX():
+        raise Exception("Different histogram sizes after unfolding")
+
+    return hReco
 
 def scale(h, s):
     #h.Scale(s)
@@ -140,45 +218,77 @@ def unfold(action, infileName):
             rawName = "xsunfolded_" + variation+ c
             sys.stdout.flush()
 
-            histoCopy = histo.Clone()
-            clonedResponse = responseWithBrokenFakesNorm = histos[baseMC][r]
-            if alaGri:
-                # histos[baseMC][r] - response object
-                # histo - detector level distribution
-                #   RooUnfoldResponse(const TH1* measured, const TH1* truth, const TH2* response
-                for i in xrange(0, h.GetNbinsX()+1):
-                    denom = clonedResponse.Hmeasured().GetBinContent(i)
-                    if denom == 0: continue
-                    nom = clonedResponse.Hfakes().GetBinContent(i)
-                    if nom > denom:
-                        print "Warning! More fakes than meas", nom, denom
-                    factor = 1.-nom/denom
-                    val = histoCopy.GetBinContent(i)*factor
-                    err = histoCopy.GetBinError(i)*factor
-                    histoCopy.SetBinContent(i, val)
-                    histoCopy.SetBinError(i, err)
-
-                clonedResponse.Hmeasured().Add(clonedResponse.Hfakes(), -1)
-                clonedResponse.Hfakes().Add(clonedResponse.Hfakes(), -1)
-
-            unfold = ROOT.RooUnfoldBayes(clonedResponse, histoCopy, 10)
-            
-            hReco= unfold.Hreco()
-            if hReco.GetNbinsX() != histo.GetNbinsX():
-                raise Exception("Different histogram sizes after unfolding")
-
+            hReco = doUnfold(histo.Clone(), histos[baseMC][r].Clone())
             hReco.SetName(rawName)
-
-
-
             odirROOTfile.WriteTObject(hReco, rawName)
-            # unfold= RooUnfoldSvd (histos[r], histo, 20)
-            # unfold= RooUnfoldTUnfold (histos[r], histo)
 
-        # 1 create central histogram
+            # now - toyMC approac to limited MC statistics
+            todo = ["response", "fakes", "truth"]
+            #todo = ["truth"]
+            global ntoys
+            if variation == "central":
+                badToys = 0
+                for t in todo:
+                    #   TProfile(const char* name, const char* title, Int_t nbinsx, const Double_t* xbins, Option_t* option = "")
+                    bins = hReco.GetXaxis().GetXbins()
+                    profile =  TProfile("prof_{}_{}".format(rawName, t), "", bins.GetSize()-1, bins.GetArray())
+                    for i in xrange(0, ntoys):
+                        clonedResponse = histos[baseMC][r].Clone()
+                        if t == "truth":
+                            vary(clonedResponse.Htruth())
+                        elif t == "fakes":
+                            vary(clonedResponse.Hfakes())
+                        elif t == "response":
+                            vary(clonedResponse.Hresponse())
+                            # TODO: wiezy!!
 
-    # centralResponsesFromPythia =  filter(lambda x: x.startswith("response_"), histos["QCD_Pt-15to1000_XXX_pythiap"].keys())
-    # rename central to pythia, add to responsesVariations
+                        else:
+                            raise Exception("dont know what to do")
+
+                        hRecoVaried = doUnfold(histo.Clone(), clonedResponse)
+                        #print "TTT", hReco.Integral(), hRecoVaried.Integral()
+                        binv1 =  hRecoVaried.GetBinContent(1)
+                        if math.isnan(binv1) or math.isinf(binv1): 
+                            badToys += 1
+                            continue
+
+                        for ix in xrange(0, hRecoVaried.GetNbinsX()+2):
+                            binCenter = hRecoVaried.GetBinCenter(ix)
+                            val = hRecoVaried.GetBinContent(ix)
+                            if math.isnan(val) or math.isinf(val): 
+                                print "TOYmc Error: nan/inf value found"
+                                continue
+                            # what to do??
+                            profile.Fill(binCenter, val)
+
+                    #print "Var: ", variation
+                    #rawName = "xsunfolded_" + variation+ c
+                    rawNameUp = rawName.replace("central", "toyMC{}Up".format(t) )
+                    rawNameDown = rawName.replace("central", "toyMC{}Down".format(t) )
+                    hUp = hReco.Clone(rawNameUp)
+                    hDown = hReco.Clone(rawNameDown)
+                    for i in xrange(1, hReco.GetNbinsX()+1):
+                        binc1 =  hReco.GetBinCenter(i)
+                        binc2 =  profile.GetBinCenter(i)
+                        val1 =  hReco.GetBinContent(i)
+                        val2 =  profile.GetBinContent(i)
+                        if val1 <= 0: continue
+                        errProf =  profile.GetBinError(i)
+                        print "binc: {} {}, vals ratio {}, error: {}".format(binc1, binc2, val1/val2, errProf/val1)
+                        hUp.SetBinContent(i, val1+errProf)
+                        hDown.SetBinContent(i, val1-errProf)
+                    odirROOTfile.WriteTObject(hUp, rawNameUp)
+                    odirROOTfile.WriteTObject(hDown, rawNameDown)
+                    print "TOYmc done for", r, " bad toys:", badToys
+
+                    #ccc = hReco.Clone()
+                    #varied = vary(ccc)
+                    #print "TEST: ", hReco.Integral(), varied.Integral()
+                    #print "TEST: ", ccc.Integral(), varied.Integral()
+                #sys.stdout.flush()
+
+
+
 
 def compareMCGentoMCUnfolded(action, infileName):
     if action == "herwigOnPythia" or action == "pythiaOnPythia":
