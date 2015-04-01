@@ -21,6 +21,52 @@ from mnDraw import DrawMNPlots
 
 alaGri = False
 odir = ""
+ntoys = 10
+def vary1d(h):
+    for ix in xrange(0, h.GetNbinsX()+2): # vary also over/under flow bins
+            val = h.GetBinContent(ix)
+            if val == 0: continue
+            err = h.GetBinError(ix)
+            if err == 0: 
+                print "Warning: err=0 in {} bin {} with val={}".format(histo.GetName(), ix, val)
+            mod = ROOT.gRandom.Gaus(0, err)
+            print mod
+            newVal = val+mod
+            newErr = err # should we scale here?
+            if newVal <= 0: newVal, newErr = 0,0
+            h.SetBinContent(ix, newVal)
+            h.SetBinError(ix, newErr)
+    return h
+
+# TODO: what with over flows here?
+def vary2d(h):
+    for ix in xrange(0, h.GetNbinsX()+2): # vary also over/under flow bins
+        for iy in xrange(0, h.GetNbinsY()+2): # vary also over/under flow bins
+            val = h.GetBinContent(ix, iy)
+            if val == 0: continue
+            err = h.GetBinError(ix, iy)
+            if err == 0: 
+                print "Warning: err=0 in {} bin {},{} with val={}".format(histo.GetName(), ix, iy, val)
+            mod = ROOT.gRandom.Gaus(0, err)
+            print mod
+            newVal = val+mod
+            newErr = err # should we scale here?
+            if newVal <= 0: newVal, newErr = 0,0
+            h.SetBinContent(ix, iy, newVal)
+            h.SetBinError(ix, iy, newErr)
+
+    return h
+
+
+def vary(histo):
+    #print "RAN", ROOT.gRandom.Gaus(0, 1)
+    if "TH1" in histo.ClassName():
+        return vary1d(histo)
+    elif "TH2" in histo.ClassName():
+        return vary2d(histo)
+    else:
+        raise Exception("vary: unsupported object {} {}".format(histo.ClassName(), histo.GetName()))
+
 
 def doUnfold(measured, rooresponse):
     if alaGri:
@@ -167,10 +213,20 @@ def unfold(action, infileName):
             rawName = "xsunfolded_" + variation+ c
             sys.stdout.flush()
 
-            # http://hepunx.rl.ac.uk/~adye/software/unfold/htmldoc/src/RooUnfold.cxx.html#718
             hReco = doUnfold(histo.Clone(), histos[baseMC][r].Clone())
             hReco.SetName(rawName)
             odirROOTfile.WriteTObject(hReco, rawName)
+
+            # http://hepunx.rl.ac.uk/~adye/software/unfold/htmldoc/src/RooUnfold.cxx.html#718
+            # now - toyMC approac to limited MC statistics
+            if variation == "central":
+                global ntoys
+                for i in xrange(0, ntoys):
+                    varied = vary(hReco.Clone())
+                    #print "TEST: ", hReco.Integral(), varied.Integral()
+                #sys.stdout.flush()
+
+
 
 
 def compareMCGentoMCUnfolded(action, infileName):
