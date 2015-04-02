@@ -10,10 +10,10 @@ from CommonFSQFramework.Core.DrawPlots import DrawPlots
 import  CommonFSQFramework.Core.Style
 
 from mnDraw import DrawMNPlots 
-from array import array
+#from array import array
 from optparse import OptionParser
 
-import sys
+import sys,os
 def main():
     CommonFSQFramework.Core.Style.setTDRStyle()
 
@@ -32,24 +32,25 @@ def main():
 
     (options, args) = parser.parse_args()
 
-    odir = "~/tmp/simpleMC_{}/".format(options.variant)
 
     (options, args) = parser.parse_args()
     if not options.variant:
         print "Provide analysis variant"
         sys.exit()
 
-
     if not options.histo1:
         # -a ptHat,QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp
         print "Tell me what to do..."
         sys.exit()
 
+    odir = "~/tmp/simpleMC_{}/".format(options.variant)
+    os.system("mkdir -p "+odir)
+
     todo = []
     todo.append( options.histo1.split(",") )
     labelRaw = options.histo1.split(",")[0] 
 
-    if not options.histo2:
+    if options.histo2:
         todo.append( options.histo2.split(",") )
     
 
@@ -58,17 +59,23 @@ def main():
     histos=getHistos(histofile)
     
     toPlot = {}
+    cnt =0
+    colors = [2,1]
     for t in todo:
         toPlot[t[1]] = histos[t[1]][t[0]]
+        toPlot[t[1]].SetMarkerColor(colors[cnt])
+        toPlot[t[1]].SetLineColor(colors[cnt])
+        cnt+=1
 
 
     maxima = []
     for t in toPlot:
+        #print t, toPlot[t].GetName()
         maxima.append(toPlot[t].GetMaximum())
 
     hmax = max(maxima)*1.05
     for t in toPlot:
-        toPlot[t].SetMaximum(hMax)
+        toPlot[t].SetMaximum(hmax)
 
     if len(toPlot) > 1:
         c = ROOT.TCanvas()
@@ -84,39 +91,49 @@ def main():
     else:
         c = ROOT.TCanvas()
 
+
     DrawMNPlots.banner()
     firstPass = True
+    legend = ROOT.TLegend(0.6, 0.7, 0.9, 0.85)
+    legend.SetFillColor(0)
     for h in toPlot.keys():   # not sure if h in toPlot will always give the same order as h in toPlot.keys()
         if firstPass:
             toPlot[h].Draw()
             firstPass = False
         else:
             toPlot[h].Draw("SAME")
+        label = "pythia"
+        if "herwig" in h: label = "herwig"
+        legend.AddEntry(toPlot[h], label, "pel")
 
     '''
-    legend = ROOT.TLegend(0.6, 0.7, 0.9, 0.85)
-    legend.SetFillColor(0)
     legend.AddEntry(central, "data", "pel")
     legend.AddEntry(unc, "syst. unc.", "f")
     legend.AddEntry(genHistoHerwig, "herwig", "l")
     legend.AddEntry(genHistoPythia, "pythia", "l")
-    legend.Draw("SAME")    
     '''
+    legend.Draw("SAME")    
 
     if len(toPlot) > 1:
         c.cd(2)
 
-        frame = ROOT.gPad.DrawFrame(central.GetXaxis().GetXmin(), 0, central.GetXaxis().GetXmax(), 3)
         h1 = toPlot[toPlot.keys()[0]].Clone()
         h2 = toPlot[toPlot.keys()[1]].Clone()
-        h1.Div(h2)
+        frame = ROOT.gPad.DrawFrame(h1.GetXaxis().GetXmin(), 0.7, h1.GetXaxis().GetXmax(), 1.3)
+        h1.Divide(h2)
+        h1.SetLineColor(1)
+        h1.SetMarkerColor(1)
+        f = ROOT.TF1("f1", "[0]*x+[1]", h1.GetXaxis().GetXmin(), h1.GetXaxis().GetXmax())
+
         h1.Draw("SAME")
+        h1.Fit(f, "", "", 20, h1.GetXaxis().GetXmax())
+        f.SetLineColor(1)
+        f.Draw("SAME")
 
         #frame.GetXaxis().SetRangeUser(5,8)
 
-
-
-    c.Print(odir+"/simpleMCplot_{}_{}.png".format(labelRaw, variant))
+    c.Print(odir+"/simpleMCplot_{}_{}.png".format(labelRaw, options.variant))
+    c.Print(odir+"/simpleMCplot_{}_{}.pdf".format(labelRaw, options.variant))
 
 
 
