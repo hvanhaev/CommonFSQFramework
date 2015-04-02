@@ -182,7 +182,7 @@ class MNxsAnalyzerClean(CommonFSQFramework.Core.ExampleProofReader.ExampleProofR
         binsNew = self.variantFilter.bins()
 
         # note: set gives as unique items, since _central is repeated
-        self.hist["ptHat"] = ROOT.TH1F("ptHat",   "ptHat",  100, 0, 100)
+        self.hist["ptHat"] = ROOT.TH1F("ptHat",   "ptHat",  100, 0, 50)
 
         for shift in set(self.todoShifts+self.shiftsPU):
             for trg in todoTrg:
@@ -548,6 +548,18 @@ class MNxsAnalyzerClean(CommonFSQFramework.Core.ExampleProofReader.ExampleProofR
             profName = dname + "stats"
             self.pr.dump_stats(profName)
 
+        for h in self.hist:
+            if not h.startswith("response"): continue
+            def cloneAndAdd(h, name):
+                hh = h.Clone(name)
+                hh.SetName(name)
+                self.addToOutput(hh)
+
+            cloneAndAdd(self.hist[h].Hfakes(), "fake"+h)
+            cloneAndAdd(self.hist[h].Htruth(), "truth"+h)
+            cloneAndAdd(self.hist[h].Hmeasured(), "measured"+h)
+            cloneAndAdd(self.hist[h].Hresponse(), "resp"+h)
+
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
     parser = OptionParser(usage="usage: %prog [options] filename",
@@ -570,7 +582,7 @@ if __name__ == "__main__":
     sampleList = []
     sampleList= ["QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6"]
     sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
-    '''
+    #'''
     sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
     sampleList.append("Jet-Run2010B-Apr21ReReco-v1")
     sampleList.append("JetMET-Run2010A-Apr21ReReco-v1")
@@ -578,7 +590,7 @@ if __name__ == "__main__":
     # '''
     # '''
     #maxFilesMC = 48
-    maxFilesMC = 2
+    #maxFilesMC = 1
     #maxFilesData = 1
     nWorkers = 10
     #maxFilesMC = 16
