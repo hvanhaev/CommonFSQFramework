@@ -32,4 +32,4 @@ if cname == "etaRecoTracks_central_minbias":
     h.GetYaxis().SetRangeUser(0.03,0.06)
 
 if cname == "ptRecoTracks_central_minbias":
-    c.SetLogy()
+    c.cd(1).SetLogy()

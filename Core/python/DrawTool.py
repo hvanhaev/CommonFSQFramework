@@ -109,7 +109,11 @@ def draw(localHistoList=[],normMeth="",localSampleList=[]):
     
     global GlobalCanvasList
     global GlobalLegendList
+    global GlobalHistoRatioList
+    
     startCL = len(GlobalCanvasList)
+    
+    wehaveratiosample = False
     
     if len(GlobalHistoList) == 0:
         print "Please first read all the histograms from a root file into the memory by executing getAllHistos()"
@@ -130,6 +134,7 @@ def draw(localHistoList=[],normMeth="",localSampleList=[]):
         hname = spltstr[1]
         if hname != h.GetName(): print "Help! This doesn't make sense: hname != h.GetName()"
         isData = GlobalSampleList[hsample]["isData"]
+        if hsample == GlobalPlotRatioToSample: wehaveratiosample = True
 
         exists = False
         for c in GlobalCanvasList:
@@ -153,6 +158,13 @@ def draw(localHistoList=[],normMeth="",localSampleList=[]):
     else:
         print " We are going to plot ", len(GlobalCanvasList)-startCL, " canvases for you..."
 
+    # if there's a local sample list, check if the ratio reference sample is there
+    if GlobalPlotRatio:
+        if len(localSampleList) > 0:
+            if GlobalPlotRatioToSample not in localSampleList:
+                wehaveratiosample = False
+                print " the sample you want to plot the ratio too, is not found... you have to include it in the third argument of the draw function."
+
     # loop over canvases you want
     for icanvas, c in enumerate(GlobalCanvasList):
         if type(c) is not TCanvas: continue
@@ -166,13 +178,21 @@ def draw(localHistoList=[],normMeth="",localSampleList=[]):
         else:
             plotit = True
         if not plotit: continue
-        
-        c.cd()
-        
+
+        if GlobalPlotRatio and len(localSampleList) != 1 and wehaveratiosample:
+            c.Divide(1,2,0.0001,0.0001)
+            c.cd(1)
+            gPad.SetBottomMargin(0.)
+        else:
+            c.Divide(1,1,0.0001,0.0001)
+            c.cd(1)
+
+
         # start with a clean legend
         GlobalLegendList[icanvas].Clear()
-    
-        # loop over histograms in the list for all samples
+
+        hdata = None
+        # first plot all data samples
         ihisto = 0
         for h in GlobalHistoList:
             if h.GetName() == cname:
@@ -182,31 +202,104 @@ def draw(localHistoList=[],normMeth="",localSampleList=[]):
                 if len(localSampleList) > 0:
                     if hsample not in localSampleList: continue
                 
-                # set normalisation
-                if normMeth == "int":
-                    if h.Integral() != 0: h.Scale(1./h.Integral())
-                if normMeth == "max":
-                    if h.GetBinContent(h.GetMaximumBin()) != 0: h.Scale(1./h.GetBinContent(h.GetMaximumBin()))
+                isData = GlobalSampleList[hsample]["isData"]
+                if isData:
+                    # set normalisation
+                    if normMeth == "int":
+                        if h.Integral() != 0: h.Scale(1./h.Integral())
+                    if normMeth == "max":
+                        if h.GetBinContent(h.GetMaximumBin()) != 0: h.Scale(1./h.GetBinContent(h.GetMaximumBin()))
+                    
+                    # execute style options if there are
+                    if os.path.isfile(GlobalScriptFile+".style"):
+                        execfile(GlobalScriptFile+".style")
+                    
+                    if ihisto == 0: h.Draw()
+                    if ihisto != 0: h.Draw("same")
+                    if hsample == GlobalPlotRatioToSample: hdata = h.Clone()
+                    # add legend entry
+                    GlobalLegendList[icanvas].AddEntry(h,GlobalSampleDic[hsample],"lpf");
+                    ihisto+=1
+
+        # then plot all MC samples
+        for h in GlobalHistoList:
+            if h.GetName() == cname:
+                # get sample name
+                spltstr = h.GetTitle().split("/")
+                hsample = spltstr[0]
+                if len(localSampleList) > 0:
+                    if hsample not in localSampleList: continue
+                
+                isData = GlobalSampleList[hsample]["isData"]
+                if not isData:
+                    # set normalisation
+                    if normMeth == "int":
+                        if h.Integral() != 0: h.Scale(1./h.Integral())
+                    if normMeth == "max":
+                        if h.GetBinContent(h.GetMaximumBin()) != 0: h.Scale(1./h.GetBinContent(h.GetMaximumBin()))
             
-                # execute style options if there are
-                if os.path.isfile(sys.path[0]+"/"+GlobalScriptFile+".style"):
-                    execfile(sys.path[0]+"/"+GlobalScriptFile+".style")
+                    # execute style options if there are
+                    if os.path.isfile(GlobalScriptFile+".style"):
+                        execfile(GlobalScriptFile+".style")
                 
-                # draw the stuff
-                if ihisto == 0:
-                    h.Draw()
-                if ihisto != 0:
-                    h.Draw("same")
-                
-                # add legend entry
-                GlobalLegendList[icanvas].AddEntry(h,GlobalSampleDic[hsample],"lpf");
-                        
-                ihisto+=1
+                    # draw the stuff
+                    if ihisto == 0: h.Draw()
+                    if ihisto != 0: h.Draw("same")
+                    if hsample == GlobalPlotRatioToSample: hdata = h.Clone()
+                    # add legend entry
+                    GlobalLegendList[icanvas].AddEntry(h,GlobalSampleDic[hsample],"lpf");
+                    ihisto+=1
 
         # draw legend
         GlobalLegendList[icanvas].Draw()
 
+        # ratio pad
+        if GlobalPlotRatio and len(localSampleList) != 1 and wehaveratiosample:
+            c.cd(2)
+            gPad.SetTopMargin(0.)
+            gPad.SetBottomMargin(0.65);
+            gPad.SetTitle("")
+            
+            if hdata.InheritsFrom("TH1"):
+                iratio = 0
+                for h in GlobalHistoList:
+                    if h.GetName() == cname:
+                        # get sample name
+                        spltstr = h.GetTitle().split("/")
+                        hsample = spltstr[0]
+                        if len(localSampleList) > 0:
+                            if hsample not in localSampleList: continue
+                        
+                        if hsample != GlobalPlotRatioToSample:
+                            #calculate ratio to data
+                            hratio = None
+                            # if it is a TProfile, we have to divide their projectionsX
+                            if type(h) is TProfile:
+                                hratio = h.ProjectionX()
+                                hratio.SetName(hratio.GetName() + "_ratio")
+                                hratio.Divide(hdata.ProjectionX())
+                                # copy style
+                                hratio.SetLineColor(h.GetLineColor())
+                                hratio.SetLineStyle(h.GetLineStyle())
+                                hratio.SetLineWidth(h.GetLineWidth())
+                                hratio.SetMarkerStyle(h.GetMarkerStyle())
+                                hratio.SetMarkerSize(h.GetMarkerSize())
+                                hratio.SetMarkerColor(h.GetMarkerColor())
+                            else:
+                                hratio = h.Clone()
+                                hratio.Divide(hdata)
+
+                            hratio.GetYaxis().SetTitle("MC/"+GlobalSampleDic[GlobalPlotRatioToSample])
+                            hratio.GetYaxis().SetRangeUser(0.,2.)
+                            GlobalHistoRatioList.append(hratio)
+                            # draw the stuff
+                            if iratio == 0: hratio.Draw()
+                            if iratio != 0: hratio.Draw("same")
+
+                            iratio+=1
     
+
+
     #for s in GlobalSampleList:
     #    print "normfactor for sample: ", s, " = ", GlobalNormFactorList[s]
 
@@ -224,6 +317,24 @@ def updateCanvas():
 def setLegend(sample="",legend=""):
     GlobalSampleDic[sample] = legend
 
+def plotRatio(value=True,data=""):
+    global GlobalPlotRatio
+    global GlobalPlotRatioToSample
+    GlobalPlotRatio = value
+    if data != "":
+        GlobalPlotRatioToSample = data
+    else:
+        for s in GlobalSampleList:
+            isData = GlobalSampleList[s]["isData"]
+            if isData:
+                GlobalPlotRatioToSample = s
+                break
+        if GlobalPlotRatioToSample == "":
+            print " no valid data sample found, please select it manually"
+            GlobalPlotRatio = False
+
+    if GlobalPlotRatio: print "The following sample will be used to plot the ratio to: ", GlobalPlotRatioToSample
+
 def printCMS(localHistoList=[]):
     for c in GlobalCanvasList:
         if type(c) is not TCanvas: continue
@@ -235,7 +346,7 @@ def printCMS(localHistoList=[]):
             plotit = True
 
         if not plotit: continue
-        c.cd()
+        c.cd(1)
         GlobalCMSLabel.Draw()
 
 def printCMSPreliminary(localHistoList=[]):
@@ -249,7 +360,7 @@ def printCMSPreliminary(localHistoList=[]):
             plotit = True
         
         if not plotit: continue
-        c.cd()
+        c.cd(1)
         GlobalCMSPreLabel.Draw()
 
 def printCMEnergy(localHistoList=[],cm="13"):
@@ -264,7 +375,7 @@ def printCMEnergy(localHistoList=[],cm="13"):
             plotit = True
         
         if not plotit: continue
-        c.cd()
+        c.cd(1)
         GlobalCMEnergyLabel.Draw()
 
 def printLumi(lumi="",localHistoList=[]):
@@ -279,7 +390,7 @@ def printLumi(lumi="",localHistoList=[]):
             plotit = True
         
         if not plotit: continue
-        c.cd()
+        c.cd(1)
         GlobalLumiLabel.Draw()
 
 
@@ -290,10 +401,14 @@ if __name__ == "__main__":
     GlobalOut = ""
     GlobalScriptFile = ""
     GlobalHistoList = []
+    GlobalHistoRatioList = []
     GlobalCanvasList = []
     GlobalLegendList = []
     GlobalNormFactorList = {}
     GlobalSampleDic = {}
+    
+    GlobalPlotRatio = False
+    GlobalPlotRatioToSample = ""
     
     GlobalLumiLabel = TPaveText(0.22,0.76,0.52,0.82,"NDC")
     GlobalLumiLabel.SetTextColor(kBlack)
@@ -340,6 +455,6 @@ if __name__ == "__main__":
         GlobalScriptFile = str(sys.argv[1])
         GlobalScriptFile = GlobalScriptFile.replace(".py","")
         print "Executing script: ", GlobalScriptFile
-        execfile(sys.path[0]+"/"+str(sys.argv[1]))
+        execfile(str(sys.argv[1]))
     else:
         print "No script given as input, you will have to type all functions yourself now..."

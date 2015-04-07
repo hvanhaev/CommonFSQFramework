@@ -16,6 +16,8 @@ setLegend("data_MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8","data (CUETP8S1)")
 # this will plot ALL histograms found the in the file:
 #draw()
 # this will plot all histograms containing the string "RecoTrack" in their names normalised to their integral:
+# turn on this function to plot with ratio to a data sample
+plotRatio()
 draw(["RecoTrack"],"int")
 # this will plot a combination of histograms containing either of the two strings in their names:
 #draw(["ptRecoTracks_central_minbias","etaRecoTracks_central_minbias"])
@@ -29,13 +31,14 @@ draw(["RecoTrack"],"int")
 #draw(["GenTrack"],"int",["MinBias_TuneMonash13_13TeV-pythia8"])
 
 
+
 # add "CMS" or "CMS Preliminary" labels to all open canvases
 printCMSPreliminary()
 # add the centre-of-mass energy label to all open canvases
 # by default this is 13 TeV
 printCMEnergy()
 # add the integrated luminosity to all open canvases
-printLumi("3 nb^{-1}")
+#printLumi("3 nb^{-1}")
 
 # update all open canvases to display the changes
 updateCanvas()
