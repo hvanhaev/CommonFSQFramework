@@ -107,20 +107,17 @@ process.maxEvents.input = 10
 process.out.fileName = 'patTuple_addJets.root'
 #                                         ##
 #   process.options.wantSummary = False   ##  (to suppress the long output at the end of the job)
-
-
-
+#process.source.fileNames = cms.untracked.vstring("file:44E1E4BA-50BD-E411-A57A-002618943949.root" )
 
 
 # Here starts the CFF specific part
-
-
 import CommonFSQFramework.Core.customizePAT
 process = CommonFSQFramework.Core.customizePAT.customize(process)
 
 process.JetTree = cms.EDAnalyzer("CFFTreeProducer",
     JetViewPFAK4CHS  = cms.PSet(
         miniView = cms.string("JetView"),
+        storeageVersion = cms.untracked.int32(1),
         disableJetID = cms.bool(True),
         optionalCaloJets4ID = cms.InputTag("ak5CaloJets","","RECO"),
         optionalCaloID4ID  = cms.InputTag("ak5JetID"),
@@ -132,14 +129,10 @@ process.JetTree = cms.EDAnalyzer("CFFTreeProducer",
         variations= cms.vstring("", "jecUp", "jecDown"),
         jerFactors = cms.vstring(  # PF10
                 "5.5 1 0.007 0.07 0.072"),
+
     )
 )
 
-
 process = CommonFSQFramework.Core.customizePAT.addTreeProducer(process, process.JetTree)
-
-
-
-process.source.fileNames = cms.untracked.vstring("file:44E1E4BA-50BD-E411-A57A-002618943949.root" )
 
 
