@@ -118,7 +118,28 @@ process.out.fileName = 'patTuple_addJets.root'
 import CommonFSQFramework.Core.customizePAT
 process = CommonFSQFramework.Core.customizePAT.customize(process)
 
+process.JetTree = cms.EDAnalyzer("CFFTreeProducer",
+    JetViewPFAK4CHS  = cms.PSet(
+        miniView = cms.string("JetView"),
+        disableJetID = cms.bool(True),
+        optionalCaloJets4ID = cms.InputTag("ak5CaloJets","","RECO"),
+        optionalCaloID4ID  = cms.InputTag("ak5JetID"),
+        branchPrefix = cms.untracked.string("PFAK4CHS"),
+        maxEta = cms.double(5.2),
+        minPt = cms.double(3),
+        maxnum = cms.int32(3),
+        input = cms.InputTag("selectedPatJetsAK4PFCHSCopy"),
+        variations= cms.vstring("", "jecUp", "jecDown"),
+        jerFactors = cms.vstring(  # PF10
+                "5.5 1 0.007 0.07 0.072"),
+    )
+)
 
 
+process = CommonFSQFramework.Core.customizePAT.addTreeProducer(process, process.JetTree)
+
+
+
+process.source.fileNames = cms.untracked.vstring("file:44E1E4BA-50BD-E411-A57A-002618943949.root" )
 
 
