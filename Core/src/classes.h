@@ -1,3 +1,4 @@
+#include "FWCore/Utilities/interface/GCC11Compatibility.h"
 #include "FWCore/ParameterSet/interface/FileInPath.h"
 #include "TH1.h"
 #include "TFile.h"
@@ -5,7 +6,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <vector>
-#define constexpr static const
+//#define constexpr static const
 #include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
 #include "CommonFSQFramework/Core/interface/TestTrackData.h"
 
