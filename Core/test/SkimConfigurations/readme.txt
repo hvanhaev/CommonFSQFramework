@@ -41,7 +41,44 @@ removing the output most likely will prevent large number of CMSSW modules
 from running thanks to magic of unscheduled execution)
 
 
-3. Add plugins
+3. Add tree producers
+
+A tree producer in CFF is a edm plugin calling several miniViews (see src
+directory) in order to fill a tree. Since April 2015 there is no need to
+compose a tree producer from miniviews by hand. For most uses a generic tree
+producer named CFFTreeProducer should be enough. In configuration you need to
+provide from 0 to several psets with miniviews configuration. Each pset must
+contain miniView type and branch prefix (branches produced by this producer
+will start from this string). 
+
+
+process.JetTree = cms.EDAnalyzer("CFFTreeProducer",
+    JetViewPFAK4CHS  = cms.PSet(
+        miniView = cms.string("JetView"),
+        branchPrefix = cms.untracked.string("PFAK4CHS"),
+        (...) # here follows rest of configuration, e.g. inputtags
+    ),
+    JetViewCaloAK  = cms.PSet(
+        miniView = cms.string("JetView"),
+        branchPrefix = cms.untracked.string("CaloAK4"),
+        (...)
+    ),
+
+    (...) # other miniviews
+)
+
+See CFFTreeProducer source code (plugins directory) in order to learn what
+miniviews are supported
+
+Last thing to do is to make sure our tree producer will be executed. This is
+done by another customization function:
+
+process = CommonFSQFramework.Core.customizePAT.addTreeProducer(process, process.JetTree)
+
+4.  TODO: describe GT modifications (different GT for data/MC)
+
+
+
 
 
 
