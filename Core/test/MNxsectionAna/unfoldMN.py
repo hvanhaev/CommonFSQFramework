@@ -19,9 +19,8 @@ from HistosHelper import getHistos
 
 from mnDraw import DrawMNPlots 
 
-alaGri = False
-odir = ""
-ntoys = 1000
+optionsReg = {}
+
 
 # note: this function should modify the histogram and return a pointer to it
 # its user responsibility to clone histograms before the modifications
@@ -73,8 +72,12 @@ def vary(histo):
         raise Exception("vary: unsupported object {} {}".format(histo.ClassName(), histo.GetName()))
 
 
-def doUnfold(measured, rooresponse):
-    if alaGri:
+def doUnfold(measured, rooresponse, nIter = None):
+    global optionsReg
+    if nIter == None:
+        nIter = optionsReg["unfNIter"]
+
+    if optionsReg["alaGri"]:
         # histos[baseMC][r] - response object
         # histo - detector level distribution
         #   RooUnfoldResponse(const TH1* measured, const TH1* truth, const TH2* response
@@ -93,12 +96,18 @@ def doUnfold(measured, rooresponse):
         rooresponse.Hmeasured().Add(rooresponse.Hfakes(), -1)
         rooresponse.Hfakes().Add(rooresponse.Hfakes(), -1)
 
-    unfold = ROOT.RooUnfoldBayes(rooresponse, measured, 10)
-    hReco= unfold.Hreco()
+    unfold = ROOT.RooUnfoldBayes(rooresponse, measured, nIter)
+
+    errorTreatment = 1 
+    hReco= unfold.Hreco(errorTreatment)
+
+    chi2 = unfold.Chi2(rooresponse.Htruth(),errorTreatment)
+    sys.stdout.flush()
+
     if hReco.GetNbinsX() != measured.GetNbinsX():
         raise Exception("Different histogram sizes after unfolding")
 
-    return hReco
+    return (hReco, chi2)
 
 def scale(h, s):
     #h.Scale(s)
@@ -174,7 +183,7 @@ def unfold(action, infileName):
     # _dj15fb', 
     #'response_jecDown_jet15
 
-    of =  ROOT.TFile(odir+"/mnxsHistos_unfolded_"+action+".root","RECREATE")
+    of =  ROOT.TFile(optionsReg["odir"]+"/mnxsHistos_unfolded_"+action+".root","RECREATE")
 
     # Warning: duplicated code for lumi calculation! See mnDraw.py
     triggerToKey = {}
@@ -218,21 +227,36 @@ def unfold(action, infileName):
             rawName = "xsunfolded_" + variation+ c
             sys.stdout.flush()
 
-            hReco = doUnfold(histo.Clone(), histos[baseMC][r].Clone())
+            hReco = doUnfold(histo.Clone(), histos[baseMC][r].Clone())[0] # chi2 is on second part of ntuple
             hReco.SetName(rawName)
             odirROOTfile.WriteTObject(hReco, rawName)
+
+            if "central" in variation:
+                scanName = "chi2scan_"+rawName
+                hScan = ROOT.TH1F(scanName, scanName+";iterations;chi^{2}", 8, 0.5, 8.5)
+                hScan.GetYaxis().SetTitleOffset(1.8)
+                for i in xrange(1,9):
+                    chi2 = doUnfold(histo.Clone(), histos[baseMC][r].Clone(), i)[1]
+                    iBin = hScan.FindBin(i)
+                    hScan.SetBinContent(iBin, chi2)
+                canv = ROOT.TCanvas()
+                canv.SetLeftMargin(0.2)
+                hScan.Draw()
+                canv.Print(optionsReg["odir"]+"/{}_{}.png".format(action,scanName))
+                canv.Print(optionsReg["odir"]+"/{}_{}.pdf".format(action,scanName))
 
             # now - toyMC approac to limited MC statistics
             todo = ["response", "fakes", "truth"]
             #todo = ["truth"]
-            global ntoys
+            if optionsReg["disableToys"]:
+                todo = []
             if variation == "central":
                 badToys = 0
                 for t in todo:
                     #   TProfile(const char* name, const char* title, Int_t nbinsx, const Double_t* xbins, Option_t* option = "")
                     bins = hReco.GetXaxis().GetXbins()
                     profile =  TProfile("prof_{}_{}".format(rawName, t), "", bins.GetSize()-1, bins.GetArray())
-                    for i in xrange(0, ntoys):
+                    for i in xrange(0, optionsReg["ntoys"]):
                         clonedResponse = histos[baseMC][r].Clone()
                         htruth = clonedResponse.Htruth()
                         hfakes = clonedResponse.Hfakes()
@@ -253,7 +277,7 @@ def unfold(action, infileName):
 
                         newResponse = ROOT.RooUnfoldResponse(hmeas, htruth, hresponse, \
                                                              "resp_{}_{}_{}".format(rawName, t,i)) 
-                        hRecoVaried = doUnfold(histo.Clone(), newResponse)
+                        hRecoVaried = doUnfold(histo.Clone(), newResponse)[0]
                         #print "TTT", hReco.Integral(), hRecoVaried.Integral()
                         binv1 =  hRecoVaried.GetBinContent(1)
                         if math.isnan(binv1) or math.isinf(binv1): 
@@ -308,7 +332,7 @@ def compareMCGentoMCUnfolded(action, infileName):
         return
 
     # detaGen_central_jet15
-    fileWithUnfoldedPlotsName = odir+"/mnxsHistos_unfolded_"+action +".root"
+    fileWithUnfoldedPlotsName = optionsReg["odir"]+"/mnxsHistos_unfolded_"+action +".root"
     fileWithUnfoldedPlots = ROOT.TFile(fileWithUnfoldedPlotsName)
 
 
@@ -336,13 +360,15 @@ def compareMCGentoMCUnfolded(action, infileName):
         trueMax = max(genHisto.GetMaximum(), unfoldedHisto.GetMaximum())
         genHisto.SetMaximum(trueMax*1.07)
 
-        c.Print(odir+"/MConMCunfoldingTest_"+action+t+".png")
+        c.Print(optionsReg["odir"]+"/MConMCunfoldingTest_"+action+t+".png")
 
 def main():
     CommonFSQFramework.Core.Style.setTDRStyle()
     possibleActions = getPossibleActions()
-    global alaGri
-    alaGri = True
+    optionsReg["alaGri"] = True
+    optionsReg["ntoys"]  = 1000
+    optionsReg["unfNIter"]  = 3
+    optionsReg["disableToys"]  = False
     
     parser = OptionParser(usage="usage: %prog [options] filename",
                             version="%prog 1.0")
@@ -358,9 +384,9 @@ def main():
         sys.exit()
 
     infileName = "plotsMNxs_{}.root".format(options.variant)
-    global odir
     odir = "~/tmp/unfolded_{}/".format(options.variant)
     os.system("mkdir -p "+odir)
+    optionsReg["odir"] = odir
 
     #possibleActions = ["pythiaOnPythia",  "herwigOnPythia", "pythiaOnHerwig", "herwigOnHerwig"]
     for action in possibleActions:
