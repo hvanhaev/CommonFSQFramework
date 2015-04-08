@@ -106,6 +106,7 @@ def main():
     DrawMNPlots.banner()
     firstPass = True
 
+
     if not options.justDivide:
         legend = ROOT.TLegend(0.6, 0.7, 0.9, 0.85)
         legend.SetFillColor(0)
@@ -113,6 +114,17 @@ def main():
     for h in toPlot.keys():   # not sure if h in toPlot will always give the same order as h in toPlot.keys()
         if firstPass:
             toPlot[h].Draw()
+            nameH = toPlot[h].GetName()
+            xLab = yLab = ""
+            if "ptHat" == nameH:
+                xLab = "#hat{p}_{T}"
+                yLab = "events [a.u.]"
+
+            toPlot[h].GetXaxis().SetTitle(xLab)
+            toPlot[h].GetYaxis().SetTitle(yLab)
+            toPlot[h].GetYaxis().SetTitleOffset(1.8)
+            toPlot[h].GetXaxis().SetTitleOffset(1.5)
+
             toPlot[h].SetMinimum(0)
             firstPass = False
         else:
@@ -131,11 +143,15 @@ def main():
         h1 = toPlot[toPlot.keys()[0]].Clone()
         h2 = toPlot[toPlot.keys()[1]].Clone()
         frame = ROOT.gPad.DrawFrame(h1.GetXaxis().GetXmin(), 0.5, h1.GetXaxis().GetXmax(), 1.2)
+        frame.GetYaxis().SetTitle("ratio")
+        frame.GetYaxis().SetTitleSize(0.13)
+        frame.GetYaxis().SetTitleOffset(0.5)
         h1.Divide(h2)
         h1.SetLineColor(1)
         h1.SetMarkerColor(1)
         #f = ROOT.TF1("f1", "[0]*x+[1]", h1.GetXaxis().GetXmin(), h1.GetXaxis().GetXmax())
         h1.Draw("SAME")
+
         #h1.Fit(f, "", "", 20, h1.GetXaxis().GetXmax())
         #f.SetLineColor(1)
         #f.Draw("SAME")
