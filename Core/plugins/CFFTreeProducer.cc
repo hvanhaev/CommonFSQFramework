@@ -32,6 +32,10 @@
 #include "CommonFSQFramework/Core/interface/RecoTrackView.h"
 #include "CommonFSQFramework/Core/interface/VerticesView.h"
 
+#include "CommonFSQFramework/Core/interface/JetView.h"
+#include "CommonFSQFramework/Core/interface/TriggerResultsView.h"
+#include "CommonFSQFramework/Core/interface/GenericCandidateView.h"
+
 //
 // class declaration
 //
@@ -76,10 +80,64 @@ CFFTreeProducer::CFFTreeProducer(const edm::ParameterSet& iConfig)
 {
     edm::Service<TFileService> tFileService;
     m_tree = tFileService->make<TTree>("data", "data");
-    m_views.push_back(new EventIdData(iConfig.getParameter< edm::ParameterSet >("EventData"), m_tree));
-    m_views.push_back(new GenTrackView(iConfig.getParameter< edm::ParameterSet >("GenTrackView"), m_tree));
-    m_views.push_back(new RecoTrackView(iConfig.getParameter< edm::ParameterSet >("RecoTrackView"), m_tree));
-    m_views.push_back(new VerticesView(iConfig.getParameter< edm::ParameterSet >("VerticesView"), m_tree));
+
+    std::vector< std::string > allParams = iConfig.getParameterNames();
+
+    std::set< std::string> prefixes;
+    for (size_t i = 0; i < allParams.size();++i){
+        std::string name = allParams.at(i);
+        if (name.find("@") != std::string::npos) continue; // remove some CMSSW artifacts
+
+        if (!iConfig.existsAs<edm::ParameterSet>(name)) {
+            throw "Parameter " + name + " is not a pset as expected";
+        }
+
+        edm::ParameterSet pset = iConfig.getParameter< edm::ParameterSet >(name);
+        if (!pset.existsAs<std::string>("miniView")){
+            throw "Provide miniView (tell me what miniView to create) in pset " +  name;
+        }
+        std::string miniViewType = pset.getParameter<std::string>("miniView");
+
+
+        if (!pset.existsAs<std::string>("branchPrefix", false)){
+            throw "Provide branchPrefix in pset " +  name;
+        }
+
+        std::string prefix = pset.getUntrackedParameter<std::string>("branchPrefix");
+        if (prefixes.count(prefix)!=0)
+            throw "Multiple prefixes (?) - "+prefix;
+
+        prefixes.insert(prefix);
+
+
+        if (miniViewType == "JetView") {
+            m_views.push_back(new JetView(pset, m_tree));
+        }
+        else if (miniViewType == "TriggerResultsView") {
+            m_views.push_back(new TriggerResultsView(pset, m_tree));
+        }
+        else if (miniViewType == "GenericCandidateView") {
+            m_views.push_back(new GenericCandidateView(pset, m_tree));
+        }
+        else if (miniViewType == "GenTrackView") {
+            m_views.push_back(new GenTrackView(pset, m_tree));
+        }
+        else if (miniViewType == "RecoTrackView") {
+            m_views.push_back(new RecoTrackView(pset, m_tree));
+        }
+        else if (miniViewType == "VerticesView") {
+            m_views.push_back(new VerticesView(pset, m_tree));
+        }
+        else {
+            throw "Miniview not known: "+ miniViewType;
+        }
+
+    }
+
+    // run/event number
+    m_views.push_back(new EventIdData(edm::ParameterSet(), m_tree));
+
+
 }
 
 CFFTreeProducer::~CFFTreeProducer() {}
