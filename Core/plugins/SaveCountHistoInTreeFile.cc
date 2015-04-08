@@ -35,6 +35,8 @@
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "DataFormats/Common/interface/MergeableCounter.h"
 #include "TH1D.h"
+
+#include <iostream>
 //
 // class declaration
 //
