@@ -86,6 +86,13 @@ class SingleJet(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader):
     def finalize(self):
         print "Finalize:"
         normFactor = self.getNormalizationFactor()
+        # exercise A.2
+        #  this is the lumi for jet15 trigger in JetMETtau
+        if self.isData:
+            print "Expected norm factor is 1. Got", normFactor
+            print "Changeing norm factor to have properly normalized data histo"
+            normFactor = 1/0.013781
+
         print "  applying norm", normFactor
         for h in self.hist:
             self.hist[h].Scale(normFactor)
