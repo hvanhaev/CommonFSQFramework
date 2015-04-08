@@ -182,6 +182,8 @@ class MNxsAnalyzerClean(CommonFSQFramework.Core.ExampleProofReader.ExampleProofR
         binsNew = self.variantFilter.bins()
 
         # note: set gives as unique items, since _central is repeated
+        self.hist["ptHat"] = ROOT.TH1F("ptHat",   "ptHat",  100, 0, 50)
+
         for shift in set(self.todoShifts+self.shiftsPU):
             for trg in todoTrg:
                 t = shift+trg
@@ -190,6 +192,8 @@ class MNxsAnalyzerClean(CommonFSQFramework.Core.ExampleProofReader.ExampleProofR
                 self.hist["etaLead"+t] =  ROOT.TH1F("etaLead"+t,   "etaLead"+t,  100, -5, 5)
                 self.hist["etaSublead"+t] =  ROOT.TH1F("etaSublead"+t,   "etaSublead"+t,  100, -5, 5)
                 self.hist["xsVsDeltaEta"+t] =  ROOT.TH1F("xs"+t,   "xs"+t, len(binsNew)-1, binsNew)
+                self.hist["miss"+t] = self.hist["xsVsDeltaEta"+t].Clone("miss"+t)
+
                 self.hist["vtx"+t] =  ROOT.TH1F("vtx"+t,   "vtx"+t,  10, -0.5, 9.5)
 
                 if self.unfoldEnabled:
@@ -198,6 +202,7 @@ class MNxsAnalyzerClean(CommonFSQFramework.Core.ExampleProofReader.ExampleProofR
                                                                     self.hist["xsVsDeltaEta"+t], 
                                                                     dummy,
                                                                     "response"+t,"response"+t)
+
 
         # in principle trigger does not applies to gen plots. We keep consistent naming though, so the unfolded result to gen level plots is possible
         # in each category
@@ -389,6 +394,10 @@ class MNxsAnalyzerClean(CommonFSQFramework.Core.ExampleProofReader.ExampleProofR
                 variationName = "_"+spl[2]
                 puWeights[trgName][variationName] = self.lumiWeighters[lw].weight(truePU)
 
+        # note: this is intentionally before ptHat reweighing
+        if not self.isData:
+            self.hist["ptHat"].Fill(self.fChain.qScale, weightBase)
+
         if not self.isData and  self.applyPtHatReweighing:
             ptHat = self.fChain.qScale
             w = 1.
@@ -530,6 +539,7 @@ class MNxsAnalyzerClean(CommonFSQFramework.Core.ExampleProofReader.ExampleProofR
                         for w in weightNoNorm:
                             histoName = w + genTopology
                             self.hist["response"+histoName].Miss(detaGen, weightNoNorm[w])
+                            self.hist["miss"+histoName].Fill(detaGen, weightNoNorm[w])
 
     def finalize(self):
         print "Finalize:"
@@ -537,6 +547,18 @@ class MNxsAnalyzerClean(CommonFSQFramework.Core.ExampleProofReader.ExampleProofR
             dname = "/nfs/dust/cms/user/fruboest/2015.01.MN/slc6/CMSSW_7_0_5/src/CommonFSQFramework/Core/test/MNxsectionAna/bak/"
             profName = dname + "stats"
             self.pr.dump_stats(profName)
+
+        for h in self.hist:
+            if not h.startswith("response"): continue
+            def cloneAndAdd(h, name):
+                hh = h.Clone(name)
+                hh.SetName(name)
+                self.addToOutput(hh)
+
+            cloneAndAdd(self.hist[h].Hfakes(), "fake"+h)
+            cloneAndAdd(self.hist[h].Htruth(), "truth"+h)
+            cloneAndAdd(self.hist[h].Hmeasured(), "measured"+h)
+            cloneAndAdd(self.hist[h].Hresponse(), "resp"+h)
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
@@ -568,7 +590,7 @@ if __name__ == "__main__":
     # '''
     # '''
     #maxFilesMC = 48
-    maxFilesMC = 2
+    #maxFilesMC = 1
     #maxFilesData = 1
     nWorkers = 10
     #maxFilesMC = 16

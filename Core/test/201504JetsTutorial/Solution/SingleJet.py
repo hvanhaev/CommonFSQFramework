@@ -86,6 +86,13 @@ class SingleJet(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader):
     def finalize(self):
         print "Finalize:"
         normFactor = self.getNormalizationFactor()
+        # exercise A.2
+        #  this is the lumi for jet15 trigger in JetMETtau
+        if self.isData:
+            print "Expected norm factor is 1. Got", normFactor
+            print "Changeing norm factor to have properly normalized data histo"
+            normFactor = 1/0.013781
+
         print "  applying norm", normFactor
         for h in self.hist:
             self.hist[h].Scale(normFactor)
@@ -102,10 +109,15 @@ if __name__ == "__main__":
 
     # debug config:
     # Run printTTree.py alone to get the samples list
-    #sampleList = []
-    #sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
+
+    # Exercise A.1
+    sampleList = []
+    sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
+    sampleList.append("QCD_Pt-15to1000_TuneEE3C_Flat_7TeV_herwigpp")
+    sampleList.append("JetMETTau-Run2010A-Apr21ReReco-v1")
+
     maxFilesMC = 1
-    maxFilesData = 1
+    #maxFilesData = 1
     nWorkers = 4
 
 
