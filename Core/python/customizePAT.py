@@ -94,13 +94,28 @@ def customize(process):
         process.XS.provHack = cms.string(stringForProv)
         process.TMFDataForProv = cms.PSet(notes = cms.string("test"))
 
-    # also - GT 
-
     #process.out.SelectEvents = cms.untracked.PSet(
     #        SelectEvents = selectorPaths
     #)
 
    
+    return process
+
+def customizeGT(process):
+    if not hasattr(process, "GlobalTag"):
+        raise Exception(("Process has no GT defined!"))
+
+    import os
+    if "TMFSampleName" not in os.environ:
+        print "Warning: input ds not known (TMFSampleName env not set). GlobalTag wont be customized"
+        return process
+
+    import CommonFSQFramework.Core.Util
+    sampleList=CommonFSQFramework.Core.Util.getAnaDefinition("sam")
+    s = os.environ["TMFSampleName"]
+
+    print "Setting globalTag to", sampleList[s]["GT"], "for sample",s
+    process.GlobalTag.globaltag = sampleList[s]["GT"]
     return process
 
 def removeEdmOutput(process):
