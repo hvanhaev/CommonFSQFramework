@@ -114,6 +114,9 @@ process.out.fileName = 'patTuple_addJets.root'
 import CommonFSQFramework.Core.customizePAT
 process = CommonFSQFramework.Core.customizePAT.customize(process)
 
+# GT customization
+process = CommonFSQFramework.Core.customizePAT.customizeGT(process)
+
 process.JetTree = cms.EDAnalyzer("CFFTreeProducer",
     JetViewPFAK4CHS  = cms.PSet(
         miniView = cms.string("JetView"),

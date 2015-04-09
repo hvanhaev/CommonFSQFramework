@@ -75,7 +75,16 @@ done by another customization function:
 
 process = CommonFSQFramework.Core.customizePAT.addTreeProducer(process, process.JetTree)
 
-4.  TODO: describe GT modifications (different GT for data/MC)
+4. Global tag modifications 
+
+  runCrabJobs.py scripts are able to communicate with the python configuration
+via shell environment variables. Variable TMFSampleName contains a name of a
+sample for which crab jobs are created. Following customization call
+
+process = CommonFSQFramework.Core.customizePAT.customizeGT(process)
+
+tries to read TMFSampleName variable from environment and set the global
+tag to the one from samplesDictionary[TMFSampleName]["GT"] variable
 
 
 
