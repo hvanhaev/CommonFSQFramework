@@ -16,7 +16,7 @@ is nothing that forces us to use PAT if we dont need it.
 PhysicsTools/PatAlgos/test/patTuple_addJets_cfg.py
 
  This file was copied and saved as S0_makePAT_74.py
-
+(CommonFSQFramework/Core/test/SkimConfigurations/Jets directory)
 
 2. Add basic CFF services
 
@@ -67,13 +67,34 @@ process.JetTree = cms.EDAnalyzer("CFFTreeProducer",
     (...) # other miniviews
 )
 
-See CFFTreeProducer source code (plugins directory) in order to learn what
-miniviews are supported
+See CFFTreeProducer source code (plugins directory) to learn what
+miniviews are supported. Please contact us if you want your miniview to be
+included
 
 Last thing to do is to make sure our tree producer will be executed. This is
 done by another customization function:
 
 process = CommonFSQFramework.Core.customizePAT.addTreeProducer(process, process.JetTree)
+
+3b) Preffered way to configure tree producer
+
+A different way to configure the CFFTreeProducer is to first create it without
+any miniviews:
+
+--------------
+process.JetTree = cms.EDAnalyzer("CFFTreeProducer")
+--------------
+
+and than to fetch and "attach" to it miniViews configuration from python
+directory:
+
+----------------
+import CommonFSQFramework.Core.JetViewsConfigs
+process.JetTree._Parameterizable__setParameters(CommonFSQFramework.Core.JetViewsConfigs.get(["JetViewPFAK4CHS"]))
+----------------
+ 
+The "get" method expects a list of configuration names. This way a centralized 
+miniviews configuration is avaliable to all skim configurations.
 
 4. Global tag modifications 
 
@@ -87,6 +108,24 @@ tries to read TMFSampleName variable from environment and set the global
 tag to the one from samplesDictionary[TMFSampleName]["GT"] variable
 
 
+5. data/MC customization
+
+ Sometims it is necessary to apply some specific configuration changes when
+running on data/MC. This again can be done using "TMFSampleName" env variable
+
+----------------------------
+import os
+if "TMFSampleName" not in os.environ:
+    print "TMFSampleName not found, assuming we are running on MC"
+else:
+    s = os.environ["TMFSampleName"]
+    sampleList=CommonFSQFramework.Core.Util.getAnaDefinition("sam")
+    isData =  sampleList[s]["isData"]
+    if isData:
+        print "Disabling MC-specific features for sample",s
+        runOnData(process)    
+        removeMCMatching(process, ['All'])  
+-----------------
 
 
 
