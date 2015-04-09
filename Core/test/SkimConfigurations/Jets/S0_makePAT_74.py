@@ -117,25 +117,22 @@ process = CommonFSQFramework.Core.customizePAT.customize(process)
 # GT customization
 process = CommonFSQFramework.Core.customizePAT.customizeGT(process)
 
-process.JetTree = cms.EDAnalyzer("CFFTreeProducer",
-    JetViewPFAK4CHS  = cms.PSet(
-        miniView = cms.string("JetView"),
-        storeageVersion = cms.untracked.int32(1),
-        disableJetID = cms.bool(True),
-        optionalCaloJets4ID = cms.InputTag("ak5CaloJets","","RECO"),
-        optionalCaloID4ID  = cms.InputTag("ak5JetID"),
-        branchPrefix = cms.untracked.string("PFAK4CHS"),
-        maxEta = cms.double(5.2),
-        minPt = cms.double(3),
-        maxnum = cms.int32(3),
-        input = cms.InputTag("selectedPatJetsAK4PFCHSCopy"),
-        variations= cms.vstring("", "jecUp", "jecDown"),
-        jerFactors = cms.vstring(  # PF10
-                "5.5 1 0.007 0.07 0.072"),
-
-    )
-)
-
+process.JetTree = cms.EDAnalyzer("CFFTreeProducer")
+import CommonFSQFramework.Core.JetViewsConfigs
+process.JetTree._Parameterizable__setParameters(CommonFSQFramework.Core.JetViewsConfigs.get(["JetViewPFAK4CHS"]))
 process = CommonFSQFramework.Core.customizePAT.addTreeProducer(process, process.JetTree)
+
+# PAT customization for data
+import os
+if "TMFSampleName" not in os.environ:
+    print "TMFSampleName not found, assuming we are running on MC"
+else:
+    s = os.environ["TMFSampleName"]
+    sampleList=CommonFSQFramework.Core.Util.getAnaDefinition("sam")
+    isData =  sampleList[s]["isData"]
+    if isData:
+        print "Disabling MC-specific features for sample",s
+        runOnData(process)    
+        removeMCMatching(process, ['All'])  
 
 
