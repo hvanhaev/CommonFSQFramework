@@ -3,23 +3,20 @@
 import os
 import fnmatch
 
-
-
 #todoSteps = ["proof", "hadd", "draw", "unfold", "merge"]
-#todoCat = ["InclusiveBasic", "InclusiveAsym", "InclusiveWindow", "MNBasic", "MNAsym", "MNWindow"]
-#todoCat = ["InclusiveWindow", "InclusiveAsym", "InclusiveBasic", "MNBasic", "MNAsym", "MNWindow", "FWD11_002"]
+todoCat = ["InclusiveBasic", "InclusiveAsym", "InclusiveWindow", "MNBasic", "MNAsym", "MNWindow"]
 #todoCat = ["InclusiveBasic"]
-todoCat = ["MNAsym"]
+#todoCat = ["MNAsym"]
 #todoCat = ["MNWindow"]
 #todoCat = ["FWD11_002"]
 #todoCat = ["InclusiveBasic"]
 todoSteps = []
 #todoSteps.append("proof")
-todoSteps.append("simpleMCplots")
+#todoSteps.append("simpleMCplots")
 #todoSteps.append("hadd")
 #todoSteps.append("draw")
-#todoSteps.append("unfold")
-#todoSteps.append("merge")
+todoSteps.append("unfold")
+todoSteps.append("merge")
 
 for cat in todoCat:
     for step in todoSteps:
