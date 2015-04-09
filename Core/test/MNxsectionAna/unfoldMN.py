@@ -99,6 +99,7 @@ def doUnfold(measured, rooresponse, nIter = None):
     unfold = ROOT.RooUnfoldBayes(rooresponse, measured, nIter)
 
     errorTreatment = 1 
+    #errorTreatment = 3
     hReco= unfold.Hreco(errorTreatment)
 
     chi2 = unfold.Chi2(rooresponse.Htruth(),errorTreatment)
@@ -127,6 +128,27 @@ def scale2d(h, s):
             h.SetBinError(i, j, err)
 
 
+# this returns a tuple of three histograms
+#   central histo (with errors set to 0)
+#   +- err histos
+def extractErrors(h):
+    ret = h.Clone()
+    retUp = h.Clone()
+    retDown = h.Clone()
+    map(lambda h: h.Reset(), [ret, retUp, retDown])
+    map(lambda h: h.Sumw2(), [ret, retUp, retDown])
+
+    for i in xrange(0, h.GetNbinsX()+2):
+        val = h.GetBinContent(i)
+        err = h.GetBinError(i)
+        ret.SetBinContent(i, val)
+        ret.SetBinError(i, 0)
+        retUp.SetBinContent(i, val+err)
+        retUp.SetBinError(i, 0)
+        retDown.SetBinContent(i, val-err)
+        retDown.SetBinError(i, 0)
+
+    return (ret, retUp, retDown)
 
 def getPossibleActions():
     return set(["pythiaOnData", "herwigOnData", "pythiaOnHerwig", "herwigOnPythia", "herwigOnHerwig", "pythiaOnPythia"])
@@ -228,9 +250,32 @@ def unfold(action, infileName):
             sys.stdout.flush()
 
             hReco = doUnfold(histo.Clone(), histos[baseMC][r].Clone())[0] # chi2 is on second part of ntuple
-            hReco.SetName(rawName)
-            odirROOTfile.WriteTObject(hReco, rawName)
+            # unfolding sets the errors of the unfolded histo to the ones from 
+            # covariance matrix (ie this do not correspond to  stat errors from input distribution)
+            #  so we treat those as just another variation
+            # note: disabled
+            if "central" in variation and False:
+                hAndErr=extractErrors(hReco)
+                centralValueWithoutErrors = hAndErr[0]
+                up   = hAndErr[1]
+                down = hAndErr[2]
+                centralValueWithoutErrors.SetName(rawName)
+                centralValueWithoutErrorsRawName = rawName
+                # if toyMC was disabled write without errors
+                # if toyMC is enabled stat errors will be fetched from toyMC variations named "measured"
+                if optionsReg["disableToys"]:
+                    odirROOTfile.WriteTObject(centralValueWithoutErrors, centralValueWithoutErrorsRawName)
+                upName = rawName.replace("central", "unfcovUp")
+                downName = rawName.replace("central", "unfcovDown")
+                up.SetName(upName)
+                odirROOTfile.WriteTObject(up,upName)
+                down.SetName(downName)
+                odirROOTfile.WriteTObject(down,downName)
+            else:
+                hReco.SetName(rawName)
+                odirROOTfile.WriteTObject(hReco, rawName)
 
+            # perform chi2 vs nIter scan (doesnt affect the final result
             if "central" in variation:
                 scanName = "chi2scan_"+rawName
                 hScan = ROOT.TH1F(scanName, scanName+";iterations;chi^{2}", 8, 0.5, 8.5)
@@ -242,10 +287,11 @@ def unfold(action, infileName):
                 canv = ROOT.TCanvas()
                 canv.SetLeftMargin(0.2)
                 hScan.Draw()
-                canv.Print(optionsReg["odir"]+"/{}_{}.png".format(action,scanName))
-                canv.Print(optionsReg["odir"]+"/{}_{}.pdf".format(action,scanName))
+                canv.Print(optionsReg["odir"]+"/chi2/{}_{}.png".format(action,scanName))
+                canv.Print(optionsReg["odir"]+"/chi2/{}_{}.pdf".format(action,scanName))
 
             # now - toyMC approac to limited MC statistics
+            #todo = ["response", "fakes", "truth", "measured"]
             todo = ["response", "fakes", "truth"]
             #todo = ["truth"]
             if optionsReg["disableToys"]:
@@ -262,6 +308,8 @@ def unfold(action, infileName):
                         hfakes = clonedResponse.Hfakes()
                         hresponse = clonedResponse.Hresponse()
                         hmeas = clonedResponse.Hmeasured()
+
+                        histoToUnfold = histo.Clone()
                         if t == "truth":
                             vary(htruth)
                         elif t == "fakes":
@@ -272,12 +320,15 @@ def unfold(action, infileName):
                             hmeas.Add(fakesDiff)
                         elif t == "response":
                             vary(hresponse)
+                        elif t == "measured":
+                            vary(histoToUnfold)
+
                         else:
                             raise Exception("dont know what to do")
 
                         newResponse = ROOT.RooUnfoldResponse(hmeas, htruth, hresponse, \
                                                              "resp_{}_{}_{}".format(rawName, t,i)) 
-                        hRecoVaried = doUnfold(histo.Clone(), newResponse)[0]
+                        hRecoVaried = doUnfold(histoToUnfold, newResponse)[0]
                         #print "TTT", hReco.Integral(), hRecoVaried.Integral()
                         binv1 =  hRecoVaried.GetBinContent(1)
                         if math.isnan(binv1) or math.isinf(binv1): 
@@ -309,8 +360,22 @@ def unfold(action, infileName):
                         print "binc: {} {}, vals ratio {}, error: {}".format(binc1, binc2, val1/val2, errProf/val1)
                         hUp.SetBinContent(i, val1+errProf)
                         hDown.SetBinContent(i, val1-errProf)
-                    odirROOTfile.WriteTObject(hUp, rawNameUp)
-                    odirROOTfile.WriteTObject(hDown, rawNameDown)
+
+                    if t != "measured":
+                        odirROOTfile.WriteTObject(hUp, rawNameUp)
+                        odirROOTfile.WriteTObject(hDown, rawNameDown)
+                    else:
+                        for i in xrange(0, centralValueWithoutErrors.GetNbinsX()+1):
+                            valCen = centralValueWithoutErrors.GetBinContent(i)
+                            valUp  = hUp.GetBinContent(i)
+                            valDown  = hDown.GetBinContent(i)
+                            err1 = abs(valCen-valUp)
+                            err2 = abs(valCen-valDown)
+                            err = (err1+err2)/2.
+                            if valCen > 0:
+                                print "Stat errors from toy:", err, valCen, err/valCen
+                            centralValueWithoutErrors.SetBinError(i,err)
+                        odirROOTfile.WriteTObject(centralValueWithoutErrors, centralValueWithoutErrorsRawName)
                     print "TOYmc done for", r, " bad toys:", badToys
 
                     #ccc = hReco.Clone()
@@ -361,6 +426,7 @@ def compareMCGentoMCUnfolded(action, infileName):
         genHisto.SetMaximum(trueMax*1.07)
 
         c.Print(optionsReg["odir"]+"/MConMCunfoldingTest_"+action+t+".png")
+        c.Print(optionsReg["odir"]+"/MConMCunfoldingTest_"+action+t+".pdf")
 
 def main():
     CommonFSQFramework.Core.Style.setTDRStyle()
@@ -369,6 +435,7 @@ def main():
     optionsReg["ntoys"]  = 1000
     optionsReg["unfNIter"]  = 3
     optionsReg["disableToys"]  = False
+    #optionsReg["disableToys"]  = True
     
     parser = OptionParser(usage="usage: %prog [options] filename",
                             version="%prog 1.0")
@@ -386,6 +453,7 @@ def main():
     infileName = "plotsMNxs_{}.root".format(options.variant)
     odir = "~/tmp/unfolded_{}/".format(options.variant)
     os.system("mkdir -p "+odir)
+    os.system("mkdir -p "+odir+"/chi2")
     optionsReg["odir"] = odir
 
     #possibleActions = ["pythiaOnPythia",  "herwigOnPythia", "pythiaOnHerwig", "herwigOnHerwig"]
@@ -394,5 +462,6 @@ def main():
         compareMCGentoMCUnfolded(action, infileName)
 
 if __name__ == "__main__":
+    # note http://indico.cern.ch/event/107747/session/1/material/slides/1?contribId=72, s.19
     main()
 
