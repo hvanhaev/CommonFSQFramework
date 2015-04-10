@@ -119,6 +119,17 @@ def main():
             if "ptHat" == nameH:
                 xLab = "#hat{p}_{T}"
                 yLab = "events [a.u.]"
+            elif "miss" in nameH:
+                xLab = "#Delta #eta"
+                yLab = "p_{miss}"
+                toPlot[h].SetMinimum(0)
+                toPlot[h].SetMaximum(1)
+            elif "fake" in nameH:
+                xLab = "#Delta #eta"
+                yLab = "p_{fake}"
+                toPlot[h].SetMinimum(0)
+                toPlot[h].SetMaximum(1)
+
 
             toPlot[h].GetXaxis().SetTitle(xLab)
             toPlot[h].GetYaxis().SetTitle(yLab)
