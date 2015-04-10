@@ -248,8 +248,16 @@ def unfold(action, infileName):
             print "Doing: ", c, r, variation
             rawName = "xsunfolded_" + variation+ c
             sys.stdout.flush()
-
+        
+            '''
+            histoWithChangedErrors = histo.Clone()
+            for i in xrange(histoWithChangedErrors.GetNbinsX()+2):
+                err = histoWithChangedErrors.GetBinError(i)
+                histoWithChangedErrors.SetBinError(i, err/2)
+            hReco = doUnfold(histoWithChangedErrors, histos[baseMC][r].Clone())[0] # chi2 is on second part of ntuple
+            '''
             hReco = doUnfold(histo.Clone(), histos[baseMC][r].Clone())[0] # chi2 is on second part of ntuple
+            # '''
             # unfolding sets the errors of the unfolded histo to the ones from 
             # covariance matrix (ie this do not correspond to  stat errors from input distribution)
             #  so we treat those as just another variation

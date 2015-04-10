@@ -12,11 +12,11 @@ todoCat = ["InclusiveBasic", "InclusiveAsym", "InclusiveWindow", "MNBasic", "MNA
 #todoCat = ["InclusiveBasic"]
 todoSteps = []
 #todoSteps.append("proof")
-#todoSteps.append("simpleMCplots")
+todoSteps.append("simpleMCplots")
 #todoSteps.append("hadd")
 #todoSteps.append("draw")
-todoSteps.append("unfold")
-todoSteps.append("merge")
+#todoSteps.append("unfold")
+#todoSteps.append("merge")
 
 for cat in todoCat:
     for step in todoSteps:
@@ -42,7 +42,7 @@ for cat in todoCat:
             for t in todo:
                 os.system("./simpleMCplots.py -a {0},{1} -b {0},{2} -v {3}".format(t,samples[0], samples[1], cat))
                 #os.system("../simpleMCplots.py -d -a {0},{1} -b {0},{2} -v {3}".format(t,samples[0], samples[1], cat))
-            continue
+            #continue
             ptypes = ["fake" , "miss"]
             for ptype in ptypes:
                 for s in samples:
