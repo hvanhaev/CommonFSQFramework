@@ -3,13 +3,10 @@
 import os
 import fnmatch
 
-
-
 #todoSteps = ["proof", "hadd", "draw", "unfold", "merge"]
-#todoCat = ["InclusiveBasic", "InclusiveAsym", "InclusiveWindow", "MNBasic", "MNAsym", "MNWindow"]
-#todoCat = ["InclusiveWindow", "InclusiveAsym", "InclusiveBasic", "MNBasic", "MNAsym", "MNWindow", "FWD11_002"]
+todoCat = ["InclusiveBasic", "InclusiveAsym", "InclusiveWindow", "MNBasic", "MNAsym", "MNWindow"]
 #todoCat = ["InclusiveBasic"]
-todoCat = ["MNAsym"]
+#todoCat = ["MNAsym"]
 #todoCat = ["MNWindow"]
 #todoCat = ["FWD11_002"]
 #todoCat = ["InclusiveBasic"]
@@ -45,7 +42,7 @@ for cat in todoCat:
             for t in todo:
                 os.system("./simpleMCplots.py -a {0},{1} -b {0},{2} -v {3}".format(t,samples[0], samples[1], cat))
                 #os.system("../simpleMCplots.py -d -a {0},{1} -b {0},{2} -v {3}".format(t,samples[0], samples[1], cat))
-            continue
+            #continue
             ptypes = ["fake" , "miss"]
             for ptype in ptypes:
                 for s in samples:
