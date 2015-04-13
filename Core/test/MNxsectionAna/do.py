@@ -17,7 +17,7 @@ todoSteps = []
 #todoSteps.append("hadd")
 #todoSteps.append("draw")
 #todoSteps.append("unfold")
-#todoSteps.append("merge")
+todoSteps.append("merge")
 todoSteps.append("rivetExport")
 
 def main():
@@ -71,8 +71,8 @@ def main():
                 if cat == "FWD11_002":
                     os.system("./mergeUnfoldedResult.py -v {} -n xs  -b -s 5.6".format(cat))
                 else:
-                    os.system("./mergeUnfoldedResult.py -v {} -n xs".format(cat))
-                    os.system("./mergeUnfoldedResult.py -v {} -n area".format(cat))
+                    os.system("./mergeUnfoldedResult.py -v {} -n xs -b".format(cat))
+                    os.system("./mergeUnfoldedResult.py -v {} -n area -b".format(cat))
 
     if "rivetExport" in todoSteps:
         mergeF = "/cvmfs/cms.cern.ch/slc6_amd64_gcc481/external/yoda/1.3.0-cms/bin/yodamerge"
