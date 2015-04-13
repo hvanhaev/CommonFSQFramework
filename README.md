@@ -2,11 +2,11 @@
 
 This is the common software analysis package, aimed for processing Run2 data, of the Forward and Small-x QCD group in the CMS experiment at CERN.
 
-For more information regarding this framework, please look at the following pages:
+For more information regarding this framework, please look at the following pages: <br>
 (extensive information, not completely up to date unfortunately)
 https://twiki.cern.ch/twiki/bin/viewauth/CMS/FSQCommonFW
-https://twiki.cern.ch/twiki/bin/viewauth/CMS/FSQCommonFWTutorialP2
-(special tutoral session should be solid)
+https://twiki.cern.ch/twiki/bin/viewauth/CMS/FSQCommonFWTutorialP2 <br>
+(special tutorial session, should be solid) <br>
 https://twiki.cern.ch/twiki/bin/view/CMS/FSQCommonFW201504Jets
 
 Or look into the /Core/doc directory for information.
