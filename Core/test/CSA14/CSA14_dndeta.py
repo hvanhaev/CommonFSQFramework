@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-import CommonFSQFramework.Core.ExampleProofReader
-from  CommonFSQFramework.Core.RecoTracksGetter import RecoTracksGetter
-from  CommonFSQFramework.Core.RecoVertexGetter import RecoVertexGetter
-from  CommonFSQFramework.Core.GenTracksGetter import GenTracksGetter
+import MNTriggerStudies.MNTriggerAna.ExampleProofReader
+from  MNTriggerStudies.MNTriggerAna.RecoTracksGetter import RecoTracksGetter
+from  MNTriggerStudies.MNTriggerAna.RecoVertexGetter import RecoVertexGetter
+from  MNTriggerStudies.MNTriggerAna.GenTracksGetter import GenTracksGetter
 
 import sys, os, time, math
 sys.path.append(os.path.dirname(__file__))
@@ -10,7 +10,7 @@ sys.path.append(os.path.dirname(__file__))
 import ROOT
 ROOT.gROOT.SetBatch(True)
 
-class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader):
+class CSA14_dndeta(MNTriggerStudies.MNTriggerAna.ExampleProofReader.ExampleProofReader):
     def init( self):
         self.triggers   = ["minbias"]
         self.variations = ["central"] # only a central value now
@@ -20,24 +20,28 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
             for v in self.variations:
                 histPostfix = "_" + v + "_" + t
 				# gen level histos
-                self.hist["numGenTracks"+histPostfix] =  ROOT.TH1F("numGenTracks"+histPostfix,   "numGenTracks"+histPostfix,  150, 0, 150)
+                self.hist["numGenTracks"+histPostfix] =  ROOT.TH1F("numGenTracks"+histPostfix,   "numGenTracks"+histPostfix,  50, 0, 50)
                 self.hist["etaGenTracks"+histPostfix] =  ROOT.TH1F("etaGenTracks"+histPostfix,   "etaGenTracks"+histPostfix,  24, -2.4, 2.4)
                 self.hist["phiGenTracks"+histPostfix] =  ROOT.TH1F("phiGenTracks"+histPostfix,   "phiGenTracks"+histPostfix,  25, -math.pi, math.pi)
-                self.hist["ptGenTracks"+histPostfix] =  ROOT.TH1F("ptGenTracks"+histPostfix,   "ptGenTracks"+histPostfix,  120, 0, 6)
+                self.hist["ptGenTracks"+histPostfix] =  ROOT.TH1F("ptGenTracks"+histPostfix,   "ptGenTracks"+histPostfix,  100, 0, 10)
                 self.hist["pdgIDGenTracks"+histPostfix] =  ROOT.TH1F("pdgIDGenTracks"+histPostfix,   "pdgIDGenTracks"+histPostfix,  100, -50, 50)
 				# reco level histos
-                self.hist["numRecoTracks"+histPostfix] =  ROOT.TH1F("numRecoTracks"+histPostfix,   "numRecoTracks"+histPostfix,  150, 0, 150)
+                self.hist["numRecoTracks"+histPostfix] =  ROOT.TH1F("numRecoTracks"+histPostfix,   "numRecoTracks"+histPostfix,  50, 0, 50)
                 self.hist["etaRecoTracks"+histPostfix] =  ROOT.TH1F("etaRecoTracks"+histPostfix,   "etaRecoTracks"+histPostfix,  24, -2.4, 2.4)
                 self.hist["phiRecoTracks"+histPostfix] =  ROOT.TH1F("phiRecoTracks"+histPostfix,   "phiRecoTracks"+histPostfix,  25, -math.pi, math.pi)
-                self.hist["ptRecoTracks"+histPostfix] =  ROOT.TH1F("ptRecoTracks"+histPostfix,   "ptRecoTracks"+histPostfix,  100, 0, 1000)
-                self.hist["dzRecoTracks"+histPostfix] =  ROOT.TH1F("dzRecoTracks"+histPostfix,   "dzRecoTracks"+histPostfix,  100, -200, 200)
-                self.hist["d0RecoTracks"+histPostfix] =  ROOT.TH1F("d0RecoTracks"+histPostfix,   "d0RecoTracks"+histPostfix,  100, -200, 200)
+                self.hist["ptRecoTracks"+histPostfix] =  ROOT.TH1F("ptRecoTracks"+histPostfix,   "ptRecoTracks"+histPostfix,  100, 0, 10)
+                self.hist["dzRecoTracks"+histPostfix] =  ROOT.TH1F("dzRecoTracks"+histPostfix,   "dzRecoTracks"+histPostfix,  100, -20, 20)
+                self.hist["d0RecoTracks"+histPostfix] =  ROOT.TH1F("d0RecoTracks"+histPostfix,   "d0RecoTracks"+histPostfix,  100, -20, 20)
 
                 self.hist["numgoodRecoVertex"+histPostfix] =  ROOT.TH1F("numgoodRecoVertex"+histPostfix,   "numgoodRecoVertex"+histPostfix,  10, 0, 10)
                 self.hist["nTracksRecoVertex"+histPostfix] =  ROOT.TH1F("nTracksRecoVertex"+histPostfix,   "nTracksRecoVertex"+histPostfix,  50, 0, 200)
                 self.hist["zRecoVertex"+histPostfix] =  ROOT.TH1F("zRecoVertex"+histPostfix,   "zRecoVertex"+histPostfix,  60, -30, 30)
                 self.hist["rhoRecoVertex"+histPostfix] =  ROOT.TH1F("rhoRecoVertex"+histPostfix,   "rhoRecoVertex"+histPostfix, 20, 0, 5)
                 self.hist["ndofRecoVertex"+histPostfix] =  ROOT.TH1F("ndofRecoVertex"+histPostfix,   "ndofRecoVertex"+histPostfix,  300, 0, 300)
+    
+                # try other types
+                self.hist["SumPt_vs_Ntrack"+histPostfix] = ROOT.TH2D("SumPt_vs_Ntrack"+histPostfix,"SumPt_vs_Ntrack"+histPostfix,50,0,50,50,0,100)
+                self.hist["MeanNtrack_vs_LeadPt"+histPostfix] = ROOT.TProfile("MeanNtrack_vs_LeadPt"+histPostfix,"MeanNtrack_vs_LeadPt"+histPostfix,50,0,50)
 
         for h in self.hist:
             self.hist[h].Sumw2()
@@ -79,7 +83,7 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
 				# trigger and event selection
                 trigger = False
                 if trg == "minbias":
-                    if numgoodvtx == 1: trigger = True # trigger on exactly one good primary vertex
+                    if self.vertices.getSize() == 1 and numgoodvtx == 1: trigger = True # trigger on exactly one good primary vertex
  			
                 if not trigger: continue
 
@@ -99,10 +103,14 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
 				
 				# fill reco histos
                 numreco = 0
+                sumpt = 0
+                ptmax = 0
                 for track in self.tracks.get(variation):
                     trackp4 = track.recoTracks # wrong naming in Samples_CSA14_Tracks_20140904 skim, this will evolve to trackp4 = track.p4 in next version
                     if trackp4.pt() > 0.5 and abs(trackp4.eta()) < 2.4 and track.highpurity == True:
                         numreco+=1
+                        sumpt+= trackp4.pt()
+                        if trackp4.pt() > ptmax: ptmax = trackp4.pt()
                         self.hist["etaRecoTracks"+histPostfix].Fill(trackp4.eta(), weight)
                         self.hist["phiRecoTracks"+histPostfix].Fill(trackp4.phi(), weight)
                         self.hist["ptRecoTracks"+histPostfix].Fill(trackp4.pt(), weight)
@@ -110,6 +118,9 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
                         self.hist["d0RecoTracks"+histPostfix].Fill(track.d0, weight)
 
                 self.hist["numRecoTracks"+histPostfix].Fill(numreco, weight)
+
+                self.hist["SumPt_vs_Ntrack"+histPostfix].Fill(numreco,sumpt,weight)
+                self.hist["MeanNtrack_vs_LeadPt"+histPostfix].Fill(ptmax,numreco,weight)
 
     # note: this is executed on the slave (ie output will appear in logs),
     #       - before merging the histograms. Here we should apply the histogram 
