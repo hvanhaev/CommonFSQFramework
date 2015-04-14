@@ -5,8 +5,8 @@ import fnmatch
 # note: dont touch todoCatAll variable, since rivet export in mergeUnfolded.py depends on it 
 #   (entry order matters, since it must be consistent with one in rivet routine!)
 todoCatAll = ["InclusiveBasic", "InclusiveAsym", "InclusiveWindow", "MNBasic", "MNAsym", "MNWindow"]
-todoCat = todoCatAll
-#todoCat = ["InclusiveBasic"]
+#todoCat = todoCatAll
+todoCat = ["InclusiveBasic"]
 #todoCat = ["MNAsym", "InclusiveBasic"]
 #todoCat = ["MNWindow"]
 #todoCat = ["FWD11_002"]
@@ -18,7 +18,7 @@ todoSteps = []
 #todoSteps.append("draw")
 #todoSteps.append("unfold")
 todoSteps.append("merge")
-todoSteps.append("rivetExport")
+#todoSteps.append("rivetExport")
 
 def main():
     for cat in todoCat:
