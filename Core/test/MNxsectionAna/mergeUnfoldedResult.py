@@ -12,6 +12,7 @@ import  CommonFSQFramework.Core.Style
 from mnDraw import DrawMNPlots 
 from array import array
 from optparse import OptionParser
+import math
 
 import sys
 def main():
@@ -225,13 +226,26 @@ def main():
     y = array('d')
     xDown = array('d')
     xUp = array('d')
+
+    y4Rivet = array('d')
+    yUp4Rivet = array('d')
+    yDown4Rivet = array('d')
     for iBin in xrange(1, central.GetNbinsX()+1):
         val =  central.GetBinContent(iBin)
+        if val == 0: continue
+
         if val != 0:
-            valDown = unc.GetErrorYlow(iBin-1)/central.GetBinContent(iBin)
-            valUp =   unc.GetErrorYhigh(iBin-1)/central.GetBinContent(iBin)
+            binErr  = central.GetBinError(iBin)
+            errUp = unc.GetErrorYhigh(iBin-1)
+            errDown =  unc.GetErrorYlow(iBin-1)
+            valDown = errDown/val
+            valUp =   errUp/val
             yDown.append(valDown)
             yUp.append(valUp)
+            valDown4Rivet = math.sqrt(errDown*errDown + binErr*binErr  )
+            valUp4Rivet   = math.sqrt(errUp*errUp + binErr*binErr  )
+            yUp4Rivet.append(valUp4Rivet)
+            yDown4Rivet.append(valDown4Rivet)
             #print valDown, valUp
         else:
            yUp.append(0)
@@ -239,11 +253,20 @@ def main():
         #print 
         x.append(unc.GetX()[iBin-1])
         y.append(1)
+        ratio = unc.GetY()[iBin-1]/val
+        if max(ratio-1., 1.-ratio)>0.001:
+            raise Exception("Expected equal values")
+
+        y4Rivet.append(val)
         xDown.append(unc.GetErrorXlow(iBin-1))
         xUp.append(unc.GetErrorXhigh(iBin-1))
 
     #print type(x)
-    uncRatio = ROOT.TGraphAsymmErrors(len(x), x, y, xDown, xUp, yDown, yUp)
+    uncRatio =     ROOT.TGraphAsymmErrors(len(x), x, y, xDown, xUp, yDown, yUp)
+    result4Rivet = ROOT.TGraphAsymmErrors(len(x), x, y4Rivet, xDown, xUp, yDown4Rivet, yUp4Rivet)
+
+    #uncRatio = ROOT.TGraphAsymmErrors(len(x), x, y, xDown, xUp, yDown, yUp)
+
     uncRatio.SetFillStyle(3001)
     uncRatio.SetFillColor(17)
     uncRatio.Draw("2SAME")
@@ -272,12 +295,49 @@ def main():
     c.Print(indir+"/mergedUnfolded_{}_log.pdf".format(options.normalization))
 
 
+    # rivet export
+    from do import todoCatAll
+    if len(todoCatAll) != 6:
+        raise Exception("Error: inconsistent number of categories in todoCatAll")
+    rivet = ROOT.TFile("toRivet.root", "RECREATE")
+    rivetNum = todoCatAll.index(options.variant)+1
+    if "area" == options.normalization:
+        rivetNum += 10
+    numAsStr = str(rivetNum)
+    if len (numAsStr) == 1:
+        numAsStr = "0"+numAsStr
+
+    rivetName = "d"+numAsStr+"-x01-y01"
+    print options.normalization, rivetNum, rivetName
+    rivet.WriteTObject(result4Rivet, rivetName)
+    rivet.Close()
+    del rivet
+
+    import os
+    r2f = "/cvmfs/cms.cern.ch/slc6_amd64_gcc481/external/rivet/1.8.2-cms8/bin/root2flat"
+    if not os.path.isfile(r2f):
+        raise Exception("Cannot find root2flat. Rivet export failed")
+
+    os.system(r2f + " toRivet.root")
+
+    import yoda
+    analysisobjects = yoda.readFLAT(rivetName+".dat")
+    #print type(analysisobjects)
+    #print analysisobjects.keys()
+    for k in analysisobjects:
+        pth = "/CMS_2015_FWD071/"+rivetName
+        #print dir(analysisobjects[k])
+        #analysisobjects[k].setTitle(pth)
+        #analysisobjects[k].setPath(pth)
+        analysisobjects[k].setAnnotation("Title", pth)
+        analysisobjects[k].setAnnotation("Path",  pth)
+
+    yoda.writeYODA(analysisobjects, rivetName+".yoda")
 
 
 
+    # /cvmfs/cms.cern.ch/slc6_amd64_gcc481/external/rivet/1.8.2-cms8/bin/root2flat
 
-
-    #central = filter(lambda  finalSet["merged"])
 
 if __name__ == "__main__":
     main()

@@ -1,7 +1,13 @@
+(cmsenv)
+
+
 
 svn co https://svnsrv.desy.de/public/unfolding/RooUnfold/trunk RooUnfold
 -> Checked out revision 349.
+( or  350  - root6 support)
+
 
 make
-cp libRooUnfold.so  $CMSSW_BASE/lib/slc5_amd64_gcc434
+cp libRooUnfold.so  $CMSSW_BASE/lib/$SCRAM_ARCH
+cp RooUnfoldDict_rdict.pcm $CMSSW_BASE/lib/$SCRAM_ARCH
 
