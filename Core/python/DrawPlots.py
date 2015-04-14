@@ -80,8 +80,8 @@ class DrawPlots():
 
 
             y.append(centralValue)
-            yUp.append(sqrt(yUpLocal))
-            yDown.append(sqrt(yDownLocal))
+            yUp.append(math.sqrt(yUpLocal))
+            yDown.append(math.sqrt(yDownLocal))
 
         minY = min(min(y), min( [a-b for a,b in zip(y, yDown)]),  min( [a+b for a,b in zip(y, yUp)]))
         maxY = max(max(y), max( [a-b for a,b in zip(y, yDown)]),  max( [a+b for a,b in zip(y, yUp)]))
