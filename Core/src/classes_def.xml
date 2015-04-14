@@ -1,6 +1,5 @@
 <lcgdict>
     <class name="edm::FileInPath"/>
-    <class name="edm::LumiReWeighting"/> 
     <class name="tmf::TestTrackData"/>
     <class name="std::vector<tmf::TestTrackData>"/>
 

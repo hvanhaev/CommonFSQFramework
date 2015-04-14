@@ -179,7 +179,6 @@ def printSam(sam):
     toFile.append('anaVersion="' + anaVersion + '"\n')
     toFile.append('anaType="'    + anaType + '"\n')
     toFile.append(preamble + "\n")
-    toFile.append('rootPath="' + rootPath(dateTT) + '"\n')
     
     toFile.append('sam = {}' + "\n")
 
@@ -267,7 +266,7 @@ if __name__ == "__main__":
     f, filename, desc = imp.find_module(mod, [mod_dir])
     mod = imp.load_module(mod, f, filename, desc)
 
-    todo = ["preamble","dsFile","anaType","rootPath","onTheFlyCustomization","fun"]
+    todo = ["preamble","dsFile","anaType","onTheFlyCustomization","fun"]
     for t in todo:
         globals()[t] = getattr(mod,t)
 

@@ -7,14 +7,14 @@
 #include <boost/shared_ptr.hpp>
 #include <vector>
 //#define constexpr static const
-#include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
+//#include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
 #include "CommonFSQFramework/Core/interface/TestTrackData.h"
 
 
 namespace {
   struct dictionary {
     edm::FileInPath v1;
-    edm::LumiReWeighting v2;
+    //edm::LumiReWeighting v2;
 
     tmf::TestTrackData v3;
     std::vector<tmf::TestTrackData> v4;
