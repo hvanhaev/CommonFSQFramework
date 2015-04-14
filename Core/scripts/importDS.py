@@ -191,7 +191,9 @@ def printSam(sam):
     epilogue = onTheFlyCustomization()
     toFile.append(epilogue)
 
-    toFile.append('''def fixLocalPaths(sam):
+    toFile.append('''
+
+def fixLocalPaths(sam):
         import os,imp
         if "SmallXAnaDefFile" not in os.environ:
             print "Please set SmallXAnaDefFile environment variable:"

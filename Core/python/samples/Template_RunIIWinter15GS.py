@@ -109,33 +109,11 @@ def lumiMinBias(ds):
     return getLumi(ds,"minbias")
 
 
+# could useful in the future
 @util
 def onTheFlyCustomization():
-    ret = '''
-def icm(sam):
-    import socket
-    import os
-    host = socket.gethostname()
-    if ".icm." not in host:
-       return sam
-    root = "/mnt/lustre/permanent/plgtfruboes/data/"
-    thisAna = root + anaVersion + "/"
-    for s in sam:
-        pathList = set()
-        for r,d,f in os.walk(thisAna):
-            for files in f:
-                if files.endswith(".root"):
-                     if s in r:
-                        pathList.add( r )
-        if len(pathList) != 1:
-            print "Problem with paths:", s, pathList
-        else:
-            sam[s]["path"] = pathList.pop() + "/"
-            sam[s]["sgeJobs"] = 80
+    ret = ""
 
-    return sam
-sam = icm(sam)
-'''
     return ret
 #setattr(onTheFlyCustomization, "ignore", 1)
 
