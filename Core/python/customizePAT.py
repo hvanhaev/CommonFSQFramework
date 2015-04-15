@@ -26,7 +26,7 @@ def customize(process):
     if hasattr(process, "options"):
         process.options.wantSummary = False   ##  (to suppress the long output at the end of the job)
     if hasattr(process, "MessageLogger"):
-        process.MessageLogger.cerr.FwkReport.reportEvery = 50
+        process.MessageLogger.cerr.FwkReport.reportEvery = 1000
     process.TFileService = cms.Service("TFileService", fileName = cms.string("trees.root") )
 
     process.infoHisto = cms.EDAnalyzer("SaveCountHistoInTreeFile")
