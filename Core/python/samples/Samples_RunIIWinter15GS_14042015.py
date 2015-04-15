@@ -1,7 +1,10 @@
 anaVersion="RunIIWinter15GS_14042015"
 anaType="RunIIWinter15GS"
 
-
+cbSmartCommand="smartCopy"
+cbSmartBlackList=""
+cbWMS="https://wmscms.cern.ch:7443/glite_wms_wmproxy_server"
+skimEfficiencyMethod="getSkimEff"
 
 sam = {}
 

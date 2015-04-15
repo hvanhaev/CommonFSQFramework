@@ -1,9 +1,12 @@
 anaType="RunIIWinter15GS"
 
 # root path needs proper XXX
-# could be useful in the future, ignore this for the moment
+# some stuff needed for crab configuration, e.g. blacklisting
 preamble='''
-
+cbSmartCommand="smartCopy"
+cbSmartBlackList=""
+cbWMS="https://wmscms.cern.ch:7443/glite_wms_wmproxy_server"
+skimEfficiencyMethod="getSkimEff"
 '''
 
 # point towards your list of samples you want
