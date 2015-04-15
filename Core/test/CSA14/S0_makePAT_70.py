@@ -118,12 +118,12 @@ process.exampleTree = cms.EDAnalyzer("ExampleTreeProducer")
 process = CommonFSQFramework.Core.customizePAT.addTreeProducer(process, process.exampleTree)
 process.tracksTree = cms.EDAnalyzer("TracksTreeProducer",
     EventData = cms.PSet(),
-    GenTrackView = cms.PSet(
-        branchPrefix = cms.untracked.string("genTracks"),
+    GenPartView = cms.PSet(
+        branchPrefix = cms.untracked.string("genParticles"),
         maxEta = cms.double(7.), 
-        charge = cms.int32(1), 
+        charge = cms.int32(-1), 
         minPt = cms.double(0.2),
-        genTracks = cms.InputTag("genParticles")
+        genParticles = cms.InputTag("genParticles")
     ),
     RecoTrackView  = cms.PSet(
         branchPrefix = cms.untracked.string("recoTracks"),

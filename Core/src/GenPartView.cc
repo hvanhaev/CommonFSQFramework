@@ -1,7 +1,7 @@
-#include "CommonFSQFramework/Core/interface/GenTrackView.h"
+#include "CommonFSQFramework/Core/interface/GenPartView.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
-GenTrackView::GenTrackView(const edm::ParameterSet& iConfig, TTree * tree):
+GenPartView::GenPartView(const edm::ParameterSet& iConfig, TTree * tree):
 EventViewBase(iConfig,  tree)
 {
 
@@ -15,25 +15,21 @@ EventViewBase(iConfig,  tree)
     m_maxEta = iConfig.getParameter<double>("maxEta");
     m_minPt = iConfig.getParameter<double>("minPt");
     m_charge = iConfig.getParameter<int>("charge");
-    m_genTracks = iConfig.getParameter<edm::InputTag>("genTracks");
+    m_GenParts = iConfig.getParameter<edm::InputTag>("genParticles");
 
     if (m_charge != 0 && m_charge != 1 && m_charge != -1){
         throw "charge parameter not equal to -1(save all)/0(save neutrals)/1(save charded)\n";
     }
 
 
-
-
-    //std::cout << "XX "  << m_maxEta << " " << m_charge << std::endl;
-
 }
 
 
-void GenTrackView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSetup){
+void GenPartView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSetup){
 
     // vector<reco::GenParticle>             "genParticles"              ""                "SIM"          recoGenParticles_genParticles__SIM
     edm::Handle<std::vector<reco::GenParticle> > hIn;
-    iEvent.getByLabel(m_genTracks, hIn);
+    iEvent.getByLabel(m_GenParts, hIn);
     for (unsigned int i = 0; i< hIn->size();++i){
         if (hIn->at(i).status() != 1  ) continue;
         if (m_charge != -1){   // -1 - save all particles
