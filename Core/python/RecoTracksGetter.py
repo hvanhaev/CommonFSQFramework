@@ -7,8 +7,7 @@ class RecoTracksGetter(BaseGetter.BaseGetter):
         self.knownVariations = set()
 
     # Note: use the most used branch (so performance wont suffer from reading otherwise unused stuff)
-    # fixme: -> p4
     def getSize(self):
-        srcBranch = "recoTracksrecoTracks"
+        srcBranch = "recoTracksp4"
         return getattr(self.chain, srcBranch).size()
 
