@@ -8,7 +8,7 @@ class EventIdData: public EventViewBase{
       EventIdData(const edm::ParameterSet& ps, TTree * tree);
    private:
       virtual void fillSpecific(const edm::Event&, const edm::EventSetup&);
-
-
+      int localcount;
+   
 };
 #endif
