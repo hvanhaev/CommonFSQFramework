@@ -14,9 +14,12 @@ sam["MinBias_TuneMonash13_13TeV-pythia8"]["GT"]='MCRUN2_71_V0::All'
 sam["MinBias_TuneMonash13_13TeV-pythia8"]["name"]='MinBias_TuneMonash13_13TeV-pythia8'
 sam["MinBias_TuneMonash13_13TeV-pythia8"]["isData"]=False
 sam["MinBias_TuneMonash13_13TeV-pythia8"]["numEvents"]=998368
+sam["MinBias_TuneMonash13_13TeV-pythia8"]["pathSE"]='srm://maite.iihe.ac.be:8443/srm/managerv2?SFN=/pnfs/iihe/cms/store/user/hvanhaev/MinBias_TuneMonash13_13TeV-pythia8/RunIIWinter15GS_14042015_MinBias_TuneMonash13_13TeV-pythia8/95ea622e8997022887ce06b89efc55f6/'
+sam["MinBias_TuneMonash13_13TeV-pythia8"]["pathTrees"]='/XXXTMFTTree/store/user/hvanhaev/MinBias_TuneMonash13_13TeV-pythia8/RunIIWinter15GS_14042015_MinBias_TuneMonash13_13TeV-pythia8/95ea622e8997022887ce06b89efc55f6//'
 sam["MinBias_TuneMonash13_13TeV-pythia8"]["json"]=''
 sam["MinBias_TuneMonash13_13TeV-pythia8"]["lumiMinBias"]=1.273129775664895e-05
 sam["MinBias_TuneMonash13_13TeV-pythia8"]["XS"]=78418400000.0
+sam["MinBias_TuneMonash13_13TeV-pythia8"]["pathPAT"]='/XXXTMFPAT/store/user/hvanhaev/MinBias_TuneMonash13_13TeV-pythia8/RunIIWinter15GS_14042015_MinBias_TuneMonash13_13TeV-pythia8/95ea622e8997022887ce06b89efc55f6//'
 sam["MinBias_TuneMonash13_13TeV-pythia8"]["DS"]='/MinBias_TuneMonash13_13TeV-pythia8/RunIIWinter15GS-castor_MCRUN2_71_V0-v1/GEN-SIM'
 
 
