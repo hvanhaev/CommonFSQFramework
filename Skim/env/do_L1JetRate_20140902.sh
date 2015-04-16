@@ -1,1 +1,1 @@
-export SmallXAnaVersion="CommonFSQFramework.Core.samples.Samples_L1JetRate_20140902"
+export SmallXAnaVersion="CommonFSQFramework.Skim.Samples_L1JetRate_20140902"
