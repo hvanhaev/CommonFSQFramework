@@ -28,8 +28,7 @@ skimEfficiencyMethod="getSkimEff"
 
 MyVariablesAllEvents="DiJetAnalysis.DiJetAna.ana.BaseVariables"
 '''
-# /scratch/scratch0/tfruboes/2013.05.DiJetNewGit/CMSSW_4_2_8_patch7/src/DiJetAnalysis/DiJetAna/python/samples
-dsFile="CommonFSQFramework.Core/python/samples/ds2010_42.txt"
+dsFile="CommonFSQFramework/Skim/python/ds2010_42.txt"
 
 # define the util decorator. Functions marked with this wont turn into ds attribute
 def util(func):

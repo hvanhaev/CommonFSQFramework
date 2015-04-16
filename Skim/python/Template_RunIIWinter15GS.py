@@ -10,7 +10,7 @@ skimEfficiencyMethod="getSkimEff"
 '''
 
 # point towards your list of samples you want
-dsFile="CommonFSQFramework/Core/python/samples/ds_RunIIWinter15GS.txt"
+dsFile="CommonFSQFramework/Skim/python/ds_RunIIWinter15GS.txt"
 
 # define the util decorator. Functions marked with this wont turn into ds attribute
 def util(func):
