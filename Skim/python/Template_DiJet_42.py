@@ -67,7 +67,7 @@ def json(ds):
         return "DiJetAnalysis/DiJetAna/lumi//Cert_160404-180252_7TeV_PromptReco_Collisions11_JSON.txt"
     '''
     if realData:
-        return "CommonFSQFramework.Core/lumi/Cert_136033-149442_7TeV_Apr21ReReco_Collisions10_JSON_v2.txt"
+        return "CommonFSQFramework/Skim/lumi/Cert_136033-149442_7TeV_Apr21ReReco_Collisions10_JSON_v2.txt"
     else:
         return ""
 
