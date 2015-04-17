@@ -6,7 +6,7 @@
 #setBatchMode()
 
 # Set the wanted input file and load all available histograms in this file in the memory:
-setInput("../test/CSA14/plotsCSA14_dndeta.root")
+setInput("plotsCSA14_dndeta.root")
 getAllHistos()
 
 # define nice legend names for the samples that you are plotting:

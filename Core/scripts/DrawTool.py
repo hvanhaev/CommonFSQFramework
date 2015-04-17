@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from ROOT import *
 from array import array
 
