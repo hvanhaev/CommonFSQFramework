@@ -29,6 +29,8 @@ def resetCanvas():
 
 def setBatchMode():
     ROOT.gROOT.SetBatch(True)
+    global wait
+    wait = False
 
 def saveCanvas(outdir="./",tosave=[],formats=["pdf"]):
     global GlobalCanvasList
@@ -399,6 +401,7 @@ def printLumi(lumi="",localHistoList=[]):
 if __name__ == "__main__":
     
     # declare global variables
+    wait = True
     GlobalIn = ""
     GlobalOut = ""
     GlobalScriptFile = ""
@@ -460,3 +463,12 @@ if __name__ == "__main__":
         execfile(str(sys.argv[1]))
     else:
         print "No script given as input, you will have to type all functions yourself now..."
+
+    if wait:
+        print " "
+        print " "
+        py3 = sys.version_info[0] > 2 #creates boolean value for test that Python major version > 2
+        if py3:
+            response = input("Press enter to exit ")
+        else:
+            response = raw_input("Press enter to exit ")

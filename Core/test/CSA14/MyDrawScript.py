@@ -2,7 +2,7 @@
 # For a complete list of all available functions and options
 # please visit: https://twiki.cern.ch/twiki/bin/viewauth/CMS/CFFDrawTool
 
-# specify if you want to run ROOT in batch mode (this will not show any canvases):
+# specify if you want to run the script and ROOT in batch mode (this will not show any canvases):
 #setBatchMode()
 
 # Set the wanted input file and load all available histograms in this file in the memory:
@@ -47,7 +47,7 @@ updateCanvas()
 # by default the PDF format is chosen to save a plot
 # by default they are saved in the current directory
 # save all open canvases to pdf files:
-#saveCanvas()
+saveCanvas()
 
 # save all canvases with the string "etaRecoTrack" in their names:
 #saveCanvas("./",["etaRecoTrack"])
