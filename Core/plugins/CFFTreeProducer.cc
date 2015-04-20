@@ -29,6 +29,7 @@
 
 #include "CommonFSQFramework/Core/interface/EventIdData.h"
 #include "CommonFSQFramework/Core/interface/GenPartView.h"
+#include "CommonFSQFramework/Core/interface/GenJetView.h"
 #include "CommonFSQFramework/Core/interface/RecoTrackView.h"
 #include "CommonFSQFramework/Core/interface/VerticesView.h"
 
@@ -122,6 +123,9 @@ CFFTreeProducer::CFFTreeProducer(const edm::ParameterSet& iConfig)
         else if (miniViewType == "GenPartView") {
             m_views.push_back(new GenPartView(pset, m_tree));
         }
+	else if (miniViewType == "GenJetView") {
+	    m_views.push_back(new GenJetView(pset, m_tree));
+	}
         else if (miniViewType == "RecoTrackView") {
             m_views.push_back(new RecoTrackView(pset, m_tree));
         }

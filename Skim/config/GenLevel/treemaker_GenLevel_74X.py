@@ -29,7 +29,7 @@ process = CommonFSQFramework.Core.customizePAT.customize(process)
 process = CommonFSQFramework.Core.customizePAT.customizeGT(process)
 
 # define treeproducer
-process.GenPartTree = cms.EDAnalyzer("CFFTreeProducer")
-import CommonFSQFramework.Core.GenPartViewsConfigs
-process.GenPartTree._Parameterizable__setParameters(CommonFSQFramework.Core.GenPartViewsConfigs.get(["GenPartView"]))
-process = CommonFSQFramework.Core.customizePAT.addTreeProducer(process, process.GenPartTree)
+process.GenLevelTree = cms.EDAnalyzer("CFFTreeProducer")
+import CommonFSQFramework.Core.GenLevelViewsConfigs
+process.GenLevelTree._Parameterizable__setParameters(CommonFSQFramework.Core.GenLevelViewsConfigs.get(["GenPartView","ak4GenJetView","ak5GenJetView"]))
+process = CommonFSQFramework.Core.customizePAT.addTreeProducer(process, process.GenLevelTree)
