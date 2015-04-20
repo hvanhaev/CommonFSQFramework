@@ -32,6 +32,23 @@ def get(todo):
         genJets = cms.InputTag("ak5GenJets"),
     )
 
+    # Charged GenJets for UE
+    defs["ak4ChgGenJetView"]= cms.PSet(
+        miniView = cms.string("GenJetView"),
+        branchPrefix = cms.untracked.string("ak4ChgGenJets"),
+        maxEta = cms.double(3.0),
+        minPt = cms.double(0.3),
+        genJets = cms.InputTag("ak4ChgGenJets"),
+    )
+
+    defs["ak5ChgGenJetView"]= cms.PSet(
+        miniView = cms.string("GenJetView"),
+        branchPrefix = cms.untracked.string("ak5ChgGenJets"),
+        maxEta = cms.double(3.0),
+        minPt = cms.double(0.3),
+        genJets = cms.InputTag("ak5ChgGenJets"),
+    )
+
     # main function
     ret = {}
     for t in todo:
