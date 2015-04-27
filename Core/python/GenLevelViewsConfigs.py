@@ -7,8 +7,9 @@ def get(todo):
     defs["GenPartView"]  = cms.PSet(
         miniView = cms.string("GenPartView"),
         branchPrefix = cms.untracked.string("genParticles"),
-        maxEta = cms.double(10.0),
-        minPt = cms.double(0.2),
+        # maxEta = -1: no eta cut; maxEta > 0: eta cut
+        maxEta = cms.double(-1),
+        minPt = cms.double(0.0),
 	#charge parameter: -1(save all)/0(save neutrals)/1(save charged)
         charge = cms.int32(-1),
         genParticles = cms.InputTag("genParticles"),

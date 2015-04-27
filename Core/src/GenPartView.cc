@@ -42,7 +42,8 @@ void GenPartView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& 
             if (!good) continue;
         }
         if (hIn->at(i).pt() < m_minPt ) continue;
-        if (std::abs(hIn->at(i).eta()) > m_maxEta ) continue;
+        // maxEta = -1: all genparticles are accepted
+        if (m_maxEta != -1 && std::abs(hIn->at(i).eta()) > m_maxEta ) continue;
         addToP4Vec("p4", hIn->at(i).p4());
         addToIVec("charge", hIn->at(i).charge());
         addToIVec("pdg", hIn->at(i).pdgId());
