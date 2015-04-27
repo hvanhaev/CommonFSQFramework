@@ -45,18 +45,39 @@ def json(ds):
 def crabJobs(ds):
     dsName = name(ds)
     # define to run 100 crab jobs
-    # make something more clever, based on number of events in the dataset
-    return 100
+    # make something more clever, based on number of events in the dataset:
+    # require around 50000 events to be processed per job
+    return int(round(numEvents(ds)/50000.0)) 
+    #return 100
 
 def numEvents(ds):
     evts = -1
-    # list all datasets in ds_RunIIWinterGS.txt file
-    if "MinBias_TuneMonash13_13TeV-pythia8" in ds: evts = 998368 # from DAS
+    
+    # list all datasets in ds_RunIIWinterGS.txt file, get events from DAS
+    if "MinBias_TuneMonash13_13TeV-pythia8" in ds: evts = 998368
+    if "MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8" in ds: evts = 9765120
+    if "ReggeGribovPartonMC_13TeV-EPOS" in ds: evts = 998312
+    if "ReggeGribovPartonMC_13TeV-QGSJetII" in ds: evts = 1000000
+    if "MinBias_TuneZ2star_13TeV-pythia6" in ds: evts = 998098
+    if "MinBias_TuneCUETP8M1_13TeV-pythia8" in ds: evts = 999330
+    if "MinBias_TuneMBR_13TeV-pythia8" in ds: evts = 998920
+    if "MinBias_TuneEE5C_13TeV-herwigpp" in ds: evts = 1000000
+    if "MinBias_TuneMBR_epsilon080-pythia8" in ds: evts = 998380
+    
+    if "QCD_Pt-15to3000_castorJet_TuneCUETP8M1_Flat_13TeV-pythia8" in ds: evts = 4941690
+    if "ReggeGribovPartonMC_castorJet_13TeV-EPOS" in ds: evts = 4974768
+    if "ReggeGribovPartonMC_castorJet_13TeV-QGSJetII" in ds: evts = 5703036
+    
+    if "MinBias_chgMult110_TuneCUETP8M1_13TeV-pythia8" in ds: evts = 1152226
+    if "MinBias_chgMult60_TuneCUETP8M1_13TeV-pythia8" in ds: evts = 772686
     
     return evts
 
 def GT(ds):
     # no data, just get GT from GEN-SIM samples
+    if "MinBias_chgMult" in ds: return "MCRUN2_71_V1::All"
+    if "TuneCUETP8S1-HERAPDF" in ds: return "MCRUN2_71_V1::All"
+    
     return "MCRUN2_71_V0::All"
 
 def XS(ds):
@@ -79,6 +100,21 @@ def XS(ds):
     # Give all XS in pb
     s = {}
     s["MinBias_TuneMonash13_13TeV-pythia8"] = 78418400000.0 # from DAS - McM
+    s["MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8"] = 78418400000.0
+    s["ReggeGribovPartonMC_13TeV-EPOS"] = 78418400000.0
+    s["ReggeGribovPartonMC_13TeV-QGSJetII"] = 78418400000.0
+    s["MinBias_TuneZ2star_13TeV-pythia6"] = 78260000000.0
+    s["MinBias_TuneCUETP8M1_13TeV-pythia8"] = 78418400000.0
+    s["MinBias_TuneMBR_13TeV-pythia8"] = 78418400000.0
+    s["MinBias_TuneEE5C_13TeV-herwigpp"] = 36460000000.0
+    s["MinBias_TuneMBR_epsilon080-pythia8"] = 75930000000.0
+    
+    s["QCD_Pt-15to3000_castorJet_TuneCUETP8M1_Flat_13TeV-pythia8"] = 986200000.0
+    s["ReggeGribovPartonMC_castorJet_13TeV-EPOS"] = 1.0 # XS not known
+    s["ReggeGribovPartonMC_castorJet_13TeV-QGSJetII"] = 1.0 # XS not known
+    
+    s["MinBias_chgMult110_TuneCUETP8M1_13TeV-pythia8"] = 28590000.0
+    s["MinBias_chgMult60_TuneCUETP8M1_13TeV-pythia8"] = 28590000.0
 
 
     dsName = name(ds)
@@ -94,19 +130,10 @@ def getLumi(ds, trg):
     '''
     all lumi values here should be given in picob
     '''
-
-    s = {}
-    s.setdefault("minbias", {})
-
-    # add all MC and data samples - for data get from json file in future?
-    s["minbias"]["MinBias_TuneMonash13_13TeV-pythia8"] = numEvents(ds)/XS(ds) # pb, Nevents/XS
-
-    dsName = name(ds)
-    if dsName in s[trg]:
-        return float(s[trg][dsName])
-
-    print "Problem with lumi!", ds
-    return "crashMe"
+    
+    # just do something very simple for now
+    lumi = float(numEvents(ds)/XS(ds)) # pb, Nevents/XS
+    return lumi
 
 def lumiMinBias(ds):
     return getLumi(ds,"minbias")
