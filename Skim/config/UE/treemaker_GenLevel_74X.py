@@ -4,7 +4,7 @@ process = cms.Process("Treemaker")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1000))
+#process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1000))
 
 process.MessageLogger.cerr.FwkReport.reportEvery = 10000
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
