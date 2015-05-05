@@ -67,36 +67,22 @@ for s in sampleListTodo:
   pycfgextra.append("config.Data.publishDataName='"+name+"'")
   pycfgextra.append("config.Data.inputDataset='"+sampleList[s]["DS"]+"'")
 
-  '''
+  
   if isData:
     print isData, sampleList[s]["json"]
-    command+=" -CMSSW.total_number_of_lumis=-1"
-    
+    pycfgextra.append("config.Data.splitting='LumiBased'")
+    pycfgextra.append("config.Data.unitsPerJob=1000")
     jsonFile=edm.FileInPath(sampleList[s]["json"])
-    command+=" -CMSSW.lumi_mask="+jsonFile.fullPath()
+    pycfgextra.append("config.Data.lumiMask='"+jsonFile.fullPath()+"'")
+    
   else:
-    command+=" -CMSSW.total_number_of_events="+str(sampleList[s]["numEvents"])
-    '''
+    pycfgextra.append("config.Data.splitting='EventAwareLumiBased'")
+    pycfgextra.append("config.Data.unitsPerJob=100000")
+  
 
   # TODO save old value and set it at exit   
   os.environ["TMFSampleName"]=s
 
-  # crab is not able to submit more than 500 jobs at once
-  # note, there was a limit of ~2000 jobs per task (one could
-  # submit more than 2000, but job status check resulted in crash
-  '''
-  if int(sampleList[s]["crabJobs"]) >= 500:
-    i=1
-    step = 400
-    while i<int(sampleList[s]["crabJobs"]):
-        range=str(i)+","+str(i+step)
-        command+="crab -submit " + range + " -c " + name
-        i+=step
-  else:
-      #print command
-      #sys.exit()
-      os.system(command)
-  '''
 
   os.system("cp crabcfg.py  tmp.py")
   with open("tmp.py", "a") as myfile:
@@ -124,4 +110,6 @@ for s in sampleListTodo:
     else:
         fOut = targetPath + "/" + cfgName
         shutil.copy(cfgName, fOut)
-  sys.exit()  
+
+	
+sys.exit()  
