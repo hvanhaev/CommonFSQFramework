@@ -117,13 +117,15 @@ def main(sam,final):
             if value != None:
                 sam[name][f] = value
         
+
 	# set crab output stuff
+	SEDirs = set()
         crabVersion = CommonFSQFramework.Core.Util.getCrabVersion()
-        if crabVersion == 2:
+        if crabVersion == 2 and final:
             SEDirs = getSEDirsCrab2(anaVersion, name)
-        elif crabVersion == 3:
+        elif crabVersion == 3 and final:
             SEDirs = getSEDirsCrab3(anaVersion, name)
-        else:
+        elif final:
             raise Exception("Unexpected crab version: "+str(crabVersion))
 
         SEDir = None
