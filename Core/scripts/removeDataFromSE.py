@@ -23,7 +23,7 @@ print ""
 for s in samples:
     print "   ", s
 print ""
-print "defined in", sampleFile
+print "for analysis version", mod.anaVersion, " defined in", sampleFile
 a=random.randint(1, 10)
 b=random.randint(1, 10)
 print "Type result of", a, "+", b, " <enter> to continue. ",
@@ -61,6 +61,8 @@ for s in samples:
             if len(fname)!=0:
                 print "\nCannot extract file name from line: |"+d+"|"
                 continue
+	    else:
+	        continue
 
         fullname = path + "/" +fname
         if choice > 0:
@@ -74,6 +76,32 @@ for s in samples:
         else:
             print fullname
 
+    print ""
+    print "Removed ", cnt, " files in ", path
+    
+    removepath = path
+    if mod.anaVersion not in path.split("/")[-2]:
+        removepath = removepath.replace(path.split("/")[-2]+"/","")
+    
+        if mod.anaVersion not in path.split("/")[-3]:
+            removepath = removepath.replace(path.split("/")[-3]+"/","")
+    
+    # remove directory
+    if choice > 0:
+        print "directory to remove is", removepath
+	print " ==> are you sure you want to remove it? (y/n)",
+	try:
+            accept = raw_input().lower()
+        except:
+            print "Wrong answer, exiting"
+            sys.exit()
+	
+	if accept == "y":    
+            subprocess.call(["srmrmdir","-recursive=true",removepath])
+	    print " removed... "
+	else:
+	    print " ok, skipping..."
+    
     print ""
 
 

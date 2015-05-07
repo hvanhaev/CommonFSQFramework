@@ -30,7 +30,9 @@ def getSEDirsCrab3(anaVersion, name):
         filename = l.split("/")[-1]
         if not filename.startswith("trees_"): continue
         if not filename.endswith(".root"): continue
-        SEDirs.add(l.replace(filename,""))
+	n = l.replace("1) PFN: ","") # works for crab version v3.3.15.patch1
+        SEDirs.add(n.replace(filename,""))
+	break # quit searching as soon as one root file is found
 
     return SEDirs
 
