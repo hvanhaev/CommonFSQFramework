@@ -9,6 +9,8 @@
 <use name="DataFormats/PatCandidates"/>
 <use name="JetMETCorrections/Objects"/>
 <use name="CondFormats/JetMETObjects"/>
+<use name="CondFormats/CastorObjects"/>
+<use name="CondFormats/DataRecord"/>
 <use name="DataFormats/HcalRecHit"/>
 <export>
    <lib name="1"/>
