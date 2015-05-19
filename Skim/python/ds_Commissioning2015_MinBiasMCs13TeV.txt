@@ -1,0 +1,4 @@
+/MinimumBias/Commissioning2015-PromptReco-v1/RECO
+/MinBias_TuneMonash13_13TeV-pythia8/Spring14dr-castor_NoPileUp_POSTLS170_V6-v1/AODSIM
+/MinBias_TuneZ2star_13TeV_pythia6/Fall13dr-castor_tsg_NoPileUp_POSTLS162_V1-v1/AODSIM
+/MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8/Spring14dr-castor_NoPileUp_POSTLS170_V6-v1/AODSIM

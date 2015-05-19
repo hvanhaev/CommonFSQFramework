@@ -38,6 +38,7 @@
 #include "CommonFSQFramework/Core/interface/JetView.h"
 #include "CommonFSQFramework/Core/interface/TriggerResultsView.h"
 #include "CommonFSQFramework/Core/interface/GenericCandidateView.h"
+#include "CommonFSQFramework/Core/interface/HFRecHitView.h"
 
 //
 // class declaration
@@ -140,6 +141,9 @@ CFFTreeProducer::CFFTreeProducer(const edm::ParameterSet& iConfig)
         else if (miniViewType == "CastorJetView") {
             m_views.push_back(new CastorJetView(pset, m_tree));
         }
+	else if (miniViewType == "HFRecHitView") {
+	    m_views.push_back(new HFRecHitView(pset, m_tree));
+	}
         else {
             throw "Miniview not known: "+ miniViewType;
         }
