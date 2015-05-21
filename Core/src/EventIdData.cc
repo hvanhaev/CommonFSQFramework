@@ -22,6 +22,7 @@ EventViewBase(iConfig, tree)
     registerFloat("Xiy", tree);
     registerFloat("XiSD", tree);
     registerFloat("XiDD", tree);
+    registerFloat("cmenergy", tree);
     
 
     registerFloat("puTrueNumInteractions", tree);
@@ -54,20 +55,29 @@ void EventIdData::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& 
     double xisd = 100;
     double xidd = 10e10;
     
-    // get the HepMC information
-    edm::Handle<edm::HepMCProduct> hepmc;
-    iEvent.getByLabel("generator", hepmc);
+    // get the GenParticles information
+    edm::Handle<reco::GenParticleCollection> genParticles;
+    iEvent.getByLabel("genParticles", genParticles);
     
     std::vector<TLorentzVector> myTempParticles;
     std::vector<TLorentzVector> myRapiditySortedParticles;
     
     // copy only final state particles from the genParticles collection
-    for(HepMC::GenEvent::particle_const_iterator p = hepmc->GetEvent()->particles_begin(); p != hepmc->GetEvent()->particles_end(); ++p) {
-    	if ((*p)->status() != 1) continue;
+    double cmenergy = 0.0;
+    int bpcnt = 0;
+    for(reco::GenParticleCollection::const_iterator p = genParticles->begin(); p != genParticles->end(); ++ p) {
+    	if (p->px() == 0.0 && p->py() == 0.0 && abs(p->pz()) > 0.0 && p->pdgId() == 2212) {
+		// add pz of beam particles to get cmenergy, only add two!
+		bpcnt++;
+		if (bpcnt < 3) cmenergy += abs(p->pz());
+	}	
+    	if (p->status() != 1) continue;
 	TLorentzVector vp;
-	vp.SetPxPyPzE((*p)->momentum().px(),(*p)->momentum().py(),(*p)->momentum().pz(),(*p)->momentum().e());
+	vp.SetPxPyPzE(p->px(),p->py(),p->pz(),p->energy());
     	myTempParticles.push_back(vp);
     }
+    // save the centre of mass energy in the tree - so one can cross check its value
+    setF("cmenergy",cmenergy);
     		
     // sort genParticles in y, from y_min to y_max
     while (myTempParticles.size() != 0) {
@@ -121,11 +131,7 @@ void EventIdData::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& 
     }
     long double My2 = -1.;
     My2 = YEtot*YEtot - YPxtot*YPxtot - YPytot*YPytot - YPztot*YPztot;
-			
-    // get the centre-of-mass energy from the event
-    double cmenergy = 0;
-    cmenergy = std::abs(hepmc->GetEvent()->beam_particles().first->momentum().pz()) + std::abs(hepmc->GetEvent()->beam_particles().second->momentum().pz());
-    
+			    
     // set Mx2, My2 to zero if negative (i.e. the X,Y system is a photon)
     if (Mx2 < 0) Mx2 = 0;
     if (My2 < 0) My2 = 0;
