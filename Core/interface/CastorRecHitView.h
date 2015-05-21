@@ -8,7 +8,9 @@ class CastorRecHitView: public EventViewBase {
        CastorRecHitView(const edm::ParameterSet& ps, TTree * tree);
 
     private:
-      virtual void fillSpecific(const edm::Event&, const edm::EventSetup&);  
+      virtual void fillSpecific(const edm::Event&, const edm::EventSetup&);
+      bool m_onlyGoodRecHits;
+      bool m_saturationInfo;
 };
 
 #endif
