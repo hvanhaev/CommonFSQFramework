@@ -12,6 +12,8 @@ EventViewBase(iConfig,  tree)
     registerVecFloat("fem", tree);
     registerVecFloat("width", tree);
     registerVecFloat("depth", tree);
+    registerVecFloat("fhot", tree);
+    registerVecFloat("sigmaz", tree);
 
     // fetch config data
     m_minCastorJetEnergy = iConfig.getParameter<double>("minCastorJetEnergy");
@@ -45,6 +47,8 @@ void CastorJetView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup
            addToFVec("fem", jetId.fem);
            addToFVec("width", jetId.width);
            addToFVec("depth", jetId.depth);
+           addToFVec("fhot", jetId.fhot);
+           addToFVec("sigmaz", jetId.sigmaz);
 
       }
    }
