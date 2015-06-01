@@ -16,21 +16,17 @@ EventViewBase(iConfig,  tree)
 void HFRecHitView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSetup){
 
 
-  
-     std::vector<edm::Handle<HFRecHitCollection> > colls;
-     iEvent.getManyByType(colls);
-     std::vector<edm::Handle<HFRecHitCollection> >::iterator i;
-     for (i=colls.begin(); i!=colls.end(); i++) {
-        
-       for (HFRecHitCollection::const_iterator j=(*i)->begin(); j!=(*i)->end(); j++) {
-	 if (j->id().subdet() == HcalForward) {
+     edm::Handle<HFRecHitCollection> hfRecHits;
+     iEvent.getByLabel("hfreco","",hfRecHits); // specifically ask that the product instance name is an empty string to get correct collection
+     
+     for (HFRecHitCollection::const_iterator j = hfRecHits->begin(); j != hfRecHits->end(); j++) {
+	if (j->id().subdet() == HcalForward) {
 	   
 	   addToFVec("energy", j->energy());
 	   addToFVec("time", j->time());
 	   addToIVec("ieta", j->id().ieta());
 	   addToIVec("iphi", j->id().iphi());
 	   addToIVec("depth", j->id().depth());
-	    }
-       }
+	}
      }
 }
