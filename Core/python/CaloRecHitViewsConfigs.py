@@ -3,10 +3,16 @@ import FWCore.ParameterSet.Config as cms
 def get(todo):
     defs = {}
 
-    # EnergyFlow
+    # HFRecHits
     defs["HFRecHitView"]  = cms.PSet(
         miniView = cms.string("HFRecHitView"),
         branchPrefix = cms.untracked.string("HFRecHit"),
+    )
+
+    # HBHERecHits 
+    defs["HBHERecHitView"]  = cms.PSet(
+        miniView = cms.string("HBHERecHitView"),
+        branchPrefix = cms.untracked.string("HBHERecHit"),
     )
 
  
