@@ -41,6 +41,7 @@
 #include "CommonFSQFramework/Core/interface/HFRecHitView.h"
 #include "CommonFSQFramework/Core/interface/HBHERecHitView.h"
 #include "CommonFSQFramework/Core/interface/CaloTowerView.h"
+#include "CommonFSQFramework/Core/interface/PFCandidateView.h"
 
 //
 // class declaration
@@ -151,6 +152,9 @@ CFFTreeProducer::CFFTreeProducer(const edm::ParameterSet& iConfig)
         }
 	else if (miniViewType == "CaloTowerView") {
             m_views.push_back(new CaloTowerView(pset, m_tree));
+        }
+	else if (miniViewType == "PFCandidateView") {
+            m_views.push_back(new PFCandidateView(pset, m_tree));
         }
         else {
             throw "Miniview not known: "+ miniViewType;
