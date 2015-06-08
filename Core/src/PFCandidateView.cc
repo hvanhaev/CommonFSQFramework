@@ -6,6 +6,8 @@ PFCandidateView::PFCandidateView(const edm::ParameterSet& iConfig, TTree * tree)
 EventViewBase(iConfig,  tree)
 {
     registerVecP4("p4", tree);
+    registerVecFloat("rawEcalEnergy",tree);
+    registerVecFloat("rawHcalEnergy",tree);
     registerVecInt("particleId", tree);
 
 
@@ -23,7 +25,10 @@ void PFCandidateView::fillSpecific(const edm::Event& iEvent, const edm::EventSet
     for (reco::PFCandidateCollection::const_iterator i = pfCandidates->begin(); i != pfCandidates->end(); ++i) {
         
         addToP4Vec("p4", reco::Candidate::LorentzVector(i->px(),i->py(),i->pz(),i->energy()));
+	addToFVec("rawEcalEnergy",i->rawEcalEnergy());
+	addToFVec("rawHcalEnergy",i->rawHcalEnergy());
 	addToIVec("particleId",i->particleId());
+	
 
     }
 
