@@ -10,6 +10,19 @@ def get(todo):
         inputcoll = cms.InputTag("particleFlow")
     )
 
+    # Get ECAL PFClusters
+    defs["ecalPFClusterView"]  = cms.PSet(
+        miniView = cms.string("PFClusterView"),
+        branchPrefix = cms.untracked.string("ecalPFClusters"),
+        inputcoll = cms.InputTag("particleFlowClusterECAL")
+    )
+
+    # Get HCAL PFClusters                             
+    defs["hcalPFClusterView"]  = cms.PSet(
+        miniView = cms.string("PFClusterView"),
+        branchPrefix = cms.untracked.string("hcalPFClusters"),
+        inputcoll = cms.InputTag("particleFlowClusterHCAL")
+    )
  
     # main function
     ret = {}
