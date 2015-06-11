@@ -1,5 +1,5 @@
 #include "CommonFSQFramework/Core/interface/PFClusterView.h"
-
+#include <TMath.h>
 
 
 PFClusterView::PFClusterView(const edm::ParameterSet& iConfig, TTree * tree):
@@ -12,6 +12,7 @@ EventViewBase(iConfig,  tree)
     registerVecFloat("depth",tree);
     
     registerVecFloat("pt",tree);
+    registerVecFloat("Et",tree);
     registerVecFloat("eta",tree);
     registerVecFloat("phi",tree);
     
@@ -39,6 +40,7 @@ void PFClusterView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup
 	addToFVec("depth",i->depth());
 	
 	addToFVec("pt",i->pt());
+	addToFVec("Et",(i->energy()/(TMath::CosH(i->eta()))));
 	addToFVec("eta",i->eta());
 	addToFVec("phi",i->phi());
 	
