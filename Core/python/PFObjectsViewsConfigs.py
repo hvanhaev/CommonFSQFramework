@@ -23,6 +23,13 @@ def get(todo):
         branchPrefix = cms.untracked.string("hcalPFClusters"),
         inputcoll = cms.InputTag("particleFlowClusterHCAL")
     )
+
+    # Get HF PFClusters
+    defs["hfPFClusterView"]  = cms.PSet(
+        miniView = cms.string("PFClusterView"),
+        branchPrefix = cms.untracked.string("hfPFClusters"),
+        inputcoll = cms.InputTag("particleFlowClusterHF")
+    )
  
     # main function
     ret = {}
