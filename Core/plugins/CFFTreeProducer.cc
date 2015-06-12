@@ -33,6 +33,7 @@
 #include "CommonFSQFramework/Core/interface/RecoTrackView.h"
 #include "CommonFSQFramework/Core/interface/VerticesView.h"
 #include "CommonFSQFramework/Core/interface/CastorRecHitView.h"
+#include "CommonFSQFramework/Core/interface/CastorTowerView.h"
 #include "CommonFSQFramework/Core/interface/CastorJetView.h"
 
 #include "CommonFSQFramework/Core/interface/JetView.h"
@@ -141,6 +142,9 @@ CFFTreeProducer::CFFTreeProducer(const edm::ParameterSet& iConfig)
         }
         else if (miniViewType == "CastorRecHitView") {
             m_views.push_back(new CastorRecHitView(pset, m_tree));
+        }
+        else if (miniViewType == "CastorTowerView") {
+            m_views.push_back(new CastorTowerView(pset, m_tree));
         }
         else if (miniViewType == "CastorJetView") {
             m_views.push_back(new CastorJetView(pset, m_tree));
