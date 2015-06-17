@@ -1,5 +1,6 @@
 #include "CommonFSQFramework/Core/interface/TriggerResultsView.h"
 #include "FWCore/Common/interface/TriggerResultsByName.h"
+#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
 
 TriggerResultsView::TriggerResultsView(const edm::ParameterSet& iConfig, TTree * tree):
 EventViewBase(iConfig,  tree)
@@ -8,7 +9,10 @@ EventViewBase(iConfig,  tree)
     m_process = iConfig.getParameter<std::string>("process");
     m_triggerNames = iConfig.getParameter<std::vector<std::string> >("triggers");
     for (unsigned int i=0; i < m_triggerNames.size();++i){
-        if (iConfig.exists(m_triggerNames.at(i))) {
+        // check, if it's for L1GT readout
+        if (m_triggerNames.at(i).find("L1GT") != std::string::npos) {
+            m_triggerClasses[m_triggerNames.at(i)] = std::vector<std::string>();
+        } else if (iConfig.exists(m_triggerNames.at(i))) {
             std::vector<std::string> triggerClass =  iConfig.getParameter<std::vector<std::string> >(m_triggerNames.at(i));
             m_triggerClasses[m_triggerNames.at(i)] = triggerClass;
             //std::cout << "Trigger created via pset: " << m_triggerNames.at(i) << std::endl; 
@@ -34,7 +38,11 @@ EventViewBase(iConfig,  tree)
     it = m_triggerClasses.begin();
     itE = m_triggerClasses.end();
     for(;it != itE;++it){
-        registerInt(it->first, tree);
+        if (it->first.find("L1GT") != std::string::npos) {
+            registerVecInt(it->first, tree);
+        } else {
+            registerInt(it->first, tree);
+        }
     }
 }
 
@@ -43,12 +51,26 @@ void TriggerResultsView::fillSpecific(const edm::Event& iEvent, const edm::Event
 
     edm::TriggerResultsByName trbn = iEvent.triggerResultsByName(m_process);
     // TODO error message?
-    if (!trbn.isValid()) return;
+    if (!trbn.isValid()) {
+        edm::LogWarning(" TriggerResultsByName ") << " Cannot read TriggerResultsByName " << std::endl;
+        return; 
+    }
 
     const std::vector< std::string > names = trbn.triggerNames(); 
     //for (unsigned int i = 0; i<names.size(); ++i){
     //    std::cout << names.at(i) << std::endl;
     //}
+
+
+    edm::Handle<L1GlobalTriggerReadoutRecord> gtReadoutRecord;
+    iEvent.getByLabel(edm::InputTag("gtDigis"), gtReadoutRecord);
+    if( !gtReadoutRecord.isValid() || gtReadoutRecord.failedToGet() ) {
+        edm::LogWarning(" GTReadoutRecord ") << " Cannot read gtReadoutRecord " << std::endl;
+        return;
+    };
+
+    TechnicalTriggerWord TechTrigg = gtReadoutRecord->technicalTriggerWord();
+    DecisionWord AlgoTrig          = gtReadoutRecord->decisionWord();
 
 
     std::map<std::string, std::vector<std::string> >::const_iterator it, itE;
@@ -59,6 +81,15 @@ void TriggerResultsView::fillSpecific(const edm::Event& iEvent, const edm::Event
         //it->second - list of triggers to check
         //
         //std::cout << "Trying " << it->first << std::endl;
+
+        if (it->first == "L1GTTech") {
+            for (unsigned int i=0; i < TechTrigg.size(); ++i) addToIVec(it->first, TechTrigg.at(i));
+            continue;
+        } else if (it->first == "L1GTAlgo") {
+            for (unsigned int i=0; i < AlgoTrig.size(); ++i)  addToIVec(it->first, AlgoTrig.at(i));
+            continue;
+        }
+
         int accept = 0;
         for (unsigned int i=0; i < it->second.size();++i){
             std::string name = it->second.at(i);
