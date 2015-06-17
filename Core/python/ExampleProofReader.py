@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 ###############################################################################
 #
-#  TODO: 
+#  TODO:
 #   1. Select output root file when calling runAll
 #   2. Same for datasets
 #   4. Fetch generator weight, create histos with sumw
@@ -20,24 +20,24 @@
 #   Additional notes:
 #
 #     1. change "workers" parameter to run on more cores
-#     2. This script needs to be called from a directory where it is placed, 
-#        (that is by typing ExampleProofReader.py). You can use symbolic 
+#     2. This script needs to be called from a directory where it is placed,
+#        (that is by typing ExampleProofReader.py). You can use symbolic
 #        link to overcome this
-#     3.  Histos will be saved in ~/tmp/plots.root (this is currently 
+#     3.  Histos will be saved in ~/tmp/plots.root (this is currently
 #         hardcoded, change if needed)
-#     4. You can see proof execution logs under  
+#     4. You can see proof execution logs under
 #
 #           ~/.proof/<long string coresponding to your directory name>/last-lite-session/worker-0.0.log
 #
-#         Your print statements will go there. 
+#         Your print statements will go there.
 #
 #     5. Debugging proof analyzer (ie this analyzer) is often difficult, since
-#        you dont see err messages (not even in file above). Often the only 
+#        you dont see err messages (not even in file above). Often the only
 #        way is to comment/uncomment suspected parts of code and see if crash
 #        persists
-#       
-#     6. Often problems are caused by having a bare return statement (without a 
-#        value) in Process function. You should always return 1 (0 value is 
+#
+#     6. Often problems are caused by having a bare return statement (without a
+#        value) in Process function. You should always return 1 (0 value is
 #        is used once, see below and dont touch :) )
 #
 #
@@ -52,9 +52,10 @@ from array import *
 
 from CommonFSQFramework.Core.GetDatasetInfo import getTreeFilesAndNormalizations
 import CommonFSQFramework.Core.Util
+from CommonFSQFramework.Core.TermColor import bcolors
 
 
-# please note that python selector class name (here: ExampleProofReader) 
+# please note that python selector class name (here: ExampleProofReader)
 # should be consistent with this file name (ExampleProofReader.py)
 #from ROOT import TPySelector
 class ExampleProofReader( ROOT.TPySelector ):
@@ -102,7 +103,7 @@ class ExampleProofReader( ROOT.TPySelector ):
                     print "Cannot set bool attribute", s, "from", attr
             else:
                 print "Dont know what to do with", s, attrType
-            
+
         #print "XXX1", self.YODA, self.LUKE, self.VADER, self.LEIA, self.LEIA2
 
 
@@ -114,9 +115,9 @@ class ExampleProofReader( ROOT.TPySelector ):
     def SlaveBegin( self, tree ):
         #print 'py: slave beginning'
         try:
-            self.getVariables() # needed for 
+            self.getVariables() # needed for
         except:
-            print "Exception catched during worker configuration. Traceback:"
+            print bcolors.ERROR + "Exception caught during worker configuration. Traceback:" + bcolors.ENDC
             traceback.print_exc(file=sys.stdout)
             sys.stdout.flush()
 
@@ -125,7 +126,7 @@ class ExampleProofReader( ROOT.TPySelector ):
             curPath = ROOT.gDirectory.GetPath()
             bigFileName = self.outFile.replace(".root","")+"_"+ self.datasetName+".root"
             self.proofFile=ROOT.TProofOutputFile(bigFileName,"M")
-            self.oFileViaPOF = self.proofFile.OpenFile("RECREATE") 
+            self.oFileViaPOF = self.proofFile.OpenFile("RECREATE")
             self.outDirViaPOF = self.oFileViaPOF.mkdir(self.datasetName)
 
             ROOT.gDirectory.cd(curPath)
@@ -133,9 +134,9 @@ class ExampleProofReader( ROOT.TPySelector ):
             self.oFileViaPOF = None
 
         try:
-            self.init() 
+            self.init()
         except:
-            print "Exception catched during worker configuration. Traceback:"
+            print bcolors.ERROR + "Exception caught during worker configuration. Traceback:" + bcolors.ENDC
             traceback.print_exc(file=sys.stdout)
             sys.stdout.flush()
             raise Exception("Whooopps!")
@@ -155,13 +156,13 @@ class ExampleProofReader( ROOT.TPySelector ):
     def init(self):
 
         self.histograms = {}
-        self.ptLeadHisto = ROOT.TH1F("ptLead",   "ptLead",  100, 0, 100)      
-        self.ptRatioHisto = ROOT.TH1F("ptRatio", "ptRatio", 100, -0.0001, 10)      
+        self.ptLeadHisto = ROOT.TH1F("ptLead",   "ptLead",  100, 0, 100)
+        self.ptRatioHisto = ROOT.TH1F("ptRatio", "ptRatio", 100, -0.0001, 10)
         self.GetOutputList().Add(self.ptLeadHisto)
         self.GetOutputList().Add(self.ptRatioHisto)
         sys.stdout.flush()
-    
-    # protect from returning None or other nonsense by 
+
+    # protect from returning None or other nonsense by
     # putting analysis stuff in separate function
     def Process( self, entry ):
         if self.fChain.GetEntry( entry ) <= 0:
@@ -170,7 +171,7 @@ class ExampleProofReader( ROOT.TPySelector ):
         try:
             self.analyze()
         except:
-            print "Exception catched from analyze function. Traceback:"
+            print bcolors.ERROR + "Exception caught from analyze function. Traceback:" + bcolors.ENDC
             traceback.print_exc(file=sys.stdout)
             sys.stdout.flush()
             raise Exception("Whooopps!")
@@ -214,7 +215,7 @@ class ExampleProofReader( ROOT.TPySelector ):
         except:
             print ""
             print ""
-            print "Exception catched in finalize function. Traceback:"
+            print bcolors.ERROR + "Exception caught in finalize function. Traceback:" + bcolors.ENDC
             print ""
             traceback.print_exc(file=sys.stdout)
             print ""
@@ -257,15 +258,15 @@ class ExampleProofReader( ROOT.TPySelector ):
             grandeTotale =  o.GetBinContent(o.GetNbinsX()+1)+ o.GetBinContent(0)+o.Integral()
             if grandeTotale == 0: continue
             if o.GetBinContent(o.GetNbinsX()+1) != 0:
-                print "!!WARNING!! histogram", o.GetName(), "has overflow ==> fraction of events in overflow bin:", \
-                    (o.GetBinContent(o.GetNbinsX()+1)/grandeTotale)*100, "%"
+                print bcolors.WARNING + "!!WARNING!! histogram", o.GetName(), "has overflow ==> fraction of events in overflow bin:", \
+                    (o.GetBinContent(o.GetNbinsX()+1)/grandeTotale)*100, "%" + bcolors.ENDC
                 problems = True
             if o.GetBinContent(0) != 0:
-                print "!!WARNING!! histogram", o.GetName(), "has underflow ==> fraction of events in underflow bin:", \
-                    (o.GetBinContent(0)/grandeTotale)*100, "%"
+                print bcolors.WARNING + "!!WARNING!! histogram", o.GetName(), "has underflow ==> fraction of events in underflow bin:", \
+                    (o.GetBinContent(0)/grandeTotale)*100, "%" + bcolors.ENDC
                 problems = True
 
-        if not problems: print "everything is fine!"
+        if not problems: print bcolors.OKGREEN + "everything is fine!" + bcolors.ENDC
 
     def Terminate( self ): # executed once on client
 
@@ -274,7 +275,7 @@ class ExampleProofReader( ROOT.TPySelector ):
         except:
             print ""
             print ""
-            print "Exception catched in checkUnderOverFlow function. Traceback:"
+            print bcolors.ERROR + "Exception caught in checkUnderOverFlow function. Traceback:" + bcolors.ENDC
             print ""
             traceback.print_exc(file=sys.stdout)
             print ""
@@ -288,7 +289,7 @@ class ExampleProofReader( ROOT.TPySelector ):
         except:
             print ""
             print ""
-            print "Exception catched in finalizeWhenMerged function. Traceback:"
+            print bcolors.ERROR + "Exception caught in finalizeWhenMerged function. Traceback:" + bcolors.ENDC
             print ""
             traceback.print_exc(file=sys.stdout)
             print ""
@@ -300,7 +301,7 @@ class ExampleProofReader( ROOT.TPySelector ):
 
 
 
-        #print 'py: terminating' 
+        #print 'py: terminating'
         olist =  self.GetOutputList()
 
         if not self.useProofOFile:
@@ -321,7 +322,7 @@ class ExampleProofReader( ROOT.TPySelector ):
             slaveParameters = {}
 
         cwd = os.getcwd()+"/"
-        treeFilesAndNormalizations = getTreeFilesAndNormalizations(maxFilesMC=maxFilesMC, 
+        treeFilesAndNormalizations = getTreeFilesAndNormalizations(maxFilesMC=maxFilesMC,
                                 maxFilesData=maxFilesData, samplesToProcess=sampleList, usePickle=usePickle)
 
         if sampleList == None:
@@ -338,7 +339,7 @@ class ExampleProofReader( ROOT.TPySelector ):
                 print "Cannot create outfile:", outFile
                 sys.exit()
             of.Close() # so we dont mess with file opens during proof ana
-        
+
         slaveParameters["outFile"] = outFile
 
 
@@ -360,7 +361,7 @@ class ExampleProofReader( ROOT.TPySelector ):
             dataset = ROOT.TDSet( 'TTree', 'data', treeName) # the last name is the directory name inside the root file
             for file in treeFilesAndNormalizations[t]["files"]:
                 dataset.Add(file)
-            
+
             slaveParameters["datasetName"] = t
             slaveParameters["isData"] = sampleListFullInfo[t]["isData"]
             slaveParameters["normalizationFactor"] =  treeFilesAndNormalizations[t]["normFactor"]
@@ -403,10 +404,10 @@ class ExampleProofReader( ROOT.TPySelector ):
             else:
                 proof = ROOT.TProof.Open(proofConnectionString)
 
-            
+
             proof.Exec( 'gSystem->Setenv("PYTHONPATH",gSystem->Getenv("PATH2"));') # for some reason cannot use method below for python path
             proof.Exec( 'gSystem->Setenv("PATH", "'+ROOT.gSystem.Getenv("PATH") + '");')
-            for v in variablesToSetInProof:  
+            for v in variablesToSetInProof:
                 # if you get better implemenation (GetParameter?) mail me
                 proof.Exec('gSystem->Setenv("'+v+'","'+variablesToSetInProof[v]+'");')
             print dataset.Process( 'TPySelector',  cls.__name__)
@@ -416,6 +417,18 @@ class ExampleProofReader( ROOT.TPySelector ):
                 logs = proof.GetManager().GetSessionLogs().GetListOfLogs()
                 for l in logs:
                     print l.GetTitle()
+                if len(logs) > 1:
+                    print "Printing output of first worker node:"
+                    with open(logs[1].GetTitle(),"r") as f:
+                        for l in f:
+                            if "error" in l.lower():
+                                print bcolors.ERROR + l.rstrip('\n') + bcolors.ENDC
+                            elif "warn" in l.lower():
+                                print bcolors.WARNING + l.rstrip('\n') + bcolors.ENDC
+                            else:
+                                print l,
+                else: #logs has not enough entries
+                    print "Cannot print log file of first worker node. Only" + len(logs) + "logs available"
             except:
                 print "Cannot get lognames"
 
@@ -444,7 +457,7 @@ class ExampleProofReader( ROOT.TPySelector ):
             ROOT.gDirectory.cd(curPath)
 
             # clean environment
-            for v in variablesToSetInProof:  
+            for v in variablesToSetInProof:
                 #command = 'gSystem->Unsetenv("'+v+'");'
                 #print command
                 proof.Exec('gSystem->Unsetenv("'+v+'");')
@@ -497,5 +510,5 @@ if __name__ == "__main__":
     ExampleProofReader.runAll(treeName="exampleTree", maxFilesMC = 10, \
                               slaveParameters=slaveParams, \
                               outFile = "~/tmp/plots.root")
-                              
+
     # '''
