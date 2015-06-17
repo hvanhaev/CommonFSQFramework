@@ -12,6 +12,12 @@ def get(todo):
         ZeroBias = cms.vstring("HLT_ZeroBias_part*")
     )
 
+    defs["L1GTriggerResultsView"] = cms.PSet(
+        miniView = cms.string("TriggerResultsView"),
+        branchPrefix = cms.untracked.string("trgl1"),
+        process = cms.string("HLT"),
+        triggers = cms.vstring("L1GTTech","L1GTAlgo")
+    )
  
     # main function
     ret = {}
