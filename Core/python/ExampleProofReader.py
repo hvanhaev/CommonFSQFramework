@@ -314,8 +314,10 @@ class ExampleProofReader( ROOT.TPySelector ):
 
     @classmethod
     def runAll(cls, treeName, outFile, sampleList = None, \
-                maxFilesMC=None, maxFilesData=None, \
-                slaveParameters = None, nWorkers=None, usePickle=False, useProofOFile = False):
+               maxFilesMC=None, maxFilesData=None, \
+               slaveParameters = None, nWorkers=None,
+               usePickle=False, useProofOFile = False,
+               verbosity=1):
 
 
         if slaveParameters == None: # When default param is used reset contents on every call to runAll
@@ -418,17 +420,28 @@ class ExampleProofReader( ROOT.TPySelector ):
                 for l in logs:
                     print l.GetTitle()
                 if len(logs) > 1:
-                    print "Printing output of first worker node:"
                     with open(logs[1].GetTitle(),"r") as f:
-                        for l in f:
-                            if "error" in l.lower():
-                                print bcolors.ERROR + l.rstrip('\n') + bcolors.ENDC
-                            elif "warn" in l.lower():
-                                print bcolors.WARNING + l.rstrip('\n') + bcolors.ENDC
-                            else:
-                                print l,
+                        if verbosity > 1:
+                            print "Printing output of first worker node:"
+                            for l in f:
+                                if "error" in l.lower() or "exception" in l.lower():
+                                    print bcolors.ERROR + l.rstrip('\n') + bcolors.ENDC
+                                elif "warn" in l.lower():
+                                    print bcolors.WARNING + l.rstrip('\n') + bcolors.ENDC
+                                else:
+                                    print l,
+                        elif verbosity == 1:
+                            if any("error" in l.lower() for l in f) or any("exception" in l.lower() for l in f) or any("warning" in l.lower() for l in f):
+                                print "Error/Warning found in log file. Printing first log of worker node:"
+                                for l in f:
+                                    if "error" in l.lower() or "exception" in l.lower():
+                                        print bcolors.ERROR + l.rstrip('\n') + bcolors.ENDC
+                                    elif "warn" in l.lower():
+                                        print bcolors.WARNING + l.rstrip('\n') + bcolors.ENDC
+                                    else:
+                                        print l,
                 else: #logs has not enough entries
-                    print "Cannot print log file of first worker node. Only" + len(logs) + "logs available"
+                    print "Cannot print log file of first worker node. Only" + len(logs) + "log(s) available"
             except:
                 print "Cannot get lognames"
 
