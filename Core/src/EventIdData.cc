@@ -5,6 +5,7 @@
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "DataFormats/Luminosity/interface/LumiSummary.h"
 #include "DataFormats/Luminosity/interface/LumiDetails.h"
+#include "SimDataFormats/Vertex/interface/SimVertexContainer.h"
 #include "TLorentzVector.h"
 
 EventIdData::EventIdData(const edm::ParameterSet& iConfig, TTree * tree):
@@ -30,6 +31,10 @@ EventViewBase(iConfig, tree)
     registerFloat("instLumiPerBX",tree);
     registerFloat("puTrueNumInteractions", tree);
     registerFloat("PUNumInteractions", tree);
+    
+    registerFloat("simvtxx",tree);
+    registerFloat("simvtxy",tree);
+    registerFloat("simvtxz",tree);
 
     localcount = 0;
 
@@ -193,5 +198,14 @@ void EventIdData::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& 
     } catch (...) {
     	if (localcount == 1) std::cout << " An exception was thrown when accessing the PileupSummaryInfo object. This means we are probably running on GEN-SIM samples that do not have this information." << std::endl;
     }
+    
+    
+    // get the first (primary?) simulated vertex from Geant4
+    edm::Handle<edm::SimVertexContainer> simVertexCollection;
+    iEvent.getByLabel("g4SimHits", simVertexCollection);
+    const SimVertex simPVh = *(simVertexCollection->begin());
+    setF("simvtxx",simPVh.position().x());
+    setF("simvtxy",simPVh.position().y());
+    setF("simvtxz",simPVh.position().z());
 
 }
