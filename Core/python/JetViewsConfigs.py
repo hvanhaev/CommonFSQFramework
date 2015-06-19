@@ -18,7 +18,13 @@ def get(todo):
                 "5.5 1 0.007 0.07 0.072"),
     )
     # and so on
-    # defs["JetViewAK4Calo"]= cmsPSet(...
+    defs["JetViewSisCone5TrackJets"]= cms.PSet(
+        miniView = cms.string("TrackJetView"),
+	maxEta = cms.double(2),
+        minPt = cms.double(1),
+	branchPrefix = cms.untracked.string("SisCone5CH"),
+        input = cms.InputTag("sisCone5TrackJets"),	
+    )
 
     ret = {}
     for t in todo:
