@@ -37,11 +37,11 @@
 #include "CommonFSQFramework/Core/interface/CastorJetView.h"
 
 #include "CommonFSQFramework/Core/interface/JetView.h"
+#include "CommonFSQFramework/Core/interface/TrackJetView.h"
 #include "CommonFSQFramework/Core/interface/TriggerResultsView.h"
 #include "CommonFSQFramework/Core/interface/GenericCandidateView.h"
 #include "CommonFSQFramework/Core/interface/HFRecHitView.h"
 #include "CommonFSQFramework/Core/interface/HBHERecHitView.h"
-#include "CommonFSQFramework/Core/interface/EcalRecHitView.h"
 #include "CommonFSQFramework/Core/interface/CaloTowerView.h"
 #include "CommonFSQFramework/Core/interface/PFCandidateView.h"
 #include "CommonFSQFramework/Core/interface/PFClusterView.h"
@@ -119,8 +119,10 @@ CFFTreeProducer::CFFTreeProducer(const edm::ParameterSet& iConfig)
 
         prefixes.insert(prefix);
 
-
-        if (miniViewType == "JetView") {
+        if (miniViewType == "TrackJetView") {
+            m_views.push_back(new TrackJetView(pset, m_tree));
+        }
+        else if (miniViewType == "JetView") {
             m_views.push_back(new JetView(pset, m_tree));
         }
         else if (miniViewType == "TriggerResultsView") {
@@ -155,9 +157,6 @@ CFFTreeProducer::CFFTreeProducer(const edm::ParameterSet& iConfig)
 	}
 	else if (miniViewType == "HBHERecHitView") {
             m_views.push_back(new HBHERecHitView(pset, m_tree));
-        }
-        else if (miniViewType == "EcalRecHitView") {
-            m_views.push_back(new EcalRecHitView(pset, m_tree));
         }
 	else if (miniViewType == "CaloTowerView") {
             m_views.push_back(new CaloTowerView(pset, m_tree));
