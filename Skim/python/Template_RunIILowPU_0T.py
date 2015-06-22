@@ -10,7 +10,7 @@ skimEfficiencyMethod="getSkimEff"
 '''
 
 # point towards your list of samples you want
-dsFile="CommonFSQFramework/Skim/python/ds_RunIILowPU_0T_v1.txt"
+dsFile="CommonFSQFramework/Skim/python/ds_RunIILowPU_0T_v2.txt"
 
 # define the util decorator. Functions marked with this wont turn into ds attribute
 def util(func):
@@ -31,8 +31,8 @@ def name(ds):
     if not isData(ds): return split[1]
 
     if isData(ds):
-	if "Commissioning2015" in ds: return "data_"+split[1]+"_Commissioning2015"
-	if "Run2015A" in ds: return "data_"+split[1]+"_Run2015A"
+	if "Run247324" in ds: return "data_"+split[1]+"_Run2015A_Run247324"
+	if "LHCf_lowPUruns" in ds: return "data_"+split[1]+"_Run2015A_LHCf_lowPU"
 	return "data_"+split[1]
 
 def isData(ds):
@@ -46,6 +46,7 @@ def json(ds):
     if realData:
         if "Run245194" in ds: return "CommonFSQFramework/Skim/lumi/Run245194.json"
 	if "Run247324" in ds: return "CommonFSQFramework/Skim/lumi/Run247324.json"
+	if "LHCf_lowPUruns" in ds: return "CommonFSQFramework/Skim/lumi/LHCf_lowPUruns_v1.json"
     else:
         return ""
 
@@ -64,6 +65,8 @@ def numEvents(ds):
     if "MinBias_TuneZ2star_13TeV-pythia6_MagnetOff" in name(ds): return 998082
     if "MinBias_TuneMBR_13TeV-pythia8_MagnetOff" in name(ds): return 997146
     if "MinBias_TuneEE5C_13TeV-herwigpp_MagnetOff" in name(ds): return 997682
+    if "ReggeGribovPartonMC_13TeV-EPOS_MagnetOff" in name(ds): return 998671
+    if "ReggeGribovPartonMC_13TeV-QGSJetII_MagnetOff" in name(ds): return 980585
     
     # 3.8T MC
     if "MinBias_TuneMonash13_13TeV-pythia8" in name(ds): return 997552
@@ -75,10 +78,15 @@ def numEvents(ds):
     if "MinBias_TuneEE5C_13TeV-herwigpp" in name(ds): return 1000000 
     
     # data
-    if "Run245194" in ds: evts = 505132
-    if "Run247324" in ds: evts = 1666987
+    if "Run245194" in ds: return 505132
+    if "ZeroBias1" in ds and "Run247324" in ds: return 1666987
+    if "ZeroBias1" in ds and "LHCf_lowPUruns" in ds: return 2551697
+    if "L1TechBPTXQuiet" in ds and "Run247324" in ds: return 1454985
+    if "L1TechBPTXPlusOnly" in ds and "Run247324" in ds: return 1500029
+    if "L1TechBPTXMinusOnly" in ds and "Run247324" in ds: return 1748311
     
-    return evts
+    # if nothing found...
+    return -1
 
 def GT(ds):
     if isData(ds): return "GR_P_V56"
@@ -112,7 +120,6 @@ def XS(ds):
     # Give all XS in pb
     s = {}
     s["MinBias_TuneMonash13_13TeV-pythia8"] = 78418400000.0 # from DAS - McM
-    s["MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8"] = 78418400000.0
     s["ReggeGribovPartonMC_13TeV-EPOS"] = 78418400000.0
     s["ReggeGribovPartonMC_13TeV-QGSJetII"] = 78418400000.0
     s["MinBias_TuneZ2star_13TeV-pythia6"] = 78260000000.0
