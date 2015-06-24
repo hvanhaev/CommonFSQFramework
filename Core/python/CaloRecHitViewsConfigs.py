@@ -15,6 +15,11 @@ def get(todo):
         branchPrefix = cms.untracked.string("HBHERecHit"),
     )
 
+   # EcalRecHits
+    defs["EcalRecHitView"]  = cms.PSet(
+        miniView = cms.string("EcalRecHitView"),
+        branchPrefix = cms.untracked.string("EcalRecHit"),
+    )
  
     # main function
     ret = {}
