@@ -8,6 +8,6 @@ class PFClusterGetter(BaseGetter.BaseGetter):
 
     # Note: use the most used branch (so performance wont suffer from reading otherwise unused stuff)
     def getSize(self):
-        srcBranch = "PFClustersenergy"
+        srcBranch = self.branchPrefix + "energy"
         return getattr(self.chain, srcBranch).size()
 
