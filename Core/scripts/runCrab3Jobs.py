@@ -66,12 +66,16 @@ for s in sampleListTodo:
   pycfgextra.append("config.General.requestName='"+name+"'")
   pycfgextra.append("config.Data.publishDataName='"+name+"'")
   pycfgextra.append("config.Data.inputDataset='"+sampleList[s]["DS"]+"'")
+  # customize when running on private datasets
+  if "/USER" in sampleList[s]["DS"]: 
+      print "Submitting jobs with a private USER made input dataset"
+      pycfgextra.append("config.Data.inputDBS = 'phys03'")
 
   
   if isData:
     print isData, sampleList[s]["json"]
     pycfgextra.append("config.Data.splitting='LumiBased'")
-    pycfgextra.append("config.Data.unitsPerJob=1000")
+    pycfgextra.append("config.Data.unitsPerJob=10")
     jsonFile=edm.FileInPath(sampleList[s]["json"])
     pycfgextra.append("config.Data.lumiMask='"+jsonFile.fullPath()+"'")
     

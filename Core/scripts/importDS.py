@@ -23,7 +23,8 @@ def getSEDirsCrab3(anaVersion, name):
     else:
         raise Exception("Cannot find crab3 dir for "+anaVersion+" "+ name)
 
-    taskDir = os.path.join(anaVersion, taskDir)
+    taskDir = os.path.join(anaVersion, "crab_"+anaVersion+"_"+name)
+    print " in taskdir: ", taskDir
     output = subprocess.check_output(["crab", "getoutput", "--dump", taskDir])
     SEDirs = set()
     for l in output.splitlines():
@@ -124,6 +125,7 @@ def main(sam,final):
         if crabVersion == 2 and final:
             SEDirs = getSEDirsCrab2(anaVersion, name)
         elif crabVersion == 3 and final:
+	    print " fetch output for: ", name
             SEDirs = getSEDirsCrab3(anaVersion, name)
         elif final:
             raise Exception("Unexpected crab version: "+str(crabVersion))
@@ -137,7 +139,7 @@ def main(sam,final):
         elif final:
             SEDir = SEDirs.pop()
             # put also local paths together
-
+            print " SEDir fetched: ", SEDir
             sam[name]["pathSE"] = SEDir
             tagBasePathPAT = "XXXTMFPAT"  # note this tag in customization function below
             tagBasePathTrees = "XXXTMFTTree" # note this tag in customization function below

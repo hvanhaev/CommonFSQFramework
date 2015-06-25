@@ -30,8 +30,8 @@ process = CommonFSQFramework.Core.customizePAT.customizeGT(process)
 
 # define treeproducer
 process.HFRecHitTree = cms.EDAnalyzer("CFFTreeProducer")
-import CommonFSQFramework.Core.HFRecHitView
-process.HFRecHitTree._Parameterizable__setParameters(CommonFSQFramework.Core.HFRecHitView.get(["HFRecHitView"]))
+import CommonFSQFramework.Core.CaloRecHitViewsConfigs
+process.HFRecHitTree._Parameterizable__setParameters(CommonFSQFramework.Core.CaloRecHitViewsConfigs.get(["HFRecHitView"]))
 
 # add paths
 process = CommonFSQFramework.Core.customizePAT.addTreeProducer(process, process.HFRecHitTree)
