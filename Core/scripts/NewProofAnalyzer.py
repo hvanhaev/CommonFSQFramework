@@ -5,6 +5,9 @@ from optparse import OptionParser
 template='''#!/usr/bin/env python
 import CommonFSQFramework.Core.ExampleProofReader
 
+# import all your getters here
+from  CommonFSQFramework.Core.GenParticlesGetter import GenParticlesGetter
+
 import sys, os, time
 sys.path.append(os.path.dirname(__file__))
 
@@ -15,48 +18,80 @@ from ROOT import edm
 from array import *
 
 class XXXXX(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader):
+
     def init( self):
 
+        # define all your histograms
         self.hist = {}
-        self.hist["numGenTracks"] =  ROOT.TH1F("numGenTracks",   "numGenTracks",  100, -0.5, 99.5)
-        for h in self.hist:
+        self.hist["numGenParticles"] =  ROOT.TH1F("numGenParticles",   "numGenParticles",  100, -0.5, 99.5)
+	
+	# define and initialize your getters
+	self.genparts = GenParticlesGetter("genParticles")
+        
+	# add error treatment and add histograms to output
+	for h in self.hist:
             self.hist[h].Sumw2()
             self.GetOutputList().Add(self.hist[h])
 
     def analyze(self):
         weight = 1
-        num = 0
-        # genTracks
-        #num = self.fChain.genTracks.size()
-        #print num
+	
+	# fetch all info with the getters for this event
+	self.genparts.newEvent(self.fChain)
+	
+	# start making your histograms here...
+	
+	# fill gen histos
+        numgen = 0
+        for genpart in self.genparts.get():
+            genpartp4 = genpart.p4 # get fourvector
+            if genpartp4.pt() > 1.0:
+                numgen+=1
+                #self.hist["etaGenParticles"].Fill(genpartp4.eta(), weight)
+                #self.hist["phiGenParticles"].Fill(genpartp4.phi(), weight)
+                #self.hist["ptGenParticles"].Fill(genpartp4.pt(), weight)
+                #self.hist["pdgIDGenParticles"].Fill(genpart.pdg, weight)
+
+        self.hist["numGenParticles"].Fill(numgen, weight)
+        
+	
         #print self.maxEta # see slaveParams below
-        self.hist["numGenTracks"].Fill(num, weight)
+	
+	
         return 1
 
+    # this function will be executed after all events are processed, on each worker node separately
     def finalize(self):
         print "Finalize:"
         normFactor = self.getNormalizationFactor()
         print "  applying norm", normFactor
         for h in self.hist:
             self.hist[h].Scale(normFactor)
+	   
+    # this function will be executed after all events are processed, and after the results of all workers are merged/added
+    # use it to e.g. correct mean values in histograms etc. for the number of workers that you used	   
+    def finalizeWhenMerged(self):
+        print "Final calculations after merging workers..."	   
+	   
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
     ROOT.gSystem.Load("libFWCoreFWLite.so")
     ROOT.AutoLibraryLoader.enable()
 
-    sampleList = None # run through all
-    maxFilesMC = None # run through all ffiles found
-    maxFilesData = None # same
+    sampleList = None # run through all samples in the dictionary
+    maxFilesMC = None # run through all files found
+    maxFilesData = None # same but for data samples
+    maxNevents = -1 # run on all events, change this to some positive value to restrict the number of events you want to process
     nWorkers = None # Use all cpu cores
 
-    # debug config:
+    # debug/test config:
     # Run printTTree.py alone to get the samples list
     #sampleList = []
-    #sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
+    #sampleList.append("MinBias_TuneMonash13_13TeV-pythia8")
     #maxFilesMC = 1
     #maxFilesData = 1
-    #maxFilesData = 1
+    #maxNevents = 5000
     #nWorkers = 1
 
 
@@ -65,11 +100,12 @@ if __name__ == "__main__":
 
 
     # use printTTree.py <sampleName> to see what trees are avaliable inside the skim file
-    XXXXX.runAll(treeName="tracksTree",
+    XXXXX.runAll(treeName="GenLevelTree",
            slaveParameters=slaveParams,
            sampleList=sampleList,
            maxFilesMC = maxFilesMC,
            maxFilesData = maxFilesData,
+	   maxNevents = maxNevents,
            nWorkers=nWorkers,
            outFile = "plotsXXXXX.root" )
 '''
