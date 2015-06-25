@@ -430,8 +430,10 @@ class ExampleProofReader( ROOT.TPySelector ):
                                 else:
                                     print l,
                         elif verbosity == 1:
-                            if any("error" in l.lower() for l in f) or any("exception" in l.lower() for l in f) or any("warning" in l.lower() for l in f):
+                            hasErrorsInLog = False
+                            if any([("error" in l.lower()) or ("exception" in l.lower()) or ("warning" in l.lower()) for l in f):
                                 print "Error/Warning found in log file. Printing first log of worker node:"
+                                f.seek(0)
                                 for l in f:
                                     if "error" in l.lower() or "exception" in l.lower():
                                         print bcolors.ERROR + l.rstrip('\n') + bcolors.ENDC
