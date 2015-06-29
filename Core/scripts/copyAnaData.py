@@ -253,8 +253,9 @@ def main():
     if not doPAT and not doTrees:
         print "Nothing to do. Run me with '-t' option to copy trees from current skim"
         sys.exit()
+	
 
-   #333
+    #333
     myprocs = []
     for s in sampleList:
         if "pathSE" not in sampleList[s]:
@@ -263,10 +264,15 @@ def main():
         try:
             todo = [sampleList[s]["pathPAT"], sampleList[s]["pathTrees"]]
             for d in todo:
-                os.system("mkdir -p "+ d)
-                if not os.path.isdir(d):
-                    raise Exception("Cannot create output dir "+d)
-                    continue
+	        if "eos/cms" in d:
+		    os.system("xrd eoscms mkdir -p " + d)
+		    #print " would create dir: xrd eoscms mkdir -p ", d
+		else:
+                    os.system("mkdir -p "+ d)
+		    #print " would create dir:", d
+                    if not os.path.isdir(d):
+                        raise Exception("Cannot create output dir "+d)
+                        continue
         except:
             continue
 
@@ -304,10 +310,15 @@ def main():
             if not sampleList[s]["isData"] and maxFilesMC >= 0 and cnt >= maxFilesMC:
                 continue
 
-
-            cpCommand = ['lcg-cp', srcFile, targetFile]
-            #cpCommand = ['lcg-ls', srcFile]
-            if os.path.isfile(targetFile):
+            if "eos/cms" in targetDir:
+	        cpCommand = ['lcg-cp', srcFile, "srm://srm-eoscms.cern.ch/"+targetFile]
+	    else:
+                cpCommand = ['lcg-cp', srcFile, targetFile]
+            
+	    #cpCommand = ['lcg-ls', srcFile]
+	    #print "would be cpCommand: ", cpCommand
+            
+	    if "eos/cms" not in targetDir and os.path.isfile(targetFile):
                 print "Allready present", typeString, fname, " #"+str(cnt), "from", s
                 continue
 
