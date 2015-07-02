@@ -10,7 +10,7 @@ skimEfficiencyMethod="getSkimEff"
 '''
 
 # point towards your list of samples you want
-dsFile="CommonFSQFramework/Skim/python/ds_RunIILowPU_0T_v2.txt"
+dsFile="CommonFSQFramework/Skim/python/ds_RunIILowPU_0T_v3.txt"
 
 # define the util decorator. Functions marked with this wont turn into ds attribute
 def util(func):
@@ -81,6 +81,7 @@ def numEvents(ds):
     if "Run245194" in ds: return 505132
     if "ZeroBias1" in ds and "Run247324" in ds: return 1666987
     if "ZeroBias1" in ds and "LHCf_lowPUruns" in ds: return 2551697
+    if "EmptyBX" in ds and "LHCf_lowPUruns" in ds: return 2921923
     if "L1TechBPTXQuiet" in ds and "Run247324" in ds: return 1454985
     if "L1TechBPTXPlusOnly" in ds and "Run247324" in ds: return 1500029
     if "L1TechBPTXMinusOnly" in ds and "Run247324" in ds: return 1748311
