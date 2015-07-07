@@ -80,11 +80,12 @@ class ExampleProofReader( ROOT.TPySelector ):
         variablesToFetch = ROOT.gSystem.Getenv(self.encodeEnvString("VariablesToFetch") )
         #print variablesToFetch
         split = variablesToFetch.split(",")
+	print " "
         for s in split:
             attrRaw = ROOT.gSystem.Getenv(self.encodeEnvString(s))
             #print s, attr
             attrSpl = attrRaw.split(";;;")
-            print s, attrSpl
+            print "Variable ", s, " set to: ", attrSpl[0]
             attr = attrSpl[0]
             attrType = attrSpl[1]
 
@@ -105,7 +106,7 @@ class ExampleProofReader( ROOT.TPySelector ):
                 print "Dont know what to do with", s, attrType
 
         #print "XXX1", self.YODA, self.LUKE, self.VADER, self.LEIA, self.LEIA2
-
+        print " "
 
 
     def Begin( self ):
@@ -369,8 +370,6 @@ class ExampleProofReader( ROOT.TPySelector ):
 
             ROOT.TProof.AddEnvVar("PATH2",ROOT.gSystem.Getenv("PYTHONPATH")+":"+os.getcwd())
 
-            #ROOT.gSystem.Setenv("TMFDatasetName", t)
-
             supportedTypes = set(["int", "str", "float", "bool"])
             variablesToFetch = ""
             coma = ""
@@ -407,10 +406,11 @@ class ExampleProofReader( ROOT.TPySelector ):
 
 
             proof.Exec( 'gSystem->Setenv("PYTHONPATH",gSystem->Getenv("PATH2"));') # for some reason cannot use method below for python path
-            proof.Exec( 'gSystem->Setenv("PATH", "'+ROOT.gSystem.Getenv("PATH") + '");')
+            #proof.Exec( 'gSystem->Setenv("PATH", "'+ROOT.gSystem.Getenv("PATH") + '");')
             for v in variablesToSetInProof:
                 # if you get better implemenation (GetParameter?) mail me
                 proof.Exec('gSystem->Setenv("'+v+'","'+variablesToSetInProof[v]+'");')
+	    	
             print dataset.Process( 'TPySelector',  cls.__name__, maxNevents) # with parameter to limit on number of events
 
             try:
@@ -474,6 +474,8 @@ class ExampleProofReader( ROOT.TPySelector ):
                 #command = 'gSystem->Unsetenv("'+v+'");'
                 #print command
                 proof.Exec('gSystem->Unsetenv("'+v+'");')
+
+	    proof.Close()
 
         if len(skipped)>0:
             print "Note: following samples were skipped:"
