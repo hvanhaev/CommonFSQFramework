@@ -1,0 +1,8 @@
+/ExpressPhysics/Run2015B-Express-v1/FEVT
+/ZeroBias/Run2015B-PromptReco-v1/RECO
+/ReggeGribovPartonMC_13TeV-EPOS/RunIISpring15DR74-NoPURawReco_castor_MCRUN2_74_V8B-v1/GEN-SIM-RECO
+/ReggeGribovPartonMC_13TeV-QGSJetII/RunIISpring15DR74-NoPURawReco_castor_MCRUN2_74_V8B-v1/GEN-SIM-RECO
+/MinBias_TuneZ2star_13TeV-pythia6/RunIISpring15DR74-NoPURawReco_castor_MCRUN2_74_V8B-v1/GEN-SIM-RECO
+/MinBias_TuneCUETP8M1_13TeV-pythia8/RunIISpring15DR74-NoPURawReco_castor_MCRUN2_74_V8B-v1/GEN-SIM-RECO
+/MinBias_TuneMBR_13TeV-pythia8/RunIISpring15DR74-NoPURawReco_castor_MCRUN2_74_V8B-v1/GEN-SIM-RECO
+/MinBias_TuneEE5C_13TeV-herwigpp/RunIISpring15DR74-NoPURawReco_castor_MCRUN2_74_V8B-v1/GEN-SIM-RECO
