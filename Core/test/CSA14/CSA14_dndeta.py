@@ -37,6 +37,7 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
         binHalf = "_bh"
         binOne = "_b1"
         binTwo = "_b2"
+	binFour = "_b4"
         genPrefix = "GEN_"
 
 
@@ -47,6 +48,34 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
 
 
         #Nch_response_Name = histPrefix+"Nch_response"
+
+        ptMaxName_GEN_b4 = genPrefix+"ptMax"+binFour
+        towardName_GEN_b4 = genPrefix+"toward"+binFour
+        awayName_GEN_b4 = genPrefix+"away"+binFour
+        transMaxName_GEN_b4 = genPrefix+"transMax"+binFour
+        transMinName_GEN_b4 = genPrefix+"transMin"+binFour
+        towardNchName_GEN_b4 = genPrefix+"towardNch"+binFour
+        awayNchName_GEN_b4 = genPrefix+"awayNch"+binFour
+        transMaxNchName_GEN_b4 = genPrefix+"transMaxNch"+binFour
+        transMinNchName_GEN_b4 = genPrefix+"transMinNch"+binFour
+
+        transDifName_GEN_b4 = genPrefix+"transDif"+binFour
+        transDifNchName_GEN_b4 = genPrefix+"transDifNch"+binFour
+        towardTotalName_GEN_b4= genPrefix+"towardTotal"+binFour
+        towardTotalNchName_GEN_b4= genPrefix+"towardTotalNch"+binFour
+        towardTotalAvgName_GEN_b4= genPrefix+"towardTotalAvg"+binFour
+        overallTotalName_GEN_b4= genPrefix+"overallTotal"+binFour
+        overallTotalNchName_GEN_b4= genPrefix+"overallTotalNch"+binFour
+        overallTotalAvgName_GEN_b4= genPrefix+"overallTotalAvg"+binFour        
+
+        transName_GEN_b4 = genPrefix+"trans"+binFour
+        transNchName_GEN_b4 = genPrefix+"transNch"+binFour
+        transAvgName_GEN_b4 = genPrefix+"transAvg"+binFour
+        towardAvgName_GEN_b4 = genPrefix+"towardAvg"+binFour
+        awayAvgName_GEN_b4 = genPrefix+"awayAvg"+binFour
+        overallName_GEN_b4 = genPrefix+"overall"+binFour
+        overallNchName_GEN_b4 = genPrefix+"overallNch"+binFour
+        overallAvgName_GEN_b4 = genPrefix+"overallAvg"+binFour
 
 
         #SIM PLOTS
@@ -680,6 +709,17 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
                 self.hist[overallTotalNchName_GEN_b2] =  ROOT.TProfile(overallTotalNchName_GEN_b2,overallTotalNchName_GEN_b2, 25, 0, 50)
                 self.hist[overallTotalAvgName_GEN_b2] =  ROOT.TProfile(overallTotalAvgName_GEN_b2,overallTotalAvgName_GEN_b2, 25, 0, 50)
 
+                self.hist[ptMaxName_GEN_b4] =  ROOT.TProfile(ptMaxName_GEN_b4,ptMaxName_GEN_b4, 12, 0, 48)
+                self.hist[transDifName_GEN_b4] =  ROOT.TProfile(transDifName_GEN_b4,transDifName_GEN_b4, 12, 0, 48)
+                self.hist[transDifNchName_GEN_b4] =  ROOT.TProfile(transDifNchName_GEN_b4,transDifNchName_GEN_b4, 12, 0, 48)
+                self.hist[towardTotalName_GEN_b4] =  ROOT.TProfile(towardTotalName_GEN_b4,towardTotalName_GEN_b4, 12, 0, 48)
+                self.hist[towardTotalNchName_GEN_b4] =  ROOT.TProfile(towardTotalNchName_GEN_b4,towardTotalNchName_GEN_b4, 12, 0, 48)
+                self.hist[towardTotalAvgName_GEN_b4] =  ROOT.TProfile(towardTotalAvgName_GEN_b4,towardTotalAvgName_GEN_b4, 12, 0, 48)
+                self.hist[overallTotalName_GEN_b4] =  ROOT.TProfile(overallTotalName_GEN_b4,overallTotalName_GEN_b4, 12, 0, 48)
+                self.hist[overallTotalNchName_GEN_b4] =  ROOT.TProfile(overallTotalNchName_GEN_b4,overallTotalNchName_GEN_b4, 12, 0, 48)
+                self.hist[overallTotalAvgName_GEN_b4] =  ROOT.TProfile(overallTotalAvgName_GEN_b4,overallTotalAvgName_GEN_b4, 12, 0, 48)
+
+
                 #BIN 0.5
                 self.hist[towardName_GEN_bh] =  ROOT.TProfile(towardName_GEN_bh, towardName_GEN_bh+";toward [pT]",  100,  0, 50)
                 self.hist[awayName_GEN_bh] =  ROOT.TProfile(awayName_GEN_bh, awayName_GEN_bh+";away [pT]",  100,  0, 50)
@@ -718,7 +758,7 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
                 self.hist[overallNchName_GEN_b1] =  ROOT.TProfile(overallNchName_GEN_b1, overallNchName_GEN_b1+";overall [Nch]",  50,  0, 50)
                 self.hist[overallAvgName_GEN_b1] =  ROOT.TProfile(overallAvgName_GEN_b1, overallAvgName_GEN_b1+";overall [Avg pT]",  50,  0, 50)
 
-                #BIN 1
+                #BIN 2
                 self.hist[towardName_GEN_b2] =  ROOT.TProfile(towardName_GEN_b2, towardName_GEN_b2+";toward [pT]",  25,  0, 50)
                 self.hist[awayName_GEN_b2] =  ROOT.TProfile(awayName_GEN_b2, awayName_GEN_b2+";away [pT]",  25,  0, 50)
                 self.hist[transMaxName_GEN_b2] =  ROOT.TProfile(transMaxName_GEN_b2, transMaxName_GEN_b2+";transMax [pT]",  25,  0, 50)
@@ -737,7 +777,24 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
                 self.hist[overallNchName_GEN_b2] =  ROOT.TProfile(overallNchName_GEN_b2, overallNchName_GEN_b2+";overall [Nch]",  25,  0, 50)
                 self.hist[overallAvgName_GEN_b2] =  ROOT.TProfile(overallAvgName_GEN_b2, overallAvgName_GEN_b2+";overall [Avg pT]",  25,  0, 50)
 
+                #BIN 4
+                self.hist[towardName_GEN_b4] =  ROOT.TProfile(towardName_GEN_b4, towardName_GEN_b4+";toward [pT]",  12,  0, 48)
+                self.hist[awayName_GEN_b4] =  ROOT.TProfile(awayName_GEN_b4, awayName_GEN_b4+";away [pT]",  12,  0, 48)
+                self.hist[transMaxName_GEN_b4] =  ROOT.TProfile(transMaxName_GEN_b4, transMaxName_GEN_b4+";transMax [pT]",  12,  0, 48)
+                self.hist[transMinName_GEN_b4] =  ROOT.TProfile(transMinName_GEN_b4, transMinName_GEN_b4+";transMin [pT]",  12,  0, 48)
+                self.hist[towardNchName_GEN_b4] =  ROOT.TProfile(towardNchName_GEN_b4, towardNchName_GEN_b4+";toward [Nch]",  12,  0, 48)
+                self.hist[awayNchName_GEN_b4] =  ROOT.TProfile(awayNchName_GEN_b4, awayNchName_GEN_b4+";away [Nch]",  12,  0, 48)
+                self.hist[transMaxNchName_GEN_b4] =  ROOT.TProfile(transMaxNchName_GEN_b4, transMaxNchName_GEN_b4+";transMax [Nch]",  12,  0, 48)
+                self.hist[transMinNchName_GEN_b4] =  ROOT.TProfile(transMinNchName_GEN_b4, transMinNchName_GEN_b4+";transMin [Nch]",  12,  0, 48)
 
+                self.hist[transName_GEN_b4] =  ROOT.TProfile(transName_GEN_b4, transName_GEN_b4+";trans [pT]",  12,  0, 48)
+                self.hist[transNchName_GEN_b4] =  ROOT.TProfile(transNchName_GEN_b4, transNchName_GEN_b4+";trans [Nch]",  12,  0, 48)
+                self.hist[transAvgName_GEN_b4] =  ROOT.TProfile(transAvgName_GEN_b4, transAvgName_GEN_b4+";trans [pT]",  12,  0, 48)
+                self.hist[towardAvgName_GEN_b4] =  ROOT.TProfile(towardAvgName_GEN_b4, towardAvgName_GEN_b4+";toward [Avg pT]",  12,  0, 48)
+                self.hist[awayAvgName_GEN_b4] =  ROOT.TProfile(awayAvgName_GEN_b4, awayAvgName_GEN_b4+";away [Avg pT]",  12,  0, 48)
+                self.hist[overallName_GEN_b4] =  ROOT.TProfile(overallName_GEN_b4, overallName_GEN_b4+";overall [pT]",  12,  0, 48)
+                self.hist[overallNchName_GEN_b4] =  ROOT.TProfile(overallNchName_GEN_b4, overallNchName_GEN_b4+";overall [Nch]",  12,  0, 48)
+                self.hist[overallAvgName_GEN_b4] =  ROOT.TProfile(overallAvgName_GEN_b4, overallAvgName_GEN_b4+";overall [Avg pT]",  12,  0, 48)
 
                 #self.Nch_response = RooUnfoldResponse(100, 0, 100, "Nch_response_name", "Nch_response_title");
                 #self.Nch_response2 = RooUnfoldResponse(100, 0, 100, "Nch_response_name2", "Nch_response_title2");
@@ -822,6 +879,35 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
 
         #HISTOGRAMS
         #Nch_response_Name = histPrefix+"Nch_response"
+
+        ptMaxName_GEN_b4 = genPrefix+"ptMax"+binFour
+        towardName_GEN_b4 = genPrefix+"toward"+binFour
+        awayName_GEN_b4 = genPrefix+"away"+binFour
+        transMaxName_GEN_b4 = genPrefix+"transMax"+binFour
+        transMinName_GEN_b4 = genPrefix+"transMin"+binFour
+        towardNchName_GEN_b4 = genPrefix+"towardNch"+binFour
+        awayNchName_GEN_b4 = genPrefix+"awayNch"+binFour
+        transMaxNchName_GEN_b4 = genPrefix+"transMaxNch"+binFour
+        transMinNchName_GEN_b4 = genPrefix+"transMinNch"+binFour
+
+        transDifName_GEN_b4 = genPrefix+"transDif"+binFour
+        transDifNchName_GEN_b4 = genPrefix+"transDifNch"+binFour
+        towardTotalName_GEN_b4= genPrefix+"towardTotal"+binFour
+        towardTotalNchName_GEN_b4= genPrefix+"towardTotalNch"+binFour
+        towardTotalAvgName_GEN_b4= genPrefix+"towardTotalAvg"+binFour
+        overallTotalName_GEN_b4= genPrefix+"overallTotal"+binFour
+        overallTotalNchName_GEN_b4= genPrefix+"overallTotalNch"+binFour
+        overallTotalAvgName_GEN_b4= genPrefix+"overallTotalAvg"+binFour        
+
+        transName_GEN_b4 = genPrefix+"trans"+binFour
+        transNchName_GEN_b4 = genPrefix+"transNch"+binFour
+        transAvgName_GEN_b4 = genPrefix+"transAvg"+binFour
+        towardAvgName_GEN_b4 = genPrefix+"towardAvg"+binFour
+        awayAvgName_GEN_b4 = genPrefix+"awayAvg"+binFour
+        overallName_GEN_b4 = genPrefix+"overall"+binFour
+        overallNchName_GEN_b4 = genPrefix+"overallNch"+binFour
+        overallAvgName_GEN_b4 = genPrefix+"overallAvg"+binFour
+
 
         #CUT ANALYSIS HISTOGRAMS
 
@@ -1329,6 +1415,8 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
                         self.hist[ptMaxName_GEN_bh].Fill(ptMax, ptMax, weight)
                         self.hist[ptMaxName_GEN_b1].Fill(ptMax, ptMax, weight)
                         self.hist[ptMaxName_GEN_b2].Fill(ptMax, ptMax, weight)
+                        self.hist[ptMaxName_GEN_b4].Fill(ptMax, ptMax, weight)
+
 
                         self.hist[phiMaxName_GEN].Fill(phiMax*180/math.pi, weight)
                         if ptMax > 5: self.hist[phiMaxName_GEN_pt5].Fill(phiMax*180/math.pi, weight)
@@ -1488,15 +1576,36 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
                     self.hist[overallTotalNchName_GEN_b2].Fill(ptMax, (Nch+1)/(etaphi_three), weight)
                     if Nch != 0: self.hist[overallTotalAvgName_GEN_b2].Fill(ptMax, ( (pTsum+ptMax)/(Nch+1) ), weight)
 
+                    self.hist[towardName_GEN_b4].Fill(ptMax, pTsumToward/etaphi, weight)
+                    self.hist[awayName_GEN_b4].Fill(ptMax, pTsumAway/etaphi, weight)
+                    if NchToward != 0: self.hist[towardAvgName_GEN_b4].Fill(ptMax, (pTsumToward/NchToward), weight)
+                    if NchAway != 0: self.hist[awayAvgName_GEN_b4].Fill(ptMax, (pTsumAway/NchAway), weight)
+                    self.hist[transName_GEN_b4].Fill(ptMax, pTsumTrans/etaphi, weight)
+                    self.hist[transNchName_GEN_b4].Fill(ptMax, NchTrans/etaphi, weight)
+                    if NchTrans != 0: self.hist[transAvgName_GEN_b4].Fill(ptMax, (pTsumTrans/NchTrans), weight)
+                    self.hist[overallName_GEN_b4].Fill(ptMax, pTsum/(etaphi_three), weight)
+                    self.hist[overallNchName_GEN_b4].Fill(ptMax, Nch/(etaphi_three), weight)
+                    if Nch != 0: self.hist[overallAvgName_GEN_b4].Fill(ptMax, (pTsum/Nch), weight)
+
+                    self.hist[towardTotalName_GEN_b4].Fill(ptMax, (pTsumToward+ptMax)/etaphi, weight)
+                    self.hist[towardTotalNchName_GEN_b4].Fill(ptMax, (NchToward+1)/etaphi, weight)
+                    if NchToward != 0: self.hist[towardTotalAvgName_GEN_b4].Fill(ptMax, ( (pTsumToward+ptMax)/(NchToward+1) ), weight)
+                    self.hist[overallTotalName_GEN_b4].Fill(ptMax, (pTsum+ptMax)/(etaphi_three), weight)
+                    self.hist[overallTotalNchName_GEN_b4].Fill(ptMax, (Nch+1)/(etaphi_three), weight)
+                    if Nch != 0: self.hist[overallTotalAvgName_GEN_b4].Fill(ptMax, ( (pTsum+ptMax)/(Nch+1) ), weight)
 
 
-                    if pTsumTrans1 > pTsumTrans2:
+
+                     if pTsumTrans1 > pTsumTrans2:
                         self.hist[transMaxName_GEN_bh].Fill(ptMax, pTsumTrans1/(etaphi_half), weight) # always use weight when filling
                         self.hist[transMinName_GEN_bh].Fill(ptMax, pTsumTrans2/(etaphi_half), weight) # always use weight when filling
                         self.hist[transMaxName_GEN_b1].Fill(ptMax, pTsumTrans1/(etaphi_half), weight) # always use weight when filling
                         self.hist[transMinName_GEN_b1].Fill(ptMax, pTsumTrans2/(etaphi_half), weight) # always use weight when filling
                         self.hist[transMaxName_GEN_b2].Fill(ptMax, pTsumTrans1/(etaphi_half), weight) # always use weight when filling
                         self.hist[transMinName_GEN_b2].Fill(ptMax, pTsumTrans2/(etaphi_half), weight) # always use weight when filling
+                        self.hist[transMaxName_GEN_b4].Fill(ptMax, pTsumTrans1/(etaphi_half), weight) # always use weight when filling
+                        self.hist[transMinName_GEN_b4].Fill(ptMax, pTsumTrans2/(etaphi_half), weight) # always use weight when filling
+
                     else:
                         self.hist[transMinName_GEN_bh].Fill(ptMax, pTsumTrans1/(etaphi_half), weight) # always use weight when filling
                         self.hist[transMaxName_GEN_bh].Fill(ptMax, pTsumTrans2/(etaphi_half), weight) # always use weight when filling
@@ -1504,6 +1613,9 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
                         self.hist[transMaxName_GEN_b1].Fill(ptMax, pTsumTrans2/(etaphi_half), weight) # always use weight when filling
                         self.hist[transMinName_GEN_b2].Fill(ptMax, pTsumTrans1/(etaphi_half), weight) # always use weight when filling
                         self.hist[transMaxName_GEN_b2].Fill(ptMax, pTsumTrans2/(etaphi_half), weight) # always use weight when filling
+                        self.hist[transMinName_GEN_b4].Fill(ptMax, pTsumTrans1/(etaphi_half), weight) # always use weight when filling
+                        self.hist[transMaxName_GEN_b4].Fill(ptMax, pTsumTrans2/(etaphi_half), weight) # always use weight when filling
+
                         
                     self.hist[towardNchName_GEN_bh].Fill(ptMax, NchToward/etaphi, weight) # always use weight when filling
                     self.hist[awayNchName_GEN_bh].Fill(ptMax, NchAway/etaphi, weight) # always use weight when filling
@@ -1511,6 +1623,9 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
                     self.hist[awayNchName_GEN_b1].Fill(ptMax, NchAway/etaphi, weight) # always use weight when filling
                     self.hist[towardNchName_GEN_b2].Fill(ptMax, NchToward/etaphi, weight) # always use weight when filling
                     self.hist[awayNchName_GEN_b2].Fill(ptMax, NchAway/etaphi, weight) # always use weight when filling
+                    self.hist[towardNchName_GEN_b4].Fill(ptMax, NchToward/etaphi, weight) # always use weight when filling
+                    self.hist[awayNchName_GEN_b4].Fill(ptMax, NchAway/etaphi, weight) # always use weight when filling
+
 
                     self.hist[transDifName_GEN_bh].Fill(ptMax, math.fabs(pTsumTrans1-pTsumTrans2)/(etaphi_half), weight)
                     self.hist[transDifNchName_GEN_bh].Fill(ptMax, math.fabs(NchTrans1-NchTrans2)/(etaphi_half), weight)
@@ -1518,6 +1633,9 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
                     self.hist[transDifNchName_GEN_b1].Fill(ptMax, math.fabs(NchTrans1-NchTrans2)/(etaphi_half), weight)
                     self.hist[transDifName_GEN_b2].Fill(ptMax, math.fabs(pTsumTrans1-pTsumTrans2)/(etaphi_half), weight)
                     self.hist[transDifNchName_GEN_b2].Fill(ptMax, math.fabs(NchTrans1-NchTrans2)/(etaphi_half), weight)
+                    self.hist[transDifName_GEN_b4].Fill(ptMax, math.fabs(pTsumTrans1-pTsumTrans2)/(etaphi_half), weight)
+                    self.hist[transDifNchName_GEN_b4].Fill(ptMax, math.fabs(NchTrans1-NchTrans2)/(etaphi_half), weight)
+
 
                     if NchTrans1 > NchTrans2:
                         self.hist[transMaxNchName_GEN_bh].Fill(ptMax, NchTrans1/(etaphi_half), weight) # always use weight when filling
@@ -1526,6 +1644,9 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
                         self.hist[transMinNchName_GEN_b1].Fill(ptMax, NchTrans2/(etaphi_half), weight) # always use weight when filling
                         self.hist[transMaxNchName_GEN_b2].Fill(ptMax, NchTrans1/(etaphi_half), weight) # always use weight when filling
                         self.hist[transMinNchName_GEN_b2].Fill(ptMax, NchTrans2/(etaphi_half), weight) # always use weight when filling
+                        self.hist[transMaxNchName_GEN_b4].Fill(ptMax, NchTrans1/(etaphi_half), weight) # always use weight when filling
+                        self.hist[transMinNchName_GEN_b4].Fill(ptMax, NchTrans2/(etaphi_half), weight) # always use weight when filling
+
                     else:
                         self.hist[transMinNchName_GEN_bh].Fill(ptMax, NchTrans1/(etaphi_half), weight) # always use weight when filling
                         self.hist[transMaxNchName_GEN_bh].Fill(ptMax, NchTrans2/(etaphi_half), weight) # always use weight when filling
@@ -1533,6 +1654,10 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
                         self.hist[transMaxNchName_GEN_b1].Fill(ptMax, NchTrans2/(etaphi_half), weight) # always use weight when filling
                         self.hist[transMinNchName_GEN_b2].Fill(ptMax, NchTrans1/(etaphi_half), weight) # always use weight when filling
                         self.hist[transMaxNchName_GEN_b2].Fill(ptMax, NchTrans2/(etaphi_half), weight) # always use weight when filling
+                        self.hist[transMinNchName_GEN_b4].Fill(ptMax, NchTrans1/(etaphi_half), weight) # always use weight when filling
+                        self.hist[transMaxNchName_GEN_b4].Fill(ptMax, NchTrans2/(etaphi_half), weight) # always use weight when filling
+
+
 
 
 
