@@ -14,12 +14,12 @@ ROOT.gROOT.SetBatch(True)
 from ROOT import gSystem
 #from config.RooUnfold import library
 #gSystem.Load(library)
-gSystem.Load("/home/rankdw/RooUnfold-1.1.1/libRooUnfold")
-from ROOT import RooUnfoldResponse
-from ROOT import RooUnfold
-from ROOT import RooUnfoldBayes
-from ROOT import RooUnfoldSvd
-from ROOT import RooUnfoldTUnfold
+#gSystem.Load("/home/rankdw/RooUnfold-1.1.1/libRooUnfold")
+#from ROOT import RooUnfoldResponse
+#from ROOT import RooUnfold
+#from ROOT import RooUnfoldBayes
+#from ROOT import RooUnfoldSvd
+#from ROOT import RooUnfoldTUnfold
 #from rootpy import asrootpy
 
 import math
@@ -406,7 +406,7 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
 
                 #CUT ANALYSIS HISTOGRAMS
 
-                #self.hist[CUT_TFF_TTF_NchMB_Name] = ROOT.TH2F(CUT_TFF_TTF_NchMB_Name,CUT_TFF_TTF_NchMB_Name, 100, -0.5, 99.5, 100, -99.5, 0.5)
+                self.hist[CUT_TFF_TTF_NchMB_Name] = ROOT.TH2F(CUT_TFF_TTF_NchMB_Name,CUT_TFF_TTF_NchMB_Name, 100, -0.5, 99.5, 100, -99.5, 0.5)
 
                 self.hist[CUT_FFF_eta_Name] =  ROOT.TH1F(CUT_FFF_eta_Name, CUT_FFF_eta_Name, 100, -10, 10)
                 self.hist[CUT_TFF_eta_Name] =  ROOT.TH1F(CUT_TFF_eta_Name, CUT_TFF_eta_Name, 100, -10, 10)
@@ -739,8 +739,8 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
 
 
 
-                self.Nch_response = RooUnfoldResponse(100, 0, 100, "Nch_response_name", "Nch_response_title");
-                self.Nch_response2 = RooUnfoldResponse(100, 0, 100, "Nch_response_name2", "Nch_response_title2");
+                #self.Nch_response = RooUnfoldResponse(100, 0, 100, "Nch_response_name", "Nch_response_title");
+                #self.Nch_response2 = RooUnfoldResponse(100, 0, 100, "Nch_response_name2", "Nch_response_title2");
 
                 #self.hist[CUT_TFF_TTF_NchMB_Name] = ROOT.TH2F(CUT_TFF_TTF_NchMB_Name,CUT_TFF_TTF_NchMB_Name, 100, -0.5, 99.5, 100, -99.5, 0.5)
 
@@ -756,26 +756,26 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
                 #self.hist["2DHIST_transAvgName_GEN_bh"] =  ROOT.TH2F("2DHIST_transAvgName_GEN_bh","2DHIST_transAvgName_GEN_bh",  100,  0, 50, 50, 0, 10);
 
                 #self.hist["2DHIST_transAvgName_bh"] =  ROOT.TH2F("2DHIST_transAvgName_bh","2DHIST_transAvgName_bh",  100,  0, 50, 50, 0, 10);
-		"""
-                self.hist["2DHIST_transAvgName_GEN_bh"] =  ROOT.TH2F("2DHIST_transAvgName_GEN_bh","2DHIST_transAvgName_GEN_bh",  100,  0, 50, 20, 0, 10);
 
-                self.hist["2DHIST_transAvgName_bh"] =  ROOT.TH2F("2DHIST_transAvgName_bh","2DHIST_transAvgName_bh",  100,  0, 50, 20, 0, 10);
+                #self.hist["2DHIST_transAvgName_GEN_bh"] =  ROOT.TH2F("2DHIST_transAvgName_GEN_bh","2DHIST_transAvgName_GEN_bh",  100,  0, 50, 20, 0, 10);
 
-                self.transName_response = RooUnfoldResponse(self.hist["2DHIST_transAvgName_bh"], self.hist["2DHIST_transAvgName_GEN_bh"], "transName_response", "transName_response_title");
+                #self.hist["2DHIST_transAvgName_bh"] =  ROOT.TH2F("2DHIST_transAvgName_bh","2DHIST_transAvgName_bh",  100,  0, 50, 20, 0, 10);
 
-
-                self.hist["2DHIST_transNchName_GEN_bh"] =  ROOT.TH2F("2DHIST_transNchName_GEN_bh","2DHIST_transNchName_GEN_bh",  100,  0, 50, 50, -0.5, 49.5);
-                self.hist["2DHIST_transNchName_bh"] =  ROOT.TH2F("2DHIST_transNchName_bh","2DHIST_transNchName_bh",  100,  0, 50, 50, -0.5, 49.5);
-
-                self.transNch_response = RooUnfoldResponse(self.hist["2DHIST_transNchName_bh"], self.hist["2DHIST_transNchName_GEN_bh"], "transNch_Unfold", "transNch_Unfold_title");
+                #self.transName_response = RooUnfoldResponse(self.hist["2DHIST_transAvgName_bh"], self.hist["2DHIST_transAvgName_GEN_bh"], "transName_response", "transName_response_title");
 
 
+                #self.hist["2DHIST_transNchName_GEN_bh"] =  ROOT.TH2F("2DHIST_transNchName_GEN_bh","2DHIST_transNchName_GEN_bh",  100,  0, 50, 50, -0.5, 49.5);
+                #self.hist["2DHIST_transNchName_bh"] =  ROOT.TH2F("2DHIST_transNchName_bh","2DHIST_transNchName_bh",  100,  0, 50, 50, -0.5, 49.5);
 
-                self.hist["2DHIST_transName_GEN_bh"] =  ROOT.TH2F("2DHIST_transName_GEN_bh","2DHIST_transName_GEN_bh",  100,  0, 50, 80, 0.5, 20.5);
-                self.hist["2DHIST_transName_bh"] =  ROOT.TH2F("2DHIST_transName_bh","2DHIST_transName_bh",  100,  0, 50, 80, 0.5, 20.5);
+                #self.transNch_response = RooUnfoldResponse(self.hist["2DHIST_transNchName_bh"], self.hist["2DHIST_transNchName_GEN_bh"], "transNch_Unfold", "transNch_Unfold_title");
 
-                self.trans_response = RooUnfoldResponse(self.hist["2DHIST_transName_bh"], self.hist["2DHIST_transName_GEN_bh"], "trans_Unfold", "trans_Unfold_title");
-		"""
+
+
+                #self.hist["2DHIST_transName_GEN_bh"] =  ROOT.TH2F("2DHIST_transName_GEN_bh","2DHIST_transName_GEN_bh",  100,  0, 50, 80, 0.5, 20.5);
+                #self.hist["2DHIST_transName_bh"] =  ROOT.TH2F("2DHIST_transName_bh","2DHIST_transName_bh",  100,  0, 50, 80, 0.5, 20.5);
+
+                #self.trans_response = RooUnfoldResponse(self.hist["2DHIST_transName_bh"], self.hist["2DHIST_transName_GEN_bh"], "trans_Unfold", "trans_Unfold_title");
+
 
 
                 #self.trans_response = RooUnfoldResponse(self.hist[transName_bh], self.hist[transName_GEN_bh]);
@@ -818,7 +818,7 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
         binTwo = "_b2"
         genPrefix = "GEN_"
 
-        ETAMAX = 0.8
+        ETAMAX = 2.0
 
         #HISTOGRAMS
         #Nch_response_Name = histPrefix+"Nch_response"
@@ -1243,21 +1243,20 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
                 for i_track, track in enumerate(self.gentracks.get(variation)):
                     #if firstTime == False: i_track += 1
                     #firstTime = False
-                    trackp4 = track.p4 # wrong naming in Samples_CSA14_Tracks_20140904 skim. 
-                                               # this will evolve to trackp4 = track.p4 in next version
+                    #trackp4 = track.genTracks # wrong naming in Samples_CSA14_Tracks_20140904 skim. 
+                                               # this will evolve to trackp4 = track.p4 in next version 
 
-		    #trackp4 = track
+		    trackp4 = track.p4
                     eta = trackp4.eta()
                     pt =    trackp4.pt()
                     phi = trackp4.phi()
                 
                     if pt < 0.5: continue
                     if math.fabs(eta) > ETAMAX: continue
-
+                    if track.charge == 0: continue
                     #if self.fChain.genTrackscharge == 0:
-                    if track.charge == 0:
                     #    print "WARNING: gen track is uncharged!"
-                        continue
+                    #    continue
                 
                     #self.hist[ptMBName_GEN].Fill(pt, weight)
                 
@@ -1271,8 +1270,10 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
                 #GEN
 
                 for i_track, track in enumerate(self.gentracks.get(variation)):
-                    trackp4 = track.p4 # wrong naming in Samples_CSA14_Tracks_20140904 skim. 
+                    #trackp4 = track.genTracks # wrong naming in Samples_CSA14_Tracks_20140904 skim. 
                                                # this will evolve to trackp4 = track.p4 in next version
+
+		    trackp4 = track.p4
 
                     etaptH_inc = False
                     NchMB_inc = False
@@ -1285,7 +1286,7 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
                     #if track.status == 0:
                     #    print "GEN PART WITH STATUS 0 @ INDEX", i_track
                     #    continue
-
+		    if track.charge == 0: continue
                     N_all += 1
 
                     self.hist[pt_all_Name_GEN].Fill(pt, weight)
@@ -1308,7 +1309,7 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
                         self.hist[phi_etaptH_Name_GEN].Fill(phi, weight)
                         etaptH_inc = True
 
-                    if math.fabs(eta) > ETAMAX or pt < 0.5: 
+                    if math.fabs(eta) > ETAMAX or pt < 0.5 or track.charge == 0: 
                         #i_track += 1
                         continue
 
@@ -1542,9 +1543,835 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
                     #self.hist["2DHIST_transName_GEN_bh"].Fill(ptMax, pTsumTrans, weight)
 
 
-		#SIM REMOVED HERE!
+                Nch_GEN = Nch
+                ptMax_GEN = ptMax
+                pTsumTrans_GEN = pTsumTrans
+                NchTrans_GEN = NchTrans
 
-		#END SIM REMOVE!
+                #SIM
+                #i_track = 0
+                pTsumToward = 0
+                pTsumTrans1 = 0
+                pTsumTrans2 = 0
+                pTsumAway = 0
+                NchToward = 0
+                NchTrans1 = 0
+                NchTrans2 = 0
+                NchAway = 0
+                ptMax = 0
+
+                NchTrans = 0
+                pTsumTrans = 0
+
+                Nch = 0
+                pTsum = 0
+
+                #etaphi = 8*math.pi/3
+                #etaphi_half = 4*math.pi/3
+                #etaphi_three = 8*math.pi
+
+                #We set the etaphi area to unity and let Rick divide for now
+                etaphi = 1
+                etaphi_half = 1
+                etaphi_three = 1
+
+                i_ptMax = -1
+                #i_track = 0
+                firstTime = True
+
+                N_TFF = 0
+                N_TTF = 0
+                N_TTT = 0
+                N_FFF = 0
+                N_TFT = 0
+
+                #PtErr_TFF = []
+                #PtErr_TTF = []
+                #PtErr_TTT = []
+                #PtErr_FFF = []
+                #PtErr_TFT = []
+
+
+
+                vertexValid = True
+                vertexSingle = True
+                vertexThreeTracks = True
+                vertexInTen = True
+                vertexNdof = True
+                vertexChi2 = True
+
+                vertexGood = True
+
+                nValid = 0
+                iValid = -1
+
+
+                #TOMASZ
+                #I've labeled what I want each of these checks to do.  Please let me know if the branch I'm accessing is not what I think.
+
+
+                #TOMASZ HAS SUGGESTED ITERATING OVER ALL VERTICES TO FIND IF THERE IS ONE AND ONLY ONE VALID.
+
+                for i in range (0, self.fChain.vtxisValid.size() ):
+                    if self.fChain.vtxisValid.at(i) == 1:
+                        nValid += 1
+                        iValid = i
+                #Do we have a single valid vertex?
+                #if self.fChain.vtxisValid.size() != 1: 
+                        #continue
+                        #vertexSingle = False
+
+                #print "Number of vertices", self.fChain.vtxisValid.size()
+                #print "Number of valid", nValid
+
+                if nValid !=1:
+                    vertexSingle = False
+
+                #print "vertexSingle" , vertexSingle
+                #print "iValid", iValid
+                #print "\n"
+
+                #Is the hypothetical one-and-only-one vertex valid? (possibly redundant)
+                if self.fChain.vtxisValid.at(iValid) != 1: 
+                    #continue
+                    vertexValid = False
+
+                #Do at least three tracks point back to the vertex?
+                if self.fChain.vtxnTracks.at(iValid) < 3: 
+                    #print "skipping cause vertex tracks is ", self.fChain.vtxnTracks.at(iValid)
+                    #continue
+                    vertexThreeTracks = False
+
+                #Is the vertex within 10cm of the beamspot?
+                if math.fabs(self.fChain.vtxz.at(iValid)) > 10: 
+                    #print "skipping cause vertex position is ", self.fChain.vtxz.at(iValid)
+                    #continue
+                    vertexInTen = False
+
+                #Is the vertex ndof at least 4?
+                if self.fChain.vtxndof.at(iValid) < 4: 
+                    #print "skipping cause vertex ndof is ", self.fChain.vtxndof.at(iValid)
+                    #continue
+                    vertexNdof = False
+
+                #Is the vertex chi2 less than 10000?  (This is a check found in the old analysis that was commented with a "why?" but was left in)
+                if self.fChain.vtxchi2.at(iValid) > 10000: 
+                    #print "skipping cause vertex chi2 is ", self.fChain.vtxchi2.at(iValid)
+                    #continue
+                    vertexChi2 = False
+
+                #If all conditions are True, we have a good vertex.
+                if not (vertexValid and vertexSingle and vertexThreeTracks and vertexInTen and vertexNdof and vertexChi2):
+                    vertexGood = False 
+
+
+                #if we have a single, valid vertex - we can look at its other properties
+                if(vertexSingle and vertexValid):
+                    self.hist[VTX_nTrk_Name].Fill(self.fChain.vtxnTracks.at(iValid), weight)
+                    self.hist[VTX_ndof_Name].Fill(self.fChain.vtxndof.at(iValid), weight)
+                    self.hist[VTX_Zpos_Name].Fill(self.fChain.vtxz.at(iValid), weight)
+                    self.hist[VTX_chi2_Name].Fill(self.fChain.vtxchi2.at(iValid), weight)
+
+                #END TOMASZ
+
+                #print "vertex booleans are:", vertexValid, vertexSingle, vertexThreeTracks, vertexInTen, vertexChi2
+                #print "vertex good?:", vertexGood
+
+                #This is an acceptable way to check vertices.  Currently disabled because "continue" statements interfere with cut analysis
+                """
+                if self.fChain.vtxisValid.size() != 1: continue
+                if self.fChain.vtxisValid.at(iValid) != 1: continue
+                if self.fChain.vtxnTracks.at(iValid) < 3: 
+                        #print "skipping cause vertex tracks is ", self.fChain.vtxnTracks.at(iValid)
+                        continue
+                if math.fabs(self.fChain.vtxz.at(iValid)) > 10: 
+                        #print "skipping cause vertex position is ", self.fChain.vtxz.at(iValid)
+                        continue
+                if self.fChain.vtxndof.at(iValid) < 4: 
+                        #print "skipping cause vertex ndof is ", self.fChain.vtxndof.at(iValid)
+                        continue
+                if self.fChain.vtxchi2.at(iValid) > 10000: 
+                        #print "skipping cause vertex chi2 is ", self.fChain.vtxchi2.at(iValid)
+                        continue
+                """
+                good_Nch_TTT = []
+                good_Nch = []
+
+                list_trk_d0 = []
+                list_trk_dz = []
+                list_sigma_xy = []
+                list_sigma_z = []
+                #SIM   !!!!!!!!THIS IS THE JUST THE LOOP TO FIND PTMAX!!!!!!!! (and now some cut analysis too)
+                for i_track, track in enumerate(self.tracks.get(variation)):
+                    #if firstTime == False: i_track += 1
+                    #firstTime = False
+		    trackp4 = track.p4
+                    #trackp4 = track.recoTracks # wrong naming in Samples_CSA14_Tracks_20140904 skim. 
+                                               # this will evolve to trackp4 = track.p4 in next version 
+
+
+                    trackPt5 = True
+                    trackPtErr = True
+                    trackd0dz = True
+                    trackEta = True
+
+                    trackHighPurity = self.fChain.recoTrackshighPurity.at(i_track)
+
+                    #if self.fChain.recoTrackshighPurity.at(i_track) == False: print "NON HIGH-PURITY TRACK @ INDEX", i_track
+
+                    #This is true if all vertex criteria are good 
+                    VTX = vertexGood
+                    #This is true is d0, dz, and ptErr are good for a given track
+                    TRK = True
+                    #This is true if |n| < 2, pT > 0.5, and there is at least 1 charged particle that passes.
+                    KIN = True
+
+
+
+                    eta = trackp4.eta()
+                    pt =    trackp4.pt()
+                    phi = trackp4.phi()
+
+                    #Normal method disabled for cut analysis
+                    """
+                    if pt < 0.5: continue
+                    if math.fabs(eta) > ETAMAX: continue
+                    if self.fChain.recoTracksptErr.at(i_track)/pt > 0.05: continue
+                    """
+                    if math.fabs(eta) > ETAMAX: trackEta = False
+                    if pt < 0.5: trackPt5 = False
+                    if self.fChain.recoTracksptErr.at(i_track)/pt > 0.05: trackPtErr = False
+
+                        #print "pterr is", self.fChain.recoTracksptErr.at(i_track)/pt
+                        #continue
+                    #print "Number of vertices = ", self.fChain.vtxisValid.size()
+                    #print "Valid? ", self.fChain.vtxisValid.at(iValid)
+
+
+                    #TOMASZ
+                    #Again I've labeled what I'm doing here.  Please let me know if the branches I'm accessing are what I think they are.
+                    #(Please ignore the block of ~10 lines commented out.  That's just old code that I haven't deleted yet.)
+
+                    #Here we store the d0, dz, and errors of the track
+                    trk_d0 = self.fChain.recoTracksd0.at(i_track)
+                    trk_dz = self.fChain.recoTracksdz.at(i_track)
+
+                    trk_d0_Err = self.fChain.recoTracksd0Err.at(i_track)
+                    trk_dz_Err = self.fChain.recoTracksdzErr.at(i_track)
+
+                    #Here we store the errors of the vertex position
+                    vtx_x_Err = self.fChain.vtxxErr.at(iValid)
+                    vtx_y_Err = self.fChain.vtxyErr.at(iValid)
+                    vtx_z_Err = self.fChain.vtxzErr.at(iValid)
+
+
+                    #THIS IS EXPERIMENTAL:
+                    #We attempt to reconstruct trk_d0 and trk_dz with respect to the vertex coordinates
+
+                    vtx_x = self.fChain.vtxx.at(iValid)
+                    vtx_y = self.fChain.vtxy.at(iValid)
+                    vtx_z = self.fChain.vtxz.at(iValid)
+
+                    trk_x = self.fChain.recoTracksvx.at(i_track)
+                    trk_y = self.fChain.recoTracksvy.at(i_track)
+                    trk_z = self.fChain.recoTracksvz.at(i_track)
+
+                    trk_x += -vtx_x
+                    trk_y += -vtx_y
+                    trk_z += -vtx_z
+
+                    trk_px = trackp4.px()
+                    trk_py = trackp4.py()
+                    trk_pz = trackp4.pz()
+                    trk_pt = trackp4.pt()
+
+                    trk_d0 = (trk_x*trk_py - trk_y*trk_px)/trk_pt
+                    trk_dz = trk_z - (trk_x*trk_px+trk_y*trk_py)/trk_pt * trk_pz/trk_pt
+
+                    #Here we add the errors in quadrature to get the the error between the track and the vertex
+                    sigma_xy = math.sqrt(trk_d0_Err**2 + vtx_x_Err**2 + vtx_y_Err**2)
+                    sigma_z = math.sqrt(trk_dz_Err**2 + vtx_z_Err**2)
+
+                    #if i_track == 0: print "PTMAX LOOP"
+                    #print "i_track = ", i_track
+                    #print "d0 and dz:", math.fabs(trk_d0/sigma_xy), math.fabs(trk_dz/sigma_z)
+
+                    list_trk_d0.append(trk_d0)
+                    list_trk_dz.append(trk_dz)
+                    list_sigma_xy.append(sigma_xy)
+                    list_sigma_z.append(sigma_z)
+
+                    #Normal method disabled for cut analysis
+                    """
+                    if (math.fabs(trk_d0/sigma_xy > 3)) or math.fabs((trk_dz/sigma_z > 3)): continue
+                    if self.fChain.recoTrackscharge == 0:
+                        print "reco track is uncharged!"
+                        continue
+
+                    if(pt > ptMax):
+                        ptMax = pt
+                        phiMax = phi
+                        i_ptMax = i_track
+                    """
+
+                    #If the track approach by d0 or dz is greater than three times the error, we drop the track.
+                    if math.fabs(trk_d0/sigma_xy) > 3 or math.fabs(trk_dz/sigma_z) > 3: trackd0dz = False
+
+                    #print "d0, dz, trackd0dz", math.fabs(trk_d0/sigma_xy), math.fabs(trk_dz/sigma_z), trackd0dz
+
+
+                    #This was used to convince me that d0 and dz were being given WRT roughly (0,0,0) and not a vertex.
+                    """
+                    print "NEW TRACK:"
+                    print "d0, d0_Err, dz, dz_Err, vtx_x_Err, vtx_y_Err, vtx_z_Err:"
+                    print trk_d0, trk_d0_Err, trk_dz, trk_dz_Err, vtx_x_Err, vtx_y_Err, vtx_z_Err
+                    print "sigma_xy", sigma_xy, "sigma_z", sigma_z
+                    print "trk_d0/sigma_xy", math.fabs(trk_d0/sigma_xy), "trk_dz/sigma_z", math.fabs(trk_dz/sigma_z)
+                    print "trackd0dz", trackd0dz
+                    print "Track coordinates:", self.fChain.recoTracksvx.at(i_track), self.fChain.recoTracksvy.at(i_track), self.fChain.recoTracksvz.at(i_track)
+                    print "Track dz: ", self.fChain.recoTracksdz.at(i_track)
+                    print "px, py, pt:", trackp4.px(), trackp4.py(), trackp4.pt()
+                    print "Vertex coordinates:", self.fChain.vtxx.at(iValid), self.fChain.vtxy.at(iValid), self.fChain.vtxz.at(iValid)
+                    print "\n"
+                    """
+                    self.hist[dZ_vs_vtxZ_Name].Fill(self.fChain.vtxz.at(iValid), trk_dz, weight)
+
+
+                    #END TOMASZ
+
+                    if self.fChain.recoTrackscharge == 0:
+                        print "WARNING: reco track is uncharged!"
+                        continue
+
+                    if not (trackd0dz and trackPtErr and trackHighPurity): TRK = False
+                    if not (trackPt5 and trackEta): KIN = False 
+                    #print "trackPtErr, TRK", trackPtErr, TRK
+
+                    #if (trackd0dz == True) and (trackPtErr == True) and (KIN == True) and (VTX == True) and (trackHighPurity == False):
+                        #print "EVENT, i_track", self.eventCounter, i_track
+                        #print "Dropping track because of High Purity only!:", trackHighPurity
+
+                    #print "track bools are: ", trackPt5, trackPtErr, trackd0dz
+
+
+                    #FIX THIS SLOPPY LINE OF CODE:
+                    #if (pt > ptMax) and (trackPt5 and trackPtErr and trackd0dz and trackEta and trackHighPurity and vertexGood):
+                    if VTX and TRK and KIN and (pt > ptMax):
+                        #print "Good ptMax track candidate because track bools are", trackPt5, trackPtErr, trackd0dz
+                        ptMax = pt
+                        phiMax = phi
+                        i_ptMax = i_track
+                        #print "and we have a new pTmax!"
+
+
+                    if (vertexValid and vertexSingle):
+                        N_FFF += 1
+                        #PtErr_FFF.append( self.fChain.recoTracksptErr.at(i_track)/pt )
+                        self.hist[CUT_FFF_d0_Name].Fill(math.fabs(trk_d0/sigma_xy), weight)
+                        self.hist[CUT_FFF_dz_Name].Fill(math.fabs(trk_dz/sigma_z), weight)
+                        self.hist[CUT_FFF_d0dzMax_Name].Fill( max( math.fabs(trk_dz/sigma_z), math.fabs(trk_d0/sigma_xy) ), weight)
+                        self.hist[CUT_FFF_PtErr_Name].Fill( self.fChain.recoTracksptErr.at(i_track)/pt, weight)
+                        self.hist[CUT_FFF_eta_Name].Fill( eta, weight)
+                        self.hist[CUT_FFF_phi_Name].Fill( phi*180/math.pi+180, weight)
+
+                    if (VTX and KIN): 
+                        N_TFT += 1
+                        #PtErr_TFT.append( self.fChain.recoTracksptErr.at(i_track)/pt )
+                        self.hist[CUT_TFT_d0_Name].Fill(math.fabs(trk_d0/sigma_xy), weight)
+                        self.hist[CUT_TFT_dz_Name].Fill(math.fabs(trk_dz/sigma_z), weight)
+                        self.hist[CUT_TFT_d0dzMax_Name].Fill( max( math.fabs(trk_dz/sigma_z), math.fabs(trk_d0/sigma_xy) ), weight)
+                        self.hist[CUT_TFT_PtErr_Name].Fill( self.fChain.recoTracksptErr.at(i_track)/pt, weight)
+                        self.hist[CUT_TFT_eta_Name].Fill( eta, weight)
+                        self.hist[CUT_TFT_phi_Name].Fill( phi*180/math.pi+180, weight)
+
+                    if VTX: 
+                        N_TFF += 1
+                        #PtErr_TFF.append( self.fChain.recoTracksptErr.at(i_track)/pt )
+                        self.hist[CUT_TFF_d0_Name].Fill(math.fabs(trk_d0/sigma_xy), weight)
+                        self.hist[CUT_TFF_dz_Name].Fill(math.fabs(trk_dz/sigma_z), weight)
+                        self.hist[CUT_TFF_d0dzMax_Name].Fill( max( math.fabs(trk_dz/sigma_z), math.fabs(trk_d0/sigma_xy) ), weight)
+                        self.hist[CUT_TFF_PtErr_Name].Fill( self.fChain.recoTracksptErr.at(i_track)/pt, weight)
+                        self.hist[CUT_TFF_eta_Name].Fill( eta, weight)
+                        self.hist[CUT_TFF_phi_Name].Fill( phi*180/math.pi+180, weight)
+
+                    if (VTX and TRK): 
+                        N_TTF += 1
+                        #PtErr_TTF.append( self.fChain.recoTracksptErr.at(i_track)/pt )
+                        self.hist[CUT_TTF_d0_Name].Fill(math.fabs(trk_d0/sigma_xy), weight)
+                        self.hist[CUT_TTF_dz_Name].Fill(math.fabs(trk_dz/sigma_z), weight)
+                        self.hist[CUT_TTF_d0dzMax_Name].Fill( max( math.fabs(trk_dz/sigma_z), math.fabs(trk_d0/sigma_xy) ), weight)
+                        self.hist[CUT_TTF_PtErr_Name].Fill( self.fChain.recoTracksptErr.at(i_track)/pt, weight)
+                        self.hist[CUT_TTF_eta_Name].Fill( eta, weight)
+                        self.hist[CUT_TTF_phi_Name].Fill( phi*180/math.pi+180, weight)
+
+
+                    if (VTX and TRK and KIN): 
+                        N_TTT += 1
+                        #PtErr_TTT.append( self.fChain.recoTracksptErr.at(i_track)/pt )
+                        self.hist[CUT_TTT_d0_Name].Fill(math.fabs(trk_d0/sigma_xy), weight)
+                        self.hist[CUT_TTT_dz_Name].Fill(math.fabs(trk_dz/sigma_z), weight)
+                        self.hist[CUT_TTT_d0dzMax_Name].Fill( max( math.fabs(trk_dz/sigma_z), math.fabs(trk_d0/sigma_xy) ), weight)
+                        self.hist[CUT_TTT_PtErr_Name].Fill( self.fChain.recoTracksptErr.at(i_track)/pt, weight)
+                        self.hist[CUT_TTT_eta_Name].Fill( eta, weight)
+                        self.hist[CUT_TTT_phi_Name].Fill( phi*180/math.pi+180, weight)
+                        good_Nch_TTT.append(i_track)
+
+                        #print "VTX, TRK, KIN, VertexGood, i_track", VTX, TRK, KIN, vertexGood, i_track
+
+
+                    #print "d0 and dz:", math.fabs(trk_d0/sigma_xy), math.fabs(trk_dz/sigma_z)
+                    #if i_track == 0:
+                        #print "Extra info for i_track = 0:"
+                        #print trackEta, trackPt5, trackPtErr, trackd0dz, vertexValid, vertexSingle, vertexThreeTracks, vertexInTen, vertexNdof, vertexChi2, vertexGood, VTX, TRK, KIN
+
+
+                #if not (ptMax !=0 and trackPt5 and trackEta): KIN = False 
+
+                self.hist[CUT_FFF_NchMB_Name].Fill(N_FFF, weight)
+                self.hist[CUT_TFT_NchMB_Name].Fill(N_TFT, weight)
+                self.hist[CUT_TFF_NchMB_Name].Fill(N_TFF, weight)
+                self.hist[CUT_TTF_NchMB_Name].Fill(N_TTF, weight)
+                self.hist[CUT_TTT_NchMB_Name].Fill(N_TTT, weight)
+
+                if (N_TTF != 0 and N_TFF != 0): self.hist[CUT_TFF_TTF_NchMB_Name].Fill(N_TFF, N_TTF - N_TFF)
+
+                #Starded doing this before realizing I should just fill them in the boolean checks...
+                #for i, ptErr in enumerate(PtErr_FFF):
+                #    self.hist[CUT_FFF_PtErr_Name].Fill(ptErr, weight)
+                #for i, ptErr in enumerate(PtErr_FFF):
+                #    self.hist[CUT_FFF_PtErr_Name].Fill(ptErr, weight)
+
+                #print "Filled TTT_NchMB with this:", N_TTT
+
+                """
+                self.hist[vert_ON_pt5_ON_Name].Fill(N_vert_ON_pt5_ON, weight)
+                self.hist[vert_ON_pt5_OFF_Name].Fill(N_vert_ON_pt5_OFF, weight)
+                self.hist[vert_OFF_pt5_ON_Name].Fill(N_vert_OFF_pt5_ON, weight)
+                self.hist[vert_OFF_pt5_OFF_Name].Fill(N_vert_OFF_pt5_OFF, weight)
+
+                self.hist[vert_ON_PtErr_ON_Name].Fill(N_vert_ON_PtErr_ON, weight)
+                self.hist[vert_ON_PtErr_OFF_Name].Fill(N_vert_ON_PtErr_OFF, weight)
+                self.hist[vert_OFF_PtErr_ON_Name].Fill(N_vert_OFF_PtErr_ON, weight)
+                self.hist[vert_OFF_PtErr_OFF_Name].Fill(N_vert_OFF_PtErr_OFF, weight)
+
+                self.hist[vert_ON_d0dz_ON_Name].Fill(N_vert_ON_d0dz_ON, weight)
+                self.hist[vert_ON_d0dz_OFF_Name].Fill(N_vert_ON_d0dz_OFF, weight)
+                self.hist[vert_OFF_d0dz_ON_Name].Fill(N_vert_OFF_d0dz_ON, weight)
+                self.hist[vert_OFF_d0dz_OFF_Name].Fill(N_vert_OFF_d0dz_OFF, weight)
+                """
+
+                #i_track = 0
+                firstTime = True
+
+                N_TTT_save = N_TTT
+                #print "N_TTT_save and N_TTT are", N_TTT_save, N_TTT
+                N_TFF = 0
+                N_TTF = 0
+                N_TTT = 0
+                N_FFF = 0
+                N_TFT = 0
+
+                #PtErr_TFF = []
+                #PtErr_TTF = []
+                #PtErr_TTT = []
+                #PtErr_FFF = []
+                #PtErr_TFT = []
+
+                N_pTmax = 0
+                #print "i_ptMax =", i_ptMax
+
+                #SIM
+                for i_track, track in enumerate(self.tracks.get(variation)):
+                    #if firstTime == False: i_track += 1
+                    #if firstTime == True: one_pTmax = False
+                    #firstTime = False
+		    trackp4 = track.p4
+                    #trackp4 = track.recoTracks # wrong naming in Samples_CSA14_Tracks_20140904 skim. 
+                                               # this will evolve to trackp4 = track.p4 in next version 
+                    #print "i_track =", i_track
+
+                    #if i_track == 0: print "NORMAL LOOP"
+
+                    """
+                    if self.fChain.vtxisValid.size() != 1: continue
+                    if self.fChain.vtxisValid.at(iValid) != 1: continue
+                    if self.fChain.vtxnTracks.at(iValid) < 3: 
+                        print "skipping cause vertex tracks is ", self.fChain.vtxnTracks.at(iValid)
+                        continue
+                    if math.fabs(self.fChain.vtxz.at(iValid)) > 10: 
+                        print "skipping cause vertex position is ", self.fChain.vtxz.at(iValid)
+                        continue
+                    if self.fChain.vtxndof.at(iValid) < 4: 
+                        print "skipping cause vertex ndof is ", self.fChain.vtxndof.at(iValid)
+                        continue
+                    if self.fChain.vtxchi2.at(iValid) > 10000: 
+                        print "skipping cause vertex chi2 is ", self.fChain.vtxchi2.at(iValid)
+                        continue
+                    """
+
+                    #print "Again, thevertex is", vertexGood
+                    if not vertexGood: continue
+                    #print "so we proceed"
+                    eta = trackp4.eta()
+                    pt =    trackp4.pt()
+                    phi = trackp4.phi()
+
+                    #print "i_track is currently", type(i_track), i_track
+                    #print "track collection size is", self.fChain.recoTracksptErr.size()
+                
+                    if pt < 0.5: continue
+                    if math.fabs(eta) > ETAMAX: continue
+
+                    self.hist[TRK_PtErr_Name].Fill(self.fChain.recoTracksptErr.at(i_track)/pt, weight)
+
+                    if self.fChain.recoTracksptErr.at(i_track)/pt > 0.05: continue
+                    #print "This track passes pt and ptErr cut:"
+
+                    #print "i_track = ", i_track
+                    #print "d0 and dz:", math.fabs(trk_d0/sigma_xy), math.fabs(trk_dz/sigma_z)
+
+                    trk_d0 = list_trk_d0[i_track]
+                    trk_dz = list_trk_dz[i_track]
+                    sigma_xy = list_sigma_xy[i_track]
+                    sigma_z = list_sigma_z[i_track]
+
+                    #print "i_track = ", i_track
+                    #print "d0 and dz:", math.fabs(trk_d0/sigma_xy), math.fabs(trk_dz/sigma_z)
+                    
+                    if math.fabs(trk_d0/sigma_xy) > 3 or math.fabs(trk_dz/sigma_z) > 3: 
+                        #print "Bad track because sigmas are:", math.fabs(trk_d0/sigma_xy), math.fabs(trk_dz/sigma_z)
+                        continue
+
+                    #print "passes all cuts"
+                    #print "This track passes sigma cut"
+                    if self.fChain.recoTrackscharge == 0:
+                        print "reco track is uncharged!"
+                        continue
+
+                    if self.fChain.recoTrackshighPurity.at(i_track) == False:
+                        continue
+
+
+                    self.hist[phi_etaptH_Name].Fill(phi, weight)
+
+                    if i_track == i_ptMax:
+                        #print "i_track and i_ptMax are equal"
+                        good_Nch.append(i_track)
+                        if N_pTmax > 0:
+                            print "WARNING, YOU HAVE MORE THAN ONE SIM PTMAX"
+                            #print i_track, i_ptMax, pt, Nch, N_etaptH
+                        #print "And here is the good ptMax track with pT", pt
+                        ptMax = pt
+                        phiMax = phi
+                        #self.hist[intentionalBREAK].Fill(pt, weight)
+                        self.hist[ptMBName].Fill(pt, weight)
+                        self.hist[etaMBName].Fill(eta, weight)
+                        self.hist[ptMaxName].Fill(ptMax, weight)
+                        self.hist[ptMaxName_bh].Fill(ptMax, ptMax, weight)
+                        self.hist[ptMaxName_b1].Fill(ptMax, ptMax, weight)
+                        self.hist[ptMaxName_b2].Fill(ptMax, ptMax, weight)
+
+                        self.hist[phiMaxName].Fill(phiMax*180/math.pi, weight)
+                        if ptMax > 5: self.hist[phiMaxName_pt5].Fill(phiMax*180/math.pi, weight)
+                        N_pTmax += 1
+                        #print "ptMax = ", ptMax
+                    if i_track != i_ptMax:
+                        #print "Heres a good regular track"
+                        delPhi = phiMax - phi
+                        if delPhi > math.pi:
+                            delPhi -= 2*math.pi
+                        if delPhi < -math.pi:
+                            delPhi += 2*math.pi
+                        delPhiDeg = delPhi*180/math.pi
+
+                        self.hist[phiName].Fill(phi*180/math.pi, weight)
+                        if ptMax > 5: self.hist[phiName_pt5].Fill(phi*180/math.pi, weight)
+
+                        #print "PhiMax = ", phiMax
+                        #print "phi    = ", phi
+                        #print "delPhi = ", delPhi
+                        #print "degree = ", delPhiDeg
+                        #print " \n "
+                        #print "pt = ", pt
+                        
+                        Nch += 1
+                        pTsum += pt
+
+                        #print "i_track and i_ptMax are not equal so Nch incremented.  Nch =", Nch
+
+                        good_Nch.append(i_track)
+
+
+                        if math.fabs(delPhi) < math.pi/3:
+                            pTsumToward += pt
+                            NchToward += 1
+                        if math.fabs(delPhi) > math.pi*2/3:
+                            pTsumAway += pt
+                            NchAway += 1
+                        if delPhi >= math.pi/3 and delPhi <= math.pi*2/3:
+                            pTsumTrans1 += pt
+                            NchTrans1 += 1
+                            self.hist[trans12Name].Fill(1, weight)
+                            if ptMax < 5: self.hist[trans12Name_pt5].Fill(1, weight)
+                        if delPhi <= -math.pi/3 and delPhi >= -math.pi*2/3:
+                            pTsumTrans2 += pt
+                            NchTrans2 += 1
+                            self.hist[trans12Name].Fill(-1, weight)
+                            if ptMax < 5: self.hist[trans12Name_pt5].Fill(-1, weight)
+
+                        if math.fabs(delPhi) >= math.pi/3 and math.fabs(delPhi) <= math.pi*2/3:
+                            pTsumTrans += pt
+                            NchTrans += 1
+
+                            self.hist[transPtName].Fill(pt, weight)
+                            if ptMax > 5: self.hist[transPtName_pt5].Fill(pt, weight)
+
+
+                        self.hist[ptMBName].Fill(pt, weight)
+                        self.hist[etaMBName].Fill(eta, weight)
+
+                        self.hist[ptName].Fill(pt, weight)
+                        self.hist[etaName].Fill(eta, weight)
+
+                        self.hist[delPhiName].Fill(delPhiDeg, weight)
+                        self.hist[delPhiPtName].Fill(delPhiDeg, pt)
+
+                        if ptMax > 5:
+                            self.hist[delPhiName_pt5].Fill(delPhiDeg, weight)
+                            self.hist[delPhiPtName_pt5].Fill(delPhiDeg, pt)
+                            self.hist[ptName_pt5].Fill(pt, weight)
+                            self.hist[etaName_pt5].Fill(eta, weight)          
+
+
+                    #This was VERY bad because it didn't increment once the selection criteria were introduced!
+                    #i_track += 1
+
+                #END PARTICLE LOOP
+
+                #print "ptMax is:", ptMax
+                #if ptMax == 0: continue
+
+		"""
+                if Nch != 0 and Nch_GEN != 0:
+                    self.Nch_response.Fill(Nch, Nch_GEN);
+                elif Nch == 0 and Nch_GEN != 0:
+                    self.Nch_response.Miss(Nch_GEN);
+
+                if Nch != 0 and Nch_GEN != 0:
+                    self.Nch_response2.Fill(Nch, Nch_GEN);
+                elif Nch == 0 and Nch_GEN != 0:
+                    self.Nch_response2.Miss(Nch_GEN);
+
+
+                if (N_pTmax != 0):
+                    if NchTrans != 0: self.hist["2DHIST_transAvgName_bh"].Fill(ptMax, (pTsumTrans/NchTrans), weight)
+                    self.hist["2DHIST_transNchName_bh"].Fill(ptMax, NchTrans/etaphi, weight)
+                    self.hist["2DHIST_transName_bh"].Fill(ptMax, pTsumTrans, weight)
+		"""
+
+ 
+                #print "values:", ptMax, pTsumTrans, NchTrans, ptMax_GEN, pTsumTrans_GEN, NchTrans_GEN
+                #if NchTrans != 0 and NchTrans_GEN != 0: print "values:", ptMax, pTsumTrans/NchTrans, ptMax_GEN, pTsumTrans_GEN/NchTrans_GEN
+
+                #self.transName_response.Fill(4.33, 2.34, 4.55, 6.5343 );
+
+
+                #FOR SOME REASON THE LAST NUMBER (1.5777etc) WILL CAUSE A CRASH.  WHY?!?
+                #IT WONT CAUSE A CRASH IF SWITCHED INTO THE SECOND PARAMETER.
+                #AGHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
+
+
+                #Evidently its a memory issue.  Lowered bins from 2000 to 200.
+
+                #self.transName_response.Fill(5.25622421323, 0.806199473923, 5.22455787659, 1.57773929834);
+                #self.transName_response.Fill(5.25622421323, 1.57773929834, 5.22455787659, 6.5343);
+
+		"""
+                if (NchTrans != 0 and pTsumTrans/NchTrans > self.maxAvgTrans):
+                    print "New highest pTsumTrans/NchTrans: ", pTsumTrans/NchTrans
+                    self.maxAvgTrans = pTsumTrans/NchTrans
+                if (NchTrans != 0 and NchTrans_GEN != 0 and N_pTmax != 0):
+                    self.transName_response.Fill(ptMax, (pTsumTrans/NchTrans), ptMax_GEN, (pTsumTrans_GEN/NchTrans_GEN) );
+                    #self.transName_response.Fill(ptMax, pTsumTrans, ptMax_GEN, pTsumTrans_GEN);
+                else:
+                    if NchTrans_GEN != 0: self.transName_response.Miss(ptMax_GEN, (pTsumTrans_GEN/NchTrans_GEN) );
+
+
+
+                if (N_pTmax != 0):
+                    self.transNch_response.Fill(ptMax, NchTrans/etaphi, ptMax_GEN, NchTrans_GEN/etaphi);
+                    self.trans_response.Fill(ptMax, pTsumTrans, ptMax_GEN, pTsumTrans_GEN/etaphi);
+                elif (ptMax_GEN != 0):
+                    self.transNch_response.Miss(ptMax_GEN, NchTrans_GEN/etaphi);
+                    self.trans_response.Miss(ptMax_GEN, pTsumTrans_GEN);
+		"""
+
+                    #print "Got past response fill"
+
+                if N_pTmax == 0: continue
+
+
+                NchMB_check = Nch + 1
+                if (NchMB_check) != N_TTT_save:
+                    good_Nch.sort()
+                    good_Nch_TTT.sort()
+                    print "EVENT", self.eventCounter
+                    print "WARNING: NchMB != N_TTT"
+                    print NchMB_check, N_TTT_save
+                    print "Nch indices are:"
+                    print good_Nch
+                    print "N_TTT indices are:"
+                    print good_Nch_TTT
+
+                    print "\n"
+
+                self.hist[ptSumName].Fill(pTsum, weight)
+                self.hist[nchName].Fill(Nch, weight)
+                self.hist[ptSumMBName].Fill(pTsum+ptMax, weight)
+                #print "After particle loop, the vertex is:", vertexGood
+                #print "After the particle loop, ptMax is:", ptMax
+                #print "After particle loop, we are filling nchMBName with:", Nch+1
+                self.hist[nchMBName].Fill(Nch+1, weight)
+                #print "Filled nchMB with (NOT +1 to this):", (Nch+1)
+                self.hist[transPtSumName].Fill(pTsumTrans, weight)
+                self.hist[transNchName].Fill(NchTrans, weight)
+
+
+                if ptMax > 5:
+                    self.hist[ptSumName_pt5].Fill(pTsum, weight)
+                    self.hist[nchName_pt5].Fill(Nch, weight)
+                    self.hist[transPtSumName_pt5].Fill(pTsumTrans, weight)
+                    self.hist[transNchName_pt5].Fill(NchTrans, weight)
+
+                self.hist[towardName_bh].Fill(ptMax, pTsumToward/etaphi, weight)
+                self.hist[awayName_bh].Fill(ptMax, pTsumAway/etaphi, weight)
+                if NchToward != 0: self.hist[towardAvgName_bh].Fill(ptMax, (pTsumToward/NchToward), weight)
+                if NchAway != 0: self.hist[awayAvgName_bh].Fill(ptMax, (pTsumAway/NchAway), weight)
+                self.hist[transName_bh].Fill(ptMax, pTsumTrans/etaphi, weight)
+                self.hist[transNchName_bh].Fill(ptMax, NchTrans/etaphi, weight)
+                if NchTrans != 0: self.hist[transAvgName_bh].Fill(ptMax, (pTsumTrans/NchTrans), weight)
+                self.hist[overallName_bh].Fill(ptMax, pTsum/(etaphi_three), weight)
+                self.hist[overallNchName_bh].Fill(ptMax, Nch/(etaphi_three), weight)
+                if Nch != 0: self.hist[overallAvgName_bh].Fill(ptMax, (pTsum/Nch), weight)
+
+                self.hist[towardTotalName_bh].Fill(ptMax, (pTsumToward+ptMax)/etaphi, weight)
+                self.hist[towardTotalNchName_bh].Fill(ptMax, (NchToward+1)/etaphi, weight)
+                if NchToward != 0: self.hist[towardTotalAvgName_bh].Fill(ptMax, ( (pTsumToward+ptMax)/(NchToward+1) ), weight)
+                self.hist[overallTotalName_bh].Fill(ptMax, (pTsum+ptMax)/(etaphi_three), weight)
+                self.hist[overallTotalNchName_bh].Fill(ptMax, (Nch+1)/(etaphi_three), weight)
+                if Nch != 0: self.hist[overallTotalAvgName_bh].Fill(ptMax, ( (pTsum+ptMax)/(Nch+1) ), weight)
+
+                self.hist[towardName_b1].Fill(ptMax, pTsumToward/etaphi, weight)
+                self.hist[awayName_b1].Fill(ptMax, pTsumAway/etaphi, weight)
+                if NchToward != 0: self.hist[towardAvgName_b1].Fill(ptMax, (pTsumToward/NchToward), weight)
+                if NchAway != 0: self.hist[awayAvgName_b1].Fill(ptMax, (pTsumAway/NchAway), weight)
+                self.hist[transName_b1].Fill(ptMax, pTsumTrans/etaphi, weight)
+                self.hist[transNchName_b1].Fill(ptMax, NchTrans/etaphi, weight)
+                if NchTrans != 0: self.hist[transAvgName_b1].Fill(ptMax, (pTsumTrans/NchTrans), weight)
+                self.hist[overallName_b1].Fill(ptMax, pTsum/(etaphi_three), weight)
+                self.hist[overallNchName_b1].Fill(ptMax, Nch/(etaphi_three), weight)
+                if Nch != 0: self.hist[overallAvgName_b1].Fill(ptMax, (pTsum/Nch), weight)
+
+                self.hist[towardTotalName_b1].Fill(ptMax, (pTsumToward+ptMax)/etaphi, weight)
+                self.hist[towardTotalNchName_b1].Fill(ptMax, (NchToward+1)/etaphi, weight)
+                if NchToward != 0: self.hist[towardTotalAvgName_b1].Fill(ptMax, ( (pTsumToward+ptMax)/(NchToward+1) ), weight)
+                self.hist[overallTotalName_b1].Fill(ptMax, (pTsum+ptMax)/(etaphi_three), weight)
+                self.hist[overallTotalNchName_b1].Fill(ptMax, (Nch+1)/(etaphi_three), weight)
+                if Nch != 0: self.hist[overallTotalAvgName_b1].Fill(ptMax, ( (pTsum+ptMax)/(Nch+1) ), weight)
+
+                self.hist[towardName_b2].Fill(ptMax, pTsumToward/etaphi, weight)
+                self.hist[awayName_b2].Fill(ptMax, pTsumAway/etaphi, weight)
+                if NchToward != 0: self.hist[towardAvgName_b2].Fill(ptMax, (pTsumToward/NchToward), weight)
+                if NchAway != 0: self.hist[awayAvgName_b2].Fill(ptMax, (pTsumAway/NchAway), weight)
+                self.hist[transName_b2].Fill(ptMax, pTsumTrans/etaphi, weight)
+                self.hist[transNchName_b2].Fill(ptMax, NchTrans/etaphi, weight)
+                if NchTrans != 0: self.hist[transAvgName_b2].Fill(ptMax, (pTsumTrans/NchTrans), weight)
+                self.hist[overallName_b2].Fill(ptMax, pTsum/(etaphi_three), weight)
+                self.hist[overallNchName_b2].Fill(ptMax, Nch/(etaphi_three), weight)
+                if Nch != 0: self.hist[overallAvgName_b2].Fill(ptMax, (pTsum/Nch), weight)
+
+                self.hist[towardTotalName_b2].Fill(ptMax, (pTsumToward+ptMax)/etaphi, weight)
+                self.hist[towardTotalNchName_b2].Fill(ptMax, (NchToward+1)/etaphi, weight)
+                if NchToward != 0: self.hist[towardTotalAvgName_b2].Fill(ptMax, ( (pTsumToward+ptMax)/(NchToward+1) ), weight)
+                self.hist[overallTotalName_b2].Fill(ptMax, (pTsum+ptMax)/(etaphi_three), weight)
+                self.hist[overallTotalNchName_b2].Fill(ptMax, (Nch+1)/(etaphi_three), weight)
+                if Nch != 0: self.hist[overallTotalAvgName_b2].Fill(ptMax, ( (pTsum+ptMax)/(Nch+1) ), weight)
+
+
+
+                if pTsumTrans1 > pTsumTrans2:
+                    self.hist[transMaxName_bh].Fill(ptMax, pTsumTrans1/(etaphi_half), weight) # always use weight when filling
+                    self.hist[transMinName_bh].Fill(ptMax, pTsumTrans2/(etaphi_half), weight) # always use weight when filling
+                    self.hist[transMaxName_b1].Fill(ptMax, pTsumTrans1/(etaphi_half), weight) # always use weight when filling
+                    self.hist[transMinName_b1].Fill(ptMax, pTsumTrans2/(etaphi_half), weight) # always use weight when filling
+                    self.hist[transMaxName_b2].Fill(ptMax, pTsumTrans1/(etaphi_half), weight) # always use weight when filling
+                    self.hist[transMinName_b2].Fill(ptMax, pTsumTrans2/(etaphi_half), weight) # always use weight when filling
+                else:
+                    self.hist[transMinName_bh].Fill(ptMax, pTsumTrans1/(etaphi_half), weight) # always use weight when filling
+                    self.hist[transMaxName_bh].Fill(ptMax, pTsumTrans2/(etaphi_half), weight) # always use weight when filling
+                    self.hist[transMinName_b1].Fill(ptMax, pTsumTrans1/(etaphi_half), weight) # always use weight when filling
+                    self.hist[transMaxName_b1].Fill(ptMax, pTsumTrans2/(etaphi_half), weight) # always use weight when filling
+                    self.hist[transMinName_b2].Fill(ptMax, pTsumTrans1/(etaphi_half), weight) # always use weight when filling
+                    self.hist[transMaxName_b2].Fill(ptMax, pTsumTrans2/(etaphi_half), weight) # always use weight when filling
+                    
+                self.hist[towardNchName_bh].Fill(ptMax, NchToward/etaphi, weight) # always use weight when filling
+                self.hist[awayNchName_bh].Fill(ptMax, NchAway/etaphi, weight) # always use weight when filling
+                self.hist[towardNchName_b1].Fill(ptMax, NchToward/etaphi, weight) # always use weight when filling
+                self.hist[awayNchName_b1].Fill(ptMax, NchAway/etaphi, weight) # always use weight when filling
+                self.hist[towardNchName_b2].Fill(ptMax, NchToward/etaphi, weight) # always use weight when filling
+                self.hist[awayNchName_b2].Fill(ptMax, NchAway/etaphi, weight) # always use weight when filling
+
+                self.hist[transDifName_bh].Fill(ptMax, math.fabs(pTsumTrans1-pTsumTrans2)/(etaphi_half), weight)
+                self.hist[transDifNchName_bh].Fill(ptMax, math.fabs(NchTrans1-NchTrans2)/(etaphi_half), weight)
+                self.hist[transDifName_b1].Fill(ptMax, math.fabs(pTsumTrans1-pTsumTrans2)/(etaphi_half), weight)
+                self.hist[transDifNchName_b1].Fill(ptMax, math.fabs(NchTrans1-NchTrans2)/(etaphi_half), weight)
+                self.hist[transDifName_b2].Fill(ptMax, math.fabs(pTsumTrans1-pTsumTrans2)/(etaphi_half), weight)
+                self.hist[transDifNchName_b2].Fill(ptMax, math.fabs(NchTrans1-NchTrans2)/(etaphi_half), weight)
+
+                if NchTrans1 > NchTrans2:
+                    self.hist[transMaxNchName_bh].Fill(ptMax, NchTrans1/(etaphi_half), weight) # always use weight when filling
+                    self.hist[transMinNchName_bh].Fill(ptMax, NchTrans2/(etaphi_half), weight) # always use weight when filling
+                    self.hist[transMaxNchName_b1].Fill(ptMax, NchTrans1/(etaphi_half), weight) # always use weight when filling
+                    self.hist[transMinNchName_b1].Fill(ptMax, NchTrans2/(etaphi_half), weight) # always use weight when filling
+                    self.hist[transMaxNchName_b2].Fill(ptMax, NchTrans1/(etaphi_half), weight) # always use weight when filling
+                    self.hist[transMinNchName_b2].Fill(ptMax, NchTrans2/(etaphi_half), weight) # always use weight when filling
+                else:
+                    self.hist[transMinNchName_bh].Fill(ptMax, NchTrans1/(etaphi_half), weight) # always use weight when filling
+                    self.hist[transMaxNchName_bh].Fill(ptMax, NchTrans2/(etaphi_half), weight) # always use weight when filling
+                    self.hist[transMinNchName_b1].Fill(ptMax, NchTrans1/(etaphi_half), weight) # always use weight when filling
+                    self.hist[transMaxNchName_b1].Fill(ptMax, NchTrans2/(etaphi_half), weight) # always use weight when filling
+                    self.hist[transMinNchName_b2].Fill(ptMax, NchTrans1/(etaphi_half), weight) # always use weight when filling
+                    self.hist[transMaxNchName_b2].Fill(ptMax, NchTrans2/(etaphi_half), weight) # always use weight when filling
+
+
+                #The """ commented part is KINDA how this is done.  Anything else is testing to figure out why it crashes.
+
+                """
+                print "attempting Nch check"
+                if Nch != None:
+                    print "attempting response fill"
+                    Nch_response.Fill(Nch, Nch_GEN);
+                    print "finished response fill"
+                else:
+                    print "attempting response miss"
+                    Nch_response.Miss(Nch_GEN);
+                    print "finished response miss"
+                """
+
+
+                #Remember that you will have to modify this to properly incorporate the Miss() function.
+
+                #self.Nch_response.Fill(Nch, Nch_GEN);
+
+                #self.Nch_response2.Fill(Nch, Nch_GEN);
+
+
+
+                #THIS CURRENTLY DOES NOT WORK BECAUSE PROFILE PLOTS != 2D HISTOGRAMS AS FAR AS ROOUNFOLD IS CONCERNED!
+                #self.trans_response.Fill(ptMax, pTsumTrans, ptMax_GEN, pTsumTrans_GEN, weight);
+                #self.transNch_response.Fill(ptMax, NchTrans, ptMax_GEN, NchTrans_GEN, weight);
+
+
 
 
 
@@ -1570,16 +2397,16 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
         #self.Nch_RECO2 = self.Nch_unfold2.Hreco();
         #self.GetOutputList().Add(self.Nch_RECO2);
 
-
-	'''
+	"""
+	
         unfoldStartTime = time.time()
 
-        self.Nch_unfold = RooUnfoldBayes(self.Nch_response, self.hist["HIST_nchMB"], 4);
+        #self.Nch_unfold = RooUnfoldBayes(self.Nch_response, self.hist["HIST_nchMB"], 4);
         self.Nch_RECO = self.Nch_unfold.Hreco();
         self.GetOutputList().Add(self.Nch_RECO);
 
 
-        self.transNch_unfold = RooUnfoldBayes(self.transNch_response, self.hist["2DHIST_transNchName_bh"], 2);
+        #self.transNch_unfold = RooUnfoldBayes(self.transNch_response, self.hist["2DHIST_transNchName_bh"], 2);
         self.transNch_RECO = self.transNch_unfold.Hreco();
         self.GetOutputList().Add(self.transNch_RECO);
 
@@ -1602,8 +2429,8 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
         unfoldTime = unfoldEndTime - unfoldStartTime
 
         print "Unfolding trans took %d seconds." % unfoldTime
-	'''
-
+	
+	"""
 
         #self.Nch_RECO = ROOT.(* self.Nch_unfold.Hreco() );
         #self.GetOutputList().Add(self.Nch_RECO);
@@ -1661,12 +2488,15 @@ if __name__ == "__main__":
     ROOT.AutoLibraryLoader.enable()
 
     sampleList = None
-    maxFilesMC = None
+    #maxFilesMC = None
+    #maxFilesData = None
+    maxFilesMC = 50
     maxFilesData = None
-    nWorkers = 10 # "None" to Use all cores
+    nWorkers = None
+    #nWorkers = 15 # Use all cores
 
-    #quickTest = False
-    quickTest = True
+    quickTest = False
+    #quickTest = True
     
     if quickTest:
         # Run printTTree.py alone to get the samples list
@@ -1674,7 +2504,8 @@ if __name__ == "__main__":
         #sampleList.append("data_MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8")
         maxFilesMC = 1
         maxFilesData = 1
-        nWorkers = 1
+        #nWorkers = 1
+	nWorkers = None
 
     # another possibility to process bit faster: process only part of MC
     #maxFilesMC = 4
@@ -1694,13 +2525,13 @@ if __name__ == "__main__":
 
 
     # use printTTree.py <sampleName> to see what trees are avaliable inside the skim file
-    CSA14_dndeta.runAll(treeName="GenLevelTree",
+    CSA14_dndeta.runAll(treeName="UETree",
                                slaveParameters=slaveParams,
                                sampleList=sampleList,
                                maxFilesMC = maxFilesMC,
                                maxFilesData = maxFilesData,
                                nWorkers=nWorkers,
-                               outFile = "plotsGENTUNES.root" )
+                               outFile = "plots_7-18-15_eta20.root" )
 
 
 
