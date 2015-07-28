@@ -10,7 +10,7 @@ skimEfficiencyMethod="getSkimEff"
 '''
 
 # point towards your list of samples you want
-dsFile="CommonFSQFramework/Skim/python/ds_RunIILowPU_0T_v3.txt"
+dsFile="CommonFSQFramework/Skim/python/ds_RunIILowPU_0T_v4.txt"
 
 # define the util decorator. Functions marked with this wont turn into ds attribute
 def util(func):
@@ -33,6 +33,7 @@ def name(ds):
     if isData(ds):
 	if "Run247324" in ds: return "data_"+split[1]+"_Run2015A_Run247324"
 	if "LHCf_lowPUruns" in ds: return "data_"+split[1]+"_Run2015A_LHCf_lowPU"
+	if "LHCf_lastruns" in ds: return "data_"+split[1]+"_Run2015A_LHCf_lastruns"
 	return "data_"+split[1]
 
 def isData(ds):
@@ -47,6 +48,7 @@ def json(ds):
         if "Run245194" in ds: return "CommonFSQFramework/Skim/lumi/Run245194.json"
 	if "Run247324" in ds: return "CommonFSQFramework/Skim/lumi/Run247324.json"
 	if "LHCf_lowPUruns" in ds: return "CommonFSQFramework/Skim/lumi/LHCf_lowPUruns_v1.json"
+	if "LHCf_lastruns" in ds: return "CommonFSQFramework/Skim/lumi/LHCf_lastruns_v1.json"
     else:
         return ""
 
@@ -55,7 +57,7 @@ def crabJobs(ds):
     # define to run 100 crab jobs
     # make something more clever, based on number of events in the dataset:
     # require around 50000 events to be processed per job
-    return int(round(numEvents(ds)/50000.0))
+    return int(round(numEvents(ds)/100000.0))
 
 
 def numEvents(ds):
@@ -82,6 +84,8 @@ def numEvents(ds):
     if "ZeroBias1" in ds and "Run247324" in ds: return 1666987
     if "ZeroBias1" in ds and "LHCf_lowPUruns" in ds: return 2551697
     if "EmptyBX" in ds and "LHCf_lowPUruns" in ds: return 2921923
+    if "ZeroBias1" in ds and "LHCf_lastruns" in ds: return 6070244
+    if "EmptyBX" in ds and "LHCf_lastruns" in ds: return 17318167
     if "L1TechBPTXQuiet" in ds and "Run247324" in ds: return 1454985
     if "L1TechBPTXPlusOnly" in ds and "Run247324" in ds: return 1500029
     if "L1TechBPTXMinusOnly" in ds and "Run247324" in ds: return 1748311
