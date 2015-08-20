@@ -8,7 +8,7 @@ config.section_("General")
 
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
-config.JobType.psetName = 'treemaker_Eflow_74X.py'
+config.JobType.psetName = 'treemaker_Eflow_74X_NoCastor.py'
 
 config.section_("Data")
 
