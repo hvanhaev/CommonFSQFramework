@@ -65,6 +65,15 @@ void EventViewBase::fill(const edm::Event& iEvent, const edm::EventSetup& iSetup
     fillSpecific(iEvent, iSetup);
 }
 
+void EventViewBase::doBeginRun(const edm::Run& r, const edm::EventSetup& es) {
+    // do nothing here, overwrite this in derived miniView class
+
+}
+
+void EventViewBase::doEndRun(const edm::Run& r, const edm::EventSetup& es) {
+    // do nothing here, overwrite this in derived miniView class
+    
+}
 
 
 void EventViewBase::resetVariables(){

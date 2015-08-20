@@ -46,6 +46,12 @@ EventViewBase(iConfig,  tree)
     }
 }
 
+void TriggerResultsView::doBeginRun(const edm::Run& r, const edm::EventSetup& es) {
+    
+    //std::cout << "This is executed during doBeginRun() in the TriggerResultsView" << std::endl;
+    
+}
+
 
 void TriggerResultsView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSetup){
 

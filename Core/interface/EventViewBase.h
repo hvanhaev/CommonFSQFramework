@@ -15,6 +15,8 @@ class EventViewBase {
       EventViewBase() {};
       EventViewBase(const edm::ParameterSet&, TTree * tree);
       void fill(const edm::Event&, const edm::EventSetup&);
+      virtual void doBeginRun(const edm::Run&, const edm::EventSetup&);
+      virtual void doEndRun(const edm::Run&, const edm::EventSetup&);
       ~EventViewBase();
 
       void resetVariables();

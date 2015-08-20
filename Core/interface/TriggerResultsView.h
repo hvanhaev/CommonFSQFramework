@@ -6,6 +6,7 @@
 class TriggerResultsView: public EventViewBase{
     public:
        TriggerResultsView(const edm::ParameterSet& ps, TTree * tree);
+       void doBeginRun(const edm::Run&, const edm::EventSetup&);
 
     private:
       virtual void fillSpecific(const edm::Event&, const edm::EventSetup&);

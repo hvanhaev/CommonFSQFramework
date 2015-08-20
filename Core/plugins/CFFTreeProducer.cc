@@ -67,8 +67,8 @@ class CFFTreeProducer : public edm::EDAnalyzer {
       TTree *m_tree;
       std::vector<EventViewBase *> m_views;
 
-      //virtual void beginRun(edm::Run const&, edm::EventSetup const&) override;
-      //virtual void endRun(edm::Run const&, edm::EventSetup const&) override;
+      virtual void beginRun(edm::Run const&, edm::EventSetup const&);
+      virtual void endRun(edm::Run const&, edm::EventSetup const&);
       //virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&) override;
       //virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&) override;
 
@@ -210,20 +210,32 @@ CFFTreeProducer::endJob()
 }
 
 // ------------ method called when starting to processes a run  ------------
-/*
+
 void 
-CFFTreeProducer::beginRun(edm::Run const&, edm::EventSetup const&)
+CFFTreeProducer::beginRun(const edm::Run& r, edm::EventSetup const& es)
 {
+
+    using namespace edm;
+    for (unsigned int i = 0; i < m_views.size(); ++i){
+        m_views[i]->doBeginRun(r, es);
+    }
+
 }
-*/
+
 
 // ------------ method called when ending the processing of a run  ------------
-/*
+
 void 
-CFFTreeProducer::endRun(edm::Run const&, edm::EventSetup const&)
+CFFTreeProducer::endRun(const edm::Run& r, edm::EventSetup const& es)
 {
+
+    using namespace edm;
+    for (unsigned int i = 0; i < m_views.size(); ++i){
+        m_views[i]->doEndRun(r, es);
+    }
+
 }
-*/
+
 
 // ------------ method called when starting to processes a luminosity block  ------------
 /*
