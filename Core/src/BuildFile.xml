@@ -19,6 +19,7 @@
 <use name="CalibFormats/HcalObjects"/>
 <use name="Geometry/Records"/>
 <use name="DataFormats/GeometryVector"/>
+<use name="HLTrigger/HLTcore"/>
 <export>
    <lib name="1"/>
 </export>

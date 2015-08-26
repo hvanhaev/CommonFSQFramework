@@ -2,6 +2,7 @@
 #define TriggerResultsView_h
 
 #include "CommonFSQFramework/Core/interface/EventViewBase.h"
+#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 
 class TriggerResultsView: public EventViewBase{
     public:
@@ -13,7 +14,10 @@ class TriggerResultsView: public EventViewBase{
       std::string m_process;
       std::vector<std::string > m_triggerNames;
       std::map<std::string, std::vector<std::string > > m_triggerClasses;
+      bool m_storePrescales;
 
+      HLTConfigProvider hltConfig_;
+      bool isValidHLTConfig_;
 
 
 };

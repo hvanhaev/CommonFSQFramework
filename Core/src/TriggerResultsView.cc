@@ -8,6 +8,8 @@ EventViewBase(iConfig,  tree)
     // fetch config data
     m_process = iConfig.getParameter<std::string>("process");
     m_triggerNames = iConfig.getParameter<std::vector<std::string> >("triggers");
+    m_storePrescales = iConfig.getParameter<bool>("storePrescales");
+    
     for (unsigned int i=0; i < m_triggerNames.size();++i){
         // check, if it's for L1GT readout
         if (m_triggerNames.at(i).find("L1GT") != std::string::npos) {
@@ -42,6 +44,29 @@ EventViewBase(iConfig,  tree)
             registerVecInt(it->first, tree);
         } else {
             registerInt(it->first, tree);
+	    
+	    if (m_storePrescales) {
+	        if (it->second.size() == 1) {
+		    std::string name = it->second.at(0);
+		    if (name.find("*")!= std::string::npos){ // wildcard entry
+		        // do nothing
+		    } else {
+		        registerInt("L1PS_" + it->first, tree);
+			registerInt("HLTPS_" + it->first, tree);
+		    }
+		} else {
+	            for (unsigned int i=0; i < it->second.size();++i){
+                        std::string name = it->second.at(i);
+                        if (name.find("*")!= std::string::npos){ // wildcard entry
+                            // do not store prescales for wildcard triggers as we can not easily fetch the complete trigger name.
+                        
+                        } else { // normal entry
+                            registerInt("L1PS_" + name, tree);
+			    registerInt("HLTPS_" + name, tree);
+                        }
+                    }
+	        }
+            }
         }
     }
 }
@@ -49,6 +74,8 @@ EventViewBase(iConfig,  tree)
 void TriggerResultsView::doBeginRun(const edm::Run& r, const edm::EventSetup& es) {
     
     //std::cout << "This is executed during doBeginRun() in the TriggerResultsView" << std::endl;
+    bool changed = true;
+    isValidHLTConfig_ = hltConfig_.init(r,es,"*",changed);
     
 }
 
@@ -87,7 +114,7 @@ void TriggerResultsView::fillSpecific(const edm::Event& iEvent, const edm::Event
         //it->second - list of triggers to check
         //
         //std::cout << "Trying " << it->first << std::endl;
-
+	
         if (it->first == "L1GTTech") {
             for (unsigned int i=0; i < TechTrigg.size(); ++i) addToIVec(it->first, TechTrigg.at(i));
             continue;
@@ -97,6 +124,17 @@ void TriggerResultsView::fillSpecific(const edm::Event& iEvent, const edm::Event
         }
 
         int accept = 0;
+	
+	if (m_storePrescales && it->second.size() == 1) {
+	    std::string name = it->second.at(0);
+            if (name.find("*")!= std::string::npos){ // wildcard entry
+	        // do nothing
+	    } else {
+	       setI("L1PS_" + it->first, (hltConfig_.prescaleValues(iEvent, iSetup, name)).first );
+	       setI("HLTPS_" + it->first, (hltConfig_.prescaleValues(iEvent, iSetup, name)).second );
+            }
+	}
+	
         for (unsigned int i=0; i < it->second.size();++i){
             std::string name = it->second.at(i);
             if (name.find("*")!= std::string::npos){ // wildcard entry
@@ -105,11 +143,16 @@ void TriggerResultsView::fillSpecific(const edm::Event& iEvent, const edm::Event
                     std::string nameForSearch = std::string(it->second.at(i), 0, it->second.at(i).size()-1); // strip the star
                     if (names.at(iName).find(nameForSearch)==0) { // starts with
                         //std::cout << "Found for start\n";
+			//std::cout << " found trigger: " << names.at(iName) << std::endl;
                         if (trbn.accept(names.at(iName)))  accept = 1;
                     }
                 }
             } else { // normal entry
                 if (trbn.accept( it->second.at(i))) accept = 1;
+		if (m_storePrescales) {
+		    setI("L1PS_" + name, (hltConfig_.prescaleValues(iEvent, iSetup, name)).first );
+	            setI("HLTPS_" + name, (hltConfig_.prescaleValues(iEvent, iSetup, name)).second );
+		}
             }
             //std::cout << "Accept: " << it->first <<  " "  << accept << std::endl;
             setI(it->first, accept);
