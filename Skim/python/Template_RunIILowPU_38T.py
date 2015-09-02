@@ -10,7 +10,7 @@ skimEfficiencyMethod="getSkimEff"
 '''
 
 # point towards your list of samples you want
-dsFile="CommonFSQFramework/Skim/python/ds_RunIILowPU_38T_v2.txt"
+dsFile="CommonFSQFramework/Skim/python/ds_RunIILowPU_38T_v3.txt"
 
 # define the util decorator. Functions marked with this wont turn into ds attribute
 def util(func):
@@ -40,7 +40,8 @@ def isData(ds):
 def json(ds):
     realData = isData(ds)
     if realData:
-        return "CommonFSQFramework/Skim/lumi/Run251721.json"
+        if "Run2015B" in ds: return "CommonFSQFramework/Skim/lumi/Run251721.json"
+        if "Run2015C" in ds: return "CommonFSQFramework/Skim/lumi/VdM38Truns_v1.json"
     else:
         return ""
 
@@ -69,8 +70,9 @@ def numEvents(ds):
     return -1
 
 def GT(ds):
-    if isData(ds) and "PromptReco" in ds: return "74X_dataRun2_Prompt_v0"
-    if isData(ds) and "Express" in ds: return "74X_dataRun2_Express_v0"
+    if isData(ds) and "Run2015B-PromptReco-v1" in ds: return "74X_dataRun2_Prompt_v0"
+    if isData(ds) and "Run2015B-Express-v1" in ds: return "74X_dataRun2_Express_v0"
+    if isData(ds) and "Run2015C-PromptReco-v1" in ds: return "74X_dataRun2_Prompt_v1"
 	
     # 3.8T MC GT
     if "NoPU_castor_MCRUN2_74_V8" in ds: return "MCRUN2_74_V8" 
