@@ -89,3 +89,13 @@ def getPATBasePath():
     mod = imp.load_module(mod, f, filename, desc)
 
     return mod.PATbasePATH
+
+def preventExit():
+    print " "
+    py3 = sys.version_info[0] > 2 #creates boolean value for test that Python major version > 2
+    if py3:
+        response = input("Press enter to exit ")
+    else:
+        response = raw_input("Press enter to exit ")
+
+    return 1

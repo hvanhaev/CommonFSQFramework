@@ -11,14 +11,25 @@ getAllHistos()
 
 # define nice legend names for the samples that you are plotting:
 setLegend("MinBias_TuneMonash13_13TeV-pythia8","Pythia8 Monash13")
-setLegend("data_MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8","data (CUETP8S1)")
+setLegend("data_MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8","Data (CUETP8S1)")
+
+# by default the CMS style is applied and CMS Preliminary + centre-of-mass energy are displayed
+# use below functions to set CMS lumi options:
+#isPreliminary(False) # this removes Preliminary from the plot
+#setLumiPos("out") # this moves CMS and Preliminary outside the frame on top left
+#setLumiValue("14.9 mb^{-1} (13 TeV)") # change the integrated lumi and centre-of-mass energy displayed at top right
 
 # this will plot ALL histograms found the in the file:
 #draw()
-# this will plot all histograms containing the string "RecoTrack" in their names normalised to their integral:
-# turn on this function to plot with ratio to a data sample
+# this will plot all histograms containing the string "phiRecoTracks" in their names normalised to their integral:
+draw(["phiRecoTracks"],"int")
+
+# use this function to plot with ratio to a data sample
 plotRatio()
-draw(["RecoTrack"],"int")
+
+# draw something with the ratio panel on
+draw(["ptRecoTracks"],"int")
+
 # this will plot a combination of histograms containing either of the two strings in their names:
 #draw(["ptRecoTracks_central_minbias","etaRecoTracks_central_minbias"])
 
@@ -31,15 +42,6 @@ draw(["RecoTrack"],"int")
 #draw(["GenTrack"],"int",["MinBias_TuneMonash13_13TeV-pythia8"])
 
 
-
-# add "CMS" or "CMS Preliminary" labels to all open canvases
-printCMSPreliminary()
-# add the centre-of-mass energy label to all open canvases
-# by default this is 13 TeV
-printCMEnergy()
-# add the integrated luminosity to all open canvases
-#printLumi("3 nb^{-1}")
-
 # update all open canvases to display the changes
 updateCanvas()
 
@@ -47,7 +49,7 @@ updateCanvas()
 # by default the PDF format is chosen to save a plot
 # by default they are saved in the current directory
 # save all open canvases to pdf files:
-saveCanvas()
+#saveCanvas()
 
 # save all canvases with the string "etaRecoTrack" in their names:
 #saveCanvas("./",["etaRecoTrack"])

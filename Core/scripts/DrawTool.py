@@ -10,6 +10,7 @@ sys.path.append('/Users/hans/Physics/CSA14/CommonFSQFramework')
 
 import CommonFSQFramework.Core.Util
 import CommonFSQFramework.Core.Style
+import CommonFSQFramework.Core.DrawUtil
 
 def setInput(inputfile):
     global GlobalIn
@@ -104,6 +105,7 @@ def getAllHistos():
             curObjClone = curObj.Clone()
             curObjClone.SetDirectory(0)
             curObjClone.SetTitle(sampleName + "/" + curObjClone.GetName())
+            curObjClone.UseCurrentStyle()
             GlobalHistoList.append(curObjClone)
 
     print "All histograms from ", GlobalIn, " loaded. In total: ", len(GlobalHistoList), " in the memory"
@@ -146,14 +148,15 @@ def draw(localHistoList=[],normMeth="",localSampleList=[]):
             if c.GetName() == hname: exists = True
         
         if not exists:
-            c = TCanvas(hname,hname)
-            GlobalCanvasList.append(c)
+	    if GlobalPlotRatio:
+	        c = CommonFSQFramework.Core.DrawUtil.makeCMSCanvas(hname,hname,800,760)
+            else:
+	        c = CommonFSQFramework.Core.DrawUtil.makeCMSCanvas(hname,hname,800,600)
+	    GlobalCanvasList.append(c)
             # define legend with default style
-            leg = TLegend(0.52,0.73,0.82,0.92)
-            leg.SetMargin(0.2)
-            leg.SetFillColor(kWhite)
-            leg.SetBorderSize(0)
-            leg.SetTextSize(0.035)
+            nentries = len(GlobalNormFactorList)
+            if len(localSampleList) != 0: nentries = len(localSampleList)
+            leg = CommonFSQFramework.Core.DrawUtil.makeLegend(nentries)
             leg.SetName(hname)
             GlobalLegendList.append(leg)
 
@@ -183,15 +186,30 @@ def draw(localHistoList=[],normMeth="",localSampleList=[]):
             plotit = True
         if not plotit: continue
 
-        if GlobalPlotRatio and len(localSampleList) != 1 and wehaveratiosample:
-            c.Divide(1,2,0.0001,0.0001)
-            c.cd(1)
-            gPad.SetBottomMargin(0.)
+        upperpad = None
+	lowerpad = None
+	reallyPlotRatio = False
+        if GlobalPlotRatio and len(localSampleList) != 1 and wehaveratiosample: reallyPlotRatio = True
+	if reallyPlotRatio:
+	    c.cd()
+	    upperpad = TPad(cname+"_up",cname+"_up",0,0.305,1,1)
+	    lowerpad = TPad(cname+"_down",cname+"_down",0,0,1,0.305)
+	    upperpad.SetLeftMargin(0.12)
+	    upperpad.SetRightMargin(0.04)
+	    upperpad.SetTopMargin(0.08*600/528)
+	    upperpad.SetBottomMargin(0)
+	    lowerpad.SetLeftMargin(0.12)
+	    lowerpad.SetRightMargin(0.04)
+	    lowerpad.SetTopMargin(0)
+	    lowerpad.SetBottomMargin(0.12*600/232)
+	    lowerpad.SetTickx(1)
+	    upperpad.Draw()
+	    lowerpad.Draw()
+	    upperpad.cd()
+	    
         else:
-            c.Divide(1,1,0.0001,0.0001)
-            c.cd(1)
-
-
+            c.cd()
+	    
         # start with a clean legend
         GlobalLegendList[icanvas].Clear()
 
@@ -214,10 +232,23 @@ def draw(localHistoList=[],normMeth="",localSampleList=[]):
                     if normMeth == "max":
                         if h.GetBinContent(h.GetMaximumBin()) != 0: h.Scale(1./h.GetBinContent(h.GetMaximumBin()))
                     
+		    # draw the stuff
+		    if reallyPlotRatio:
+                        h.GetYaxis().SetTitleSize(0.06*600/528)
+                        h.GetYaxis().SetTitleOffset(0.83)
+                        #h.GetYaxis().SetTickLength(0.03*600/528)
+                        h.GetYaxis().SetLabelSize(0.05*600/528)
+                        h.GetYaxis().SetLabelOffset(0.007*528/600)
+                        h.GetXaxis().SetTitleSize(0.06*600/528)
+                        h.GetXaxis().SetTitleOffset(0.9*528/600)
+                        h.GetXaxis().SetTickLength(0.03*600/528)
+                        h.GetXaxis().SetLabelSize(0.05*600/528)
+                        h.GetXaxis().SetLabelOffset(0.007*528/600)
+
                     # execute style options if there are
                     if os.path.isfile(GlobalScriptFile+".style"):
                         execfile(GlobalScriptFile+".style")
-                    
+		    
                     if ihisto == 0: h.Draw()
                     if ihisto != 0: h.Draw("same")
                     if hsample == GlobalPlotRatioToSample: hdata = h.Clone()
@@ -241,12 +272,24 @@ def draw(localHistoList=[],normMeth="",localSampleList=[]):
                         if h.Integral() != 0: h.Scale(1./h.Integral())
                     if normMeth == "max":
                         if h.GetBinContent(h.GetMaximumBin()) != 0: h.Scale(1./h.GetBinContent(h.GetMaximumBin()))
-            
+                
+                    # draw the stuff
+		    if reallyPlotRatio:
+                        h.GetYaxis().SetTitleSize(0.06*600/528)
+                        h.GetYaxis().SetTitleOffset(0.83)
+                        #h.GetYaxis().SetTickLength(0.03*600/528)
+                        h.GetYaxis().SetLabelSize(0.05*600/528)
+                        h.GetYaxis().SetLabelOffset(0.007*528/600)
+                        h.GetXaxis().SetTitleSize(0.06*600/528)
+                        h.GetXaxis().SetTitleOffset(0.9*528/600)
+                        h.GetXaxis().SetTickLength(0.03*600/528)
+                        h.GetXaxis().SetLabelSize(0.05*600/528)
+                        h.GetXaxis().SetLabelOffset(0.007*528/600)
+
                     # execute style options if there are
                     if os.path.isfile(GlobalScriptFile+".style"):
                         execfile(GlobalScriptFile+".style")
-                
-                    # draw the stuff
+		    
                     if ihisto == 0: h.Draw()
                     if ihisto != 0: h.Draw("same")
                     if hsample == GlobalPlotRatioToSample: hdata = h.Clone()
@@ -255,13 +298,18 @@ def draw(localHistoList=[],normMeth="",localSampleList=[]):
                     ihisto+=1
 
         # draw legend
+	if reallyPlotRatio: GlobalLegendList[icanvas].SetTextSize(0.04*600/528)
         GlobalLegendList[icanvas].Draw()
+	
+        # add CMS lumi style to current active pad
+	if GlobalLumiPos == "left" and GlobalIsPrel: CommonFSQFramework.Core.DrawUtil.printLumiPrelLeft(gPad,GlobalLumiValue)
+	if GlobalLumiPos == "out" and GlobalIsPrel: CommonFSQFramework.Core.DrawUtil.printLumiPrelOut(gPad,GlobalLumiValue)
+        if GlobalLumiPos == "left" and not GlobalIsPrel: CommonFSQFramework.Core.DrawUtil.printLumiLeft(gPad,GlobalLumiValue)
+        if GlobalLumiPos == "out" and not GlobalIsPrel: CommonFSQFramework.Core.DrawUtil.printLumiOut(gPad,GlobalLumiValue)	
 
         # ratio pad
-        if GlobalPlotRatio and len(localSampleList) != 1 and wehaveratiosample:
-            c.cd(2)
-            gPad.SetTopMargin(0.)
-            gPad.SetBottomMargin(0.65);
+        if reallyPlotRatio:
+            lowerpad.cd()
             gPad.SetTitle("")
             
             if hdata.InheritsFrom("TH1"):
@@ -293,8 +341,20 @@ def draw(localHistoList=[],normMeth="",localSampleList=[]):
                                 hratio = h.Clone()
                                 hratio.Divide(hdata)
 
-                            hratio.GetYaxis().SetTitle("MC/"+GlobalSampleDic[GlobalPlotRatioToSample])
-                            hratio.GetYaxis().SetRangeUser(0.,2.)
+                            hratio.GetYaxis().SetTitle("MC/Data")
+                            hratio.GetYaxis().SetRangeUser(0.1,1.9)
+			    hratio.GetYaxis().SetTitleSize(0.06*600/232)
+			    hratio.GetYaxis().SetTitleOffset(0.4)
+			    hratio.GetYaxis().SetTickLength(0.04)
+			    hratio.GetYaxis().SetLabelSize(0.05*600/232)
+			    #hratio.GetYaxis().SetLabelOffset(0.007*232/600)
+			    hratio.GetYaxis().SetNdivisions(505)
+                            hratio.GetXaxis().SetTitleSize(0.06*600/232)
+                            hratio.GetXaxis().SetTitleOffset(0.85)
+                            hratio.GetXaxis().SetTickLength(0.03*600/232)
+                            hratio.GetXaxis().SetLabelSize(0.05*600/232)
+                            hratio.GetXaxis().SetLabelOffset(0.007*600/232)
+			    
                             GlobalHistoRatioList.append(hratio)
                             # draw the stuff
                             if iratio == 0: hratio.Draw()
@@ -338,65 +398,20 @@ def plotRatio(value=True,data=""):
             GlobalPlotRatio = False
 
     if GlobalPlotRatio: print "The following sample will be used to plot the ratio to: ", GlobalPlotRatioToSample
+    
+def setLumiPos(pos="left"):
+    global GlobalLumiPos
+    GlobalLumiPos = pos
+    
+def setLumiValue(value="13 TeV"):
+    global GlobalLumiValue
+    GlobalLumiValue = value
+    
+def isPreliminary(value=True):
+    global GlobalIsPrel
+    GlobalIsPrel = value
 
-def printCMS(localHistoList=[]):
-    for c in GlobalCanvasList:
-        if type(c) is not TCanvas: continue
-        plotit = False
-        if len(localHistoList) > 0:
-            for n in localHistoList:
-                if n in c.GetName(): plotit = True
-        else:
-            plotit = True
-
-        if not plotit: continue
-        c.cd(1)
-        GlobalCMSLabel.Draw()
-
-def printCMSPreliminary(localHistoList=[]):
-    for c in GlobalCanvasList:
-        if type(c) is not TCanvas: continue
-        plotit = False
-        if len(localHistoList) > 0:
-            for n in localHistoList:
-                if n in c.GetName(): plotit = True
-        else:
-            plotit = True
-        
-        if not plotit: continue
-        c.cd(1)
-        GlobalCMSPreLabel.Draw()
-
-def printCMEnergy(localHistoList=[],cm="13"):
-    GlobalCMEnergyLabel.AddText("#sqrt{s} = "+cm+" TeV")
-    for c in GlobalCanvasList:
-        if type(c) is not TCanvas: continue
-        plotit = False
-        if len(localHistoList) > 0:
-            for n in localHistoList:
-                if n in c.GetName(): plotit = True
-        else:
-            plotit = True
-        
-        if not plotit: continue
-        c.cd(1)
-        GlobalCMEnergyLabel.Draw()
-
-def printLumi(lumi="",localHistoList=[]):
-    GlobalLumiLabel.AddText("L = "+lumi)
-    for c in GlobalCanvasList:
-        if type(c) is not TCanvas: continue
-        plotit = False
-        if len(localHistoList) > 0:
-            for n in localHistoList:
-                if n in c.GetName(): plotit = True
-        else:
-            plotit = True
-        
-        if not plotit: continue
-        c.cd(1)
-        GlobalLumiLabel.Draw()
-
+	
 
 if __name__ == "__main__":
     
@@ -415,42 +430,17 @@ if __name__ == "__main__":
     GlobalPlotRatio = False
     GlobalPlotRatioToSample = ""
     
-    GlobalLumiLabel = TPaveText(0.22,0.76,0.52,0.82,"NDC")
-    GlobalLumiLabel.SetTextColor(kBlack)
-    GlobalLumiLabel.SetFillColor(kWhite)
-    GlobalLumiLabel.SetBorderSize(0)
-    GlobalLumiLabel.SetTextAlign(12)
-    GlobalLumiLabel.SetTextSize(0.035)
-    #GlobalLumiLabel.SetTextFont(42)
-    
-    GlobalCMEnergyLabel = TPaveText(0.22,0.81,0.52,0.87,"NDC")
-    GlobalCMEnergyLabel.SetTextColor(kBlack)
-    GlobalCMEnergyLabel.SetFillColor(kWhite)
-    GlobalCMEnergyLabel.SetBorderSize(0)
-    GlobalCMEnergyLabel.SetTextAlign(12)
-    GlobalCMEnergyLabel.SetTextSize(0.035)
-    #GlobalCMEnergyLabel.SetTextFont(42)
-    
-    GlobalCMSLabel = TPaveText(0.22,0.86,0.52,0.92,"NDC")
-    GlobalCMSLabel.SetTextColor(kBlack)
-    GlobalCMSLabel.SetFillColor(kWhite)
-    GlobalCMSLabel.SetBorderSize(0)
-    GlobalCMSLabel.SetTextAlign(12)
-    GlobalCMSLabel.SetTextSize(0.035)
-    #GlobalCMSLabel.SetTextFont(42)
-    GlobalCMSLabel.AddText("CMS")
-    
-    GlobalCMSPreLabel = TPaveText(0.22,0.86,0.52,0.92,"NDC")
-    GlobalCMSPreLabel.SetTextColor(kBlack)
-    GlobalCMSPreLabel.SetFillColor(kWhite)
-    GlobalCMSPreLabel.SetBorderSize(0)
-    GlobalCMSPreLabel.SetTextAlign(12)
-    GlobalCMSPreLabel.SetTextSize(0.035)
-    #GlobalCMSPreLabel.SetTextFont(42)
-    GlobalCMSPreLabel.AddText("CMS Preliminary")
+    GlobalLumiPos = "left"
+    GlobalLumiValue = "13 TeV"
+    GlobalIsPrel = True
     
     GlobalSampleList=CommonFSQFramework.Core.Util.getAnaDefinition("sam")
     GlobalStyle = CommonFSQFramework.Core.Style.setStyle()
+    # local changes to tdr style
+    GlobalStyle.SetTitleYOffset(1)
+    GlobalStyle.SetPadTickX(0)
+    GlobalStyle.SetPadTickY(0)
+
     for s in GlobalSampleList:
         GlobalSampleDic[s] = s
     

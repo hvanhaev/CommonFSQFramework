@@ -18,18 +18,22 @@ if hsample == "data_MinBias_TuneCUETP8S1-HERAPDF_13TeV-pythia8":
 # use the "cname" variable to set draw properties of the histograms per canvas e.g. plot ranges
 # access the histograms with "h"
 # access the canvas with "c"
+# if a particular canvas plots a ratio panel, you'll have to use the upper pad to set e.g. log scales. Access it with "upperpad"
 # all default ROOT functions can be used here
 #
 
 if cname == "phiRecoTracks_central_minbias":
-    h.GetYaxis().SetRangeUser(0.03,0.05)
-    h.GetYaxis().SetTitle("(1/N_{ev})dN/d#phi")
-    h.GetYaxis().SetTitleOffset(2.0)
+    h.GetYaxis().SetRangeUser(0.031,0.05)
+    h.GetYaxis().SetNdivisions(505)
+    h.GetYaxis().SetTitle("(1/N)dN/d#phi")
     h.GetXaxis().SetTitle("#phi_{track}")
-    h.GetXaxis().SetTitleOffset(1.2)
 
 if cname == "etaRecoTracks_central_minbias":
     h.GetYaxis().SetRangeUser(0.03,0.06)
 
 if cname == "ptRecoTracks_central_minbias":
-    c.cd(1).SetLogy()
+    #c.cd().SetLogy() # use this without ratio panel
+    upperpad.SetLogy() # use with ratio panel
+    h.GetYaxis().SetRangeUser(0.000002,10)
+    h.GetYaxis().SetTitle("(1/N)dN/dp_{T}")
+    h.GetXaxis().SetTitle("track p_{T}")
