@@ -9,7 +9,7 @@ from optparse import OptionParser
 
 from CommonFSQFramework.Core.GetDatasetInfo import getTreeFilesAndNormalizations
 from CommonFSQFramework.Core.Util import getAnaDefinition
-
+from CommonFSQFramework.Core.Util import getVariant
 
 def main():
 
@@ -19,7 +19,9 @@ def main():
     #parser.add_option("-s", "--sample",   action="store", type="string", dest="sample", help="sample name" )
     #parser.add_option("-l", "--listSamples",   action="store", type="string", dest="list", help="listAllSamples" )
     (options, args) = parser.parse_args()
-
+    
+    anaVersion = getVariant()
+    print " Current active skim: ", anaVersion
     anaDef = getAnaDefinition("sam")
     directlyFromRootfile = False
     if len(args) != 1 or (not args[0].endswith(".root") and args[0] not in anaDef):
