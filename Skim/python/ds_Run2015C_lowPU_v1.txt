@@ -1,0 +1,8 @@
+/ZeroBias1/hvanhaev-Run2015C-v1_LowPU_RERECO_74X_dataRun2_Prompt_v2_withCustomCond-v1-b082e4f913e5590a0dda17057a084b91/USER
+/EmptyBX/hvanhaev-Run2015C-v1_LowPU_RERECO_74X_dataRun2_Prompt_v2_withCustomCond-v1-b082e4f913e5590a0dda17057a084b91/USER
+/ReggeGribovPartonMC_13TeV-EPOS/RunIISpring15DR74-NoPURawReco_castor_MCRUN2_74_V8B-v1/GEN-SIM-RECO
+/ReggeGribovPartonMC_13TeV-QGSJetII/RunIISpring15DR74-NoPURawReco_castor_MCRUN2_74_V8B-v1/GEN-SIM-RECO
+/MinBias_TuneZ2star_13TeV-pythia6/RunIISpring15DR74-NoPURawReco_castor_MCRUN2_74_V8B-v1/GEN-SIM-RECO
+/MinBias_TuneCUETP8M1_13TeV-pythia8/RunIISpring15DR74-NoPURawReco_castor_MCRUN2_74_V8B-v1/GEN-SIM-RECO
+/MinBias_TuneMBR_13TeV-pythia8/RunIISpring15DR74-NoPURawReco_castor_MCRUN2_74_V8B-v1/GEN-SIM-RECO
+/MinBias_TuneEE5C_13TeV-herwigpp/RunIISpring15DR74-NoPURawReco_castor_MCRUN2_74_V8B-v1/GEN-SIM-RECO
