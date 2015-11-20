@@ -39,7 +39,7 @@ def isData(ds):
 def json(ds):
     realData = isData(ds)
     if realData:
-        if "Run2015D" in ds: return "CommonFSQFramework/Skim/lumi/Run2015D_lowPU.json"
+        if "Run2015D" in ds: return "CommonFSQFramework/Skim/lumi/Cert_259152-259431_13TeV_PromptReco_Collisions15_25ns_Totem_JSON.txt"
     else:
         return ""
 
