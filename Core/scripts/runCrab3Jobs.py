@@ -64,7 +64,7 @@ for s in sampleListTodo:
   pycfgextra = []  
   pycfgextra.append("config.General.workArea='"+anaVersion+"'")
   pycfgextra.append("config.General.requestName='"+name+"'")
-  pycfgextra.append("config.Data.publishDataName='"+name+"'")
+  pycfgextra.append("config.Data.outputDatasetTag='"+name+"'")
   pycfgextra.append("config.Data.inputDataset='"+sampleList[s]["DS"]+"'")
   # customize when running on private datasets
   if "/USER" in sampleList[s]["DS"]: 
