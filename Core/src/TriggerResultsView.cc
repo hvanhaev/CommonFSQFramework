@@ -2,8 +2,8 @@
 #include "FWCore/Common/interface/TriggerResultsByName.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
 
-TriggerResultsView::TriggerResultsView(const edm::ParameterSet& iConfig, TTree * tree):
-EventViewBase(iConfig,  tree)
+TriggerResultsView::TriggerResultsView(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC, edm::EDAnalyzer* module):
+EventViewBase(iConfig,  tree), hltprovider_(iConfig, iC, *module)
 {
     // fetch config data
     m_process = iConfig.getParameter<std::string>("process");
@@ -14,6 +14,7 @@ EventViewBase(iConfig,  tree)
         // check, if it's for L1GT readout
         if (m_triggerNames.at(i).find("L1GT") != std::string::npos) {
             m_triggerClasses[m_triggerNames.at(i)] = std::vector<std::string>();
+
         } else if (iConfig.exists(m_triggerNames.at(i))) {
             std::vector<std::string> triggerClass =  iConfig.getParameter<std::vector<std::string> >(m_triggerNames.at(i));
             m_triggerClasses[m_triggerNames.at(i)] = triggerClass;
@@ -39,48 +40,50 @@ EventViewBase(iConfig,  tree)
     std::map<std::string, std::vector<std::string> >::const_iterator it, itE;
     it = m_triggerClasses.begin();
     itE = m_triggerClasses.end();
-    for(;it != itE;++it){
+    for(;it != itE;++it) {
         if (it->first.find("L1GT") != std::string::npos) {
             registerVecInt(it->first, tree);
         } else {
             registerInt(it->first, tree);
 	    
-	    if (m_storePrescales) {
-	        if (it->second.size() == 1) {
-		    std::string name = it->second.at(0);
-		    if (name.find("*")!= std::string::npos){ // wildcard entry
-		        // do nothing
-		    } else {
-		        registerInt("L1PS_" + it->first, tree);
-			registerInt("HLTPS_" + it->first, tree);
-		    }
-		} else {
-	            for (unsigned int i=0; i < it->second.size();++i){
+            if (m_storePrescales) {
+                if (it->second.size() == 1) {
+                    std::string name = it->second.at(0);
+                    if (name.find("*")!= std::string::npos){ // wildcard entry
+                        // do nothing
+                    } else {
+                        registerInt("L1PS_" + it->first, tree);
+                        registerInt("HLTPS_" + it->first, tree);
+                    }
+                } else {
+                    for (unsigned int i=0; i < it->second.size();++i) {
                         std::string name = it->second.at(i);
                         if (name.find("*")!= std::string::npos){ // wildcard entry
                             // do not store prescales for wildcard triggers as we can not easily fetch the complete trigger name.
-                        
                         } else { // normal entry
                             registerInt("L1PS_" + name, tree);
-			    registerInt("HLTPS_" + name, tree);
+                            registerInt("HLTPS_" + name, tree);
                         }
                     }
-	        }
+                }
             }
         }
     }
+
+    // register consumes
+    iC.consumes<L1GlobalTriggerReadoutRecord>(edm::InputTag("gtDigis"));
 }
 
 void TriggerResultsView::doBeginRun(const edm::Run& r, const edm::EventSetup& es) {
     
     //std::cout << "This is executed during doBeginRun() in the TriggerResultsView" << std::endl;
     bool changed = true;
-    isValidHLTConfig_ = hltConfig_.init(r,es,"*",changed);
+    isValidHLTConfig_ = hltprovider_.init(r,es,"*",changed);
     
 }
 
 
-void TriggerResultsView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSetup){
+void TriggerResultsView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
     edm::TriggerResultsByName trbn = iEvent.triggerResultsByName(m_process);
     // TODO error message?
@@ -109,12 +112,12 @@ void TriggerResultsView::fillSpecific(const edm::Event& iEvent, const edm::Event
     std::map<std::string, std::vector<std::string> >::const_iterator it, itE;
     it = m_triggerClasses.begin();
     itE = m_triggerClasses.end();
-    for(;it != itE;++it){
+    for(;it != itE;++it) {
         //it->first  - branch name
         //it->second - list of triggers to check
         //
         //std::cout << "Trying " << it->first << std::endl;
-	
+
         if (it->first == "L1GTTech") {
             for (unsigned int i=0; i < TechTrigg.size(); ++i) addToIVec(it->first, TechTrigg.at(i));
             continue;
@@ -124,42 +127,38 @@ void TriggerResultsView::fillSpecific(const edm::Event& iEvent, const edm::Event
         }
 
         int accept = 0;
-	
-	if (m_storePrescales && it->second.size() == 1) {
-	    std::string name = it->second.at(0);
-            if (name.find("*")!= std::string::npos){ // wildcard entry
-	        // do nothing
-	    } else {
-	       setI("L1PS_" + it->first, (hltConfig_.prescaleValues(iEvent, iSetup, name)).first );
-	       setI("HLTPS_" + it->first, (hltConfig_.prescaleValues(iEvent, iSetup, name)).second );
+
+        if (m_storePrescales && it->second.size() == 1) {
+            std::string name = it->second.at(0);
+            if (name.find("*")!= std::string::npos) { // wildcard entry
+                // do nothing
+            } else {
+                // setI("L1PS_" + it->first, (hltprovider_.prescaleValues(iEvent, iSetup, name)).first );
+                // setI("HLTPS_" + it->first, (hltprovider_.prescaleValues(iEvent, iSetup, name)).second );
             }
-	}
-	
-        for (unsigned int i=0; i < it->second.size();++i){
+        }
+
+        for (unsigned int i=0; i < it->second.size();++i) {
             std::string name = it->second.at(i);
-            if (name.find("*")!= std::string::npos){ // wildcard entry
+            if (name.find("*")!= std::string::npos) { // wildcard entry
                 //std::cout << "TODO:" << it->second.at(i) << std::endl;
-                for (unsigned iName = 0; iName < names.size(); ++iName){
+                for (unsigned iName = 0; iName < names.size(); ++iName) {
                     std::string nameForSearch = std::string(it->second.at(i), 0, it->second.at(i).size()-1); // strip the star
                     if (names.at(iName).find(nameForSearch)==0) { // starts with
                         //std::cout << "Found for start\n";
-			//std::cout << " found trigger: " << names.at(iName) << std::endl;
+                        //std::cout << " found trigger: " << names.at(iName) << std::endl;
                         if (trbn.accept(names.at(iName)))  accept = 1;
                     }
                 }
             } else { // normal entry
                 if (trbn.accept( it->second.at(i))) accept = 1;
-		if (m_storePrescales) {
-		    setI("L1PS_" + name, (hltConfig_.prescaleValues(iEvent, iSetup, name)).first );
-	            setI("HLTPS_" + name, (hltConfig_.prescaleValues(iEvent, iSetup, name)).second );
-		}
+                if (m_storePrescales) {
+                    // setI("L1PS_" + name, (hltprovider_.prescaleValues(iEvent, iSetup, name)).first );
+                    // setI("HLTPS_" + name, (hltprovider_.prescaleValues(iEvent, iSetup, name)).second );
+                }
             }
             //std::cout << "Accept: " << it->first <<  " "  << accept << std::endl;
             setI(it->first, accept);
         }
     }
-
-
-
-
 }

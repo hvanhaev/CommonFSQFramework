@@ -1,7 +1,8 @@
 #include "CommonFSQFramework/Core/interface/GenJetView.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
+#include "FWCore/Framework/interface/ConsumesCollector.h"
 
-GenJetView::GenJetView(const edm::ParameterSet& iConfig, TTree * tree):
+GenJetView::GenJetView(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
 EventViewBase(iConfig,  tree)
 {
 
@@ -16,7 +17,8 @@ EventViewBase(iConfig,  tree)
     m_minPt = iConfig.getParameter<double>("minPt");
     m_genJets = iConfig.getParameter<edm::InputTag>("genJets");
 
-
+    // register consumes
+    iC.consumes<std::vector<reco::GenJet> >(m_genJets);
 }
 
 

@@ -5,7 +5,7 @@
 
 class GenPartView: public EventViewBase{
     public:
-       GenPartView(const edm::ParameterSet& ps, TTree * tree);
+       GenPartView(const edm::ParameterSet& ps, TTree * tree, edm::ConsumesCollector && iC);
 
     private:
       virtual void fillSpecific(const edm::Event&, const edm::EventSetup&);
