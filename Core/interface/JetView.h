@@ -11,7 +11,7 @@
 
 class JetView: public EventViewBase{
     public:
-       JetView(const edm::ParameterSet& ps, TTree * tree);
+       JetView(const edm::ParameterSet& ps, TTree * tree, edm::ConsumesCollector && iC);
 
     private:
       virtual void fillSpecific(const edm::Event&, const edm::EventSetup&);
@@ -40,7 +40,5 @@ class JetView: public EventViewBase{
       bool m_disableJetID;
 
       int m_storageVersion; // 0 - use p4; 1 - use floats for pt, eta, phi
-
-
 };
 #endif

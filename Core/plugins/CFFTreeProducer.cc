@@ -121,23 +121,23 @@ CFFTreeProducer::CFFTreeProducer(const edm::ParameterSet& iConfig)
         prefixes.insert(prefix);
 
         if (miniViewType == "TrackJetView") {
-            m_views.push_back(new TrackJetView(pset, m_tree));
+            m_views.push_back(new TrackJetView(pset, m_tree, this->consumesCollector()));
         }
         else if (miniViewType == "JetView") {
-            m_views.push_back(new JetView(pset, m_tree));
+            m_views.push_back(new JetView(pset, m_tree, this->consumesCollector()));
         }
         else if (miniViewType == "TriggerResultsView") {
-            m_views.push_back(new TriggerResultsView(pset, m_tree));
+            m_views.push_back(new TriggerResultsView(pset, m_tree, this->consumesCollector(), this));
         }
         else if (miniViewType == "GenericCandidateView") {
-            m_views.push_back(new GenericCandidateView(pset, m_tree));
+            m_views.push_back(new GenericCandidateView(pset, m_tree, this->consumesCollector()));
         }
         else if (miniViewType == "GenPartView") {
-            m_views.push_back(new GenPartView(pset, m_tree));
+            m_views.push_back(new GenPartView(pset, m_tree, this->consumesCollector()));
         }
-	else if (miniViewType == "GenJetView") {
-	    m_views.push_back(new GenJetView(pset, m_tree));
-	}
+        else if (miniViewType == "GenJetView") {
+            m_views.push_back(new GenJetView(pset, m_tree, this->consumesCollector()));
+        }
         else if (miniViewType == "RecoTrackView") {
             m_views.push_back(new RecoTrackView(pset, m_tree));
         }

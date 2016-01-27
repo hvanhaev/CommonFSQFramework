@@ -1,7 +1,8 @@
 #include "CommonFSQFramework/Core/interface/GenPartView.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "FWCore/Framework/interface/ConsumesCollector.h"
 
-GenPartView::GenPartView(const edm::ParameterSet& iConfig, TTree * tree):
+GenPartView::GenPartView(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
 EventViewBase(iConfig,  tree)
 {
 
@@ -21,7 +22,8 @@ EventViewBase(iConfig,  tree)
         throw "charge parameter not equal to -1(save all)/0(save neutrals)/1(save charded)\n";
     }
 
-
+    // register consumes
+    iC.consumes<std::vector<reco::GenParticle> >(m_GenParts);
 }
 
 

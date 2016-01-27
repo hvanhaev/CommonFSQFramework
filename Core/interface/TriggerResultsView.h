@@ -2,11 +2,11 @@
 #define TriggerResultsView_h
 
 #include "CommonFSQFramework/Core/interface/EventViewBase.h"
-#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
+#include "HLTrigger/HLTcore/interface/HLTPrescaleProvider.h"
 
 class TriggerResultsView: public EventViewBase{
     public:
-       TriggerResultsView(const edm::ParameterSet& ps, TTree * tree);
+       TriggerResultsView(const edm::ParameterSet& ps, TTree * tree, edm::ConsumesCollector && iC, edm::EDAnalyzer* module);
        void doBeginRun(const edm::Run&, const edm::EventSetup&);
 
     private:
@@ -16,9 +16,7 @@ class TriggerResultsView: public EventViewBase{
       std::map<std::string, std::vector<std::string > > m_triggerClasses;
       bool m_storePrescales;
 
-      HLTConfigProvider hltConfig_;
+      HLTPrescaleProvider hltprovider_;
       bool isValidHLTConfig_;
-
-
 };
 #endif

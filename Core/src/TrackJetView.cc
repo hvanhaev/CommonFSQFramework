@@ -1,10 +1,10 @@
 #include "CommonFSQFramework/Core/interface/TrackJetView.h"
 #include "DataFormats/JetReco/interface/TrackJetCollection.h"
+#include "FWCore/Framework/interface/ConsumesCollector.h"
 
-TrackJetView::TrackJetView(const edm::ParameterSet& iConfig, TTree * tree):
+TrackJetView::TrackJetView(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
 EventViewBase(iConfig,  tree)
 {
-
     // register branches
     registerVecP4("p4", tree);
     registerVecInt("nConst", tree);
@@ -17,7 +17,8 @@ EventViewBase(iConfig,  tree)
     m_minPt = iConfig.getParameter<double>("minPt");
     m_TrackJets =iConfig.getParameter<edm::InputTag>("input");
 
-
+    // register consumes
+    iC.consumes<reco::TrackJetCollection>(m_TrackJets);
 }
 
 

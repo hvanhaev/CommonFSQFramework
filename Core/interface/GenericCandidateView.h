@@ -5,7 +5,7 @@
 
 class GenericCandidateView: public EventViewBase{
     public:
-       GenericCandidateView(const edm::ParameterSet& ps, TTree * tree);
+       GenericCandidateView(const edm::ParameterSet& ps, TTree * tree, edm::ConsumesCollector && iC);
 
     private:
       virtual void fillSpecific(const edm::Event&, const edm::EventSetup&);

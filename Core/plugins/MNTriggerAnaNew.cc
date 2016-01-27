@@ -115,13 +115,13 @@ MNTriggerAnaNew::MNTriggerAnaNew(const edm::ParameterSet& iConfig)
 
     if (iConfig.exists("JetViewCalo"))
     {
-        m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewCalo"), m_tree));
+        m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewCalo"), m_tree, this->consumesCollector()));
     } else {
         std::cout << "Disabling JetViewCalo" << std::endl;
     }
     //m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPF"), m_tree));
     if (iConfig.exists("JetViewPFAK4CHS")){
-        m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPFAK4CHS"), m_tree));
+        m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPFAK4CHS"), m_tree, this->consumesCollector()));
     } else {
         std::cout << "Disabling JetViewPFAK4CHS" << std::endl;
     }
@@ -146,7 +146,7 @@ MNTriggerAnaNew::MNTriggerAnaNew(const edm::ParameterSet& iConfig)
     //m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewStage1Tau"), m_tree));
     //m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewStage1All"), m_tree));
     if (iConfig.exists("TriggerResultsView")){
-        m_views.push_back(new TriggerResultsView(iConfig.getParameter< edm::ParameterSet >("TriggerResultsView"), m_tree));
+        m_views.push_back(new TriggerResultsView(iConfig.getParameter< edm::ParameterSet >("TriggerResultsView"), m_tree, this->consumesCollector(), this));
     } else {
         std::cout << "Disabling TriggerResultsView " << std::endl;
     }

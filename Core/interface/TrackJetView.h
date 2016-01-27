@@ -5,15 +5,12 @@
 
 class TrackJetView: public EventViewBase{
     public:
-       TrackJetView(const edm::ParameterSet& ps, TTree * tree);
+      TrackJetView(const edm::ParameterSet& ps, TTree * tree, edm::ConsumesCollector && iC);
 
     private:
       virtual void fillSpecific(const edm::Event&, const edm::EventSetup&);
       float m_maxEta; // 
       float m_minPt;
       edm::InputTag m_TrackJets;
-
-
-
 };
 #endif
