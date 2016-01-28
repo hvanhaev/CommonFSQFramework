@@ -508,7 +508,7 @@ class ExampleProofReader( ROOT.TPySelector ):
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
     ROOT.gSystem.Load("libFWCoreFWLite.so")
-    ROOT.AutoLibraryLoader.enable()
+    ROOT.FWLiteEnabler.enable()
 
     slaveParams = {}
 

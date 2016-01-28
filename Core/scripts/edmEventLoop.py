@@ -29,5 +29,5 @@ def main():
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
     ROOT.gSystem.Load("libFWCoreFWLite.so")
-    AutoLibraryLoader.enable()
+    FWLiteEnabler.enable()
     main()

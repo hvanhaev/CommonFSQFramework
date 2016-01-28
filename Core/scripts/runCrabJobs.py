@@ -8,7 +8,7 @@ ROOT.gROOT.SetBatch(True)
 # for fileinpath
 from ROOT import *
 ROOT.gSystem.Load("libFWCoreFWLite.so")
-AutoLibraryLoader.enable()
+FWLiteEnabler.enable()
 
 import CommonFSQFramework.Core.Util
 

@@ -279,7 +279,7 @@ import inspect
 
 if __name__ == "__main__":
     ROOT.gSystem.Load("libFWCoreFWLite.so")
-    ROOT.AutoLibraryLoader.enable()
+    FWLiteEnabler.enable()
 
     parser = OptionParser(usage="usage: %prog [options] filename",version="%prog 1.0")
                             
