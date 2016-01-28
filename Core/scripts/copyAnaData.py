@@ -6,7 +6,7 @@ ROOT.gROOT.SetBatch(True)
 
 from ROOT import *
 ROOT.gSystem.Load("libFWCoreFWLite.so")
-AutoLibraryLoader.enable()
+FWLiteEnabler.enable()
 
 from optparse import OptionParser
 import subprocess

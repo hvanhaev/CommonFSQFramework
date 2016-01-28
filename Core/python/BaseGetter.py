@@ -1,7 +1,7 @@
 import ROOT
 ROOT.gROOT.SetBatch(True)
 ROOT.gSystem.Load("libFWCoreFWLite.so")
-ROOT.AutoLibraryLoader.enable()
+ROOT.FWLiteEnabler.enable()
 
 class Entry:
     def __init__(self, chain, branchPrefix, variation, branchStore, index):
