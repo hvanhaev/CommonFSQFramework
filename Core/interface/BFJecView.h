@@ -5,7 +5,7 @@
 
 class BFJecView: public EventViewBase{
     public:
-       BFJecView(const edm::ParameterSet& ps, TTree * tree);
+       BFJecView(const edm::ParameterSet& ps, TTree * tree, edm::ConsumesCollector && iC);
 
     private:
       virtual void fillSpecific(const edm::Event&, const edm::EventSetup&);

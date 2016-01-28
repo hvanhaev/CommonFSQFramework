@@ -1,9 +1,11 @@
 #include "CommonFSQFramework/Core/interface/HBHERecHitView.h"
 
-HBHERecHitView::HBHERecHitView(const edm::ParameterSet& iConfig, TTree * tree):
+HBHERecHitView::HBHERecHitView(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
 EventViewBase(iConfig,  tree)
 {
-
+    // register data access
+    iC.consumes< HBHERecHitCollection >(edm::InputTag("hbhereco"));
+  
     registerVecFloat("energy", tree);
     registerVecFloat("Et", tree);
     registerVecFloat("time", tree);

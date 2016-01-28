@@ -82,6 +82,10 @@ SaveCountHistoInTreeFile::SaveCountHistoInTreeFile(const edm::ParameterSet& iCon
 m_evCnt(0),
 m_evCntSeenByTreeProducers(0)
 {
+    // allow data access through consumes
+    this->consumes<edm::MergeableCounter,edm::InLumi>(edm::InputTag("initialCntr"));
+    this->consumes<double>(edm::InputTag("XS"));
+
    //now do what ever initialization is needed
     edm::Service<TFileService> tFileService;
     m_cntHisto = tFileService->make<TH1D>("cntHisto", "cntHisto", 10, -0.5, 9.5);

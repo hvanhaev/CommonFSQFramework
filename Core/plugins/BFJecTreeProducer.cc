@@ -86,8 +86,8 @@ BFJecTreeProducer::BFJecTreeProducer(const edm::ParameterSet& iConfig)
 {
     edm::Service<TFileService> tFileService;
     m_tree = tFileService->make<TTree>("data", "data");
-    m_views.push_back(new EventIdData(iConfig, m_tree));
-    m_views.push_back(new BFJecView(iConfig.getParameter< edm::ParameterSet >("BFJecView"), m_tree));
+    m_views.push_back(new EventIdData(iConfig, m_tree, this->consumesCollector()));
+    m_views.push_back(new BFJecView(iConfig.getParameter< edm::ParameterSet >("BFJecView"), m_tree, this->consumesCollector()));
 
 }
 

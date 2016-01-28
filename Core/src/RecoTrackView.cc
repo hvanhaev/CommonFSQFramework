@@ -4,8 +4,7 @@
 #include "CommonFSQFramework/Core/interface/TestTrackData.h"
 
 
-
-RecoTrackView::RecoTrackView(const edm::ParameterSet& iConfig, TTree * tree):
+RecoTrackView::RecoTrackView(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
 EventViewBase(iConfig,  tree)
 {
     registerVecP4("p4", tree);
@@ -35,7 +34,9 @@ EventViewBase(iConfig,  tree)
     m_testTrackData[getPrefix()+"testTrkData"] = std::vector<tmf::TestTrackData>();
     tree->Branch((getPrefix()+"testTrkData").c_str(), "std::vector< tmf::TestTrackData >", &m_testTrackData[getPrefix()+"testTrkData"]);
 
-
+    // register consumes
+    iC.consumes< std::vector<reco::Vertex> >(edm::InputTag("offlinePrimaryVerticesWithBS"));
+    iC.consumes< std::vector<reco::Track> >(m_inputCol);
 
     
 

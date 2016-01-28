@@ -8,9 +8,11 @@
 #include "CondFormats/DataRecord/interface/CastorChannelQualityRcd.h"
 #include "DataFormats/METReco/interface/HcalCaloFlagLabels.h"
 
-CastorRecHitView::CastorRecHitView(const edm::ParameterSet& iConfig, TTree * tree):
+CastorRecHitView::CastorRecHitView(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
 EventViewBase(iConfig,  tree)
 {
+   // register data access
+   iC.consumes< edm::SortedCollection<CastorRecHit,edm::StrictWeakOrdering<CastorRecHit> > >(edm::InputTag("castorreco"));
    // fetch config data
    m_onlyGoodRecHits = iConfig.getParameter<bool>("onlyGoodRecHits");
    m_saturationInfo = iConfig.getParameter<bool>("writeSaturationInfo");
@@ -38,6 +40,10 @@ void CastorRecHitView::fillSpecific(const edm::Event& iEvent, const edm::EventSe
    edm::ESHandle<CastorChannelQuality> p;
    iSetup.get<CastorChannelQualityRcd>().get(p);
    std::vector<DetId> channels = p->getAllChannels();
+
+   // check for correct collection size
+   if (castorRecHits->size() != 224)
+        return;
 
    // add rechits to tree
     for (unsigned int iRecHit=0; iRecHit < castorRecHits->size(); ++iRecHit) {

@@ -133,8 +133,8 @@ void TriggerResultsView::fillSpecific(const edm::Event& iEvent, const edm::Event
             if (name.find("*")!= std::string::npos) { // wildcard entry
                 // do nothing
             } else {
-                // setI("L1PS_" + it->first, (hltprovider_.prescaleValues(iEvent, iSetup, name)).first );
-                // setI("HLTPS_" + it->first, (hltprovider_.prescaleValues(iEvent, iSetup, name)).second );
+                 setI("L1PS_" + it->first, (hltprovider_.prescaleValues(iEvent, iSetup, name)).first );
+                 setI("HLTPS_" + it->first, (hltprovider_.prescaleValues(iEvent, iSetup, name)).second );
             }
         }
 
@@ -153,8 +153,8 @@ void TriggerResultsView::fillSpecific(const edm::Event& iEvent, const edm::Event
             } else { // normal entry
                 if (trbn.accept( it->second.at(i))) accept = 1;
                 if (m_storePrescales) {
-                    // setI("L1PS_" + name, (hltprovider_.prescaleValues(iEvent, iSetup, name)).first );
-                    // setI("HLTPS_" + name, (hltprovider_.prescaleValues(iEvent, iSetup, name)).second );
+                     setI("L1PS_" + name, (hltprovider_.prescaleValues(iEvent, iSetup, name)).first );
+                     setI("HLTPS_" + name, (hltprovider_.prescaleValues(iEvent, iSetup, name)).second );
                 }
             }
             //std::cout << "Accept: " << it->first <<  " "  << accept << std::endl;

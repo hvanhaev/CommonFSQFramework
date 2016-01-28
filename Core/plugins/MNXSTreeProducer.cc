@@ -124,7 +124,7 @@ m_eventsSeen(0)
 
     edm::Service<TFileService> tFileService;
     m_tree = tFileService->make<TTree>("data", "data");
-    m_views.push_back(new EventIdData(iConfig, m_tree));
+    m_views.push_back(new EventIdData(iConfig, m_tree, this->consumesCollector()));
     m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPF"), m_tree, this->consumesCollector()));
     m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewCalo"), m_tree, this->consumesCollector()));
     m_views.push_back(new TriggerResultsView(iConfig.getParameter< edm::ParameterSet >("TriggerResultsView"), m_tree, this->consumesCollector(), this));

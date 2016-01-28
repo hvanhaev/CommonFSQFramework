@@ -2,17 +2,15 @@
 
 
 
-CastorTowerView::CastorTowerView(const edm::ParameterSet& iConfig, TTree * tree):
+CastorTowerView::CastorTowerView(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
 EventViewBase(iConfig,  tree)
 {
+    m_inputCol = iConfig.getParameter<edm::InputTag>("inputcoll");
+    iC.consumes< reco::CastorTowerCollection >(edm::InputTag(m_inputCol)); 
     registerVecP4("p4", tree);
     registerVecFloat("emEnergy",tree);
     registerVecFloat("hadEnergy",tree);
-    registerVecInt("Nrechits", tree);
-
-
-    m_inputCol = iConfig.getParameter<edm::InputTag>("inputcoll");
-    
+    registerVecInt("Nrechits", tree);    
 
 }
 

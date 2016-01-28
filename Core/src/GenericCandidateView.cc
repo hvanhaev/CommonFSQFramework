@@ -1,6 +1,5 @@
 #include "CommonFSQFramework/Core/interface/GenericCandidateView.h"
 #include "DataFormats/L1Trigger/interface/L1JetParticle.h"
-#include "FWCore/Framework/interface/ConsumesCollector.h"
 
 GenericCandidateView::GenericCandidateView(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
 EventViewBase(iConfig,  tree)

@@ -1,8 +1,10 @@
 #include "CommonFSQFramework/Core/interface/HFRecHitView.h"
 
-HFRecHitView::HFRecHitView(const edm::ParameterSet& iConfig, TTree * tree):
+HFRecHitView::HFRecHitView(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
 EventViewBase(iConfig,  tree)
 {
+    // register data access
+    iC.consumes< HFRecHitCollection >(edm::InputTag("hfreco",""));
 
     registerVecFloat("energy", tree);
     registerVecFloat("Et", tree);

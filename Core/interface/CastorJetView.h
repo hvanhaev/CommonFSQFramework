@@ -7,7 +7,7 @@
 
 class CastorJetView: public EventViewBase {
     public:
-       CastorJetView(const edm::ParameterSet& ps, TTree * tree);
+       CastorJetView(const edm::ParameterSet& ps, TTree * tree, edm::ConsumesCollector && iC);
 
     private:
       virtual void fillSpecific(const edm::Event&, const edm::EventSetup&);  

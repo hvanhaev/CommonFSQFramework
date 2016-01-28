@@ -108,7 +108,7 @@ MNTriggerAnaHLTJECOnFly::MNTriggerAnaHLTJECOnFly(const edm::ParameterSet& iConfi
     edm::Service<TFileService> tFileService;
     m_tree = tFileService->make<TTree>("data", "data");
 
-    m_views.push_back(new EventIdData(iConfig, m_tree));
+    m_views.push_back(new EventIdData(iConfig, m_tree, this->consumesCollector()));
     m_todoHltCollections["ak4GenJets"] = edm::InputTag("ak4GenJets");
     m_todoHltCollections["hltAK4PFJets"] = edm::InputTag("hltAK4PFJets");
     m_todoHltCollections["hltAK4PFJetsCorrected"]  = edm::InputTag("hltAK4PFJetsCorrected", "", "TEST");

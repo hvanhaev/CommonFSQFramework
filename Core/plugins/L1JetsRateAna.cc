@@ -86,9 +86,9 @@ L1JetsRateAna::L1JetsRateAna(const edm::ParameterSet& iConfig)
 {
     edm::Service<TFileService> tFileService;
     m_tree = tFileService->make<TTree>("data", "data");
-    m_views.push_back(new EventIdData(iConfig, m_tree));
-    m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsView"), m_tree));
-    m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewStage1"), m_tree));
+    m_views.push_back(new EventIdData(iConfig, m_tree, this->consumesCollector()));
+    m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsView"), m_tree, this->consumesCollector()));
+    m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewStage1"), m_tree, this->consumesCollector()));
 
 }
 

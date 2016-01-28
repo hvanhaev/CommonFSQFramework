@@ -1,11 +1,15 @@
 #include "CommonFSQFramework/Core/interface/L1JetsView.h"
 #include "DataFormats/L1Trigger/interface/L1JetParticle.h"
 
-L1JetsView::L1JetsView(const edm::ParameterSet& iConfig, TTree * tree):
+L1JetsView::L1JetsView(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
 EventViewBase(iConfig,  tree)
 {
     registerVecP4("L1Jets", tree);
     m_todo = iConfig.getParameter< std::vector<edm::InputTag > >("src");
+    
+    for (unsigned int i = 0; i < m_todo.size();++i){
+       iC.consumes< std::vector<l1extra::L1JetParticle> >(m_todo.at(i));
+    }
 }
 
 

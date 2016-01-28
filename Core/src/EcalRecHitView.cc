@@ -1,9 +1,13 @@
 #include "CommonFSQFramework/Core/interface/EcalRecHitView.h"
 
-EcalRecHitView::EcalRecHitView(const edm::ParameterSet& iConfig, TTree * tree):
+EcalRecHitView::EcalRecHitView(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
 EventViewBase(iConfig,  tree)
 {
 
+    // register data access
+    iC.consumes< EBRecHitCollection >(edm::InputTag("ecalRecHit","EcalRecHitsEB"));
+    iC.consumes< EERecHitCollection >(edm::InputTag("ecalRecHit","EcalRecHitsEE"));
+    
     registerVecFloat("energy", tree);
     registerVecFloat("Et", tree);
     registerVecFloat("time", tree);

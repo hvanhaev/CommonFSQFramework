@@ -2,9 +2,10 @@
 #include "DataFormats/JetReco/interface/Jet.h"
 #include <DataFormats/Math/interface/deltaR.h>
 
-BFJecView::BFJecView(const edm::ParameterSet& iConfig, TTree * tree):
+BFJecView::BFJecView(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
 EventViewBase(iConfig,  tree)
 {
+
     //registerVecP4("L1Jets", tree);
     m_todoJets = iConfig.getParameter<std::vector<std::string> >("todoJets");
     m_minPT = iConfig.getParameter<double>("minPT");
@@ -36,6 +37,15 @@ EventViewBase(iConfig,  tree)
         }
     }
 
+
+    // register consumes
+    for (unsigned int i = 0; i < m_todoJets.size();++i){
+        if (m_rhos.at(i).label() != ""){
+            iC.consumes< double >(m_rhos.at(i));    
+        }
+        iC.consumes< edm::View<reco::Jet> >(m_todoRecoJets.at(i));    
+        iC.consumes< edm::View<reco::Jet> >(m_todoGenJets.at(i));    
+    }   
 }
 
 

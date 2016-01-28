@@ -2,9 +2,10 @@
 
 
 
-CaloTowerView::CaloTowerView(const edm::ParameterSet& iConfig, TTree * tree):
+CaloTowerView::CaloTowerView(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
 EventViewBase(iConfig,  tree)
 {
+    // get config
     registerVecP4("p4", tree);
     
     registerVecFloat("emEnergy", tree);
@@ -16,8 +17,10 @@ EventViewBase(iConfig,  tree)
     registerVecInt("hasHE", tree);
     registerVecInt("hasHF", tree);
 
-
     m_inputCol = iConfig.getParameter<edm::InputTag>("inputcoll");
+
+    // register data access
+    iC.consumes< CaloTowerCollection >(m_inputCol);
     
 
 }

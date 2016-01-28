@@ -1,6 +1,5 @@
 #include "CommonFSQFramework/Core/interface/TrackJetView.h"
 #include "DataFormats/JetReco/interface/TrackJetCollection.h"
-#include "FWCore/Framework/interface/ConsumesCollector.h"
 
 TrackJetView::TrackJetView(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
 EventViewBase(iConfig,  tree)

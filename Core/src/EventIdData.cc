@@ -8,10 +8,19 @@
 #include "SimDataFormats/Vertex/interface/SimVertexContainer.h"
 #include "TLorentzVector.h"
 
-EventIdData::EventIdData(const edm::ParameterSet& iConfig, TTree * tree):
+EventIdData::EventIdData(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
 EventViewBase(iConfig, tree)
 {
 
+    // register data access
+    iC.consumes< GenEventInfoProduct >(edm::InputTag("generator"));
+    iC.consumes< reco::GenParticleCollection >(edm::InputTag("genParticles"));
+    iC.consumes< edm::SimVertexContainer >(edm::InputTag("g4SimHits"));
+    iC.consumes< std::vector<PileupSummaryInfo> >(edm::InputTag("addPileupInfo"));
+
+    iC.consumes< std::vector<LumiDetails>,edm::InLumi >(edm::InputTag("lumiProducer"));
+
+    // register branches
     registerInt("run", tree);
     registerInt("lumi", tree);
     registerInt("event", tree);

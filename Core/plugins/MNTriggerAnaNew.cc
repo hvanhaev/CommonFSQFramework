@@ -98,16 +98,16 @@ MNTriggerAnaNew::MNTriggerAnaNew(const edm::ParameterSet& iConfig)
     edm::Service<TFileService> tFileService;
     m_tree = tFileService->make<TTree>("data", "data");
 
-    m_views.push_back(new EventIdData(iConfig, m_tree));
+    m_views.push_back(new EventIdData(iConfig, m_tree, this->consumesCollector()));
     //*
     //
     if (iConfig.exists("recoPFAK4ChsCorrected")){
-        m_views.push_back(new JetsJEC(iConfig.getParameter< edm::ParameterSet >("recoPFAK4ChsCorrected"), m_tree));
+        m_views.push_back(new JetsJEC(iConfig.getParameter< edm::ParameterSet >("recoPFAK4ChsCorrected"), m_tree, this->consumesCollector()));
     } else {
         std::cout << "Disabling recoPFAK4ChsCorrected" << std::endl;
     }
     if (iConfig.exists("recoPFAK4ChsCorrectedMyRho")){
-        m_views.push_back(new JetsJEC(iConfig.getParameter< edm::ParameterSet >("recoPFAK4ChsCorrectedMyRho"), m_tree));
+        m_views.push_back(new JetsJEC(iConfig.getParameter< edm::ParameterSet >("recoPFAK4ChsCorrectedMyRho"), m_tree, this->consumesCollector()));
     } else {
         std::cout << "Disabling recoPFAK4ChsCorrectedMyRho" << std::endl;
     }
@@ -119,38 +119,38 @@ MNTriggerAnaNew::MNTriggerAnaNew(const edm::ParameterSet& iConfig)
     } else {
         std::cout << "Disabling JetViewCalo" << std::endl;
     }
-    //m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPF"), m_tree));
+    //m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPF"), m_tree, this->consumesCollector()));
     if (iConfig.exists("JetViewPFAK4CHS")){
         m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPFAK4CHS"), m_tree, this->consumesCollector()));
     } else {
         std::cout << "Disabling JetViewPFAK4CHS" << std::endl;
     }
-    //m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPFAK5CHS"), m_tree));*/
+    //m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewPFAK5CHS"), m_tree, this->consumesCollector()));*/
     if (iConfig.exists("L1JetsView")){
-        m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsView"), m_tree));
+        m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsView"), m_tree, this->consumesCollector()));
     } else {
         std::cout << "Disabling L1JetsView (legacy l1)" << std::endl;
     }
     if (iConfig.exists("L1JetsViewStage1")){
-        m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewStage1"), m_tree));
+        m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewStage1"), m_tree, this->consumesCollector()));
     } else {
         std::cout << "Disabling L1JetsViewStage1 " << std::endl;
     }
 
     if (iConfig.exists("L1JetsViewRedone")){
-        m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewRedone"), m_tree));
+        m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewRedone"), m_tree, this->consumesCollector()));
     } else {
         std::cout << "Disabling L1JetsViewRedone " << std::endl;
     }
 
-    //m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewStage1Tau"), m_tree));
-    //m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewStage1All"), m_tree));
+    //m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewStage1Tau"), m_tree, this->consumesCollector()));
+    //m_views.push_back(new L1JetsView(iConfig.getParameter< edm::ParameterSet >("L1JetsViewStage1All"), m_tree, this->consumesCollector()));
     if (iConfig.exists("TriggerResultsView")){
         m_views.push_back(new TriggerResultsView(iConfig.getParameter< edm::ParameterSet >("TriggerResultsView"), m_tree, this->consumesCollector(), this));
     } else {
         std::cout << "Disabling TriggerResultsView " << std::endl;
     }
-    ///m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewCalo"), m_tree));
+    ///m_views.push_back(new JetView(iConfig.getParameter< edm::ParameterSet >("JetViewCalo"), m_tree, this->consumesCollector()));
 
     // use m_floatBranches for float values
     //  handled by views
@@ -179,7 +179,7 @@ MNTriggerAnaNew::MNTriggerAnaNew(const edm::ParameterSet& iConfig)
     for (size_t i = 0; i < todoGeneric.size(); ++i){
         if (iConfig.exists(todoGeneric.at(i))){
             std::cout << "Enabling " << todoGeneric.at(i) << std::endl;
-            m_views.push_back(new GenericCandidateViewP4(iConfig.getParameter< edm::ParameterSet >(todoGeneric.at(i)), m_tree));
+            m_views.push_back(new GenericCandidateViewP4(iConfig.getParameter< edm::ParameterSet >(todoGeneric.at(i)), m_tree, this->consumesCollector()));
         } else {
             std::cout << "Disabling " << todoGeneric.at(i) << std::endl;
         }

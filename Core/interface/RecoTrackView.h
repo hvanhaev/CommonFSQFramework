@@ -6,7 +6,7 @@
 
 class RecoTrackView: public EventViewBase{
     public:
-       RecoTrackView(const edm::ParameterSet& ps, TTree * tree);
+       RecoTrackView(const edm::ParameterSet& ps, TTree * tree, edm::ConsumesCollector && iC);
 
     private:
       virtual void fillSpecific(const edm::Event&, const edm::EventSetup&);
