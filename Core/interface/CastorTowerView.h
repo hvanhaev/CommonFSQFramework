@@ -15,7 +15,7 @@
 
 class CastorTowerView: public EventViewBase{
     public:
-       CastorTowerView(const edm::ParameterSet& ps, TTree * tree);
+       CastorTowerView(const edm::ParameterSet& ps, TTree * tree, edm::ConsumesCollector && iC);
 
     private:
       virtual void fillSpecific(const edm::Event&, const edm::EventSetup&);

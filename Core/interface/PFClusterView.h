@@ -16,7 +16,7 @@
 
 class PFClusterView: public EventViewBase{
     public:
-       PFClusterView(const edm::ParameterSet& ps, TTree * tree);
+       PFClusterView(const edm::ParameterSet& ps, TTree * tree, edm::ConsumesCollector && iC);
 
     private:
       virtual void fillSpecific(const edm::Event&, const edm::EventSetup&);

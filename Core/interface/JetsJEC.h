@@ -5,7 +5,7 @@
 
 class JetsJEC: public EventViewBase{
     public:
-       JetsJEC(const edm::ParameterSet& ps, TTree * tree);
+       JetsJEC(const edm::ParameterSet& ps, TTree * tree, edm::ConsumesCollector && iC);
 
     private:
       virtual void fillSpecific(const edm::Event&, const edm::EventSetup&);

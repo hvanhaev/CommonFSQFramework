@@ -2,7 +2,7 @@
 #include <TMath.h>
 
 
-PFClusterView::PFClusterView(const edm::ParameterSet& iConfig, TTree * tree):
+PFClusterView::PFClusterView(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
 EventViewBase(iConfig,  tree)
 {
     registerVecFloat("energy", tree);
@@ -22,6 +22,8 @@ EventViewBase(iConfig,  tree)
 
     m_inputCol = iConfig.getParameter<edm::InputTag>("inputcoll");
     
+    // register consumes
+    iC.consumes< reco::PFClusterCollection >(m_inputCol);
 
 }
 

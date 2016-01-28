@@ -139,37 +139,37 @@ CFFTreeProducer::CFFTreeProducer(const edm::ParameterSet& iConfig)
             m_views.push_back(new GenJetView(pset, m_tree, this->consumesCollector()));
         }
         else if (miniViewType == "RecoTrackView") {
-            m_views.push_back(new RecoTrackView(pset, m_tree));
+            m_views.push_back(new RecoTrackView(pset, m_tree, this->consumesCollector()));
         }
         else if (miniViewType == "VerticesView") {
-            m_views.push_back(new VerticesView(pset, m_tree));
+            m_views.push_back(new VerticesView(pset, m_tree, this->consumesCollector()));
         }
         else if (miniViewType == "CastorRecHitView") {
-            m_views.push_back(new CastorRecHitView(pset, m_tree));
+            m_views.push_back(new CastorRecHitView(pset, m_tree, this->consumesCollector()));
         }
         else if (miniViewType == "CastorTowerView") {
-            m_views.push_back(new CastorTowerView(pset, m_tree));
+            m_views.push_back(new CastorTowerView(pset, m_tree, this->consumesCollector()));
         }
         else if (miniViewType == "CastorJetView") {
-            m_views.push_back(new CastorJetView(pset, m_tree));
+            m_views.push_back(new CastorJetView(pset, m_tree, this->consumesCollector()));
         }
 	else if (miniViewType == "HFRecHitView") {
-	    m_views.push_back(new HFRecHitView(pset, m_tree));
+	    m_views.push_back(new HFRecHitView(pset, m_tree, this->consumesCollector()));
 	}
 	else if (miniViewType == "HBHERecHitView") {
-            m_views.push_back(new HBHERecHitView(pset, m_tree));
+            m_views.push_back(new HBHERecHitView(pset, m_tree, this->consumesCollector()));
         }
         else if (miniViewType == "EcalRecHitView") {
-            m_views.push_back(new EcalRecHitView(pset, m_tree));
+            m_views.push_back(new EcalRecHitView(pset, m_tree, this->consumesCollector()));
         }
 	else if (miniViewType == "CaloTowerView") {
-            m_views.push_back(new CaloTowerView(pset, m_tree));
+            m_views.push_back(new CaloTowerView(pset, m_tree, this->consumesCollector()));
         }
 	else if (miniViewType == "PFCandidateView") {
-            m_views.push_back(new PFCandidateView(pset, m_tree));
+            m_views.push_back(new PFCandidateView(pset, m_tree, this->consumesCollector()));
         }
         else if (miniViewType == "PFClusterView") {
-            m_views.push_back(new PFClusterView(pset, m_tree));
+            m_views.push_back(new PFClusterView(pset, m_tree, this->consumesCollector()));
         }
         else {
             throw "Miniview not known: "+ miniViewType;
@@ -178,7 +178,7 @@ CFFTreeProducer::CFFTreeProducer(const edm::ParameterSet& iConfig)
     }
 
     // run/event number
-    m_views.push_back(new EventIdData(edm::ParameterSet(), m_tree));
+    m_views.push_back(new EventIdData(edm::ParameterSet(), m_tree, this->consumesCollector()));
 
 
 }

@@ -1,6 +1,5 @@
 #include "CommonFSQFramework/Core/interface/GenPartView.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
-#include "FWCore/Framework/interface/ConsumesCollector.h"
 
 GenPartView::GenPartView(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
 EventViewBase(iConfig,  tree)

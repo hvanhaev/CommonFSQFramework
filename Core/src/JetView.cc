@@ -16,7 +16,6 @@
 //#include "JetMETCorrections/Objects/interface/JetCorrector.h"
 #include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
 #include <DataFormats/Math/interface/deltaR.h>
-#include "FWCore/Framework/interface/ConsumesCollector.h"
 
 
 

@@ -1,6 +1,5 @@
 #include "CommonFSQFramework/Core/interface/GenJetView.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
-#include "FWCore/Framework/interface/ConsumesCollector.h"
 
 GenJetView::GenJetView(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
 EventViewBase(iConfig,  tree)

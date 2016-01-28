@@ -3,7 +3,7 @@
 
 
 
-VerticesView::VerticesView(const edm::ParameterSet& iConfig, TTree * tree):
+VerticesView::VerticesView(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
 EventViewBase(iConfig,  tree)
 {
 
@@ -25,10 +25,8 @@ EventViewBase(iConfig,  tree)
     m_src = iConfig.getParameter<edm::InputTag>("src");
 
 
-
-
-
-
+    // register consumes
+    iC.consumes< std::vector<reco::Vertex> >(m_src);
 
 }
 

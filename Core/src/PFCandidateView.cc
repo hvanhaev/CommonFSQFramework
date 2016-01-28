@@ -2,17 +2,17 @@
 
 
 
-PFCandidateView::PFCandidateView(const edm::ParameterSet& iConfig, TTree * tree):
+PFCandidateView::PFCandidateView(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
 EventViewBase(iConfig,  tree)
 {
     registerVecP4("p4", tree);
     registerVecFloat("rawEcalEnergy",tree);
     registerVecFloat("rawHcalEnergy",tree);
     registerVecInt("particleId", tree);
-
-
     m_inputCol = iConfig.getParameter<edm::InputTag>("inputcoll");
-    
+
+    // register consumes
+    iC.consumes< reco::PFCandidateCollection >(m_inputCol);
 
 }
 

@@ -13,7 +13,7 @@
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include <algorithm>
 
-JetsJEC::JetsJEC(const edm::ParameterSet& iConfig, TTree * tree):
+JetsJEC::JetsJEC(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
 EventViewBase(iConfig,  tree)
 {
     std::cout << "Warning: this view is of specific use and lacks many features present in the standard view for jets - the JetView\n" ;
@@ -21,6 +21,10 @@ EventViewBase(iConfig,  tree)
     m_todo =    iConfig.getParameter< edm::InputTag  >("src");
     m_rho =    iConfig.getParameter< edm::InputTag  >("rho");
     m_label = iConfig.getParameter< std::string >("label");
+
+    // register consumes
+    iC.consumes< double >(m_rho);
+    iC.consumes< std::vector<reco::PFJet> >(m_todo);
 
 }
 

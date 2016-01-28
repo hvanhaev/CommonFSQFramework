@@ -5,7 +5,7 @@
 
 class L1JetsView: public EventViewBase{
     public:
-       L1JetsView(const edm::ParameterSet& ps, TTree * tree);
+       L1JetsView(const edm::ParameterSet& ps, TTree * tree, edm::ConsumesCollector && iC);
 
     private:
       virtual void fillSpecific(const edm::Event&, const edm::EventSetup&);

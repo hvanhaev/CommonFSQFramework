@@ -90,10 +90,10 @@ TracksTreeProducer::TracksTreeProducer(const edm::ParameterSet& iConfig)
 {
     edm::Service<TFileService> tFileService;
     m_tree = tFileService->make<TTree>("data", "data");
-    m_views.push_back(new EventIdData(iConfig.getParameter< edm::ParameterSet >("EventData"), m_tree));
+    m_views.push_back(new EventIdData(iConfig.getParameter< edm::ParameterSet >("EventData"), m_tree, this->consumesCollector()));
     m_views.push_back(new GenPartView(iConfig.getParameter< edm::ParameterSet >("GenPartView"), m_tree, this->consumesCollector()));
-    m_views.push_back(new RecoTrackView(iConfig.getParameter< edm::ParameterSet >("RecoTrackView"), m_tree));
-    m_views.push_back(new VerticesView(iConfig.getParameter< edm::ParameterSet >("VerticesView"), m_tree));
+    m_views.push_back(new RecoTrackView(iConfig.getParameter< edm::ParameterSet >("RecoTrackView"), m_tree, this->consumesCollector()));
+    m_views.push_back(new VerticesView(iConfig.getParameter< edm::ParameterSet >("VerticesView"), m_tree, this->consumesCollector()));
 }
 
 TracksTreeProducer::~TracksTreeProducer() {}

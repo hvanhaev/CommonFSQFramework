@@ -18,7 +18,7 @@
 
 class HFRecHitView: public EventViewBase{
     public:
-       HFRecHitView(const edm::ParameterSet& ps, TTree * tree);
+       HFRecHitView(const edm::ParameterSet& ps, TTree * tree, edm::ConsumesCollector && iC);
 
     private:
       virtual void fillSpecific(const edm::Event&, const edm::EventSetup&);
