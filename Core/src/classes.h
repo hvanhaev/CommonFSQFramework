@@ -18,7 +18,6 @@ namespace {
 
     tmf::TestTrackData v3;
     std::vector<tmf::TestTrackData> v4;
-
   };
 }
 
