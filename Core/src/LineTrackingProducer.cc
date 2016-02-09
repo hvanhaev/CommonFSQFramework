@@ -95,17 +95,16 @@ int LineTrackingProducer::readHits(std::vector<RawPixelRecHit> RawPixelRecHits,
                                    vector<LineFit> & simLines)
 {
     int i=0;
-    for(; i<int(RawPixelRecHits.size()); i++){
+    for(std::vector<RawPixelRecHit>::iterator RecHit = RawPixelRecHits.begin(); RecHit != RawPixelRecHits.end(); ++RecHit){
 
-        RawPixelRecHit tmp = RawPixelRecHits[i];
         // wrt beam
-        double x = tmp.x - beam_x;
-        double y = tmp.y - beam_y;
-        double z = tmp.z;
+        double x = RecHit->x - beam_x;
+        double y = RecHit->y - beam_y;
+        double z = RecHit->z;
 
-        //int nx = tmp.nx;
-        int ny = tmp.ny;
-        unsigned long id = tmp.id;
+        //int nx = RecHit->nx;
+        int ny = RecHit->ny;
+        unsigned long id = RecHit->id;
         int sub = ((id >> 25) & 0x7);
 
         double r = sqrt(sqr(x) + sqr(y));
@@ -127,18 +126,17 @@ int LineTrackingProducer::readHits(std::vector<RawStripRecHit> RawStripRecHits,
                                    vector<LineFit> & simLines)
 {
     int i=0;
-    for(; i<int(RawStripRecHits.size()); i++){
+    for(std::vector<RawStripRecHit>::iterator RecHit = RawStripRecHits.begin(); RecHit != RawStripRecHits.end(); ++RecHit){
 
-        RawStripRecHit tmp = RawStripRecHits[i];
         // wrt beam
-        double x = tmp.x - beam_x;
-        double y = tmp.y - beam_y;
-        double z = tmp.z;
+        double x = RecHit->x - beam_x;
+        double y = RecHit->y - beam_y;
+        double z = RecHit->z;
 
-        int monoSize = tmp.monoSize;
-        int stereoSize = tmp.stereoSize;
-        unsigned long monoId = tmp.monoId;
-        unsigned long stereoId = tmp.stereoId;
+        int monoSize = RecHit->monoSize;
+        int stereoSize = RecHit->stereoSize;
+        unsigned long monoId = RecHit->monoId;
+        unsigned long stereoId = RecHit->stereoId;
 
         if( !usePixelHits )
         if(abs(monoSize-stereoSize) <= maxClusterWidthDiff) // check clusters
