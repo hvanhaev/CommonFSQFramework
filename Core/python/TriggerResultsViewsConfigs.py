@@ -79,6 +79,21 @@ def get(todo):
        triggers = cms.vstring("FullTrack12"),
        FullTrack12 = cms.vstring("HLT_FullTrack12ForEndOfFill_v1")
     )
+
+    defs["CastorSpecialJetTriggerResultsView"]  = cms.PSet(
+        miniView = cms.string("TriggerResultsView"),
+        branchPrefix = cms.untracked.string("trg"),
+        process = cms.string("HLT"),
+        storePrescales = cms.bool(False),
+        triggers = cms.vstring("ZeroBias","MinBias","Random","CastorMedJet","CastorHighJet","CastorDiJet"),
+        ZeroBias = cms.vstring("HLT_ZeroBias*"),
+        MinBias = cms.vstring("HLT_L1MinimumBias*"),
+        Random = cms.vstring("HLT_Random*"),
+        CastorMedJet = cms.vstring("HLT_L1CastorMediumJet_v*"),
+        CastorHighJet = cms.vstring("HLT_L1CastorHighJet_v*"),
+        CastorDiJet = cms.vstring("HLT_L1CastorMediumJet_PFJet15_v*")
+    )
+
  
     # main function
     ret = {}

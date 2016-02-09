@@ -33,6 +33,13 @@ def get(todo):
         genJets = cms.InputTag("ak5GenJets"),
     )
 
+    defs["lowPtak5GenJetView"]= cms.PSet(   
+        miniView = cms.string("GenJetView"),
+        branchPrefix = cms.untracked.string("ak5GenJets"),
+        maxEta = cms.double(7.0),
+        minPt = cms.double(1.0),
+        genJets = cms.InputTag("lowPtak5GenJets"),
+    )
 
     # Charged GenJets for UE
     defs["ak4ChgGenJetView"]= cms.PSet(
