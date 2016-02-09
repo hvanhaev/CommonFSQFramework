@@ -9,6 +9,9 @@ EventViewBase(iConfig,  tree)
     
     registerVecFloat("emEnergy", tree);
     registerVecFloat("hadEnergy", tree);
+    
+    registerVecInt("ieta", tree);
+    registerVecInt("iphi", tree);
 
     registerVecInt("hasEB", tree);
     registerVecInt("hasEE", tree);
@@ -33,6 +36,9 @@ void CaloTowerView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup
         addToP4Vec("p4", reco::Candidate::LorentzVector(iCT->px(),iCT->py(),iCT->pz(),iCT->energy()));
         addToFVec("emEnergy", iCT->emEnergy());
         addToFVec("hadEnergy", iCT->hadEnergy());
+
+	addToIVec("ieta", iCT->ieta());
+	addToIVec("iphi", iCT->iphi());
 
 	int hasEB = 0;
 	int hasEE = 0;
