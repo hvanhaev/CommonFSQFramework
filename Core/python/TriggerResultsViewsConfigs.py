@@ -82,7 +82,7 @@ def get(todo):
 
     defs["CastorSpecialJetTriggerResultsView"]  = cms.PSet(
         miniView = cms.string("TriggerResultsView"),
-        branchPrefix = cms.untracked.string("trg"),
+        branchPrefix = cms.untracked.string("CasTrg"),
         process = cms.string("HLT"),
         storePrescales = cms.bool(False),
         triggers = cms.vstring("ZeroBias","MinBias","Random","CastorMedJet","CastorHighJet","CastorDiJet"),

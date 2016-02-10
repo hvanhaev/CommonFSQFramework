@@ -262,7 +262,14 @@ void LineTrackingProducer::findAndFitVertices
   
         VertexFitter theVertexFitter;
         vector<double> vtx(3);
-        theVertexFitter.run(lineFits, vtx);
+        try {
+          theVertexFitter.run(lineFits, vtx);
+        }
+        catch(...) {
+          vtx[0] = vertex->x0;
+          vtx[1] = vertex->y0;
+
+        }
 
         vertex->x0 = vtx[0];
         vertex->y0 = vtx[1];
@@ -358,13 +365,23 @@ void LineTrackingProducer::processHits(vector<LineTrack> & lines,
                                       hit!= line->hits.end(); hit++)
         ps.push_back(points[*hit]);
 
+      try {
       line->parsFree = theLineFitter.fit(ps, false); // d0 free
+      }
+      catch (...) {
+      }
+
+      bool fitFailure = false;
+      try {
       line->pars     = theLineFitter.fit(ps, true ); // d0 = 0 fix
+      }
+      catch (int i) {
+      fitFailure = true;
+      }
+          
+      //double eta = -log(tan(line->pars.theta/2));
 
-//      double eta = -log(tan(line->pars.theta/2));
-
-      if(fabs(line->pars.z0) > maxAbsoluteZ0)
-//         (!usePixelHits && fabs(eta) > 1 && line->hits.size() <= minHits + 1) )
+      if(fabs(line->pars.z0) > maxAbsoluteZ0  || fitFailure)//|| (!usePixelHits && fabs(eta) > 1 && line->hits.size() <= minHits + 1) || fitFailure)
         line = lines.erase(line);
       else
         line++;

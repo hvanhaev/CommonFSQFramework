@@ -87,8 +87,25 @@ double VertexFitter::run(const vector<LineFit> & lineFits,
     }
 
     // solve
-    TDecompLU lu; lu.SetMatrix(J); lu.Decompose();
-    TVectorD dx(F); lu.Solve(dx); dx *= -1.;
+    TDecompLU lu; lu.SetMatrix(J);
+
+    bool decomp_flag = false;
+
+    try {
+        lu.Decompose();}
+    catch (...){
+        decomp_flag = true;}
+
+    TVectorD dx(F);
+    if (!decomp_flag){ 
+        try{
+            lu.Solve(dx);}
+        catch (...){
+            decomp_flag = true;}
+        dx *= -1.;
+    }
+
+    if (decomp_flag) throw(1);
 
     // try Newtonian step
     vector<double> x_new(nPars);

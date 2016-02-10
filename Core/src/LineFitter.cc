@@ -102,8 +102,25 @@ LineFit LineFitter::fit(const vector<TVector3> & points, bool isD0Fix)
       J(i,j) = (i==j ? 1 : 0);
 
     // solve
-    TDecompLU lu; lu.SetMatrix(J); lu.Decompose();
-    TVectorD dx(F); lu.Solve(dx); dx *= -1.;
+    TDecompLU lu; lu.SetMatrix(J);
+
+    bool decomp_flag = false;
+
+    try {
+        lu.Decompose();}
+    catch (...){
+        decomp_flag = true;}
+
+    TVectorD dx(F);
+    if (!decomp_flag){ 
+        try{
+            lu.Solve(dx);}
+        catch (...){
+            decomp_flag = true;}
+        dx *= -1.;
+    }
+
+    if (decomp_flag) throw(1);
 
     // try Newtonian step
     vector<double> x_new(nPars);
