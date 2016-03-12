@@ -1,0 +1,1 @@
+export SmallXAnaVersion="CommonFSQFramework.Skim.Samples_Run2015E_lowPU_5TeV_10032016"
