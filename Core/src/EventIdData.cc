@@ -6,6 +6,7 @@
 #include "DataFormats/Luminosity/interface/LumiSummary.h"
 #include "DataFormats/Luminosity/interface/LumiDetails.h"
 #include "SimDataFormats/Vertex/interface/SimVertexContainer.h"
+#include "DataFormats/Scalers/interface/LumiScalers.h"
 #include "TLorentzVector.h"
 
 EventIdData::EventIdData(const edm::ParameterSet& iConfig, TTree * tree):
@@ -55,11 +56,13 @@ void EventIdData::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& 
     	setI("bx", iEvent.bunchCrossing());
 	try {
 	    // Get instantanious lumi information
-	    edm::LuminosityBlock const& lumiBlock = iEvent.getLuminosityBlock();
-	    edm::Handle<LumiDetails> d;
-	    lumiBlock.getByLabel("lumiProducer",d);	
+	    edm::Handle<LumiScalersCollection> lumiScalers;
+	    iEvent.getByLabel("scalersRawToDigi",lumiScalers);	
 	    // This is the call to get the lumi per bx:
-	    setF("instLumiPerPX",d->lumiValue(LumiDetails::kOCC1,iEvent.bunchCrossing()));
+	    if (lumiScalers->size() != 0) {
+	    	LumiScalersCollection::const_iterator it = lumiScalers->begin();
+	    	setF("instLumiPerBX",it->instantLumi());
+	    }
 	} catch (...) {
 	    if (localcount == 1) std::cout << " An exception was thrown when accessing the LumiDetails and/or the LumiSummary objects. This means they are not present and are not correctly filled in the ntuple" << std::endl;
 	}
