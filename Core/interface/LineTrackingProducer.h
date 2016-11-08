@@ -15,6 +15,7 @@ class LineTrackingProducer
   bool run(std::vector<RawPixelRecHit> RawPixelRecHits);
   bool run(std::vector<RawStripRecHit> RawStripRecHits);
   int getVertices(std::vector<double> & VerticesX, std::vector<double> & VerticesY, std::vector<double> & VerticesZ, std::vector<int> & nTracks);
+  int getTracks(std::vector<double> & TracksTheta, std::vector<double> & TracksPhi, std::vector<double> & TracksZ0, std::vector<double> & TracksD0, std::vector<double> & TracksSigmaZ, std::vector<int> & iVertex);
 
  private:
   int readHits(std::vector<RawPixelRecHit> RawPixelRecHits, std::vector<LineFit> & simLines);

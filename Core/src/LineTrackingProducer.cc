@@ -478,3 +478,40 @@ int LineTrackingProducer::getVertices(std::vector<double> & VerticesX, std::vect
   return verticesResult.size();
 }
 
+int LineTrackingProducer::getTracks(std::vector<double> & TracksTheta, std::vector<double> & TracksPhi, std::vector<double> & TracksZ0, std::vector<double> & TracksD0, std::vector<double> & TracksSigmaZ, std::vector<int> & TracksiVertex)
+{
+   for(vector<LineTrack>::const_iterator line = linesResult.begin();
+                                             line!= linesResult.end(); line++) {
+        TracksTheta.push_back(line->parsFree.theta);
+        TracksPhi.push_back(line->parsFree.phi);
+        TracksD0.push_back(line->parsFree.d0);
+        TracksZ0.push_back(line->parsFree.z0);
+        TracksSigmaZ.push_back(line->parsFree.sigma_z);
+
+        int vertexCheck = -1;
+        int iVertex = 0;
+        // loop over vertices
+        for(vector<LineVertex>::const_iterator vertex = verticesResult.begin();
+                                               vertex!= verticesResult.end(); vertex++) {
+
+          // loop over tracks in vertices
+          for(std::vector<int>::const_iterator ivtx_trk = vertex->tracks.begin(); 
+                                               ivtx_trk!= vertex->tracks.end(); ivtx_trk++) {
+
+            // check if vertex track id is same as stand alone track id
+            if ((line-linesResult.begin()) == *ivtx_trk) {
+              // if a track belongs to more than one vertex give error message
+              if (vertexCheck>=0) {
+                std::cerr << "LineTrackingProducer: ERROR. Track is part of several vertices!!" << std::endl;
+              }
+              vertexCheck = iVertex;  
+            }
+          } // loop over tracks in vertices
+          iVertex++;
+        } // loop over vertices
+
+        TracksiVertex.push_back(vertexCheck);
+  }
+  return linesResult.size();
+}
+

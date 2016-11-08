@@ -34,10 +34,22 @@ EventViewBase(iConfig,  tree)
     if(m_usePixels) iC.consumes<SiPixelRecHitCollection >(m_src);
     else iC.consumesMany<SiStripMatchedRecHit2DCollection >();
 
-    registerVecFloat("x",tree);
-    registerVecFloat("y",tree);
-    registerVecFloat("z",tree);
-    registerVecInt("Ntracks", tree);    
+    registerVecFloat("PixelRecHitX",tree);
+    registerVecFloat("PixelRecHitY",tree);
+    registerVecFloat("PixelRecHitZ",tree);
+
+    registerVecFloat("VtxX",tree);
+    registerVecFloat("VtxY",tree);
+    registerVecFloat("VtxZ",tree);
+    registerVecInt("VtxNtracks", tree);    
+
+    registerVecFloat("TrackTheta", tree);
+    registerVecFloat("TrackPhi", tree);
+    registerVecFloat("TrackZ0", tree);
+    registerVecFloat("TrackD0", tree);
+    registerVecFloat("TrackSigmaZ", tree);
+	registerVecInt("TrackIvtx", tree);
+
 }
 
 
@@ -123,6 +135,15 @@ void ZeroTeslaVertexView::fillSpecific(const edm::Event& iEvent, const edm::Even
         }
     }
 
+    // save Pixel RecHits
+    if (m_usePixels) {
+        for(std::vector<RawPixelRecHit>::iterator RecHit = RawPixelRecHits.begin(); RecHit != RawPixelRecHits.end(); ++RecHit){
+            addToFVec("PixelRecHitX",RecHit->x);
+            addToFVec("PixelRecHitY",RecHit->y);
+            addToFVec("PixelRecHitZ",RecHit->z);
+        }
+    }
+
     // Calculate vertices
     LineTrackingProducer theProducer(m_usePixels, beamSpot.x0(), beamSpot.y0());
     if (m_usePixels) theProducer.run(RawPixelRecHits);
@@ -130,14 +151,27 @@ void ZeroTeslaVertexView::fillSpecific(const edm::Event& iEvent, const edm::Even
 
     // Get result
     std::vector<double> VerticesX, VerticesY, VerticesZ;
-    std:: vector<int> nTracks;
-    int nVertices = theProducer.getVertices(VerticesX, VerticesY, VerticesZ, nTracks);
+    std:: vector<int> VtxNtracks;
+    int nVertices = theProducer.getVertices(VerticesX, VerticesY, VerticesZ, VtxNtracks);
+
+    std::vector<double> TracksTheta, TracksPhi, TracksZ0, TracksD0, TracksSigmaZ;
+    std:: vector<int> TracksiVertex;
+    int nTracks = theProducer.getTracks(TracksTheta, TracksPhi, TracksZ0, TracksD0, TracksSigmaZ, TracksiVertex);
 
     // fill trees
     for ( int i=0; i<nVertices; i++){
-    	addToFVec("x",VerticesX[i]);
-	    addToFVec("y",VerticesY[i]);
-	    addToFVec("z",VerticesZ[i]);
-	    addToIVec("Ntracks",nTracks[i]);
+    	addToFVec("VtxX",VerticesX[i]);
+	    addToFVec("VtxY",VerticesY[i]);
+	    addToFVec("VtxZ",VerticesZ[i]);
+	    addToIVec("VtxNtracks",VtxNtracks[i]);
+    }
+
+    for ( int i=0; i<nTracks; i++){
+    	addToFVec("TrackTheta",TracksTheta[i]);
+	    addToFVec("TrackPhi",TracksPhi[i]);
+	    addToFVec("TrackZ0",TracksZ0[i]);
+	    addToFVec("TrackD0",TracksD0[i]);
+	    addToFVec("TrackSigmaZ",TracksSigmaZ[i]);
+	    addToIVec("TrackIvtx",TracksiVertex[i]);
     }
 }
