@@ -71,7 +71,7 @@ EventViewBase(iConfig,  tree), hltprovider_(iConfig, iC, *module)
     }
 
     // register consumes
-    iC.consumes<L1GlobalTriggerReadoutRecord>(edm::InputTag("gtDigis"));
+    iC.consumes<GlobalAlgBlkBxCollection>(edm::InputTag("gtStage2Digis"));
     iC.consumes<edm::TriggerResults>(edm::InputTag("TriggerResults","","HLT")); 
 }
 
@@ -94,20 +94,10 @@ void TriggerResultsView::fillSpecific(const edm::Event& iEvent, const edm::Event
     }
 
     const std::vector< std::string > names = trbn.triggerNames(); 
-    //for (unsigned int i = 0; i<names.size(); ++i){
-    //    std::cout << names.at(i) << std::endl;
-    //}
 
-
-    edm::Handle<L1GlobalTriggerReadoutRecord> gtReadoutRecord;
-    iEvent.getByLabel(edm::InputTag("gtDigis"), gtReadoutRecord);
-    if( !gtReadoutRecord.isValid() || gtReadoutRecord.failedToGet() ) {
-        edm::LogWarning(" GTReadoutRecord ") << " Cannot read gtReadoutRecord " << std::endl;
-        return;
-    };
-
-    TechnicalTriggerWord TechTrigg = gtReadoutRecord->technicalTriggerWord();
-    DecisionWord AlgoTrig          = gtReadoutRecord->decisionWord();
+    // container for L1algo trigger bits
+    edm::Handle<GlobalAlgBlkBxCollection> uGtAlgs;
+    iEvent.getByLabel("gtStage2Digis", uGtAlgs);
 
 
     std::map<std::string, std::vector<std::string> >::const_iterator it, itE;
@@ -120,10 +110,18 @@ void TriggerResultsView::fillSpecific(const edm::Event& iEvent, const edm::Event
         //std::cout << "Trying " << it->first << std::endl;
 
         if (it->first == "L1GTTech") {
-            for (unsigned int i=0; i < TechTrigg.size(); ++i) addToIVec(it->first, TechTrigg.at(i));
+            //for (unsigned int i=0; i < TechTrigg.size(); ++i) addToIVec(it->first, TechTrigg.at(i)); // there are no more technical trigger bits
             continue;
         } else if (it->first == "L1GTAlgo") {
-            for (unsigned int i=0; i < AlgoTrig.size(); ++i)  addToIVec(it->first, AlgoTrig.at(i));
+            auto itr = uGtAlgs->begin(0);
+            for(int algoBit = 0; algoBit < 512; ++algoBit) {
+                if(itr->getAlgoDecisionInitial(algoBit)) {
+                    addToIVec(it->first, 1);
+                }
+                else {
+                    addToIVec(it->first, 0);
+                }
+            }
             continue;
         }
 

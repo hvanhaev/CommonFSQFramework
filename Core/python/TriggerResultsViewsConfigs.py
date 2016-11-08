@@ -37,7 +37,7 @@ def get(todo):
         branchPrefix = cms.untracked.string("trgl1"),
         process = cms.string("HLT"),
         storePrescales = cms.bool(False),
-        triggers = cms.vstring("L1GTTech","L1GTAlgo")
+        triggers = cms.vstring("L1GTAlgo")
     )
 
     defs["AK4CaloJetTriggerResultsView"]  = cms.PSet(
@@ -92,6 +92,16 @@ def get(todo):
         CastorMedJet = cms.vstring("HLT_L1CastorMediumJet_v*"),
         CastorHighJet = cms.vstring("HLT_L1CastorHighJet_v*"),
         CastorDiJet = cms.vstring("HLT_L1CastorMediumJet_PFJet15_v*")
+    )
+
+    defs["CastorPATriggerResultsView"]  = cms.PSet(
+        miniView = cms.string("TriggerResultsView"),
+        branchPrefix = cms.untracked.string("CasPATrg"),
+        process = cms.string("HLT"),
+        storePrescales = cms.bool(False),
+        triggers = cms.vstring("CastorPAMedJet","CastorPAMuon"),
+        CastorPAMedJet = cms.vstring("HLT_PAL1CastorMediumJet_BptxAND_v*"),
+        CastorPAMuon = cms.vstring("HLT_PAL1CastorHaloMuon_v*")
     )
 
  
