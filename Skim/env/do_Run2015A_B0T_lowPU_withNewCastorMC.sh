@@ -1,1 +1,1 @@
-export SmallXAnaVersion="CommonFSQFramework.Skim.Samples_Run2015A_B0T_lowPU_withNewcastorMC"
+export SmallXAnaVersion="CommonFSQFramework.Skim.Samples_Run2015A_B0T_lowPU_withNewCastorMC"
