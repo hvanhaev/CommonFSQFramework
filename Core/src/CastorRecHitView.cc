@@ -12,7 +12,7 @@ CastorRecHitView::CastorRecHitView(const edm::ParameterSet& iConfig, TTree * tre
 EventViewBase(iConfig,  tree)
 {
    // register data access
-   iC.consumes< edm::SortedCollection<CastorRecHit,edm::StrictWeakOrdering<CastorRecHit> > >(edm::InputTag("rechitcorrector"));
+   iC.consumes< edm::SortedCollection<CastorRecHit,edm::StrictWeakOrdering<CastorRecHit> > >(edm::InputTag("castorreco"));
    // fetch config data
    m_onlyGoodRecHits = iConfig.getParameter<bool>("onlyGoodRecHits");
    m_saturationInfo = iConfig.getParameter<bool>("writeSaturationInfo");
@@ -34,7 +34,7 @@ EventViewBase(iConfig,  tree)
 void CastorRecHitView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSetup){
 
    edm::Handle< edm::SortedCollection<CastorRecHit,edm::StrictWeakOrdering<CastorRecHit> > > castorRecHits;
-   iEvent.getByLabel("rechitcorrector",castorRecHits);  
+   iEvent.getByLabel("castorreco",castorRecHits);  
 
    // retrieve the channel quality lists from database
    edm::ESHandle<CastorChannelQuality> p;
