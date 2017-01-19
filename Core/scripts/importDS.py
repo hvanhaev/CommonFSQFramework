@@ -7,6 +7,7 @@ ROOT.gROOT.SetBatch(True)
 from ROOT import *
 
 import pprint
+import shutil
 import CommonFSQFramework.Core.Util
 
 try:
@@ -248,6 +249,7 @@ sam = fixLocalPaths(sam)
     for line in toFile:
         outputFile.write(line)
 	
+    outputFile.close()	
     print "Created new ", ofile
     	
     # move the Samples file to the CommonFSQFramework/Skim/python directory and overwrite the previous one
@@ -255,7 +257,7 @@ sam = fixLocalPaths(sam)
     global moddir
     moddir = moddir.replace("/python/CommonFSQFramework/Skim","/src/CommonFSQFramework/Skim/python")
     if final:
-        os.system("mv " + ofile + " " + moddir)
+        shutil.move("./"+ofile, moddir+"/"+ofile)
         print "Moved " + ofile + " to " + moddir	
 	
     # if not final, also write out env/do file
@@ -266,10 +268,12 @@ sam = fixLocalPaths(sam)
 	for line in toenvFile:
 	    envfile.write(line)
 	    
-	envdir = moddir.replace("/python","/env")    
-	os.system("mv " + "do_"+anaVersion+".sh" + " " + envdir)
-	os.system("source "+envdir+"/do_"+anaVersion+".sh")
-	print "Created and moved do_"+anaVersion+".sh to "+envdir+" and then sourced it"
+	envfile.close()
+	envdir = moddir.replace("/python","/env")
+	shutil.move(moddir+"/do_"+anaVersion+".sh", envdir+"/do_"+anaVersion+".sh")
+	os.environ['SmallXAnaVersion'] = "CommonFSQFramework.Skim.Samples_"+anaVersion
+	print "Created and moved do_"+anaVersion+".sh to "+envdir
+	print "Activated this skim: SmallXAnaVersion =", os.environ['SmallXAnaVersion']
 	  
 
 from optparse import OptionParser

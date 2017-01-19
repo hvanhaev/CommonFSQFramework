@@ -31,13 +31,23 @@ def get(todo):
         ZeroBias = cms.vstring("HLT_ZeroBias_v1")
     )
 
+    defs["ZeroBiasWithPSRun2015E"]  = cms.PSet(
+        miniView = cms.string("TriggerResultsView"),
+        branchPrefix = cms.untracked.string("trg"),
+        process = cms.string("HLT"),
+        storePrescales = cms.bool(True),
+        triggers = cms.vstring("ZeroBias","Random"),
+        ZeroBias = cms.vstring("HLT_ZeroBias_v2"),
+        Random = cms.vstring("HLT_Random_v1")
+    )
+
     # L1 trigger configuration - please do not edit this
     defs["L1GTriggerResultsView"] = cms.PSet(
         miniView = cms.string("TriggerResultsView"),
         branchPrefix = cms.untracked.string("trgl1"),
         process = cms.string("HLT"),
         storePrescales = cms.bool(False),
-        triggers = cms.vstring("L1GTAlgo")
+        triggers = cms.vstring("L1GTTech","L1GTAlgo")
     )
 
     defs["AK4CaloJetTriggerResultsView"]  = cms.PSet(
@@ -92,16 +102,6 @@ def get(todo):
         CastorMedJet = cms.vstring("HLT_L1CastorMediumJet_v*"),
         CastorHighJet = cms.vstring("HLT_L1CastorHighJet_v*"),
         CastorDiJet = cms.vstring("HLT_L1CastorMediumJet_PFJet15_v*")
-    )
-
-    defs["CastorPATriggerResultsView"]  = cms.PSet(
-        miniView = cms.string("TriggerResultsView"),
-        branchPrefix = cms.untracked.string("CasPATrg"),
-        process = cms.string("HLT"),
-        storePrescales = cms.bool(False),
-        triggers = cms.vstring("CastorPAMedJet","CastorPAMuon"),
-        CastorPAMedJet = cms.vstring("HLT_PAL1CastorMediumJet_BptxAND_v*"),
-        CastorPAMuon = cms.vstring("HLT_PAL1CastorHaloMuon_v*")
     )
 
  
