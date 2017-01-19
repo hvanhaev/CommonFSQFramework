@@ -1,0 +1,4 @@
+/ZeroBias/Run2015E-PromptReco-v1/RECO
+/EmptyBX/Run2015E-PromptReco-v1/RECO
+/MinBias_CUETP8M1_pp502TeV-pythia8/katkov-MinBias_CUETP8M1_pp502TeV-pythia8_MagnetOn_CASTOR00SL_RECO_v01-5b79fd4646a57d3a69529ffb034238b2/USER
+/MinBias_CUETP8M1_pp502TeV-pythia8/katkov-MinBias_CUETP8M1_pp502TeV-pythia8_MagnetOn_CASTOR00SL_RECO_v02-f2c2e4c6e05057abe12e5f1940125119/USER

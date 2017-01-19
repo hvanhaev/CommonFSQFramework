@@ -31,6 +31,16 @@ def get(todo):
         ZeroBias = cms.vstring("HLT_ZeroBias_v1")
     )
 
+    defs["ZeroBiasWithPSRun2015E"]  = cms.PSet(
+        miniView = cms.string("TriggerResultsView"),
+        branchPrefix = cms.untracked.string("trg"),
+        process = cms.string("HLT"),
+        storePrescales = cms.bool(True),
+        triggers = cms.vstring("ZeroBias","Random"),
+        ZeroBias = cms.vstring("HLT_ZeroBias_v2"),
+        Random = cms.vstring("HLT_Random_v1")
+    )
+
     # L1 trigger configuration - please do not edit this
     defs["L1GTriggerResultsView"] = cms.PSet(
         miniView = cms.string("TriggerResultsView"),

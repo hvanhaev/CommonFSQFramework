@@ -72,7 +72,7 @@ EventViewBase(iConfig,  tree), hltprovider_(iConfig, iC, *module)
 
     // register consumes
     iC.consumes<L1GlobalTriggerReadoutRecord>(edm::InputTag("gtDigis"));
-    iC.consumes<edm::TriggerResults>(edm::InputTag("TriggerResults","","HLT")); 
+    iC.consumes<edm::TriggerResults>(edm::InputTag("TriggerResults","","HLT"));
 }
 
 void TriggerResultsView::doBeginRun(const edm::Run& r, const edm::EventSetup& es) {

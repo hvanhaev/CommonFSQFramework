@@ -1,0 +1,147 @@
+anaType="Run2015E_lowPU_5TeV"
+
+# root path needs proper XXX
+# some stuff needed for crab configuration, e.g. blacklisting
+preamble='''
+cbSmartCommand="smartCopy"
+cbSmartBlackList=""
+cbWMS="https://wmscms.cern.ch:7443/glite_wms_wmproxy_server"
+skimEfficiencyMethod="getSkimEff"
+'''
+
+# point towards your list of samples you want
+dsFile="CommonFSQFramework/Skim/python/ds_Run2015E_lowPU_5TeV_v1.txt"
+
+# define the util decorator. Functions marked with this wont turn into ds attribute
+def util(func):
+    setattr(func, "ignore", 1)
+    return func
+setattr(util, "ignore", 1) # for this function only
+
+
+def DS(ds):
+    return ds
+
+def name(ds):
+    split=ds.split("/") 
+    if len(split) == 0: return None
+
+    if "katkov-MinBias_CUETP8M1_pp502TeV-pythia8_MagnetOn_CASTOR00SL_RECO_v01" in ds: return "MinBias_CUETP8M1_pp502TeV-pythia8_v1"
+    if "katkov-MinBias_CUETP8M1_pp502TeV-pythia8_MagnetOn_CASTOR00SL_RECO_v02" in ds: return "MinBias_CUETP8M1_pp502TeV-pythia8_v2"
+    
+    if not isData(ds): return split[1]
+
+    if isData(ds): return "data_"+split[1]
+
+def isData(ds):
+    realData = False
+    if "Run2015" in ds: realData = True
+    return realData
+
+def json(ds):
+    realData = isData(ds)
+    if realData:
+        if "Run2015E" in ds: return "CommonFSQFramework/Skim/lumi/Cert_262168-262172_5TeV_PromptReco_Collisions15_25ns_LOWPU_JSON.txt"
+    else:
+        return ""
+
+def crabJobs(ds):
+    dsName = name(ds)
+    # define to run 100 crab jobs
+    # make something more clever, based on number of events in the dataset:
+    # require around 50000 events to be processed per job
+    return int(round(numEvents(ds)/100000.0))
+
+
+def numEvents(ds):
+    
+    
+    # data
+    
+    # if nothing found...
+    return -1
+
+def GT(ds):
+    if isData(ds) and "Run2015E-PromptReco" in ds: return "75X_dataRun2_Prompt_ppAt5TeV_v1"
+	
+    
+    return "75X_mcRun2_asymptotic_ppAt5TeV_v3"
+    
+def XS(ds):
+    '''
+    Note: all cross sections given in pb
+    # http://iopscience.iop.org/0295-5075/96/2/21002
+    LHCtotal= 73.5 mili b
+
+    conversion factors cheatsheet:
+    nano = 10^-6 mili
+    nano = 10^-3 micro
+    nano = 10^3 pico
+    '''
+    # if real data return nothing, not needed here but keep for other Templates
+    realData = isData(ds)
+    if realData:
+        return -1
+
+    # list all datasets
+    # Give all XS in pb
+    s = {}
+    s["MinBias_TuneMonash13_13TeV-pythia8"] = 78418400000.0 # from DAS - McM
+    s["ReggeGribovPartonMC_13TeV-EPOS"] = 78418400000.0
+    s["ReggeGribovPartonMC_13TeV-QGSJetII"] = 78418400000.0
+    s["MinBias_TuneZ2star_13TeV-pythia6"] = 78260000000.0
+    s["MinBias_TuneCUETP8M1_13TeV-pythia8"] = 78418400000.0
+    s["MinBias_TuneMBR_13TeV-pythia8"] = 78418400000.0
+    s["MinBias_TuneEE5C_13TeV-herwigpp"] = 36460000000.0
+    s["MinBias_CUETP8M1_pp502TeV-pythia8_v1"] = 78418400000.0
+    s["MinBias_CUETP8M1_pp502TeV-pythia8_v2"] = 78418400000.0
+
+    dsName = name(ds)
+    if dsName in s:
+        return s[dsName]
+    else:
+        print "FIXME - XS missing for", dsName
+        print '    s["'+dsName+'"] = '
+    return -1
+
+@util
+def getLumi(ds, trg):
+    '''
+    all lumi values here should be given in picob
+    '''
+    
+    realData = isData(ds)
+    if realData:
+        return -1
+    
+    # for MC just do something very simple for now
+    lumi = float(numEvents(ds)/XS(ds)) # pb, Nevents/XS
+    return lumi
+
+def lumiMinBias(ds):
+    return getLumi(ds,"minbias")
+
+
+# could useful in the future
+@util
+def onTheFlyCustomization():
+    ret = ""
+
+    return ret
+#setattr(onTheFlyCustomization, "ignore", 1)
+
+
+fun = {}
+import copy,types
+glob = copy.copy(globals())
+for f in glob:
+    if type(glob[f])==types.FunctionType:
+        if hasattr(glob[f],"ignore"): 
+            print "Skip", f
+            continue
+        #print f
+        fun[f]=glob[f]
+
+
+
+

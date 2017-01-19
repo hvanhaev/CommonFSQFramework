@@ -5,6 +5,7 @@
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "DataFormats/Luminosity/interface/LumiSummary.h"
 #include "DataFormats/Luminosity/interface/LumiDetails.h"
+#include "DataFormats/Scalers/interface/LumiScalers.h"
 #include "SimDataFormats/Vertex/interface/SimVertexContainer.h"
 #include "TLorentzVector.h"
 #include "DataFormats/BeamSpot/interface/BeamSpot.h"
@@ -18,9 +19,8 @@ EventViewBase(iConfig, tree)
     iC.consumes< reco::GenParticleCollection >(edm::InputTag("genParticles"));
     iC.consumes< edm::SimVertexContainer >(edm::InputTag("g4SimHits"));
     iC.consumes< std::vector<PileupSummaryInfo> >(edm::InputTag("addPileupInfo"));
-
-    iC.consumes< std::vector<LumiDetails>,edm::InLumi >(edm::InputTag("lumiProducer"));
     iC.consumes<reco::BeamSpot >(edm::InputTag("offlineBeamSpot"));    
+    iC.consumes< std::vector<LumiScalers> >(edm::InputTag("scalersRawToDigi"));
 
     // register branches
     registerInt("run", tree);
@@ -70,11 +70,13 @@ void EventIdData::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& 
     	setI("bx", iEvent.bunchCrossing());
 	try {
 	    // Get instantanious lumi information
-	    edm::LuminosityBlock const& lumiBlock = iEvent.getLuminosityBlock();
-	    edm::Handle<LumiDetails> d;
-	    lumiBlock.getByLabel("lumiProducer",d);	
+	    edm::Handle<LumiScalersCollection> lumiScalers;
+	    iEvent.getByLabel("scalersRawToDigi",lumiScalers);	
 	    // This is the call to get the lumi per bx:
-	    setF("instLumiPerPX",d->lumiValue(LumiDetails::kOCC1,iEvent.bunchCrossing()));
+	    if (lumiScalers->size() != 0) {
+	    	LumiScalersCollection::const_iterator it = lumiScalers->begin();
+	    	setF("instLumiPerBX",it->instantLumi());
+	    }
 	} catch (...) {
 	    if (localcount == 1) std::cout << " An exception was thrown when accessing the LumiDetails and/or the LumiSummary objects. This means they are not present and are not correctly filled in the ntuple" << std::endl;
 	}
