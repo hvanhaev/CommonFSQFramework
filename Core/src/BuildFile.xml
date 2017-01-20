@@ -1,25 +1,38 @@
 <use name="FWCore/Framework"/>
 <use name="FWCore/PluginManager"/>
 <use name="FWCore/ParameterSet"/>
+
 <use name="PhysicsTools/Utilities"/>
+
 <use name="SimDataFormats/GeneratorProducts"/>
 <use name="SimDataFormats/PileupSummaryInfo"/>
-<use name="clhep"/>
+
 <use name="DataFormats/VertexReco"/>
 <use name="DataFormats/PatCandidates"/>
-<use name="JetMETCorrections/Objects"/>
-<use name="CondFormats/JetMETObjects"/>
-<use name="CondFormats/CastorObjects"/>
-<use name="CondFormats/DataRecord"/>
 <use name="DataFormats/Common"/>
 <use name="DataFormats/HcalRecHit"/>
 <use name="DataFormats/HcalDetId"/>
 <use name="DataFormats/Luminosity"/>
-<use name="Geometry/CaloGeometry"/>
-<use name="CalibFormats/HcalObjects"/>
-<use name="Geometry/Records"/>
 <use name="DataFormats/GeometryVector"/>
+<use name="DataFormats/TrackerRecHit2D"/>
+
+<use name="clhep"/>
+
+<use name="JetMETCorrections/Objects"/>
+
+<use name="CondFormats/JetMETObjects"/>
+<use name="CondFormats/CastorObjects"/>
+<use name="CondFormats/DataRecord"/>
+
+<use name="Geometry/CaloGeometry"/>
+<use name="Geometry/Records"/>
+<use name="Geometry/TrackerGeometryBuilder"/>
+<use name="Geometry/CommonDetUnit"/>
+
+<use name="CalibFormats/HcalObjects"/>
+
 <use name="HLTrigger/HLTcore"/>
+
 <export>
    <lib name="1"/>
 </export>

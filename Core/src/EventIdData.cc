@@ -8,6 +8,7 @@
 #include "DataFormats/Scalers/interface/LumiScalers.h"
 #include "SimDataFormats/Vertex/interface/SimVertexContainer.h"
 #include "TLorentzVector.h"
+#include "DataFormats/BeamSpot/interface/BeamSpot.h"
 
 EventIdData::EventIdData(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
 EventViewBase(iConfig, tree)
@@ -18,6 +19,7 @@ EventViewBase(iConfig, tree)
     iC.consumes< reco::GenParticleCollection >(edm::InputTag("genParticles"));
     iC.consumes< edm::SimVertexContainer >(edm::InputTag("g4SimHits"));
     iC.consumes< std::vector<PileupSummaryInfo> >(edm::InputTag("addPileupInfo"));
+    iC.consumes<reco::BeamSpot >(edm::InputTag("offlineBeamSpot"));    
     iC.consumes< std::vector<LumiScalers> >(edm::InputTag("scalersRawToDigi"));
 
     // register branches
@@ -44,6 +46,10 @@ EventViewBase(iConfig, tree)
     registerFloat("simvtxx",tree);
     registerFloat("simvtxy",tree);
     registerFloat("simvtxz",tree);
+
+    registerFloat("beamspotx",tree);
+    registerFloat("beamspoty",tree);
+    registerFloat("beamspotz",tree);
 
     localcount = 0;
 
@@ -218,5 +224,17 @@ void EventIdData::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& 
     setF("simvtxx",simPVh.position().x());
     setF("simvtxy",simPVh.position().y());
     setF("simvtxz",simPVh.position().z());
+
+    // get the beamspot position
+    reco::BeamSpot beamSpot;
+    edm::Handle<reco::BeamSpot> beamSpotHandle;
+    iEvent.getByLabel("offlineBeamSpot", beamSpotHandle);
+    if ( beamSpotHandle.isValid() )
+    {
+        beamSpot = *beamSpotHandle;
+        setF("beamspotx",beamSpot.x0());
+        setF("beamspoty",beamSpot.y0());
+        setF("beamspotz",beamSpot.z0());
+    }
 
 }

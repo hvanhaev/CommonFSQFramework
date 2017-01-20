@@ -10,6 +10,28 @@ def get(todo):
         src  = cms.InputTag("offlinePrimaryVertices")
     )
 
+    # ZeroTesla VerticesView
+    defs["ZeroTeslaVertexView_Pixel_PreSplitting"]  = cms.PSet(
+        miniView = cms.string("ZeroTeslaVertexView"),
+        branchPrefix = cms.untracked.string("ZeroTeslaTracking_PixelPreSplitting_"),
+        usePixel = cms.bool(True),
+        src = cms.InputTag("siPixelRecHitsPreSplitting"),
+    )
+
+    defs["ZeroTeslaVertexView_Pixel_noPreSplitting"]  = cms.PSet(
+        miniView = cms.string("ZeroTeslaVertexView"),
+        branchPrefix = cms.untracked.string("ZeroTeslaTracking_PixelnoPreSplitting_"),
+        usePixel = cms.bool(True),
+        src = cms.InputTag("siPixelRecHits"),
+    )
+
+    defs["ZeroTeslaVertexView_Strips"]  = cms.PSet(
+        miniView = cms.string("ZeroTeslaVertexView"),
+        branchPrefix = cms.untracked.string("ZeroTeslaTracking_Strip_"),
+        usePixel = cms.bool(False),
+        src = cms.InputTag(""),
+    )
+
  
     # main function
     ret = {}
