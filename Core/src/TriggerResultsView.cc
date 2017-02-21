@@ -70,8 +70,8 @@ EventViewBase(iConfig,  tree), hltprovider_(iConfig, iC, *module)
         }
     }
 
-    isStage1_ = iConfig.getParameter<bool>("isStage1");
-
+    isStage1_ = iConfig.existsAs<bool>("isStage1") ? iConfig.getParameter<bool>("isStage1") : false;
+    
     // register consumes                                                                                                                                                   
     if (isStage1_) {
       iC.consumes<L1GlobalTriggerReadoutRecord>(edm::InputTag("gtDigis"));
