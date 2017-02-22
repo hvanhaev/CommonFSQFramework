@@ -70,8 +70,14 @@ EventViewBase(iConfig,  tree), hltprovider_(iConfig, iC, *module)
         }
     }
 
-    // register consumes
-    iC.consumes<GlobalAlgBlkBxCollection>(edm::InputTag("gtStage2Digis"));
+    isStage1_ = iConfig.existsAs<bool>("isStage1") ? iConfig.getParameter<bool>("isStage1") : false;
+    
+    // register consumes                                                                                                                                                   
+    if (isStage1_) {
+      iC.consumes<L1GlobalTriggerReadoutRecord>(edm::InputTag("gtDigis"));
+    } else {
+      iC.consumes<GlobalAlgBlkBxCollection>(edm::InputTag("gtStage2Digis"));
+    }
     iC.consumes<edm::TriggerResults>(edm::InputTag("TriggerResults","","HLT")); 
 }
 
@@ -95,69 +101,145 @@ void TriggerResultsView::fillSpecific(const edm::Event& iEvent, const edm::Event
 
     const std::vector< std::string > names = trbn.triggerNames(); 
 
-    // container for L1algo trigger bits
-    edm::Handle<GlobalAlgBlkBxCollection> uGtAlgs;
-    iEvent.getByLabel("gtStage2Digis", uGtAlgs);
+
+    if (isStage1_) {
+
+      edm::Handle<L1GlobalTriggerReadoutRecord> gtReadoutRecord;
+      iEvent.getByLabel(edm::InputTag("gtDigis"), gtReadoutRecord);
+      if( !gtReadoutRecord.isValid() || gtReadoutRecord.failedToGet() ) {
+	edm::LogWarning(" GTReadoutRecord ") << " Cannot read gtReadoutRecord " << std::endl;
+	return;
+      }
+
+      TechnicalTriggerWord TechTrigg = gtReadoutRecord->technicalTriggerWord();
+      DecisionWord AlgoTrig          = gtReadoutRecord->decisionWord();
 
 
-    std::map<std::string, std::vector<std::string> >::const_iterator it, itE;
-    it = m_triggerClasses.begin();
-    itE = m_triggerClasses.end();
-    for(;it != itE;++it) {
+      std::map<std::string, std::vector<std::string> >::const_iterator it, itE;
+      it = m_triggerClasses.begin();
+      itE = m_triggerClasses.end();
+      for(;it != itE;++it){
+
+	//it->first  - branch name                                                                                                                                      
+	//it->second - list of triggers to check                                                                                                                        
+	//                                                                                                                                                              
+	//std::cout << "Trying " << it->first << std::endl;                                                                                                             
+
+	if (it->first == "L1GTTech") {
+	  for (unsigned int i=0; i < TechTrigg.size(); ++i) addToIVec(it->first, TechTrigg.at(i));
+	  continue;
+	} else if (it->first == "L1GTAlgo") {
+	  for (unsigned int i=0; i < AlgoTrig.size(); ++i)  addToIVec(it->first, AlgoTrig.at(i));
+	  continue;
+	}
+
+	int accept = 0;
+
+	if (m_storePrescales && it->second.size() == 1) {
+	  std::string name = it->second.at(0);
+	  if (name.find("*")!= std::string::npos){ // wildcard entry                                                                                                  
+	    // do nothing                                                                                                                                           
+	  } else {
+	    //setI("L1PS_" + it->first, (hltConfig_.prescaleValues(iEvent, iSetup, name)).first );                                                                  
+	    //setI("HLTPS_" + it->first, (hltConfig_.prescaleValues(iEvent, iSetup, name)).second );                                                                
+	    setI("L1PS_" + it->first, (hltprovider_.prescaleValues(iEvent, iSetup, name)).first );
+	    setI("HLTPS_" + it->first, (hltprovider_.prescaleValues(iEvent, iSetup, name)).second );
+	  }
+	}
+
+	for (unsigned int i=0; i < it->second.size();++i){
+	  std::string name = it->second.at(i);
+	  if (name.find("*")!= std::string::npos){ // wildcard entry                                                                                                  
+	    //std::cout << "TODO:" << it->second.at(i) << std::endl;                                                                                                
+	    for (unsigned iName = 0; iName < names.size(); ++iName){
+	      std::string nameForSearch = std::string(it->second.at(i), 0, it->second.at(i).size()-1); // strip the star                                          
+	      if (names.at(iName).find(nameForSearch)==0) { // starts with                                                                                        
+		//std::cout << "Found for start\n";                                                                                                             
+		//std::cout << " found trigger: " << names.at(iName) << std::endl;                                                                              
+		if (trbn.accept(names.at(iName)))  accept = 1;
+	      }
+	    }
+	  } else { // normal entry                                                                                                                                    
+	    if (trbn.accept( it->second.at(i))) accept = 1;
+	    if (m_storePrescales) {
+	      setI("L1PS_" + name, (hltprovider_.prescaleValues(iEvent, iSetup, name)).first );
+	      setI("HLTPS_" + name, (hltprovider_.prescaleValues(iEvent, iSetup, name)).second );
+	      //setI("L1PS_" + name, (hltConfig_.prescaleValues(iEvent, iSetup, name)).first );                                                                   
+	      //setI("HLTPS_" + name, (hltConfig_.prescaleValues(iEvent, iSetup, name)).second );                                                                 
+	    }
+	  }
+	  //std::cout << "Accept: " << it->first <<  " "  << accept << std::endl;                                                                                     
+	  setI(it->first, accept);
+	}
+      }
+
+    } else {  // this is for stage2 L1 trigger     
+      
+      // container for L1algo trigger bits
+      edm::Handle<GlobalAlgBlkBxCollection> uGtAlgs;
+      iEvent.getByLabel("gtStage2Digis", uGtAlgs);
+      
+      
+      std::map<std::string, std::vector<std::string> >::const_iterator it, itE;
+      it = m_triggerClasses.begin();
+      itE = m_triggerClasses.end();
+      for(;it != itE;++it) {
         //it->first  - branch name
         //it->second - list of triggers to check
         //
         //std::cout << "Trying " << it->first << std::endl;
-
+	
         if (it->first == "L1GTTech") {
-            //for (unsigned int i=0; i < TechTrigg.size(); ++i) addToIVec(it->first, TechTrigg.at(i)); // there are no more technical trigger bits
-            continue;
+	  //for (unsigned int i=0; i < TechTrigg.size(); ++i) addToIVec(it->first, TechTrigg.at(i)); // there are no more technical trigger bits
+	  continue;
         } else if (it->first == "L1GTAlgo") {
-            auto itr = uGtAlgs->begin(0);
-            for(int algoBit = 0; algoBit < 512; ++algoBit) {
-                if(itr->getAlgoDecisionInitial(algoBit)) {
-                    addToIVec(it->first, 1);
-                }
-                else {
-                    addToIVec(it->first, 0);
-                }
-            }
-            continue;
+	  auto itr = uGtAlgs->begin(0);
+	  for(int algoBit = 0; algoBit < 512; ++algoBit) {
+	    if(itr->getAlgoDecisionInitial(algoBit)) {
+	      addToIVec(it->first, 1);
+	    }
+	    else {
+	      addToIVec(it->first, 0);
+	    }
+	  }
+	  continue;
         }
-
+	
         int accept = 0;
-
+	
         if (m_storePrescales && it->second.size() == 1) {
-            std::string name = it->second.at(0);
-            if (name.find("*")!= std::string::npos) { // wildcard entry
-                // do nothing
-            } else {
-                 setI("L1PS_" + it->first, (hltprovider_.prescaleValues(iEvent, iSetup, name)).first );
-                 setI("HLTPS_" + it->first, (hltprovider_.prescaleValues(iEvent, iSetup, name)).second );
-            }
+	  std::string name = it->second.at(0);
+	  if (name.find("*")!= std::string::npos) { // wildcard entry
+	    // do nothing
+	  } else {
+	    setI("L1PS_" + it->first, (hltprovider_.prescaleValues(iEvent, iSetup, name)).first );
+	    setI("HLTPS_" + it->first, (hltprovider_.prescaleValues(iEvent, iSetup, name)).second );
+	  }
         }
-
+	
         for (unsigned int i=0; i < it->second.size();++i) {
-            std::string name = it->second.at(i);
-            if (name.find("*")!= std::string::npos) { // wildcard entry
-                //std::cout << "TODO:" << it->second.at(i) << std::endl;
-                for (unsigned iName = 0; iName < names.size(); ++iName) {
-                    std::string nameForSearch = std::string(it->second.at(i), 0, it->second.at(i).size()-1); // strip the star
-                    if (names.at(iName).find(nameForSearch)==0) { // starts with
-                        //std::cout << "Found for start\n";
-                        //std::cout << " found trigger: " << names.at(iName) << std::endl;
-                        if (trbn.accept(names.at(iName)))  accept = 1;
-                    }
-                }
-            } else { // normal entry
-                if (trbn.accept( it->second.at(i))) accept = 1;
-                if (m_storePrescales) {
-                     setI("L1PS_" + name, (hltprovider_.prescaleValues(iEvent, iSetup, name)).first );
-                     setI("HLTPS_" + name, (hltprovider_.prescaleValues(iEvent, iSetup, name)).second );
-                }
-            }
-            //std::cout << "Accept: " << it->first <<  " "  << accept << std::endl;
-            setI(it->first, accept);
+	  std::string name = it->second.at(i);
+	  if (name.find("*")!= std::string::npos) { // wildcard entry
+	    //std::cout << "TODO:" << it->second.at(i) << std::endl;
+	    for (unsigned iName = 0; iName < names.size(); ++iName) {
+	      std::string nameForSearch = std::string(it->second.at(i), 0, it->second.at(i).size()-1); // strip the star
+	      if (names.at(iName).find(nameForSearch)==0) { // starts with
+		//std::cout << "Found for start\n";
+		//std::cout << " found trigger: " << names.at(iName) << std::endl;
+		if (trbn.accept(names.at(iName)))  accept = 1;
+	      }
+	    }
+	  } else { // normal entry
+	    if (trbn.accept( it->second.at(i))) accept = 1;
+	    if (m_storePrescales) {
+	      setI("L1PS_" + name, (hltprovider_.prescaleValues(iEvent, iSetup, name)).first );
+	      setI("HLTPS_" + name, (hltprovider_.prescaleValues(iEvent, iSetup, name)).second );
+	    }
+	  }
+	  //std::cout << "Accept: " << it->first <<  " "  << accept << std::endl;
+	  setI(it->first, accept);
         }
+      }
     }
+    
 }
