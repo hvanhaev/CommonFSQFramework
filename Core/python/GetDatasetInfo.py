@@ -114,9 +114,11 @@ def validateRootFiles(fileListUnvalidated, maxFiles=None, quiet = False):
 
 def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet = False, samplesToProcess = None, usePickle=False, donotvalidate=True):
     # in principle we should check if lcg-ls supports -c/ -o argumets
-    legacyMode = "slc5" in os.environ["SCRAM_ARCH"] 
-    if legacyMode:
-        print "Warning - running in legacy mode. Access to remote directories with more than 1000 files wont be possible"
+    legacyMode = False
+    if "SCRAM_ARCH" in  os.environ:
+        legacyMode = "slc5" in os.environ["SCRAM_ARCH"] 
+        if legacyMode:
+            print "Warning - running in legacy mode. Access to remote directories with more than 1000 files wont be possible"
 
 
     if usePickle and donotvalidate:
