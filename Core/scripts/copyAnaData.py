@@ -14,9 +14,9 @@ import subprocess
 import CommonFSQFramework.Core.Util
 
 
-def getFileListLcgLs(path):
+def getFileListGfalLs(path):
     ret = []
-    command = ["lcg-ls", path]
+    command = ["gfal-ls", path]
     proc = subprocess.Popen(command, stdout=subprocess.PIPE)
     cnt = 0
     for line in iter(proc.stdout.readline,''):
@@ -280,14 +280,14 @@ def main():
 
 
 
-        # on my installation lcg-ls does not have offset/count params
+        # on my installation gfal-ls does not have offset/count params
         # needed for srm access to dirs with >1000 files.
         
-#command = ["lcg-ls", sampleList[s]["pathSE"]]
+#command = ["gfal-ls", sampleList[s]["pathSE"]]
         if options.usesrmls:
             flist = getFileListSrmLS(sampleList[s]["pathSE"])
         else:
-            flist = getFileListLcgLs(sampleList[s]["pathSE"])
+            flist = getFileListGfalLs(sampleList[s]["pathSE"])
         cnt = 0
         for srcFile in flist:
             fname = srcFile.split("/")[-1]
@@ -311,11 +311,11 @@ def main():
                 continue
 
             if "eos/cms" in targetDir:
-	        cpCommand = ['lcg-cp', srcFile, "srm://srm-eoscms.cern.ch/"+targetFile]
+	        cpCommand = ['gfal-copy', srcFile, "srm://srm-eoscms.cern.ch/"+targetFile]
 	    else:
-                cpCommand = ['lcg-cp', srcFile, targetFile]
+                cpCommand = ['gfal-copy', srcFile, targetFile]
             
-	    #cpCommand = ['lcg-ls', srcFile]
+	    #cpCommand = ['gfal-ls', srcFile]
 	    #print "would be cpCommand: ", cpCommand
             
 	    if "eos/cms" not in targetDir and os.path.isfile(targetFile):
