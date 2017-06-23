@@ -20,5 +20,7 @@ class TriggerResultsView: public EventViewBase{
       bool isValidHLTConfig_;
 
       bool isStage1_;
+
+      edm::EDGetTokenT<edm::TriggerResults> m_HLTtoken;
 };
 #endif
