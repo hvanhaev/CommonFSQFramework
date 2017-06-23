@@ -1,5 +1,7 @@
 #include "CommonFSQFramework/Core/interface/TriggerResultsView.h"
 #include "FWCore/Common/interface/TriggerResultsByName.h"
+#include "DataFormats/Common/interface/TriggerResults.h"
+#include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
 
 TriggerResultsView::TriggerResultsView(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC, edm::EDAnalyzer* module):
@@ -78,7 +80,7 @@ EventViewBase(iConfig,  tree), hltprovider_(iConfig, iC, *module)
     } else {
       iC.consumes<GlobalAlgBlkBxCollection>(edm::InputTag("gtStage2Digis"));
     }
-    iC.consumes<edm::TriggerResults>(edm::InputTag("TriggerResults","","HLT")); 
+    m_HLTtoken = iC.consumes<edm::TriggerResults>(edm::InputTag("TriggerResults","","HLT")); 
 }
 
 void TriggerResultsView::doBeginRun(const edm::Run& r, const edm::EventSetup& es) {
@@ -92,7 +94,9 @@ void TriggerResultsView::doBeginRun(const edm::Run& r, const edm::EventSetup& es
 
 void TriggerResultsView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-    edm::TriggerResultsByName trbn = iEvent.triggerResultsByName(m_process);
+    edm::Handle<edm::TriggerResults> trigres;
+    iEvent.getByToken(m_HLTtoken,trigres);
+    edm::TriggerResultsByName trbn = iEvent.triggerResultsByName(*trigres);
     // TODO error message?
     if (!trbn.isValid()) {
         edm::LogWarning(" TriggerResultsByName ") << " Cannot read TriggerResultsByName " << std::endl;
