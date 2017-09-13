@@ -291,10 +291,13 @@ def fixLocalPaths(sam):
         for s in sam:
             if "pathPAT" in sam[s]:
                 sam[s]["pathPAT"] = sam[s]["pathPAT"].replace("XXXTMFPAT", localBasePathPAT)
+                if not sam[s]["pathPAT"].endswith('/'):
+                        sam[s]["pathPAT"] += '/'
             if "pathTrees" in sam[s]:
                 sam[s]["pathTrees"] = sam[s]["pathTrees"].replace("XXXTMFTTree", localBasePathTrees)
-            #print sam[s]["pathPAT"]
-            #print sam[s]["pathTrees"]
+                if not sam[s]["pathTrees"].endswith('/'):
+                        sam[s]["pathTrees"] += '/'
         return sam
+
 sam = fixLocalPaths(sam)
 
