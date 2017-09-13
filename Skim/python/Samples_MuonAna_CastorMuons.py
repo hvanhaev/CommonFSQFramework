@@ -23,7 +23,7 @@ sam["data_PACastor_Muon_2016B"] = {}
 sam["data_PACastor_Muon_2016B"]["GT"] = '80X_dataRun2_Prompt_v15'
 sam["data_PACastor_Muon_2016B"]["name"] = 'data_PACastor_Muon_2016B'
 sam["data_PACastor_Muon_2016B"]["isData"] = True
-sam["data_PACastor_Muon_2016B"]["pathSE"] = 'srm://grid-srm.physik.rwth-aachen.de:8443/srm/managerv2?SFN=/pnfs/physik.rwth-aachen.de/cms/store/user/makbiyik/CastorMuon2016/PACastor/MuonAna_CastorMuon2016_data_PACastor_Muon_2016B/161215_143102/0000/'
+sam["data_PACastor_Muon_2016B"]["pathSE"] = 'srm://grid-srm.physik.rwth-aachen.de:8443/srm/managerv2?SFN=/pnfs/physik.rwth-aachen.de/cms/store/user/makbiyik/CastorMuon2016/PACastor/MuonAna_CastorMuon2016_data_PACastor_Muon_2016/161215_143102/0000/'
 # a few more files are split into directory:
 #      srm://grid-srm.physik.rwth-aachen.de:8443/srm/managerv2?SFN=/pnfs/physik.rwth-aachen.de/cms/store/user/makbiyik/CastorMuon2016/PACastor/MuonAna_CastorMuon2016_data_PACastor_Muon_2016/161215_105329/0000/
 sam["data_PACastor_Muon_2016B"]["pathTrees"]='XXXTMFTTree/CastorMuons/PACastor/MuonAna_CastorMuons2016_data_PACastor_Muon_2016B/161215_143102/0000/'
@@ -91,7 +91,7 @@ sam["data_MinimumBias_2015_JuneNoise"]={}
 #sam["data_MinimumBias_2015_JuneNoise"]["crabJobs"]=232
 #sam["data_MinimumBias_2015_JuneNoise"]["numEvents"]=-1
 sam["data_MinimumBias_2015_JuneNoise"]["GT"]='80X_dataRun2_v13'
-sam["data_MinimumBias_2015_JuneNoise"]["name"]='data_MinimumBias_2015_JuneNoise_Objects'
+sam["data_MinimumBias_2015_JuneNoise"]["name"]='data_MinimumBias_2015_JuneNoise'
 sam["data_MinimumBias_2015_JuneNoise"]["isData"]=True
 sam["data_MinimumBias_2015_JuneNoise"]["pathSE"]='srm://grid-srm.physik.rwth-aachen.de:8443/srm/managerv2?SFN=/pnfs/physik.rwth-aachen.de/cms/store/user/rulrich/CastorMuons/MinimumBias/MuonAna_CastorMuons_data_MinimumBias_2015_JuneNoise/170902_151248/0000'
 sam["data_MinimumBias_2015_JuneNoise"]["pathTrees"]='XXXTMFTTree/CastorMuons/MinimumBias/MuonAna_CastorMuons_data_MinimumBias_2015_JuneNoise/170902_151248/0000'
@@ -146,7 +146,7 @@ sam["data_MinimumBias_2015_38T_Nov"]["name"]='data_MinimumBias_2015_38T_Nov'
 sam["data_MinimumBias_2015_38T_Nov"]["isData"]=True
 sam["data_MinimumBias_2015_38T_Nov"]["numEvents"]=-1
 sam["data_MinimumBias_2015_38T_Nov"]["pathSE"]='srm://grid-srm.physik.rwth-aachen.de:8443/srm/managerv2?SFN=/pnfs/physik.rwth-aachen.de/cms/store/user/makbiyik/CastorMuon2015/muon_2015_38T_Nov/Cosmics/MuonAna_CastorMuon2016_data_MinimumBias_2015_38T_Nov/161220_135728/0000'
-sam["data_MinimumBias_2015_38T_Nov"]["pathTrees"]='XXXTMFTTree/store/user/makbiyik/CastorMuons/muon_2015_38T_Nov/Cosmics/MuonAna_CastorMuon2016_data_MinimumBias_2015_38T_Nov/161220_135728/0000'
+sam["data_MinimumBias_2015_38T_Nov"]["pathTrees"]='XXXTMFTTree/CastorMuons/muon_2015_38T_Nov/Cosmics/MuonAna_CastorMuon2016_data_MinimumBias_2015_38T_Nov/161220_135728/0000'
 sam["data_MinimumBias_2015_38T_Nov"]["json"]='muon_2015_3.8T_Nov_halo.json'
 sam["data_MinimumBias_2015_38T_Nov"]["lumiMinBias"]=-1
 sam["data_MinimumBias_2015_38T_Nov"]["XS"]=-1
@@ -200,7 +200,7 @@ sam["data_PAMinBiasUPC_Run2013"]["numEvents"]=286814246
 sam["data_PAMinBiasUPC_Run2013"]["pathSE"]='srm://grid-srm.physik.rwth-aachen.de:8443/srm/managerv2?SFN=/pnfs/physik.rwth-aachen.de/cms/store/user/makbiyik/CastorMuon2013/HIRun2013A/PAMinBiasUPC/MuonAna_CastorMuon2016_data_PAMinBiasUPC_Run2013/170120_142642/0000'
 # more data in 'srm://grid-srm.physik.rwth-aachen.de:8443/srm/managerv2?SFN=/pnfs/physik.rwth-aachen.de/cms/store/user/makbiyik/CastorMuon2013/HIRun2013A/PAMinBiasUPC/MuonAna_CastorMuon2016_data_PAMinBiasUPC_Run2013/170120_142642/0001'
 # and more data in #'srm://grid-srm.physik.rwth-aachen.de:8443/srm/managerv2?SFN=/pnfs/physik.rwth-aachen.de/cms/store/user/makbiyik/CastorMuon2013/HIRun2013A/PAMinBiasUPC/MuonAna_CastorMuon2016_data_PAMinBiasUPC_Run2013/170120_142642/0002'
-sam["data_PAMinBiasUPC_Run2013"]["pathTrees"]='XXXTMFPAT/store/user/makbiyik/CastorMuons/HIRun2013A/PAMinBiasUPC/MuonAna_CastorMuon2016_data_PAMinBiasUPC_Run2013/170120_142642/0000'
+sam["data_PAMinBiasUPC_Run2013"]["pathTrees"]='XXXTMFTTree/CastorMuons/HIRun2013A/PAMinBiasUPC/MuonAna_CastorMuon2016_data_PAMinBiasUPC_Run2013/170120_142642/0000'
 sam["data_PAMinBiasUPC_Run2013"]["json"]='muon_2013_3.8T_halo.json'
 sam["data_PAMinBiasUPC_Run2013"]["lumiMinBias"]=-1
 sam["data_PAMinBiasUPC_Run2013"]["XS"]=-1
@@ -214,9 +214,9 @@ sam["data_PAMNoise_Run2013"]["GT"]='GR_R_75_V5A'
 sam["data_PAMNoise_Run2013"]["name"]='data_PAMNoise_Run2013'
 sam["data_PAMNoise_Run2013"]["isData"]=True
 sam["data_PAMNoise_Run2013"]["numEvents"]=286814246
-sam["data_PAMNoise_Run2013"]["pathSE"]='srm://grid-srm.physik.rwth-aachen.de:8443/srm/managerv2?SFN=/pnfs/physik.rwth-aachen.de/cms/store/user/rulrich/CastorMuons/'
-sam["data_PAMNoise_Run2013"]["pathTrees"]='XXXTMFPAT/'
-sam["data_PAMNoise_Run2013"]["json"]='muon_2013_3.8T_halo.json'
+sam["data_PAMNoise_Run2013"]["pathSE"]='srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/rulrich/CastorMuons/MinimumBias/MuonAna_CastorMuons_data_PAMNoise_Run2013/170905_095809/0000'
+sam["data_PAMNoise_Run2013"]["pathTrees"]='XXXTMFTTree/CastorMuons/MinimumBias/MuonAna_CastorMuons_data_PAMNoise_Run2013/170905_095809/0000'
+sam["data_PAMNoise_Run2013"]["json"]='noise_2013_interfill.json'
 sam["data_PAMNoise_Run2013"]["lumiMinBias"]=-1
 sam["data_PAMNoise_Run2013"]["XS"]=-1
 # sam["data_PAMNoise_Run2013"]["pathPAT"]='XXXTMFPAT/store/user/makbiyik/CastorMuon2013/HIRun2013A//'
