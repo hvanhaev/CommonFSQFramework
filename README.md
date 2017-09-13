@@ -14,5 +14,15 @@ https://twiki.cern.ch/twiki/bin/view/CMS/FSQCommonFW201504Jets
 
 Or look into the /Core/doc directory for information.
 
-Please note that this is still in heavy development...
+Please note that the code is still developing and improving. 
+
+
+# NOTE (for standalone operations):
+
+In order to tun CFF in standalone mode as a python library, just
+execute the script ./makeStandalone.sh Afterwards you are ready to use
+the library on any machine that has just python an PyROOT installed!
+
+Make sure you don't load the libFWCoreFWLite.so anywhere in your code and
+scripts. This will not work on normal computer systems witout CMSSW. 
 
