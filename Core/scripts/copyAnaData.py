@@ -116,11 +116,12 @@ def getFileListGFAL(path):
         cnt += 1
         ret.append(srcFile)
 
-    if lineCnt <= 1:
-        err = "Cannot get filelist for  "+path+"\n"
+    if lineCnt < 1:
+        err = "Cannot get filelist for  " + path + "\n"
         err += " - if  some files were copied allready this probably means some server related problems."
         err += " Please retry in couple of minutes. \n"  
         err += " - if none of the files were copied please check your certificate proxy.\n"
+        print err
         raise Exception(err)
 
     return ret
@@ -302,6 +303,9 @@ def main():
 	
         
     #333
+    cntSamples = 0
+    cntCopySum = 0
+    cntReadSum = 0
     myprocs = []
     for s in sampleList:
         if "pathSE" not in sampleList[s]:
@@ -326,9 +330,9 @@ def main():
         except:
             continue
 
+        cntSamples += 1
+
         # TODO: check dir existence
-
-
 
         # on my installation lcg-ls does not have offset/count params
         # needed for srm access to dirs with >1000 files.
@@ -340,8 +344,12 @@ def main():
             flist = getFileListSrmLS(sampleList[s]["pathSE"])
         else:
             flist = getFileListLcgLs(sampleList[s]["pathSE"])
-        cnt = 0
+
+        cntCopy = 0
+        cntRead = 0
         for srcFile in flist:
+            cntRead += 1
+            cntReadSum += 1
             fname = srcFile.split("/")[-1]
             patFile = "mnTrgAna_PAT_" in fname
             treeFile = "trees_" in fname
@@ -357,10 +365,11 @@ def main():
                 typeString = "treeFile"
 
             if not doCopy: continue
-            cnt += 1
             targetFile = targetDir + "/" + fname
-            if not sampleList[s]["isData"] and maxFilesMC >= 0 and cnt >= maxFilesMC:
+            if not sampleList[s]["isData"] and maxFilesMC >= 0 and cntCopy >= maxFilesMC:
                 continue
+
+            cntCopy += 1
 
             if options.useGFAL:
                 cpCommand = ['gfal-copy', srcFile, targetFile]
@@ -374,10 +383,11 @@ def main():
 	    #print "would be cpCommand: ", cpCommand
             
 	    if "eos/cms" not in targetDir and os.path.isfile(targetFile):
-                print "Allready present", typeString, fname, " #"+str(cnt), "from", s
+                print "Allready present", typeString, fname, " #"+str(cntCopy), "from", s
                 continue
 
-            print "Copying", typeString, fname, " #"+str(cnt), "from", s
+            print "Copying", typeString, fname, " #"+str(cntCopy), "from", s
+            cntCopySum += 1
 
             myproc = subprocess.Popen(cpCommand)
             myprocs.append( (myproc, cpCommand) ) 
@@ -401,6 +411,8 @@ def main():
                     print "Problem with ", p[1]
                 myprocs.remove(p)
 
+
+    print "Finished copying " + str(cntCopySum) + " of total " + str(cntReadSum) + " files from " + str(cntSamples) + " samples "  
             
     ###
 
