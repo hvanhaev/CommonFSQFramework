@@ -62,6 +62,7 @@ for s in sampleListTodo:
 
 
   pycfgextra = []  
+  pycfgextracheck = []  
   pycfgextra.append("config.General.workArea='"+anaVersion+"'")
   pycfgextra.append("config.General.requestName='"+name+"'")
   pycfgextra.append("config.Data.outputDatasetTag='"+name+"'")
@@ -74,14 +75,14 @@ for s in sampleListTodo:
   
   if isData:
     print isData, sampleList[s]["json"]
-    pycfgextra.append("config.Data.splitting='LumiBased'")
-    pycfgextra.append("config.Data.unitsPerJob=10")
+    pycfgextracheck.append("config.Data.splitting='LumiBased'")
+    pycfgextracheck.append("config.Data.unitsPerJob=10")
     jsonFile=edm.FileInPath(sampleList[s]["json"])
     pycfgextra.append("config.Data.lumiMask='"+jsonFile.fullPath()+"'")
     
   else:
-    pycfgextra.append("config.Data.splitting='EventAwareLumiBased'")
-    pycfgextra.append("config.Data.unitsPerJob=100000")
+    pycfgextracheck.append("config.Data.splitting='EventAwareLumiBased'")
+    pycfgextracheck.append("config.Data.unitsPerJob=100000")
   
 
   # TODO save old value and set it at exit   
@@ -89,9 +90,21 @@ for s in sampleListTodo:
 
 
   os.system("cp crabcfg.py  tmp.py")
+  cfglines = []
+  with open("tmp.py", "r") as myfile:
+      cfglines = myfile.readlines()
+      myfile.close()
+  
   with open("tmp.py", "a") as myfile:
-    for l in pycfgextra:
-        myfile.write(l+"\n")
+    # without check
+    for extraline in pycfgextra:
+        myfile.write(extraline+"\n")
+    # with check
+    for extraline in pycfgextracheck:
+        for check in cfglines:
+            if check.strip().find(extraline.split('=').strip()) != 0:
+                myfile.write(extraline+"\n")
+    myfile.close()
 
   #os.system("./crab submit -c tmp.py")
   os.system("crab submit -c tmp.py")
