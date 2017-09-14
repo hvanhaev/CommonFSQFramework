@@ -131,9 +131,15 @@ for s in sampleListTodo:
           myfile.write(l+"\n")
       # append custom config, WITH-check
       for extraline in pycfgextracheck:
-          for check in cfglines:
-              if check.strip().find(extraline.split('=').strip()) != 0:
-                  myfile.write(extraline+"\n")
+          found = False
+          for check in checklines:
+              assign = extraline.split('=')
+              if (len(assign)>0):
+                  if check.strip().find(assign[0].strip()) != 0:
+                      found = True
+                      break
+          if not found:
+              myfile.write(extraline+"\n")
       myfile.close()
 
   if not cfgName:
@@ -145,7 +151,6 @@ for s in sampleListTodo:
         sys.exit()
 
   os.system("crab submit -c tmp.py")
-
 
   fOut = targetPath + "/" + cfgName
   shutil.copy(cfgName, fOut)
