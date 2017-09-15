@@ -10,7 +10,6 @@ import time
 from multiprocessing import Process, Queue
 
 import pickle
-import distutils.spawn
 import subprocess
 
 def validateRootFile(fname, q):
@@ -123,13 +122,15 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
 
 
     if usePickle and donotvalidate:
-        raise Exception("Cannot go this way (usePickle and donotvalidate)")
+        print ("Cannot go this way (usePickle and donotvalidate)")
+        sys.exit(1)
 
     # TODO: SmallXAnaDefFile access function in Util
     if "SmallXAnaDefFile" not in os.environ:
-        print "Please set SmallXAnaDefFile environment variable:"
-        print "export SmallXAnaDefFile=FullPathToFile"
-        raise Exception("Whooops! SmallXAnaDefFile env var not defined")
+        print ("Please set SmallXAnaDefFile environment variable:")
+        print ("export SmallXAnaDefFile=FullPathToFile")
+        print ("Whooops! SmallXAnaDefFile env var not defined")
+        sys.exit(1)
 
     anaDefFile = os.environ["SmallXAnaDefFile"]
     mod_dir, filename = os.path.split(anaDefFile)
@@ -140,8 +141,9 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
     localBasePathPAT = mod.PATbasePATH
     localBasePathTrees = mod.TTreeBasePATH
     if not hasattr(mod, "ROOTPrefix"):
-        raise Exception("Please note you need to provide a (new) ROOTPrefix  parameter inside SmallXAnaDefFile. " \
-                         +"See CommonFSQFramework.Core/doc/SmallXAnaDefFile.txt for details")
+        print ("Please note you need to provide a (new) ROOTPrefix  parameter inside SmallXAnaDefFile. " \
+                   +"See CommonFSQFramework.Core/doc/SmallXAnaDefFile.txt for details")
+        sys.exit(1)
 
     localROOTPrefix = mod.ROOTPrefix
     isXrootdAccess = False
@@ -156,7 +158,8 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
         newList = {}
         for s in samplesToProcess:
             if s not in sampleList:
-                raise Exception("Requested sample "+s+ " not known")
+                print ("Requested sample "+s+ " not known")
+                sys.exit(1)
             newList[s]=sampleList[s]
         sampleList = newList
 
@@ -194,17 +197,23 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
             if not quiet: print tab, "path to trees taken from 'sampleList[s][\"pathTrees\"]' variable"
             if not "eos/cms" in sampleList[s]["pathTrees"]:
                 for dirpath, dirnames, filenames in os.walk(sampleList[s]["pathTrees"]):
+                    if "fail" in dirpath: continue
                     for f in filenames:
+                        if "fail" in f: continue
                         if not f.startswith("trees_"): continue
                         if not f.endswith(".root"): continue
                         fname = dirpath.replace("//","/") + f   # somehow root doesnt like // at the begining
                         fileListUnvalidated.add(localROOTPrefix+fname)
             if "eos/cms" in sampleList[s]["pathTrees"]:
                 # only works on lxplus...
+                if not  distutils.spawn.find_executable("xrd"):
+                    print ("Cannot find xrd executable. You may need to run this on lxplus!")
+                    sys.exit(1)
                 lscomm = ["xrd", "eoscms", "ls", sampleList[s]["pathTrees"]]
                 proc = subprocess.Popen(lscomm, stdout=subprocess.PIPE)
                 for line in iter(proc.stdout.readline,''):
                     ifile = line.strip()
+                    if "fail" in ifile: continue
                     if "trees_" not in ifile: continue
                     if ".root" not in ifile: continue
                     filename = ifile.split("//")[-1]
@@ -219,14 +228,16 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                 if "trees_" not in fname: continue
                 srcFile = pathSE + "/" + fname
                 if "/store/" not in srcFile:
-                    raise "Cannot convert to lfn:", srcFile
+                    print ("Cannot convert to lfn:", srcFile)
+                    sys.exit(1)
                 lfn = "/store/"+srcFile.split("/store/")[-1]
 
                 #targetFile = targetDir + "/" + fname
                 fileListUnvalidated.add(localROOTPrefix+lfn)
 
         else:
-            raise Exception("Thats confusing! File access method undetermined!")
+            print ("Thats confusing! File access method undetermined!")
+            sys.exit(1)
 
         print "Total number of files in sample:", len(fileListUnvalidated)
         if donotvalidate:

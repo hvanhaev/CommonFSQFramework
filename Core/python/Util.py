@@ -1,4 +1,5 @@
 import os, sys, subprocess, imp
+import distutils.spawn
 
 
 
@@ -9,7 +10,8 @@ def getCrabVersion():
         p = subprocess.Popen(["crab", "--version"], stdout=subprocess.PIPE)
         ver = p.communicate()[0]
     except OSError:
-        raise Exception("Seems that crab environment is not defined. Exit... stage left")
+        print ("Seems that crab environment is not defined. Exit... stage left")
+        sys.exit(1)
     ret = 2
     if "v3" in ver:
         ret = 3 
@@ -21,7 +23,8 @@ def getVariant():
     if  "SmallXAnaVersion" not in  os.environ:
         m = " Cannot get ana variant from env. Set SmallXAnaVersion "
         m += "to desired value (e.g. by sourcing one of files from CommonFSQFramework.Core/env/ directory) "
-        raise Exception(m)
+        print (m)
+        sys.exit(1)
     variant = os.environ["SmallXAnaVersion"]
     return variant
 
@@ -35,6 +38,37 @@ def getFullPathToAnaDefinitionFile():
 
 
 
+def fixLocalPaths(sam):
+        import os,imp
+        if "SmallXAnaDefFile" not in os.environ:
+            print ("Please set SmallXAnaDefFile environment variable:")
+            print ("export SmallXAnaDefFile=FullPathToFile")
+            print ("Whooops! SmallXAnaDefFile env var not defined")
+            sys.exit(1)
+        anaDefFile = os.environ["SmallXAnaDefFile"]
+        mod_dir, filename = os.path.split(anaDefFile)
+        mod, ext = os.path.splitext(filename)
+        f, filename, desc = imp.find_module(mod, [mod_dir])
+        mod = imp.load_module(mod, f, filename, desc)
+
+        localBasePathPAT = mod.PATbasePATH
+        localBasePathTrees = mod.TTreeBasePATH
+
+        for s in sam:
+            if "pathSE" in sam[s]:
+                sam[s]["pathSE"] = sam[s]["pathSE"].rstrip('/')
+            if "pathPAT" in sam[s]:
+                sam[s]["pathPAT"] = sam[s]["pathPAT"].replace("XXXTMFPAT", localBasePathPAT)
+                sam[s]["pathPAT"] = sam[s]["pathPAT"].replace("@CFF_LOCALPATDIR@", localBasePathTrees)
+                sam[s]["pathPAT"] = sam[s]["pathPAT"].rstrip('/')
+            if "pathTrees" in sam[s]:
+                sam[s]["pathTrees"] = sam[s]["pathTrees"].replace("XXXTMFTTree", localBasePathTrees)
+                sam[s]["pathTrees"] = sam[s]["pathTrees"].replace("@CFF_LOCALTreeDIR@", localBasePathTrees)
+                sam[s]["pathTrees"] = sam[s]["pathTrees"].rstrip('/')
+        return sam
+
+
+
 def getAnaDefinition(varname, toGlobal=False):
     variant = getVariant()
     command = "from "+variant+" import "+varname
@@ -43,15 +77,16 @@ def getAnaDefinition(varname, toGlobal=False):
     else:
         exec(command)
     obj = eval(varname)
-    return obj
+    return fixLocalPaths(obj)
 
 
 
 def getROOTPrefix():
     if "SmallXAnaDefFile" not in os.environ:
-        print "Please set SmallXAnaDefFile environment variable:"
-        print "export SmallXAnaDefFile=FullPathToFile"
-        raise Exception("Whooops! SmallXAnaDefFile env var not defined")
+        print ("Please set SmallXAnaDefFile environment variable:")
+        print ("export SmallXAnaDefFile=FullPathToFile")
+        print ("Whooops! SmallXAnaDefFile env var not defined")
+        sys.exit(1)
     anaDefFile = os.environ["SmallXAnaDefFile"]
     mod_dir, filename = os.path.split(anaDefFile)
     mod, ext = os.path.splitext(filename)
@@ -63,9 +98,10 @@ def getROOTPrefix():
 
 def getTTreeBasePath():
     if "SmallXAnaDefFile" not in os.environ:
-        print "Please set SmallXAnaDefFile environment variable:"
-        print "export SmallXAnaDefFile=FullPathToFile"
-        raise Exception("Whooops! SmallXAnaDefFile env var not defined")
+        print ("Please set SmallXAnaDefFile environment variable:")
+        print ("export SmallXAnaDefFile=FullPathToFile")
+        print ("Whooops! SmallXAnaDefFile env var not defined")
+        sys.exit(1)
     anaDefFile = os.environ["SmallXAnaDefFile"]
     mod_dir, filename = os.path.split(anaDefFile)
     mod, ext = os.path.splitext(filename)
@@ -77,9 +113,10 @@ def getTTreeBasePath():
 
 def getPATBasePath():
     if "SmallXAnaDefFile" not in os.environ:
-        print "Please set SmallXAnaDefFile environment variable:"
-        print "export SmallXAnaDefFile=FullPathToFile"
-        raise Exception("Whooops! SmallXAnaDefFile env var not defined")
+        print ("Please set SmallXAnaDefFile environment variable:")
+        print ("export SmallXAnaDefFile=FullPathToFile")
+        print ("Whooops! SmallXAnaDefFile env var not defined")
+        sys.exit(1)
     anaDefFile = os.environ["SmallXAnaDefFile"]
     mod_dir, filename = os.path.split(anaDefFile)
     mod, ext = os.path.splitext(filename)
@@ -105,22 +142,27 @@ def getFileListGFAL(path, subdir=''):
     ret = []
     cnt = 0
     if not  distutils.spawn.find_executable("gfal-ls"):
-        raise Exception("Cannot find gfal-ls executable. Check your grid environment!")
-    command = ["gfal-ls", "-a", path + subdir]
+        print ("Cannot find gfal-ls executable. Check your grid environment!")
+        sys.exit(1)
+    command = ["gfal-ls", "-a", path.rstrip('/') + '/' + subdir]
     lineCnt = 0
-    print "Obtaining file list for ", path, " with gfal"
+    print "Obtaining file list for ", path.rstrip('/') + '/' + subdir, " with gfal"
     proc = subprocess.Popen(command, stdout=subprocess.PIPE)
-    for line in iter(proc.stdout.readline,''):
+    for read_line in iter(proc.stdout.readline, ''):
         lineCnt += 1
-        l =  line.strip()
-        fname = l.split("/")[-1]
+        line =  read_line.strip()
+        if ("fail" in line): continue
+        fname = line.split("/")[-1]
         if not fname.endswith(".root"):
             # could be directory...
-            ret2 = getFileListGFAL(path, '/' + fname)
+            ret2 = getFileListGFAL(path, fname)
             ret += ret2
             cnt += len(ret2)
             continue
-        srcFile = path + "/" + fname
+        srcFile = subdir
+        if (subdir!=''):
+            srcFile += '/'
+        srcFile += fname
         cnt += 1
         ret.append(srcFile)
     if lineCnt < 1:
@@ -129,5 +171,5 @@ def getFileListGFAL(path, subdir=''):
         err += " Please retry in couple of minutes. \n"  
         err += " - if none of the files were copied please check your certificate proxy.\n"
         print err
-#        raise Exception(err)
+    print ("Found " + str(len(ret)) + " files ")
     return ret

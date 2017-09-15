@@ -40,7 +40,8 @@ def checkRootFile(fp):
             break
 
     if errInStdout:
-        raise Exception("\nProblem processing call: "+" ".join(cmd)+ "\n\noutdata:\n\n" + outData)
+        print ("\nProblem processing call: "+" ".join(cmd)+ "\n\noutdata:\n\n" + outData)
+        sys.exit(1)
 
     ret = proc.poll()
     return ret
@@ -127,8 +128,25 @@ def checkDataIntegrity(remove = False, checkFilesWithRoot = False):
                                     os.system("rm "+f)
                         
 
-                        
-                        
+def makeDir(d):
+    if "eos/cms" in d:
+        os.system("xrd eoscms mkdir -p " + d)
+        #print " would create dir: xrd eoscms mkdir -p ", d
+    else:
+        if (not os.path.exists(d)):
+            os.system("mkdir -p "+ d)
+            #print " would create dir:", d
+        if not os.path.isdir(d):
+            print ("Cannot create output dir "+d)
+            sys.exit(1)
+    #mkdirCmd = ['gfal-mkdir', pathSE+'/'+ subdir]
+    #                        print (str(mkdirCmd))
+    #mkdirCmdOut = subprocess.Popen(mkdirCmd)
+    #t = out.communicate()[0],
+    #if (mkdirCmdOut.returncode!=0):
+    #    print ("error", str(mkdirCmd), str(mkdirCmd.returncode))
+    #    sys.exit(1)                        
+     
                             
 
 
@@ -175,7 +193,6 @@ def main():
     if not doPAT and not doTrees:
         print "Nothing to do. Run me with '-t' option to copy trees from current skim"
         sys.exit()
-	
         
     #333
     cntSamples = 0
@@ -184,8 +201,7 @@ def main():
     myprocs = []
     for s in sampleList:
         if "pathSE" not in sampleList[s]:
-            print "No SE path found for sample", s
-            
+            print "No SE path found for sample", s            
         try:
             todo = []
             if "pathTrees" in sampleList[s]:
@@ -193,21 +209,14 @@ def main():
             if "pathPAT" in sampleList[s]:
                 todo.append(sampleList[s]["pathPAT"])
             for d in todo:
-	        if "eos/cms" in d:
-		    os.system("xrd eoscms mkdir -p " + d)
-		    #print " would create dir: xrd eoscms mkdir -p ", d
-		else:
-                    os.system("mkdir -p "+ d)
-		    #print " would create dir:", d
-                    if not os.path.isdir(d):
-                        raise Exception("Cannot create output dir "+d)
-                        continue
+                makeDir(d)
         except:
             continue
 
         cntSamples += 1
 
-        flist = CommonFSQFramework.Core.Util.getFileListGFAL(sampleList[s]["pathSE"])
+        pathSE = sampleList[s]["pathSE"]
+        flist = CommonFSQFramework.Core.Util.getFileListGFAL(pathSE)
 
         cntCopy = 0
         cntRead = 0
@@ -219,20 +228,7 @@ def main():
             fname = path_components[-1] # filename
             patFile = "mnTrgAna_PAT_" in fname
             treeFile = "trees_" in fname
-            
-            # check eventual sub-paths
-            subdir = ''
-            if (len(path_components)>1):
-                for isub in range(len(path_components)-1):
-                    subdir += path_components[isub] + '/'
-                    if (subdir not in createdDirs):
-                        mkdirCmd = ['gfal-mkdir', path+'/'+ subdir]
-                        mkdirCmdOut = Popen(mkdirCmd)
-                        #t = out.communicate()[0],
-                        if (mkdirCmdOut.returncode!=0):
-                            print ("error", str(mkdirCmd), str(mkdirCmd.returncode))
-                            sys.exit(1)                        
-                        
+                                    
             doCopy = False
             if patFile and doPAT:
                 doCopy = True
@@ -244,21 +240,30 @@ def main():
                 typeString = "treeFile"
 
             if not doCopy: continue
-            targetFile = targetDir + "/" + subdir + fname
             if not sampleList[s]["isData"] and maxFilesMC >= 0 and cntCopy >= maxFilesMC:
                 continue
 
+            # check eventual sub-paths
+            subdir = ''
+            if (len(path_components)>1):
+                for isub in range(len(path_components)-1):
+                    subdir += path_components[isub] + '/'
+                    if (subdir not in createdDirs):
+                        createdDirs.append(subdir)
+                        makeDir(targetDir + '/' + subdir)
+
             cntCopy += 1
 
-            cpCommand = ['gfal-copy', srcFile, targetFile]            
+            targetFile = targetDir + "/" + subdir + fname
+            cpCommand = ['gfal-copy', pathSE.rstrip('/') + '/' + srcFile, targetFile]            
 	    #cpCommand = ['lcg-ls', srcFile]
 	    #print "would be cpCommand: ", cpCommand
             
 	    if "eos/cms" not in targetDir and os.path.isfile(targetFile):
-                print "Allready present", typeString, fname, " #"+str(cntCopy), "from", s
+                print "Allready present", typeString, subdir+fname, " #"+str(cntCopy), "from", s
                 continue
 
-            print "Copying", typeString, fname, " #"+str(cntCopy), "from", s
+            print "Copying", typeString, subdir+fname, " #"+str(cntCopy), "from", s
             cntCopySum += 1
 
             myproc = subprocess.Popen(cpCommand)
