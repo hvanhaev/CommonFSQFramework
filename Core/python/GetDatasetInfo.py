@@ -119,6 +119,7 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
         legacyMode = "slc5" in os.environ["SCRAM_ARCH"] 
         if legacyMode:
             print "Warning - running in legacy mode. Access to remote directories with more than 1000 files wont be possible"
+            print "CHECK, if this is really true for gfal-ls !! "
 
 
     if usePickle and donotvalidate:
@@ -147,10 +148,6 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
     if "xrootd" in localROOTPrefix: isXrootdAccess = True
     if "xrd" in localROOTPrefix: isXrootdAccess = True
     localAccess = not isXrootdAccess
-    if isXrootdAccess:
-        if not  distutils.spawn.find_executable("gfal-ls"):
-            raise Exception("Cannot find gfal-ls executable. Check your grid environment!")
-
 
     samplesFileDir = os.path.dirname(CommonFSQFramework.Core.Util.getFullPathToAnaDefinitionFile())+"/"
 
@@ -185,99 +182,81 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
         evCnt = 0
         evCntSeenByTreeProducers = 0
         fileList = []
-        if "pathTrees" not in sampleList[s]:
-            # TODO: should this be in localAccess part?
-            if not quiet: print tab, "path to trees not found! Blame the skim-responsible-guy."
-            writePickle = False
+
+        fileListUnvalidated = set()
+        if localAccess:
+
+            if "pathTrees" not in sampleList[s]:
+                if not quiet: print tab, "path to trees not found! Blame the skim-responsible-guy."
+                writePickle = False
+
+            if not quiet: print tab, "path to trees:",sampleList[s]["pathTrees"]
+            if not quiet: print tab, "path to trees taken from 'sampleList[s][\"pathTrees\"]' variable"
+            if not "eos/cms" in sampleList[s]["pathTrees"]:
+                for dirpath, dirnames, filenames in os.walk(sampleList[s]["pathTrees"]):
+                    for f in filenames:
+                        if not f.startswith("trees_"): continue
+                        if not f.endswith(".root"): continue
+                        fname = dirpath.replace("//","/") + f   # somehow root doesnt like // at the begining
+                        fileListUnvalidated.add(localROOTPrefix+fname)
+            if "eos/cms" in sampleList[s]["pathTrees"]:
+                # only works on lxplus...
+                lscomm = ["xrd", "eoscms", "ls", sampleList[s]["pathTrees"]]
+                proc = subprocess.Popen(lscomm, stdout=subprocess.PIPE)
+                for line in iter(proc.stdout.readline,''):
+                    ifile = line.strip()
+                    if "trees_" not in ifile: continue
+                    if ".root" not in ifile: continue
+                    filename = ifile.split("//")[-1]
+                    fileListUnvalidated.add("root://eoscms/"+sampleList[s]["pathTrees"]+filename)
+
+        elif isXrootdAccess:
+            if not quiet: print tab, "will access trees from:",sampleList[s]["pathSE"]
+            pathSE = sampleList[s]["pathSE"]
+            fileListUnvalidatedSE = CommonFSQFramework.Core.Util.getFileListGFAL(pathSE)
+            for fname in fileListUnvalidatedSE:
+                if ".root" not in fname: continue
+                if "trees_" not in fname: continue
+                srcFile = pathSE + "/" + fname
+                if "/store/" not in srcFile:
+                    raise "Cannot convert to lfn:", srcFile
+                lfn = "/store/"+srcFile.split("/store/")[-1]
+
+                #targetFile = targetDir + "/" + fname
+                fileListUnvalidated.add(localROOTPrefix+lfn)
+
         else:
+            raise Exception("Thats confusing! File access method undetermined!")
+
+        print "Total number of files in sample:", len(fileListUnvalidated)
+        if donotvalidate:
+            fileList = list(fileListUnvalidated) 
+            evCnt = 0
             fileListUnvalidated = set()
-            if localAccess:
-                if not quiet: print tab, "path to trees:",sampleList[s]["pathTrees"]
-                if not quiet: print tab, "path to trees taken from 'sampleList[s][\"pathTrees\"]' variable"
-		if not "eos/cms" in sampleList[s]["pathTrees"]:
-                    for dirpath, dirnames, filenames in os.walk(sampleList[s]["pathTrees"]):
-                        for f in filenames:
-                            if not f.startswith("trees_"): continue
-                            if not f.endswith(".root"): continue
-                            fname = dirpath.replace("//","/") + f   # somehow root doesnt like // at the begining
-                            fileListUnvalidated.add(localROOTPrefix+fname)
-		if "eos/cms" in sampleList[s]["pathTrees"]:
-		    # only works on lxplus...
-		    lscomm = ["xrd", "eoscms", "ls", sampleList[s]["pathTrees"]]
-		    proc = subprocess.Popen(lscomm, stdout=subprocess.PIPE)
-		    for line in iter(proc.stdout.readline,''):
-		        ifile = line.strip()
-			if "trees_" not in ifile: continue
-			if ".root" not in ifile: continue
-			filename = ifile.split("//")[-1]
-			fileListUnvalidated.add("root://eoscms/"+sampleList[s]["pathTrees"]+filename)
-			
-            elif isXrootdAccess:
-                if not quiet: print tab, "will access trees from:",sampleList[s]["pathSE"]
-                # Warning: duplicated from copyAnaData. Fixme
-                pathSE = sampleList[s]["pathSE"]
-                cnt = 999
-                offset = 0
-                lastSize = len(fileListUnvalidated)
-                while True:
-                    if legacyMode:
-                        command = ["gfal-ls", pathSE]
-                    else:
-                        #command = ["gfal-ls", "-c", str(cnt), "-o", str(offset), pathSE]
-                        command = ["gfal-ls", pathSE]
-                    proc = subprocess.Popen(command, stdout=subprocess.PIPE)
-                    for line in iter(proc.stdout.readline,''):
-                        l = line.strip()
-                        fname = l.split("/")[-1]
-                        if ".root" not in fname: continue
-                        if "trees_" not in fname: continue
-                        srcFile = pathSE + "/" + fname
-                        if "/store/" not in srcFile:
-                            raise "Cannot convert to lfn:", srcFile
-                        lfn = "/store/"+srcFile.split("/store/")[-1]
 
-                        #targetFile = targetDir + "/" + fname
-                        fileListUnvalidated.add(localROOTPrefix+lfn)
+        if maxFiles == None and usePickle: 
+            if os.path.isfile(pickleName):
+                pkl_file = open(pickleName, 'rb')
+                pickledData = pickle.load(pkl_file)
+                if set(pickledData["files"])!=set(fileListUnvalidated):
+                    print "File list from pickled file and unvalidated list of files different"
+                    print "Broken (?) pickle file", pickleName
+                else:
+                    print "Cached data from", pickleName
+                    fileListUnvalidated = set()  # Q&D - disable validation. 
+                    fileList = pickledData["files"]
+                    evCnt =  pickledData["evCnt"]
+                    evCntSeenByTreeProducers = pickledData["evCntSeenByTreeProducers"]
+                    fromPickle = True
 
-                    if lastSize !=  len(fileListUnvalidated):
-                        lastSize = len(fileListUnvalidated)
-                        offset+=cnt
-                    else:
-                        break
-                    if legacyMode:
-                        break
+        # xxxx
+        if fileListUnvalidated:
+            validationResult = validateRootFiles(fileListUnvalidated, maxFiles)
+            fileList =  validationResult["fileList"]
+            evCnt = validationResult["evCnt"]
+            evCntSeenByTreeProducers = validationResult["evCntSeenByTreeProducers"]
 
-            else:
-                raise Exception("Thats confusing! File access method undetermined!")
-
-            print "Total number of files in sample:", len(fileListUnvalidated)
-            if donotvalidate:
-                fileList = list(fileListUnvalidated) 
-                evCnt = 0
-                fileListUnvalidated = set()
-
-            if maxFiles == None and usePickle: 
-                if os.path.isfile(pickleName):
-                    pkl_file = open(pickleName, 'rb')
-                    pickledData = pickle.load(pkl_file)
-                    if set(pickledData["files"])!=set(fileListUnvalidated):
-                        print "File list from pickled file and unvalidated list of files different"
-                        print "Broken (?) pickle file", pickleName
-                    else:
-                        print "Cached data from", pickleName
-                        fileListUnvalidated = set()  # Q&D - disable validation. 
-                        fileList = pickledData["files"]
-                        evCnt =  pickledData["evCnt"]
-                        evCntSeenByTreeProducers = pickledData["evCntSeenByTreeProducers"]
-                        fromPickle = True
-
-            # xxxx
-            if fileListUnvalidated:
-                validationResult = validateRootFiles(fileListUnvalidated, maxFiles)
-                fileList =  validationResult["fileList"]
-                evCnt = validationResult["evCnt"]
-                evCntSeenByTreeProducers = validationResult["evCntSeenByTreeProducers"]
-
+            
         if writePickle and not fromPickle and  maxFiles == None and usePickle: 
             toPickle = {}
             toPickle["files"] = fileList
