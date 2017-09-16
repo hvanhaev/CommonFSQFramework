@@ -314,7 +314,7 @@ class ExampleProofReader( ROOT.TPySelector ):
             of.Close()
 
     @classmethod
-    def runAll(cls, treeName, outFile, sampleList = None, \
+    def runAll(cls, outFile, treeName="", sampleList = None, \
                maxFilesMC=None, maxFilesData=None, maxNevents = -1, \
                slaveParameters = None, nWorkers=None,
                usePickle=False, useProofOFile = False,
@@ -326,7 +326,10 @@ class ExampleProofReader( ROOT.TPySelector ):
 
         cwd = os.getcwd()+"/"
         treeFilesAndNormalizations = getTreeFilesAndNormalizations(maxFilesMC=maxFilesMC,
-                                maxFilesData=maxFilesData, samplesToProcess=sampleList, usePickle=usePickle)
+                                                                   maxFilesData=maxFilesData,
+                                                                   samplesToProcess=sampleList,
+                                                                   usePickle=usePickle,
+                                                                   donotvalidate=True)
 
         if sampleList == None:
             todo = treeFilesAndNormalizations.keys() # run them all
@@ -360,7 +363,9 @@ class ExampleProofReader( ROOT.TPySelector ):
                 skipped.append(t)
                 continue
 
-            dataset = ROOT.TDSet( 'TTree', 'data', treeName) # the last name is the directory name inside the root file
+            if "treeName" in sampleListFullInfo[t]:
+                treeName = sampleListFullInfo[t]["treeName"]
+            dataset = ROOT.TDSet( 'TTree', 'data', treeName)
             for file in treeFilesAndNormalizations[t]["files"]:
                 dataset.Add(file)
 
@@ -368,7 +373,7 @@ class ExampleProofReader( ROOT.TPySelector ):
             slaveParameters["isData"] = sampleListFullInfo[t]["isData"]
             slaveParameters["normalizationFactor"] =  treeFilesAndNormalizations[t]["normFactor"]
 
-            ROOT.TProof.AddEnvVar("PATH2",ROOT.gSystem.Getenv("PYTHONPATH")+":"+os.getcwd()+":"+os.getcwd()+'../../../../..')
+            ROOT.TProof.AddEnvVar("PATH2", ROOT.gSystem.Getenv("PYTHONPATH")+":"+os.getcwd()+":"+os.getcwd()+'../../../../..')
 
             supportedTypes = set(["int", "str", "float", "bool"])
             variablesToFetch = ""
