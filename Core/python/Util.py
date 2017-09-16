@@ -32,46 +32,61 @@ def getVariant():
 
 def getFullPathToAnaDefinitionFile():
     variant = getVariant()
-    command = "import "+variant+" as tmpxxx"
+    command = "import " + variant + " as tmpxxx"
     exec command
     return tmpxxx.__file__
 
 
 
-def fixLocalPaths(sam):
-        import os,imp
-        if "SmallXAnaDefFile" not in os.environ:
-            print ("Please set SmallXAnaDefFile environment variable:")
-            print ("export SmallXAnaDefFile=FullPathToFile")
-            print ("Whooops! SmallXAnaDefFile env var not defined")
-            sys.exit(1)
-        anaDefFile = os.environ["SmallXAnaDefFile"]
-        mod_dir, filename = os.path.split(anaDefFile)
-        mod, ext = os.path.splitext(filename)
-        f, filename, desc = imp.find_module(mod, [mod_dir])
-        mod = imp.load_module(mod, f, filename, desc)
-
+def readAnaConfig():
+    import os,imp
+    if "SmallXAnaDefFile" not in os.environ:
+        print ("Please set SmallXAnaDefFile environment variable:")
+        print ("export SmallXAnaDefFile=FullPathToFile")
+        print ("Whooops! SmallXAnaDefFile env var not defined")
+        sys.exit(1)
+    anaDefFile = os.environ["SmallXAnaDefFile"]
+    mod_dir, filename = os.path.split(anaDefFile)
+    mod, ext = os.path.splitext(filename)
+    f, filename, desc = imp.find_module(mod, [mod_dir])
+    mod = imp.load_module(mod, f, filename, desc)
+    localBasePathPAT = ""
+    localBasePathTrees = ""
+    ROOTPrefix="..none.." # don't change this!
+    if hasattr(mod, "ROOTPrefix"):
+        ROOTPrefix = mod.ROOTPrefix
+    if hasattr(mod, "ROOTprefix"):
+        ROOTPrefix = mod.ROOTprefix
+    if hasattr(mod, "PATbasePATH"):
         localBasePathPAT = mod.PATbasePATH
+    if hasattr(mod, "TTreeBasePATH"):
         localBasePathTrees = mod.TTreeBasePATH
+    return localBasePathTrees, localBasePathPAT, ROOTPrefix
 
-        for s in sam:
-            if "pathSE" in sam[s]:
-                sam[s]["pathSE"] = sam[s]["pathSE"].rstrip('/')
-            if "pathPAT" in sam[s]:
-                sam[s]["pathPAT"] = sam[s]["pathPAT"].replace("XXXTMFPAT", localBasePathPAT)
-                sam[s]["pathPAT"] = sam[s]["pathPAT"].replace("@CFF_LOCALPATDIR@", localBasePathTrees)
-                sam[s]["pathPAT"] = sam[s]["pathPAT"].rstrip('/')
-            if "pathTrees" in sam[s]:
-                sam[s]["pathTrees"] = sam[s]["pathTrees"].replace("XXXTMFTTree", localBasePathTrees)
-                sam[s]["pathTrees"] = sam[s]["pathTrees"].replace("@CFF_LOCALTreeDIR@", localBasePathTrees)
-                sam[s]["pathTrees"] = sam[s]["pathTrees"].rstrip('/')
+        
+
+def fixLocalPaths(sam):
+    if (not isinstance(sam, dict)):
         return sam
+    localBasePathTrees, localBasePathPAT, ROOTPrefix = readAnaConfig()
+    for sample in sam:
+        if "pathSE" in sam[sample]:
+            sam[sample]["pathSE"] = sam[sample]["pathSE"].rstrip('/')
+        if "pathPAT" in sam[sample]:
+            sam[sample]["pathPAT"] = sam[sample]["pathPAT"].replace("XXXTMFPAT", localBasePathPAT)
+            sam[sample]["pathPAT"] = sam[sample]["pathPAT"].replace("@CFF_LOCALPATDIR@", localBasePathPAT)
+            sam[sample]["pathPAT"] = sam[sample]["pathPAT"].rstrip('/')
+        if "pathTrees" in sam[sample]:
+            sam[sample]["pathTrees"] = sam[sample]["pathTrees"].replace("XXXTMFTTree", localBasePathTrees)
+            sam[sample]["pathTrees"] = sam[sample]["pathTrees"].replace("@CFF_LOCALTreeDIR@", localBasePathTrees)
+            sam[sample]["pathTrees"] = sam[sample]["pathTrees"].rstrip('/')
+    return sam
 
 
 
 def getAnaDefinition(varname, toGlobal=False):
     variant = getVariant()
-    command = "from "+variant+" import "+varname
+    command = "from " + variant + " import " + varname
     if toGlobal:
         exec(command, globals(), globals())
     else:
@@ -79,51 +94,6 @@ def getAnaDefinition(varname, toGlobal=False):
     obj = eval(varname)
     return fixLocalPaths(obj)
 
-
-
-def getROOTPrefix():
-    if "SmallXAnaDefFile" not in os.environ:
-        print ("Please set SmallXAnaDefFile environment variable:")
-        print ("export SmallXAnaDefFile=FullPathToFile")
-        print ("Whooops! SmallXAnaDefFile env var not defined")
-        sys.exit(1)
-    anaDefFile = os.environ["SmallXAnaDefFile"]
-    mod_dir, filename = os.path.split(anaDefFile)
-    mod, ext = os.path.splitext(filename)
-    f, filename, desc = imp.find_module(mod, [mod_dir])
-    mod = imp.load_module(mod, f, filename, desc)    
-    return mod.ROOTPrefix
-
-
-
-def getTTreeBasePath():
-    if "SmallXAnaDefFile" not in os.environ:
-        print ("Please set SmallXAnaDefFile environment variable:")
-        print ("export SmallXAnaDefFile=FullPathToFile")
-        print ("Whooops! SmallXAnaDefFile env var not defined")
-        sys.exit(1)
-    anaDefFile = os.environ["SmallXAnaDefFile"]
-    mod_dir, filename = os.path.split(anaDefFile)
-    mod, ext = os.path.splitext(filename)
-    f, filename, desc = imp.find_module(mod, [mod_dir])
-    mod = imp.load_module(mod, f, filename, desc)
-    return mod.TTreeBasePATH
-
-
-
-def getPATBasePath():
-    if "SmallXAnaDefFile" not in os.environ:
-        print ("Please set SmallXAnaDefFile environment variable:")
-        print ("export SmallXAnaDefFile=FullPathToFile")
-        print ("Whooops! SmallXAnaDefFile env var not defined")
-        sys.exit(1)
-    anaDefFile = os.environ["SmallXAnaDefFile"]
-    mod_dir, filename = os.path.split(anaDefFile)
-    mod, ext = os.path.splitext(filename)
-    f, filename, desc = imp.find_module(mod, [mod_dir])
-    mod = imp.load_module(mod, f, filename, desc)
-
-    return mod.PATbasePATH
 
 
 

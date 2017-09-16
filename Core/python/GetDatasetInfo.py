@@ -12,13 +12,14 @@ from multiprocessing import Process, Queue
 import pickle
 import subprocess
 
-def validateRootFile(fname, q):
+
+
+def validateRootFile(fname, q, CFFTreeName=""):
     rootFile = ROOT.TFile.Open(fname,"r")
     infoHisto = rootFile.Get("infoHisto/cntHisto")
     ret = {}
     ret["evCnt"]=-1
     ret["evCntSeenByTreeProducers"]=-1
-    
     if type(infoHisto) != ROOT.TH1D:
         print "\nProblem reading info histo from", fname
     elif infoHisto.GetXaxis().GetBinLabel(3)!="evCnt":
@@ -27,13 +28,19 @@ def validateRootFile(fname, q):
         ret["evCnt"]  =  int(infoHisto.GetBinContent(3))
     if  infoHisto.GetXaxis().GetBinLabel(4)=="evCntSeenByTreeProducers":
         ret["evCntSeenByTreeProducers"] =  int(infoHisto.GetBinContent(4))
-
     del infoHisto
+    if CFFTreeName != "":
+        cff = rootFile.Get(CFFTreeName + "/data")
+        if (ret["evCnt"] != cff.GetEntries()):
+            print ("validation error for" + fname + str(ret["evCnt"]) + " " + str(cff.GetEntries()))
+        del cff
     rootFile.Close()
     del rootFile
     return q.put(ret)
 
-def validateRootFiles(fileListUnvalidated, maxFiles=None, quiet = False):
+
+
+def validateRootFiles(fileListUnvalidated, maxFiles=None, quiet = False, CFFTreeName=""):
     if not quiet: print "Validating",
     # verify we are able to read event counts from very file
     fileCnt = 0
@@ -45,7 +52,6 @@ def validateRootFiles(fileListUnvalidated, maxFiles=None, quiet = False):
     evCntSeenByTreeProducers = 0
     if maxFiles != None:
         maxThreads  = min(maxThreads, maxFiles/2+1, len(fileListUnvalidated))
-
     for fname in fileListUnvalidated:
         if maxFiles != None and goodFiles >= maxFiles:
             break
@@ -55,9 +61,8 @@ def validateRootFiles(fileListUnvalidated, maxFiles=None, quiet = False):
         else:
             if not quiet: sys.stdout.write('.')
 
-
         q = Queue()               
-        thr = Process(target=validateRootFile, args=(fname, q))
+        thr = Process(target=validateRootFile, args=(fname, q, CFFTreeName))
         thr.start()
         threads[fname] = [thr, q, None]
 
@@ -111,6 +116,7 @@ def validateRootFiles(fileListUnvalidated, maxFiles=None, quiet = False):
     return validationResult
 
 
+
 def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet = False, samplesToProcess = None, usePickle=False, donotvalidate=True):
     # in principle we should check if lcg-ls supports -c/ -o argumets
     legacyMode = False
@@ -120,35 +126,19 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
             print "Warning - running in legacy mode. Access to remote directories with more than 1000 files wont be possible"
             print "CHECK, if this is really true for gfal-ls !! "
 
-
     if usePickle and donotvalidate:
         print ("Cannot go this way (usePickle and donotvalidate)")
         sys.exit(1)
 
-    # TODO: SmallXAnaDefFile access function in Util
-    if "SmallXAnaDefFile" not in os.environ:
-        print ("Please set SmallXAnaDefFile environment variable:")
-        print ("export SmallXAnaDefFile=FullPathToFile")
-        print ("Whooops! SmallXAnaDefFile env var not defined")
-        sys.exit(1)
-
-    anaDefFile = os.environ["SmallXAnaDefFile"]
-    mod_dir, filename = os.path.split(anaDefFile)
-    mod, ext = os.path.splitext(filename)
-    f, filename, desc = imp.find_module(mod, [mod_dir])
-    mod = imp.load_module(mod, f, filename, desc)
-
-    localBasePathPAT = mod.PATbasePATH
-    localBasePathTrees = mod.TTreeBasePATH
-    if not hasattr(mod, "ROOTPrefix"):
+    localBasePathTrees, localBasePathPAT, ROOTPrefix = CommonFSQFramework.Core.Util.readAnaConfig()
+    if "..none.." in ROOTPrefix:
         print ("Please note you need to provide a (new) ROOTPrefix  parameter inside SmallXAnaDefFile. " \
-                   +"See CommonFSQFramework.Core/doc/SmallXAnaDefFile.txt for details")
+                   + "See CommonFSQFramework.Core/doc/SmallXAnaDefFile.txt for details")
         sys.exit(1)
 
-    localROOTPrefix = mod.ROOTPrefix
     isXrootdAccess = False
-    if "xrootd" in localROOTPrefix: isXrootdAccess = True
-    if "xrd" in localROOTPrefix: isXrootdAccess = True
+    if "xrootd" in ROOTPrefix: isXrootdAccess = True
+    if "xrd" in ROOTPrefix: isXrootdAccess = True
     localAccess = not isXrootdAccess
 
     samplesFileDir = os.path.dirname(CommonFSQFramework.Core.Util.getFullPathToAnaDefinitionFile())+"/"
@@ -163,13 +153,13 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
             newList[s]=sampleList[s]
         sampleList = newList
 
-    anaVersion=CommonFSQFramework.Core.Util.getAnaDefinition("anaVersion")
-
+    anaVersion = CommonFSQFramework.Core.Util.getAnaDefinition("anaVersion")
     if not quiet: print "printing info for: ",  anaVersion
 
     ret = {}
     tab = "     "
     for s in sampleList:
+        
         maxFiles = maxFilesData
         if not sampleList[s]["isData"]:
             maxFiles = maxFilesMC
@@ -202,11 +192,10 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                         if "fail" in f: continue
                         if not f.startswith("trees_"): continue
                         if not f.endswith(".root"): continue
-                        fname = dirpath.replace("//","/") + f   # somehow root doesnt like // at the begining
-                        fileListUnvalidated.add(localROOTPrefix+fname)
-            if "eos/cms" in sampleList[s]["pathTrees"]:
-                # only works on lxplus...
-                if not  distutils.spawn.find_executable("xrd"):
+                        fname = dirpath.replace("//","/").rstrip('/') + '/' + f   # somehow root doesnt like // at the begining
+                        fileListUnvalidated.add(ROOTPrefix+fname)
+            else: # if "eos/cms" in sampleList[s]["pathTrees"]:
+                if not  distutils.spawn.find_executable("xrd"):   # only works on lxplus...
                     print ("Cannot find xrd executable. You may need to run this on lxplus!")
                     sys.exit(1)
                 lscomm = ["xrd", "eoscms", "ls", sampleList[s]["pathTrees"]]
@@ -230,16 +219,13 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                 if "/store/" not in srcFile:
                     print ("Cannot convert to lfn:", srcFile)
                     sys.exit(1)
-                lfn = "/store/"+srcFile.split("/store/")[-1]
-
-                #targetFile = targetDir + "/" + fname
-                fileListUnvalidated.add(localROOTPrefix+lfn)
-
+                lfn = "/store/" + srcFile.split("/store/")[-1]
+                fileListUnvalidated.add(ROOTPrefix+lfn)
         else:
             print ("Thats confusing! File access method undetermined!")
             sys.exit(1)
 
-        print "Total number of files in sample:", len(fileListUnvalidated)
+        print "Total number of (unvalidated) files in sample:", len(fileListUnvalidated)
         if donotvalidate:
             fileList = list(fileListUnvalidated) 
             evCnt = 0
@@ -261,8 +247,11 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                     fromPickle = True
 
         # xxxx
-        if fileListUnvalidated:
-            validationResult = validateRootFiles(fileListUnvalidated, maxFiles)
+        if len(fileListUnvalidated) > 0:
+            treeName = ""
+            #if localAccess and "treeName" in sampleList[s]:
+            #    treeName = sampleList[s]["treeName"]
+            validationResult = validateRootFiles(fileListUnvalidated, maxFiles, CFFTreeName=treeName)
             fileList =  validationResult["fileList"]
             evCnt = validationResult["evCnt"]
             evCntSeenByTreeProducers = validationResult["evCntSeenByTreeProducers"]
@@ -296,7 +285,7 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
     return ret
 
 if __name__ == "__main__":
-    getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, usePickle=True)
+    getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, usePickle=True, donotvalidate=True)
     #sam = getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, donotvalidate = True)
     #for s in sam:
     #    print s
