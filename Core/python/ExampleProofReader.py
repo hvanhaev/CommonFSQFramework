@@ -62,21 +62,6 @@ from CommonFSQFramework.Core.TermColor import bcolors
 # should be consistent with this file name (ExampleProofReader.py)
 #from ROOT import TPySelector
 class ExampleProofReader( ROOT.TPySelector ):
-    uniqueEnvString = "TMFTMFqWeRtY_"
-
-    @classmethod
-    def encodeEnvString(cls, s):
-        return s + cls.uniqueEnvString
-
-    @classmethod
-    def decodeEnvString(cls, s):
-        spl = s.split(cls.uniqueEnvString)
-        if len(spl)!=1:
-            err = "Cannot env decode:", s
-            print err
-            sys.stdout.flush()
-            raise Exception(err)
-        return spl[0]
 
     def getVariables(self):
         parStr = os.environ.get('__CFF__BigASCIIBlob__')
