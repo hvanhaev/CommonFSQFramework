@@ -21,15 +21,32 @@ def get(todo):
         miniView = cms.string("CastorRecHitView"),
         branchPrefix = cms.untracked.string("CastorRecHit"),
         onlyGoodRecHits = cms.bool(False),
-        writeSaturationInfo = cms.bool(True),        
+        writeSaturationInfo = cms.bool(True),
+        inputcoll = cms.InputTag("castorreco")        
     )   
+    defs["CastorRecHitViewFullCorrected"]= cms.PSet(
+        miniView = cms.string("CastorRecHitView"),
+        branchPrefix = cms.untracked.string("CastorRecHit"),
+        onlyGoodRecHits = cms.bool(False),
+        writeSaturationInfo = cms.bool(True),
+        inputcoll = cms.InputTag("rechitcorrector")
+    )
 
     defs["CastorRecHitViewBasic"]= cms.PSet(   
         miniView = cms.string("CastorRecHitView"),
         branchPrefix = cms.untracked.string("CastorRecHit"),
         onlyGoodRecHits = cms.bool(True),
-        writeSaturationInfo = cms.bool(False),        
+        writeSaturationInfo = cms.bool(False),
+        inputcoll = cms.InputTag("castorreco")        
     )   
+
+    defs["CastorRecHitViewBasicCorrected"]= cms.PSet(
+        miniView = cms.string("CastorRecHitView"),
+        branchPrefix = cms.untracked.string("CastorRecHit"),
+        onlyGoodRecHits = cms.bool(True),
+        writeSaturationInfo = cms.bool(False),
+        inputcoll = cms.InputTag("rechitcorrector")
+    )
 
     defs["CastorTowerView"]  = cms.PSet(
         miniView = cms.string("CastorTowerView"),
