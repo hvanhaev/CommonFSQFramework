@@ -11,7 +11,7 @@ def get(todo):
         branchPrefix = cms.untracked.string("PFAK4CHS"),
         maxEta = cms.double(5.2),
         minPt = cms.double(3),
-        maxnum = cms.int32(3),
+        maxnum = cms.int32(10),
         input = cms.InputTag("selectedPatJetsAK4PFCHSCopy"),
         variations= cms.vstring("", "jecUp", "jecDown"),
         jerFactors = cms.vstring(  # PF10
@@ -24,6 +24,14 @@ def get(todo):
         minPt = cms.double(1),
 	branchPrefix = cms.untracked.string("SisCone5CH"),
         input = cms.InputTag("sisCone5TrackJets"),	
+    )
+
+    defs["JetViewak5TrackJets"]= cms.PSet(
+        miniView = cms.string("TrackJetView"),
+        maxEta = cms.double(2),
+        minPt = cms.double(1),
+        branchPrefix = cms.untracked.string("ak5TrackJet"),
+        input = cms.InputTag("ak5TrackJets"),
     )
 
     ret = {}

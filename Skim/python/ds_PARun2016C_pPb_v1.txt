@@ -1,0 +1,6 @@
+/ReggeGribovPartonMC_EposLHC_pPb_4080_4080_DataBS/pPb816Summer16DR-MB_80X_mcRun2_pA_v4-v2/AODSIM
+/MinBias/hvanhaev-ReggeGribovPartonMC_EposLHC_4080_4080GeV_pPb_RECO_CastorNoiseFix-194311fa69d6ce9080eefcfdcac1459b/USER
+/PACastor/PARun2016C-PromptReco-v1/AOD
+/PAMinimumBiasBkg/PARun2016C-PromptReco-v1/AOD
+/PAMinimumBias1/PARun2016C-PromptReco-v1/AOD
+/PAEmptyBX/PARun2016C-PromptReco-v1/AOD
