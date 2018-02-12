@@ -14,118 +14,6 @@ import subprocess
 import CommonFSQFramework.Core.Util
 
 
-def getFileListLcgLs(path):
-    ret = []
-    command = ["lcg-ls", path]
-    proc = subprocess.Popen(command, stdout=subprocess.PIPE)
-    cnt = 0
-    for line in iter(proc.stdout.readline,''):
-        l = line.strip()
-        fname = l.split("/")[-1]
-        if ".root" not in fname: continue
-        srcFile = path + "/" + fname
-        #targetFile = targetDir + "/" + fname
-        ret.append(srcFile)
-
-    return ret
-
-def getFileListSrmLS(path):
-    maxResults = 500
-    offset = 0
-
-    ret = []
-    lastTime = 0
-    cnt = 0
-    while True: # handle maxResults results at a time
-        command = ["srmls", "-2", "--offset", str(offset), "--count", str(maxResults),  path]
-        retryCnt = 1
-        goodRootFiles = 0
-        # for current offset value obtain list of files.
-        #    Try couple of times to handle empty output of srmls for some calls
-        while True:
-            lineCnt = 0
-            print "Obtaining file list for", path, "- try", retryCnt, "offset", offset
-
-            curTime = time.time()
-            sinceLastSrmls= abs(curTime-lastTime)
-            if sinceLastSrmls < 15: # dont be too agressive
-                print "   Since last srmls", sinceLastSrmls,"- sleeping"
-                time.sleep( int(15 - sinceLastSrmls) )
-                print "   OK, back to work"
-            proc = subprocess.Popen(command, stdout=subprocess.PIPE)
-            lastTime = int(time.time())
-            for line in iter(proc.stdout.readline,''):
-                lineCnt += 1
-                #print "XAQ", line.rstrip()
-                l =  line.strip()
-                fname = l.split("/")[-1]
-                if not fname.endswith(".root"): continue
-                goodRootFiles += 1 # this is a bit risky, since we may have other files in dir then rootfiles. TODO
-                #print "Found", fname
-
-
-                srcFile = path + "/" + fname
-                #targetFile = targetDir + "/" + fname
-
-                #print srcFile, targetFile
-                cnt += 1
-
-                
-                #ret[srcFile]=targetFile
-                ret.append(srcFile)
-
-            if lineCnt <= 1:
-                if retryCnt == 10:
-                    err = "Cannot get filelist for  "+path+"\n"
-                    err += " - if  some files were copied allready this probably means some server related problems."
-                    err += " Please retry in couple of minutes. \n"  
-                    err += " - if none of the files were copied please check your certificate proxy.\n"
-                    raise Exception(err)
-
-                retryCnt += 1
-            else:
-                break
-
-        if goodRootFiles>0:
-            offset += maxResults
-        else:
-            break
-
-    return ret
-
-
-def getFileListGFAL(path):
-    ret = []
-    cnt = 0
-
-    command = ["gfal-ls", "-a", path]
-    # for current offset value obtain list of files.
-    #    Try couple of times to handle empty output of srmls for some calls
-
-    lineCnt = 0
-    print "Obtaining file list for ", path, " with gfal"
-    proc = subprocess.Popen(command, stdout=subprocess.PIPE)
-
-    for line in iter(proc.stdout.readline,''):
-        lineCnt += 1
-        l =  line.strip()
-        fname = l.split("/")[-1]
-        if not fname.endswith(".root"): continue
-
-        srcFile = path + "/" + fname
-        cnt += 1
-        ret.append(srcFile)
-
-    if lineCnt < 1:
-        err = "Cannot get filelist for  " + path + "\n"
-        err += " - if  some files were copied allready this probably means some server related problems."
-        err += " Please retry in couple of minutes. \n"  
-        err += " - if none of the files were copied please check your certificate proxy.\n"
-        print err
-        raise Exception(err)
-
-    return ret
-
 
 def checkRootFile(fp):
     while "//" in fp:
@@ -152,11 +40,13 @@ def checkRootFile(fp):
             break
 
     if errInStdout:
-        raise Exception("\nProblem processing call: "+" ".join(cmd)+ "\n\noutdata:\n\n" + outData)
+        print ("\nProblem processing call: "+" ".join(cmd)+ "\n\noutdata:\n\n" + outData)
+        sys.exit(1)
 
     ret = proc.poll()
     return ret
     
+
 
 def checkDataIntegrity(remove = False, checkFilesWithRoot = False):
 
@@ -238,8 +128,25 @@ def checkDataIntegrity(remove = False, checkFilesWithRoot = False):
                                     os.system("rm "+f)
                         
 
-                        
-                        
+def makeDir(d):
+    if "eos/cms" in d:
+        os.system("xrd eoscms mkdir -p " + d)
+        #print " would create dir: xrd eoscms mkdir -p ", d
+    else:
+        if (not os.path.exists(d)):
+            os.system("mkdir -p "+ d)
+            #print " would create dir:", d
+        if not os.path.isdir(d):
+            print ("Cannot create output dir "+d)
+            sys.exit(1)
+    #mkdirCmd = ['gfal-mkdir', pathSE+'/'+ subdir]
+    #                        print (str(mkdirCmd))
+    #mkdirCmdOut = subprocess.Popen(mkdirCmd)
+    #t = out.communicate()[0],
+    #if (mkdirCmdOut.returncode!=0):
+    #    print ("error", str(mkdirCmd), str(mkdirCmd.returncode))
+    #    sys.exit(1)                        
+     
                             
 
 
@@ -257,23 +164,9 @@ def main():
     parser.add_option("-c", "--checkDataIntegrity", action="store_true",  dest="check")
     parser.add_option("-d", "--deleteBadFiles", action="store_true",  dest="remove")
     parser.add_option("-r", "--rootCheck", action="store_true",  dest="checkFilesWithRoot")
-    parser.add_option("-s", "--srmls", action="store_true",  dest="usesrmls")
-    parser.add_option("-g", "--gfal", action="store_true",  dest="useGFAL")
-    parser.add_option("-l", "--lcg", action="store_true",  dest="useLCG")
     parser.add_option("-m", "--maxFilesMC", action="store",  type="int", dest="maxFilesMC")
     (options, args) = parser.parse_args()
 
-    c_method=0
-    if options.usesrmls:
-        c_method += 1
-    if options.useGFAL:
-        c_method += 1
-    if options.useLCG:
-        c_method += 1
-
-    if c_method==0 or c_method>1:
-        print "You must specify exactly one of -s -g or -l"
-        sys.exit(1)
 
     maxFilesMC = -1
     if options.maxFilesMC:
@@ -300,7 +193,6 @@ def main():
     if not doPAT and not doTrees:
         print "Nothing to do. Run me with '-t' option to copy trees from current skim"
         sys.exit()
-	
         
     #333
     cntSamples = 0
@@ -309,8 +201,7 @@ def main():
     myprocs = []
     for s in sampleList:
         if "pathSE" not in sampleList[s]:
-            print "No SE path found for sample", s
-            
+            print "No SE path found for sample", s            
         try:
             todo = []
             if "pathTrees" in sampleList[s]:
@@ -318,42 +209,26 @@ def main():
             if "pathPAT" in sampleList[s]:
                 todo.append(sampleList[s]["pathPAT"])
             for d in todo:
-	        if "eos/cms" in d:
-		    os.system("xrd eoscms mkdir -p " + d)
-		    #print " would create dir: xrd eoscms mkdir -p ", d
-		else:
-                    os.system("mkdir -p "+ d)
-		    #print " would create dir:", d
-                    if not os.path.isdir(d):
-                        raise Exception("Cannot create output dir "+d)
-                        continue
+                makeDir(d)
         except:
             continue
 
         cntSamples += 1
 
-        # TODO: check dir existence
-
-        # on my installation lcg-ls does not have offset/count params
-        # needed for srm access to dirs with >1000 files.
-        
-#command = ["lcg-ls", sampleList[s]["pathSE"]]
-        if options.useGFAL:
-            flist = getFileListGFAL(sampleList[s]["pathSE"])
-        elif options.usesrmls:
-            flist = getFileListSrmLS(sampleList[s]["pathSE"])
-        else:
-            flist = getFileListLcgLs(sampleList[s]["pathSE"])
+        pathSE = sampleList[s]["pathSE"]
+        flist = CommonFSQFramework.Core.Util.getFileListGFAL(pathSE)
 
         cntCopy = 0
         cntRead = 0
+        createdDirs = []
         for srcFile in flist:
             cntRead += 1
             cntReadSum += 1
-            fname = srcFile.split("/")[-1]
+            path_components = srcFile.split("/")
+            fname = path_components[-1] # filename
             patFile = "mnTrgAna_PAT_" in fname
             treeFile = "trees_" in fname
-
+                                    
             doCopy = False
             if patFile and doPAT:
                 doCopy = True
@@ -365,28 +240,30 @@ def main():
                 typeString = "treeFile"
 
             if not doCopy: continue
-            targetFile = targetDir + "/" + fname
             if not sampleList[s]["isData"] and maxFilesMC >= 0 and cntCopy >= maxFilesMC:
                 continue
 
+            # check eventual sub-paths
+            subdir = ''
+            if (len(path_components)>1):
+                for isub in range(len(path_components)-1):
+                    subdir += path_components[isub] + '/'
+                    if (subdir not in createdDirs):
+                        createdDirs.append(subdir)
+                        makeDir(targetDir + '/' + subdir)
+
             cntCopy += 1
 
-            if options.useGFAL:
-                cpCommand = ['gfal-copy', srcFile, targetFile]
-            else:
-                if "eos/cms" in targetDir:
-                    cpCommand = ['lcg-cp', srcFile, "srm://srm-eoscms.cern.ch/"+targetFile]
-                else:
-                    cpCommand = ['lcg-cp', srcFile, targetFile]
-            
+            targetFile = targetDir + "/" + subdir + fname
+            cpCommand = ['gfal-copy', pathSE.rstrip('/') + '/' + srcFile, targetFile]            
 	    #cpCommand = ['lcg-ls', srcFile]
 	    #print "would be cpCommand: ", cpCommand
             
 	    if "eos/cms" not in targetDir and os.path.isfile(targetFile):
-                print "Allready present", typeString, fname, " #"+str(cntCopy), "from", s
+                print "Allready present", typeString, subdir+fname, " #"+str(cntCopy), "from", s
                 continue
 
-            print "Copying", typeString, fname, " #"+str(cntCopy), "from", s
+            print "Copying", typeString, subdir+fname, " #"+str(cntCopy), "from", s
             cntCopySum += 1
 
             myproc = subprocess.Popen(cpCommand)

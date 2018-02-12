@@ -81,6 +81,7 @@ for s in sampleListTodo:
   print "Create working directory: ", targetPath
 
   pycfgextra = []  
+  pycfgextracheck = []  
   pycfgextra.append("config.General.workArea='"+anaVersion+"'")
   pycfgextra.append("config.General.requestName='"+name+"'")
   pycfgextra.append("config.Data.outputDatasetTag='"+name+"'")
@@ -93,8 +94,8 @@ for s in sampleListTodo:
   
   if isData:
     print "Input is \"data\" with lumi file: " + sampleList[s]["json"]
-    pycfgextra.append("config.Data.splitting='LumiBased'")
-    pycfgextra.append("config.Data.unitsPerJob=10")
+    pycfgextracheck.append("config.Data.splitting='LumiBased'")
+    pycfgextracheck.append("config.Data.unitsPerJob=10")
     if os.path.exists(sampleList[s]["json"]):
         jsonFile = open(sampleList[s]["json"])
         pycfgextra.append("config.Data.lumiMask='" + os.path.abspath(sampleList[s]["json"]) + "'")
@@ -104,8 +105,8 @@ for s in sampleListTodo:
     
   else:
     print "Input is \"MC\""
-    pycfgextra.append("config.Data.splitting='EventAwareLumiBased'")
-    pycfgextra.append("config.Data.unitsPerJob=100000")
+    pycfgextracheck.append("config.Data.splitting='EventAwareLumiBased'")
+    pycfgextracheck.append("config.Data.unitsPerJob=100000")
   
 
   # TODO save old value and set it at exit   
@@ -114,17 +115,32 @@ for s in sampleListTodo:
 
   cfgName = None
   with open("tmp.py", "w") as myfile:
+      checklines = []
       with open(configFile, "r") as infile:
           for inline in infile:
               myfile.write(inline)
               # search for cmssw job config file while reading
               line = inline.strip()
-              if len(line) > 0 and line[0] == "#": continue
-              if "config.JobType.psetName"  not in line: continue
+              if len(line) > 0 and line[0] == "#":
+                  continue
+              checklines.append(inline)
+              if "config.JobType.psetName"  not in line:
+                  continue
               cfgName = line.split("=")[-1].replace("'","").replace('"',"").strip()
-      # append custom config
+      # append custom config, no-check
       for l in pycfgextra:
           myfile.write(l+"\n")
+      # append custom config, WITH-check
+      for extraline in pycfgextracheck:
+          found = False
+          for check in checklines:
+              assign = extraline.split('=')
+              if (len(assign)>0):
+                  if check.strip().find(assign[0].strip()) != 0:
+                      found = True
+                      break
+          if not found:
+              myfile.write(extraline+"\n")
       myfile.close()
 
   if not cfgName:
@@ -136,7 +152,6 @@ for s in sampleListTodo:
         sys.exit()
 
   os.system("crab submit -c tmp.py")
-
 
   fOut = targetPath + "/" + cfgName
   shutil.copy(cfgName, fOut)
