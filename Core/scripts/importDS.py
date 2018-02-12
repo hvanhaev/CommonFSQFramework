@@ -9,6 +9,7 @@ from ROOT import *
 import pprint
 import shutil
 import CommonFSQFramework.Core.Util
+import datetime
 
 try:
     from elementtree import ElementTree
@@ -294,9 +295,11 @@ if __name__ == "__main__":
         
     if options.final: print "We will try to get the crab output now and update(overwrite) your existing Samples_* file"
 
+    dateTT = datetime.datetime.today().strftime('%Y%m%d')
     if not options.date:
-        print "Date missing"
-        sys.exit()
+        print "No date specified. Use today: ", dateTT
+    else:
+        dateTT = options.date
 
     if len(args) == 0:
         print "You should give the template file name"
@@ -316,8 +319,7 @@ if __name__ == "__main__":
         print "Overriding dsFile to ", options.dsFile
         globals()["dsFile"] = options.dsFile
     
-
-    dateTT = options.date #"20140411" ## TODO fixme!?
+    
     anaVersion = anaType + "_" + dateTT
 
     sam = {}
