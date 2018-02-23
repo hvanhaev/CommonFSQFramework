@@ -46,7 +46,7 @@ def get(todo):
         miniView = cms.string("TriggerResultsView"),
         branchPrefix = cms.untracked.string("trgl1"),
         process = cms.string("HLT"),
-        isStage1 = cms.bool(True),
+        isStage1 = cms.bool(False),
         storePrescales = cms.bool(False),
         triggers = cms.vstring("L1GTTech","L1GTAlgo")
     )
