@@ -64,6 +64,18 @@ void EventIdData::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& 
     setI("run", iEvent.eventAuxiliary().run());
     setI("lumi", iEvent.eventAuxiliary().luminosityBlock());
     setI("event", iEvent.eventAuxiliary().event());
+
+    // get the beamspot position
+    reco::BeamSpot beamSpot;
+    edm::Handle<reco::BeamSpot> beamSpotHandle;
+    iEvent.getByLabel("offlineBeamSpot", beamSpotHandle);
+    if ( beamSpotHandle.isValid() )
+    {
+        beamSpot = *beamSpotHandle;
+        setF("beamspotx",beamSpot.x0());
+        setF("beamspoty",beamSpot.y0());
+        setF("beamspotz",beamSpot.z0());
+    }
     
     // data only part
     if (iEvent.isRealData()) {
@@ -81,7 +93,6 @@ void EventIdData::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& 
 	    if (localcount == 1) std::cout << " An exception was thrown when accessing the LumiDetails and/or the LumiSummary objects. This means they are not present and are not correctly filled in the ntuple" << std::endl;
 	}
     }
-
 
     // start MC part
     if (iEvent.isRealData()) return;
@@ -224,17 +235,5 @@ void EventIdData::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& 
     setF("simvtxx",simPVh.position().x());
     setF("simvtxy",simPVh.position().y());
     setF("simvtxz",simPVh.position().z());
-
-    // get the beamspot position
-    reco::BeamSpot beamSpot;
-    edm::Handle<reco::BeamSpot> beamSpotHandle;
-    iEvent.getByLabel("offlineBeamSpot", beamSpotHandle);
-    if ( beamSpotHandle.isValid() )
-    {
-        beamSpot = *beamSpotHandle;
-        setF("beamspotx",beamSpot.x0());
-        setF("beamspoty",beamSpot.y0());
-        setF("beamspotz",beamSpot.z0());
-    }
 
 }
