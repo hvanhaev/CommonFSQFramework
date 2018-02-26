@@ -188,6 +188,7 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
             if not "eos/cms" in sampleList[s]["pathTrees"]:
                 for dirpath, dirnames, filenames in os.walk(sampleList[s]["pathTrees"]):
                     if "fail" in dirpath: continue
+                    if "/log" in dirpath == 0: continue
                     for f in filenames:
                         if "fail" in f: continue
                         if not f.startswith("trees_"): continue

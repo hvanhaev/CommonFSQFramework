@@ -122,6 +122,7 @@ def getFileListGFAL(path, subdir=''):
         lineCnt += 1
         line =  read_line.strip()
         if ("fail" in line): continue
+        if ("/log" in line): continue
         fname = line.split("/")[-1]
         if not fname.endswith(".root"):
             # could be directory...
