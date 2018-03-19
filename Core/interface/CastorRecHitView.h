@@ -11,7 +11,6 @@ class CastorRecHitView: public EventViewBase {
       virtual void fillSpecific(const edm::Event&, const edm::EventSetup&);
       bool m_onlyGoodRecHits;
       bool m_saturationInfo;
-      edm::InputTag m_inputlabel;
 };
 
 #endif
