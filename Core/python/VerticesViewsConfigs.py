@@ -7,7 +7,7 @@ def get(todo):
     defs["VerticesView"]  = cms.PSet(
         miniView = cms.string("VerticesView"),
         branchPrefix = cms.untracked.string("vtx"),
-        src  = cms.InputTag("offlinePrimaryVertices")
+        src  = cms.InputTag("offlineSlimmedPrimaryVertices")
     )
 
     # ZeroTesla VerticesView
