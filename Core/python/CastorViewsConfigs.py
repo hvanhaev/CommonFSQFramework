@@ -21,28 +21,32 @@ def get(todo):
         miniView = cms.string("CastorRecHitView"),
         branchPrefix = cms.untracked.string("CastorRecHit"),
         onlyGoodRecHits = cms.bool(False),
-        writeSaturationInfo = cms.bool(True),        
-    )   
-
-    defs["CastorRecHitViewBasic"]= cms.PSet(   
+        writeSaturationInfo = cms.bool(True),
+        inputcoll = cms.InputTag("castorreco")         
+     )   
+    defs["CastorRecHitViewFullCorrected"]= cms.PSet(
+        miniView = cms.string("CastorRecHitView"),
+        branchPrefix = cms.untracked.string("CastorRecHit"),
+        onlyGoodRecHits = cms.bool(False),
+        writeSaturationInfo = cms.bool(True),
+        inputcoll = cms.InputTag("rechitcorrector")
+    )
+ 
+     defs["CastorRecHitViewBasic"]= cms.PSet(   
+         miniView = cms.string("CastorRecHitView"),
+         branchPrefix = cms.untracked.string("CastorRecHit"),
+         onlyGoodRecHits = cms.bool(True),
+        writeSaturationInfo = cms.bool(False),
+        inputcoll = cms.InputTag("castorreco")         
+     )   
+ 
+    defs["CastorRecHitViewBasicCorrected"]= cms.PSet(
         miniView = cms.string("CastorRecHitView"),
         branchPrefix = cms.untracked.string("CastorRecHit"),
         onlyGoodRecHits = cms.bool(True),
-        writeSaturationInfo = cms.bool(False),        
-    )   
-
-    defs["CastorTowerView"]  = cms.PSet(
-        miniView = cms.string("CastorTowerView"),
-        branchPrefix = cms.untracked.string("CastorTower"),
-        inputcoll = cms.InputTag("CastorTowerReco")
+        writeSaturationInfo = cms.bool(False),
+        inputcoll = cms.InputTag("rechitcorrector")
     )
 
-    ret = {}
-    for t in todo:
-        if t not in defs:
-            raise Exception("miniView def not known "+t)
-
-        ret[t] = defs[t]
-    return ret
 
 
