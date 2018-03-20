@@ -8,34 +8,36 @@
 #include "CondFormats/DataRecord/interface/CastorChannelQualityRcd.h"
 #include "DataFormats/METReco/interface/HcalCaloFlagLabels.h"
 
- CastorRecHitView::CastorRecHitView(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
- EventViewBase(iConfig,  tree)
- {
+CastorRecHitView::CastorRecHitView(const edm::ParameterSet& iConfig, TTree * tree):
+EventViewBase(iConfig,  tree)
+{
+   // fetch config data
+   m_onlyGoodRecHits = iConfig.getParameter<bool>("onlyGoodRecHits");
+   m_saturationInfo = iConfig.getParameter<bool>("writeSaturationInfo");
 
-    // fetch config data
-    m_onlyGoodRecHits = iConfig.getParameter<bool>("onlyGoodRecHits");
-    m_saturationInfo = iConfig.getParameter<bool>("writeSaturationInfo");
-    m_inputlabel = iConfig.getParameter<edm::InputTag>("inputcoll");
-   
-   // register data access
-   iC.consumes< edm::SortedCollection<CastorRecHit,edm::StrictWeakOrdering<CastorRecHit> > >(m_inputlabel);
- 
-    registerVecFloat("Energy", tree);
-    registerVecInt("Sector", tree);
-    EventViewBase(iConfig,  tree)
- void CastorRecHitView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSetup){
- 
-    edm::Handle< edm::SortedCollection<CastorRecHit,edm::StrictWeakOrdering<CastorRecHit> > > castorRecHits;
-    iEvent.getByLabel(m_inputlabel,castorRecHits);  
-       
+   registerVecFloat("Energy", tree);
+   registerVecInt("Sector", tree);
+   registerVecInt("Module", tree);
+
+   if (! m_onlyGoodRecHits) {
+       registerVecInt("isBad", tree);
+   }
+   if (m_saturationInfo) {
+       registerVecInt("isSaturated", tree);
+       registerVecInt("isDesaturated", tree);
+   }
+
+}
+
+void CastorRecHitView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSetup){
+
+   edm::Handle< edm::SortedCollection<CastorRecHit,edm::StrictWeakOrdering<CastorRecHit> > > castorRecHits;
+   iEvent.getByLabel("castorreco",castorRecHits);  
+
    // retrieve the channel quality lists from database
    edm::ESHandle<CastorChannelQuality> p;
    iSetup.get<CastorChannelQualityRcd>().get(p);
    std::vector<DetId> channels = p->getAllChannels();
-
-   // check for correct collection size
-   if (castorRecHits->size() != 224)
-        return;
 
    // add rechits to tree
     for (unsigned int iRecHit=0; iRecHit < castorRecHits->size(); ++iRecHit) {
