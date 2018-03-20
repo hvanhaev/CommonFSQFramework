@@ -42,6 +42,14 @@ def get(todo):
         input = cms.InputTag("sisCone5TrackJets"),	
     )
 
+    defs["JetViewak5TrackJets"]= cms.PSet(
+        miniView = cms.string("TrackJetView"),
+        maxEta = cms.double(2),
+        minPt = cms.double(1),
+        branchPrefix = cms.untracked.string("ak5TrackJet"),
+        input = cms.InputTag("ak5TrackJets"),
+    )
+
     ret = {}
     for t in todo:
         if t not in defs:
