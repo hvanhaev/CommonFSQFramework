@@ -1,0 +1,16 @@
+/FSQJets/Run2016H-03Feb2017_ver2-v1/MINIAOD
+/QCD_Pt-15to7000_TuneCUETHS1_FlatP6_13TeV_herwigpp/RunIISummer16MiniAODv2-NoPU_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM
+/QCD_Pt-15to7000_TuneCUETP8M1_FlatP6_13TeV_pythia8/RunIISummer16MiniAODv2-NoPU_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM
+/MinBias_TuneCUETP8M1_13TeV-pythia8/mpieters-MinBias_TuneCUETP8M1_13TeV-pythia8_14122017-26987ba9f8f8afee7e8951043c6ab39f/USER
+/QCD_Pt-15to3000_TuneCUETP8M1_Flat_13TeV_pythia8/RunIIFall15DR76-25nsFlat10to25TSG_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM
+/QCD_Pt-15to7000_TuneCUETP8M1_Flat_13TeV_pythia8/RunIIFall15MiniAODv2-25nsNoPURaw_magnetOn_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM
+/L1MinimumBias1/Run2016H-PromptReco-v2/MINIAOD
+/L1MinimumBias2/Run2016H-PromptReco-v2/MINIAOD
+/L1MinimumBias3/Run2016H-PromptReco-v2/MINIAOD
+/L1MinimumBias4/Run2016H-PromptReco-v2/MINIAOD
+/L1MinimumBias5/Run2016H-PromptReco-v2/MINIAOD
+/L1MinimumBias6/Run2016H-PromptReco-v2/MINIAOD
+/L1MinimumBias7/Run2016H-PromptReco-v2/MINIAOD
+/L1MinimumBias8/Run2016H-PromptReco-v2/MINIAOD
+/L1MinimumBias9/Run2016H-PromptReco-v2/MINIAOD
+/L1MinimumBias0/Run2016H-PromptReco-v2/MINIAOD

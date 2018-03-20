@@ -19,6 +19,7 @@
 
 
 
+
 // https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePhysicsCutParser - should I ?
 
 namespace xx {
@@ -45,7 +46,7 @@ namespace xx {
 
 JetView::JetView(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
 EventViewBase(iConfig, tree),
-pfJetID(PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE),
+pfJetID(PFJetIDSelectionFunctor::WINTER16, PFJetIDSelectionFunctor::LOOSE),
 caloJetID(JetIDSelectionFunctor::PURE09,  JetIDSelectionFunctor::LOOSE),
 m_jecUnc(0)
 
@@ -72,6 +73,9 @@ m_jecUnc(0)
     //registerVecP4("recoTracks", tree);
     //registerVecFloat("dz", tree);
     //registerVecFloat("dxy", tree);
+    
+    // extra for met
+    //m_PFMET = iConfig.getParameter<edm::InputTag>("pfmet");
 
 
 
@@ -92,6 +96,10 @@ m_jecUnc(0)
             registerVecFloat("genpt"+s, tree);
             registerVecFloat("geneta"+s, tree);
             registerVecFloat("genphi"+s, tree);
+            
+            // extra for met vector
+            registerVecFloat("met_met"+s, tree);
+            registerVecFloat("met_phi"+s, tree);
 
 
 
@@ -204,6 +212,15 @@ void JetView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSet
             }
         }
     }
+    
+    // extra for met vector
+    //edm::Handle<pat::METCollection> pfmet;
+    //iEvent.getByLabel(m_PFMET, pfmet);
+    //for (unsigned int i = 0; i< pfmet->size();++i){
+    //    addToFVec("met_met", pfmet->at(i).et());
+    //    addToFVec("met_phi", pfmet->at(i).phi());
+	//}
+    
 }
 
 reco::Candidate::LorentzVector JetView::getMomentum(const pat::Jet & jet, std::string variation) {
