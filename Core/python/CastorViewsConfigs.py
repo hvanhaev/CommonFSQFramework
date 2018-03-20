@@ -47,6 +47,20 @@ def get(todo):
         writeSaturationInfo = cms.bool(False),
         inputcoll = cms.InputTag("rechitcorrector")
     )
+    
+    defs["CastorTowerView"]  = cms.PSet(
+        miniView = cms.string("CastorTowerView"),
+        branchPrefix = cms.untracked.string("CastorTower"),
+        inputcoll = cms.InputTag("CastorTowerReco")
+    )
+
+    ret = {}
+    for t in todo:
+        if t not in defs:
+            raise Exception("miniView def not known "+t)
+
+        ret[t] = defs[t]
+    return ret
 
 
 
