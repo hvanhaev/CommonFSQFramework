@@ -32,10 +32,10 @@ def get(todo):
         inputcoll = cms.InputTag("rechitcorrector")
     )
  
-     defs["CastorRecHitViewBasic"]= cms.PSet(   
-         miniView = cms.string("CastorRecHitView"),
-         branchPrefix = cms.untracked.string("CastorRecHit"),
-         onlyGoodRecHits = cms.bool(True),
+    defs["CastorRecHitViewBasic"]= cms.PSet(   
+        miniView = cms.string("CastorRecHitView"),
+        branchPrefix = cms.untracked.string("CastorRecHit"),
+        onlyGoodRecHits = cms.bool(True),
         writeSaturationInfo = cms.bool(False),
         inputcoll = cms.InputTag("castorreco")         
      )   
