@@ -166,6 +166,36 @@ def get(todo):
         CastorDiJet = cms.vstring("HLT_L1CastorMediumJet_PFJet15_v*")
     )
 
+    defs["CastorPATriggerResultsView"]  = cms.PSet(
+        miniView = cms.string("TriggerResultsView"),
+        branchPrefix = cms.untracked.string("CasPATrg"),
+        process = cms.string("HLT"),
+        isStage1 = cms.bool(False),
+        storePrescales = cms.bool(False),
+        triggers = cms.vstring("CastorPAMedJet","CastorPAMuon","Random"),
+        CastorPAMedJet = cms.vstring("HLT_PAL1CastorMediumJet_BptxAND_v*"),
+        CastorPAMuon = cms.vstring("HLT_PAL1CastorHaloMuon_v*"),
+        Random = cms.vstring("HLT_Random*")
+    )
+    
+    defs["PARun2016CTriggerResultsView"]  = cms.PSet(
+        miniView = cms.string("TriggerResultsView"),
+        branchPrefix = cms.untracked.string("Trg"),
+        process = cms.string("HLT"),
+        isStage1 = cms.bool(False),
+        storePrescales = cms.bool(True),
+        triggers = cms.vstring("CastorPAMedJet","CastorPAMuon","ZeroBias","ZeroBiasSinglePix","ZeroBiasDoublePix","MinimumBiasHFORSinglePix","MinimumBiasHFAND","MinimumBiasHFANDSinglePix","BPTXMinusOnly","BPTXPlusOnly"),
+        CastorPAMedJet = cms.vstring("HLT_PAL1CastorMediumJet_BptxAND_v*"),
+        CastorPAMuon = cms.vstring("HLT_PAL1CastorHaloMuon_v*"),
+        ZeroBias = cms.vstring("HLT_PAZeroBias_v*"),
+        ZeroBiasSinglePix = cms.vstring("HLT_PAZeroBias_SinglePixelTrack_v*"),
+        ZeroBiasDoublePix = cms.vstring("HLT_PAZeroBias_DoublePixelTrack_v*"),
+        MinimumBiasHFORSinglePix = cms.vstring("HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part*"),
+        MinimumBiasHFAND = cms.vstring("HLT_PAL1MinimumBiasHF_AND_v*"),
+        MinimumBiasHFANDSinglePix = cms.vstring("HLT_PAL1MinimumBiasHF_AND_SinglePixelTrack_v*"),
+        BPTXMinusOnly = cms.vstring("HLT_PAL1BptxMinusNotBptxPlus_v*"),
+        BPTXPlusOnly = cms.vstring("HLT_PAL1BptxPlusNotBptxMinus_v*")
+    )
  
     # main function
     ret = {}
