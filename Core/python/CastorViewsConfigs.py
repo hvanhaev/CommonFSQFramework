@@ -23,7 +23,8 @@ def get(todo):
         onlyGoodRecHits = cms.bool(False),
         writeSaturationInfo = cms.bool(True),
         inputcoll = cms.InputTag("castorreco")         
-     )   
+    )
+    
     defs["CastorRecHitViewFullCorrected"]= cms.PSet(
         miniView = cms.string("CastorRecHitView"),
         branchPrefix = cms.untracked.string("CastorRecHit"),
@@ -31,14 +32,14 @@ def get(todo):
         writeSaturationInfo = cms.bool(True),
         inputcoll = cms.InputTag("rechitcorrector")
     )
- 
-    defs["CastorRecHitViewBasic"]= cms.PSet(   
+   
+    defs["CastorRecHitViewBasic"]= cms.PSet( 
         miniView = cms.string("CastorRecHitView"),
         branchPrefix = cms.untracked.string("CastorRecHit"),
         onlyGoodRecHits = cms.bool(True),
-        writeSaturationInfo = cms.bool(False),
+        writeSaturationInfo = cms.bool(False),       
         inputcoll = cms.InputTag("castorreco")         
-     )   
+    )
  
     defs["CastorRecHitViewBasicCorrected"]= cms.PSet(
         miniView = cms.string("CastorRecHitView"),
