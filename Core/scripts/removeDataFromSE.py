@@ -48,7 +48,7 @@ for s in samples:
         continue
     path = mod.sam[s]["pathSE"]
     #print s, path
-    p = subprocess.Popen(["lcg-ls", path], stdout=subprocess.PIPE)
+    p = subprocess.Popen(["gfal-ls", path], stdout=subprocess.PIPE)
     data = p.communicate()[0].split("\n")
 
     total=float(len(data))
@@ -66,7 +66,7 @@ for s in samples:
 
         fullname = path + "/" +fname
         if choice > 0:
-            subprocess.call(["srmrm", fullname])
+            subprocess.call(["gfal-rm", fullname])
             cnt += 1
             if cnt % 20 == 0:
                 sys.stdout.write(str(int(100*cnt/total))+"%")
@@ -97,7 +97,7 @@ for s in samples:
             sys.exit()
 	
 	if accept == "y":    
-            subprocess.call(["srmrmdir","-recursive=true",removepath])
+            subprocess.call(["gfal-rm","-r",removepath])
 	    print " removed... "
 	else:
 	    print " ok, skipping..."
