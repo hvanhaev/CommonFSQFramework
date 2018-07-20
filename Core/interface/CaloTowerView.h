@@ -11,7 +11,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include "DataFormats/CaloTowers/interface/CaloTower.h"
-#include "DataFormats/CaloTowers/interface/CaloTowerFwd.h"
+#include "DataFormats/CaloTowers/interface/CaloTowerDefs.h"
 #include "DataFormats/CaloTowers/interface/CaloTowerDetId.h"
 
 #include "DataFormats/HcalDetId/interface/HcalDetId.h"
