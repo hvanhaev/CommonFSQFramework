@@ -1,10 +1,10 @@
 #!/bin/tcsh
 
-echo "Configure to study ALICE 2016 run with no collisions in CMS. Muons in pixel+CASTOR. (Maria)"
+echo "Configure for CASTOR fast feedback RAW data 2018"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 export SmallXAnaDefFile="$PWD/MyAnalysis.py"
-export SmallXAnaVersion="Samples_ALICERun2016"
+export SmallXAnaVersion="Samples_Local"
 
 #
 #
@@ -17,11 +17,13 @@ export SmallXAnaVersion="Samples_ALICERun2016"
 # source /afs/cern.ch/cms/ccs/wm/scripts/Crab/crab.csh
 
 # for crab3
-if [ -f /cvmfs/cms.cern.ch/crab3/crab.sh ]; then
-    source /cvmfs/cms.cern.ch/crab3/crab.sh
-    cp -rf data ../
-    cp -rf data ../..
-fi
+#if [ -f /cvmfs/cms.cern.ch/crab3/crab.sh ]; then
+#    source /cvmfs/cms.cern.ch/crab3/crab.sh
+#    cp -rf data ../
+#    cp -rf data ../..
+#fi
 
-export PYTHONPATH=$PYTHONPATH:$DIR:$DIR/..
-export PATH=$PATH:$DIR/../CommonFSQFramework/Core/scripts/
+export PYTHONPATH=$PYTHONPATH:$DIR:./
+#export PATH=$PATH:$DIR/../CommonFSQFramework/Core/scripts/
+ 
+printTTree.py

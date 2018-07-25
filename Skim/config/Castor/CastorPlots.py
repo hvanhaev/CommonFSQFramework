@@ -140,15 +140,13 @@ if __name__ == "__main__":
     outFileName = "CastorPlotsOutput_" + sampleList[0] + ".root"
     slaveParams = {"theSample": sampleList[0]}
     
-    MinimumBias.runAll(slaveParameters = slaveParams,
+    CastorPlots.runAll(treeName="CFFTree", 
+                       slaveParameters = slaveParams,
                        sampleList = sampleList, 
-                       maxFilesMC = None,
-                       maxFilesData = None,
                        maxNevents = -1, #100000000,
 #                       maxNevents = 100000,
                        nWorkers = 12,
-                       outFile = outFileName,
-                       verbosity = 2)
+                       outFile = outFileName)
     
     print ("Output file name: " + outFileName )
 
