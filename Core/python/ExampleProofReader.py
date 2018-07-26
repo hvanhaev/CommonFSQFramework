@@ -278,7 +278,9 @@ class ExampleProofReader( ROOT.TPySelector ):
 
         if not self.useProofOFile:
             of = ROOT.TFile(self.outFile, "UPDATE") # TODO - take dir name from Central file
-            outDir = of.mkdir(self.datasetName)
+            outDir = of.GetDirectory(self.datasetName)
+            if (not outDir) :
+                outDir = of.mkdir(self.datasetName)
             outDir.cd()
             for o in olist:
                 o.Write()

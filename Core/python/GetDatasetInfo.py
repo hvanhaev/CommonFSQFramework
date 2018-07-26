@@ -183,7 +183,7 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                 if not quiet: print tab, "path to trees not found! Blame the skim-responsible-guy."
                 writePickle = False
 
-            if not quiet: print tab, "path to trees:",sampleList[s]["pathTrees"]
+            if not quiet: print tab, "path to local trees:",sampleList[s]["pathTrees"]
             if not quiet: print tab, "path to trees taken from 'sampleList[s][\"pathTrees\"]' variable"
             if not "eos/cms" in sampleList[s]["pathTrees"]:
                 for dirpath, dirnames, filenames in os.walk(sampleList[s]["pathTrees"]):
@@ -191,7 +191,7 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                     if "/log" in dirpath == 0: continue
                     for f in filenames:
                         if "fail" in f: continue
-                        if not f.startswith("trees_"): continue
+                        if not f.startswith("trees"): continue
                         if not f.endswith(".root"): continue
                         fname = dirpath.replace("//","/").rstrip('/') + '/' + f   # somehow root doesnt like // at the begining
                         fileListUnvalidated.add(ROOTPrefix+fname)
@@ -204,7 +204,7 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                 for line in iter(proc.stdout.readline,''):
                     ifile = line.strip()
                     if "fail" in ifile: continue
-                    if "trees_" not in ifile: continue
+                    if "trees" not in ifile: continue
                     if ".root" not in ifile: continue
                     filename = ifile.split("//")[-1]
                     fileListUnvalidated.add("root://eoscms/"+sampleList[s]["pathTrees"]+filename)
@@ -215,7 +215,7 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
             fileListUnvalidatedSE = CommonFSQFramework.Core.Util.getFileListGFAL(pathSE)
             for fname in fileListUnvalidatedSE:
                 if ".root" not in fname: continue
-                if "trees_" not in fname: continue
+                if "trees" not in fname: continue
                 srcFile = pathSE + "/" + fname
                 if "/store/" not in srcFile:
                     print ("Cannot convert to lfn:", srcFile)
