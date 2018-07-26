@@ -15,6 +15,7 @@ import CommonFSQFramework.Core.Util
 
 
 
+
 def checkRootFile(fp):
     while "//" in fp:
        fp = fp.replace("//","/")
@@ -221,6 +222,7 @@ def main():
         cntCopy = 0
         cntRead = 0
         createdDirs = []
+
         for srcFile in flist:
             cntRead += 1
             cntReadSum += 1
@@ -257,6 +259,7 @@ def main():
             targetFile = targetDir + "/" + subdir + fname
             cpCommand = ['gfal-copy', pathSE.rstrip('/') + '/' + srcFile, targetFile]            
 	    #cpCommand = ['lcg-ls', srcFile]
+
 	    #print "would be cpCommand: ", cpCommand
             
 	    if "eos/cms" not in targetDir and os.path.isfile(targetFile):
