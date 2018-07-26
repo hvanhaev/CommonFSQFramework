@@ -2,6 +2,7 @@
 
 echo "Configure for CASTOR fast feedback RAW data 2018"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+echo $DIR
 
 export SmallXAnaDefFile="$PWD/MyAnalysis.py"
 export SmallXAnaVersion="Samples_Local"
@@ -24,6 +25,6 @@ export SmallXAnaVersion="Samples_Local"
 #fi
 
 export PYTHONPATH=$PYTHONPATH:$DIR:./
-#export PATH=$PATH:$DIR/../CommonFSQFramework/Core/scripts/
+export PATH=$PATH:$DIR/../../../../CommonFSQFramework/Core/scripts/
  
 printTTree.py

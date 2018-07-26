@@ -25,8 +25,8 @@ class CastorPlots(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader)
         
         # the castor data
         self.hist["castor_channel_2d"] =  ROOT.TH2D("castor_channel_2d", "castor_channel_2d", 14, 0.5, 14.5, 16, 0.5, 16.5)
-        self.hist["castor_tower"] =  ROOT.TH1D("castor_tower", "castor_tower", 300, -5, 3000)
-        self.hist["castor_total"] =  ROOT.TH1D("castor_total", "castor_total", 300, -5, 3000)
+        self.hist["castor_tower"] =  ROOT.TH1D("castor_tower", "castor_tower", 300, -10, 20)
+        self.hist["castor_total"] =  ROOT.TH1D("castor_total", "castor_total", 300, -10, 20)
 
 #        for isec in xrange(0,16):
 #            henergy = 'MuonSignal_sec_{sec}'.format(sec=str(isec+1))
