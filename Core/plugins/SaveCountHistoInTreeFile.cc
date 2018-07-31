@@ -176,7 +176,7 @@ SaveCountHistoInTreeFile::endLuminosityBlock(edm::LuminosityBlock const& lumi, e
     edm::Handle<edm::MergeableCounter> hCnt;
     lumi.getByLabel("initialCntr", hCnt);
     double val = hCnt->value;
-    std::cout << "LumiCnt " <<  val << std::endl;
+    //std::cout << "LumiCnt " <<  val << std::endl;
     m_evCnt += val;
 }
 

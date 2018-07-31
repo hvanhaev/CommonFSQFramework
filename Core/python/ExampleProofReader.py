@@ -44,6 +44,9 @@
 ###############################################################################
 
 import sys, os, time, traceback
+import pickle
+import base64
+
 sys.path.append(os.path.dirname(__file__))
 import ROOT
 ROOT.gROOT.SetBatch(True)
@@ -59,54 +62,24 @@ from CommonFSQFramework.Core.TermColor import bcolors
 # should be consistent with this file name (ExampleProofReader.py)
 #from ROOT import TPySelector
 class ExampleProofReader( ROOT.TPySelector ):
-    uniqueEnvString = "TMFTMFqWeRtY_"
-
-    @classmethod
-    def encodeEnvString(cls, s):
-        return s+cls.uniqueEnvString
-
-    @classmethod
-    def decodeEnvString(cls, s):
-        spl = s.split(cls.uniqueEnvString)
-        if len(spl)!=1:
-            err = "Cannot env decode:", s
-            print err
-            sys.stdout.flush()
-            raise Exception(err)
-        return spl[0]
 
     def getVariables(self):
-        #self.dsName = ROOT.gSystem.Getenv("TMFDatasetName")
-        variablesToFetch = ROOT.gSystem.Getenv(self.encodeEnvString("VariablesToFetch") )
-        #print variablesToFetch
-        split = variablesToFetch.split(",")
-	print " "
-        for s in split:
-            attrRaw = ROOT.gSystem.Getenv(self.encodeEnvString(s))
-            #print s, attr
-            attrSpl = attrRaw.split(";;;")
-            print "Variable ", s, " set to: ", attrSpl[0]
-            attr = attrSpl[0]
-            attrType = attrSpl[1]
-
-            if attrType == "int":
-                setattr(self, s, int(attr))
-            elif attrType == "float":
-                setattr(self, s, float(attr))
-            elif attrType == "str":
-                setattr(self, s, attr)
-            elif attrType == "bool":
-                if attr == "True":
-                    setattr(self, s, True)
-                elif attr == "False":
-                    setattr(self, s, False)
+        parStr = os.environ.get('__CFF__BigASCIIBlob__')
+        parameters = None
+        if parStr != None:
+            parameters = pickle.loads(base64.b64decode(parStr))
+            print " "
+            for par, data in parameters.iteritems():
+                dataStr = str(data)
+                if len(dataStr) < 200: 
+                    print "Set parameter: " + par + " to: " + str(data)
                 else:
-                    print "Cannot set bool attribute", s, "from", attr
-            else:
-                print "Dont know what to do with", s, attrType
-
-        #print "XXX1", self.YODA, self.LUKE, self.VADER, self.LEIA, self.LEIA2
-        print " "
+                    print "Set parameter: " + par + " of type " + data.__class__.__name__ 
+                setattr(self, par, data)                
+            print " "
+        else:
+            print "No variables set for PROOF slaves. This is probalby an error."
+                
 
 
     def Begin( self ):
@@ -148,8 +121,6 @@ class ExampleProofReader( ROOT.TPySelector ):
             # this fixes "inmemory" trees problem
             if "TTree" in obj.ClassName():
                 obj.SetDirectory(self.outDirViaPOF)
-
-
         else:
             self.GetOutputList().Add(obj)
 
@@ -307,14 +278,16 @@ class ExampleProofReader( ROOT.TPySelector ):
 
         if not self.useProofOFile:
             of = ROOT.TFile(self.outFile, "UPDATE") # TODO - take dir name from Central file
-            outDir = of.mkdir(self.datasetName)
+            outDir = of.GetDirectory(self.datasetName)
+            if (not outDir) :
+                outDir = of.mkdir(self.datasetName)
             outDir.cd()
             for o in olist:
                 o.Write()
             of.Close()
 
     @classmethod
-    def runAll(cls, treeName, outFile, sampleList = None, \
+    def runAll(cls, outFile, treeName="", sampleList = None, \
                maxFilesMC=None, maxFilesData=None, maxNevents = -1, \
                slaveParameters = None, nWorkers=None,
                usePickle=False, useProofOFile = False,
@@ -326,7 +299,10 @@ class ExampleProofReader( ROOT.TPySelector ):
 
         cwd = os.getcwd()+"/"
         treeFilesAndNormalizations = getTreeFilesAndNormalizations(maxFilesMC=maxFilesMC,
-                                maxFilesData=maxFilesData, samplesToProcess=sampleList, usePickle=usePickle)
+                                                                   maxFilesData=maxFilesData,
+                                                                   samplesToProcess=sampleList,
+                                                                   usePickle=usePickle,
+                                                                   donotvalidate=True)
 
         if sampleList == None:
             todo = treeFilesAndNormalizations.keys() # run them all
@@ -336,7 +312,7 @@ class ExampleProofReader( ROOT.TPySelector ):
         slaveParameters["useProofOFile"] = useProofOFile
 
         if not useProofOFile:
-            of = ROOT.TFile(outFile,"RECREATE")
+            of = ROOT.TFile(outFile,"UPDATE")
             if not of:
                 print "Cannot create outfile:", outFile
                 sys.exit()
@@ -360,7 +336,9 @@ class ExampleProofReader( ROOT.TPySelector ):
                 skipped.append(t)
                 continue
 
-            dataset = ROOT.TDSet( 'TTree', 'data', treeName) # the last name is the directory name inside the root file
+            if "treeName" in sampleListFullInfo[t]:
+                treeName = sampleListFullInfo[t]["treeName"]
+            dataset = ROOT.TDSet( 'TTree', 'data', treeName)
             for file in treeFilesAndNormalizations[t]["files"]:
                 dataset.Add(file)
 
@@ -368,29 +346,12 @@ class ExampleProofReader( ROOT.TPySelector ):
             slaveParameters["isData"] = sampleListFullInfo[t]["isData"]
             slaveParameters["normalizationFactor"] =  treeFilesAndNormalizations[t]["normFactor"]
 
-            ROOT.TProof.AddEnvVar("PATH2",ROOT.gSystem.Getenv("PYTHONPATH")+":"+os.getcwd())
+            ROOT.TProof.AddEnvVar("PATH2", ROOT.gSystem.Getenv("PYTHONPATH")+":"+os.getcwd()+":"+os.getcwd()+'../../../../..')
 
-            supportedTypes = set(["int", "str", "float", "bool"])
-            variablesToFetch = ""
-            coma = ""
-
-            variablesToSetInProof = {}
-            for p in slaveParameters:
-                encodedName = cls.encodeEnvString(p)
-
-                # Check if parameter is supported. Adding another type is easy - see
-                #       getVariables method
-                paramType = slaveParameters[p].__class__.__name__
-                if paramType not in supportedTypes:
-                    raise Exception("Parameter of type "+paramType \
-                          + " is not of currently supported types: " + ", ".join(supportedTypes) )
-                ROOT.gSystem.Setenv(encodedName, str(slaveParameters[p])+";;;"+paramType)
-                variablesToSetInProof[encodedName] =  str(slaveParameters[p])+";;;"+paramType
-                variablesToFetch += coma + p
-                coma = ","
-            ROOT.gSystem.Setenv(cls.encodeEnvString("VariablesToFetch"), variablesToFetch)
-            variablesToSetInProof[cls.encodeEnvString("VariablesToFetch")] = variablesToFetch
-
+            # pack all the variables into a ginat blob of ASCII
+            varDump = base64.b64encode(pickle.dumps(slaveParameters))
+            os.environ["__CFF__BigASCIIBlob__"] = varDump
+  
             proofConnectionString = None
             if "proofConnectionString" in os.environ:
                 proofConnectionString = os.environ["proofConnectionString"]
@@ -405,12 +366,7 @@ class ExampleProofReader( ROOT.TPySelector ):
                 proof = ROOT.TProof.Open(proofConnectionString)
 
 
-            proof.Exec( 'gSystem->Setenv("PYTHONPATH",gSystem->Getenv("PATH2"));') # for some reason cannot use method below for python path
-            #proof.Exec( 'gSystem->Setenv("PATH", "'+ROOT.gSystem.Getenv("PATH") + '");')
-            for v in variablesToSetInProof:
-                # if you get better implemenation (GetParameter?) mail me
-                proof.Exec('gSystem->Setenv("'+v+'","'+variablesToSetInProof[v]+'");')
-	    	
+            proof.Exec( 'gSystem->Setenv("PYTHONPATH",gSystem->Getenv("PATH2"));') # for some reason cannot use method below for python path	    	
             print dataset.Process( 'TPySelector',  cls.__name__, maxNevents) # with parameter to limit on number of events
 
             try:
@@ -469,12 +425,6 @@ class ExampleProofReader( ROOT.TPySelector ):
             of.Close()
             ROOT.gDirectory.cd(curPath)
 
-            # clean environment
-            for v in variablesToSetInProof:
-                #command = 'gSystem->Unsetenv("'+v+'");'
-                #print command
-                proof.Exec('gSystem->Unsetenv("'+v+'");')
-
 	    proof.Close()
 
         if len(skipped)>0:
@@ -507,8 +457,6 @@ class ExampleProofReader( ROOT.TPySelector ):
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
-    ROOT.gSystem.Load("libFWCoreFWLite.so")
-    ROOT.FWLiteEnabler.enable()
 
     slaveParams = {}
 

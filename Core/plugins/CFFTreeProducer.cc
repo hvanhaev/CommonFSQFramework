@@ -47,6 +47,7 @@
 #include "CommonFSQFramework/Core/interface/PFCandidateView.h"
 #include "CommonFSQFramework/Core/interface/PFClusterView.h"
 #include "CommonFSQFramework/Core/interface/ZeroTeslaVertexView.h"
+#include "CommonFSQFramework/Core/interface/PixelView.h"
 
 //
 // class declaration
@@ -174,6 +175,9 @@ CFFTreeProducer::CFFTreeProducer(const edm::ParameterSet& iConfig)
         }
         else if (miniViewType == "ZeroTeslaVertexView") {
             m_views.push_back(new ZeroTeslaVertexView(pset, m_tree, this->consumesCollector()));
+	}
+        else if (miniViewType == "PixelView") {
+            m_views.push_back(new PixelView(pset, m_tree, this->consumesCollector()));
         }
         else {
             throw "Miniview not known: "+ miniViewType;
