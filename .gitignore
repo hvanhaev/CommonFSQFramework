@@ -1,0 +1,6 @@
+*.pyc
+**/__init__.py
+**/*~
+__init__.py
+Core/__init__.py
+Skim/__init__.py
