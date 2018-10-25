@@ -18,7 +18,7 @@ class EventViewBase {
       void fill(const edm::Event&, const edm::EventSetup&);
       virtual void doBeginRun(const edm::Run&, const edm::EventSetup&);
       virtual void doEndRun(const edm::Run&, const edm::EventSetup&);
-      ~EventViewBase();
+      virtual ~EventViewBase();
 
       void resetVariables();
       // TODO: add protection against booking two branches with same name
