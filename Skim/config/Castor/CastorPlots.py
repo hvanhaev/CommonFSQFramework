@@ -28,6 +28,10 @@ class CastorPlots(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader)
         self.hist["castor_tower"] =  ROOT.TH1D("castor_tower", "castor_tower", 300, -10, 20)
         self.hist["castor_total"] =  ROOT.TH1D("castor_total", "castor_total", 300, -10, 20)
 
+        self.hist["castor_trace"] =  ROOT.TProfile("castor_trace", "castor_trace", 4000, 0, 4000)
+        self.hist["castor_trace_n"] =  ROOT.TH1D("castor_trace_n", "castor_trace_n", 4000, 0, 4000)
+        self.hist["castor_trace_high"] =  ROOT.TProfile("castor_trace_high", "castor_trace_high", 4000, 0, 4000)
+
 #        for isec in xrange(0,16):
 #            henergy = 'MuonSignal_sec_{sec}'.format(sec=str(isec+1))
 #            self.hist[henergy] = ROOT.TH1D(henergy, henergy, 200, -50, 6000)
@@ -48,7 +52,6 @@ class CastorPlots(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader)
             
     def analyze(self):
 
-
         self.hist["EventCounter"].Fill("all", 1)
 
         #if (self.hist["EventCounter"].GetBinContent(1) % 100 != 0):
@@ -60,30 +63,38 @@ class CastorPlots(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader)
         self.hist["EventCounter"].Fill("Data Valid",1)
 
         # read CASTOR RecHits
+        energy_ch_max = 0
         energy_ch = [[0 for _ in xrange(14)] for _ in xrange(16)]
         for ich in range(self.fChain.CastorRecHitEnergy.size()):
             isec = ich//14
             imod = ich%14
             energy_ch[isec][imod] = self.fChain.CastorRecHitEnergy.at(ich)
+            energy_ch_max = max(energy_ch_max, energy_ch[isec][imod])
             
 
         # CASTOR data
                     
         energy_tot = 0
         energy_secsum = [0.0] * 16
+        energy_secsum_max = 0
         for isec in xrange(16):
             for imod in xrange(14):
 #                if [isec+1,imod+1] in self.bad_ch:
 #                    continue
-                energy_secsum[isec] += energy_ch[isec][imod]                
-
+                energy_secsum[isec] += energy_ch[isec][imod]
+                energy_secsum_max = max(energy_secsum_max, energy_secsum[isec])
+                
                 self.hist["castor_channel_2d"].Fill(imod+1, isec+1, energy_ch[isec][imod])
                                 
             self.hist["castor_tower"].Fill(energy_secsum[isec]) 
             energy_tot += energy_secsum[isec]
             
         self.hist["castor_total"].Fill(energy_tot)
-                               
+        self.hist["castor_trace"].Fill(self.fChain.bx, energy_secsum_max)
+        self.hist["castor_trace_n"].Fill(self.fChain.bx, 1)
+        if (energy_secsum_max>3) :
+            self.hist["castor_trace_high"].Fill(self.fChain.bx, energy_secsum_max)
+        
         return 1
     
 
@@ -104,7 +115,7 @@ class CastorPlots(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader)
         for o in olist:
             if not "TH1" in o.ClassName():
                 if not "TH2" in o.ClassName():
-                    if not "TProfile2D" in o.ClassName():
+                    if not "TProfile" in o.ClassName():
                         continue
             histos[o.GetName()] = o
         
