@@ -17,8 +17,10 @@ EventViewBase(iConfig,  tree)
     JetLabel << "ak" << int(m_jetRadius*10) << "CastorJets";
     JetIdLabel << "ak" << int(m_jetRadius*10) << "CastorJetID";
 
+    // register data access
     iC.consumes< edm::View<reco::BasicJet> >(edm::InputTag(JetLabel.str().c_str()));
     iC.consumes< reco::CastorJetIDValueMap >(edm::InputTag(JetIdLabel.str().c_str()));
+
 
     // register branches
     registerVecP4("P4", tree);
