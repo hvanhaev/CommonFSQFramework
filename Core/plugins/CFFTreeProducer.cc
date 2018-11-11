@@ -60,8 +60,7 @@ class CFFTreeProducer : public edm::EDAnalyzer {
 
       static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
-
-   private:
+private:
       virtual void beginJob();
       virtual void analyze(const edm::Event&, const edm::EventSetup&);
       virtual void endJob();

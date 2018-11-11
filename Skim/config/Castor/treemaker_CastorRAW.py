@@ -7,7 +7,7 @@ useCustomCond = False
 # this is important to get the right trigger setup
 from Configuration.StandardSequences.Eras import eras
 
-process = cms.Process("Treemaker")
+process = cms.Process("Treemaker", eras.Run2_2018)
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.load("Configuration.Geometry.GeometryRecoDB_cff")
@@ -59,7 +59,9 @@ process.source = cms.Source("PoolSource",
         #"file:/eos/cms/store/hidata/HIRun2018/ZeroBias/RAW/v1/000/325/947/00000/5AB32F6D-6866-194B-B476-F58B0D9D3FE7.root",
         #"file:/eos/cms/store/hidata/HIRun2018/ZeroBias/RAW/v1/000/325/947/00000/8F10C6FB-A06F-F147-8FBC-A92BA916DB75.root"
         # first stable beams
-        "file:/eos/cms/store/hidata/HIRun2018A/HIMinimumBias0/RAW/v1/000/326/383/00000/A0CCB8F0-C349-0F49-9EF3-335D7889CE5B.root"
+        #"file:/eos/cms/store/hidata/HIRun2018A/HIMinimumBias0/RAW/v1/000/326/383/00000/A0CCB8F0-C349-0F49-9EF3-335D7889CE5B.root"
+        # trigger fixed
+        'file:/eos/cms/store/hidata/HIRun2018A/ZeroBias/RAW/v1/000/326/495/00000/32BC1FB4-963A-6B4E-808F-0E1C5CC78364.root'
         )
 
 )                            
@@ -70,7 +72,8 @@ process.source = cms.Source("PoolSource",
 
 
 
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(-1))
+
 process.MessageLogger.cerr.FwkReport.reportEvery = 1
 process.options = cms.untracked.PSet(
     wantSummary = cms.untracked.bool(True),
@@ -124,20 +127,20 @@ import CommonFSQFramework.Core.TriggerResultsViewsConfigs
 
 #process.CFFTree._Parameterizable__setParameters(CommonFSQFramework.Core.CastorViewsConfigs.get(["CastorRecHitViewFull"]))
 process.CFFTree._Parameterizable__setParameters(CommonFSQFramework.Core.CastorViewsConfigs.get(["CastorRecHitViewFull","CastorTowerView"]))
-process.CFFTree._Parameterizable__setParameters(CommonFSQFramework.Core.TriggerResultsViewsConfigs.get(["L1GTriggerResultsViewStage1"]))
+process.CFFTree._Parameterizable__setParameters(CommonFSQFramework.Core.TriggerResultsViewsConfigs.get(["L1GTriggerResultsView"]))
 #process.CFFTree._Parameterizable__setParameters(CommonFSQFramework.Core.CaloRecHitViewsConfigs.get(["HFRecHitView"]))
 #process.CFFTree._Parameterizable__setParameters(CommonFSQFramework.Core.CaloTowerViewsConfigs.get(["CaloTowerView"]))
 #process.CFFTree._Parameterizable__setParameters(CommonFSQFramework.Core.PFObjectsViewsConfigs.get(["PFCandidateView","ecalPFClusterView","hcalPFClusterView","hfPFClusterView"]))
 
 
 
-process.dttfDigis.DTTF_FED_Source = 'rawDataRepacker'
-process.gctDigis.inputLabel = 'rawDataRepacker'
-process.gtDigis.DaqGtInputTag = 'rawDataRepacker'
-process.gtEvmDigis.EvmGtInputTag = 'rawDataRepacker'
-process.castorDigis.InputLabel = 'rawDataRepacker'
-process.scalersRawToDigi.scalersInputTag = 'rawDataRepacker'
-process.csctfDigis.producer = 'rawDataRepacker'
+# process.dttfDigis.DTTF_FED_Source = 'rawDataRepacker'
+# process.gctDigis.inputLabel = 'rawDataRepacker'
+# process.gtDigis.DaqGtInputTag = 'rawDataRepacker'
+# process.gtEvmDigis.EvmGtInputTag = 'rawDataRepacker'
+# process.castorDigis.InputLabel = 'rawDataRepacker'
+# process.scalersRawToDigi.scalersInputTag = 'rawDataRepacker'
+# process.csctfDigis.producer = 'rawDataRepacker'
 
 
 process.dump=cms.EDAnalyzer('EventContentAnalyzer')
@@ -145,6 +148,7 @@ process.dump=cms.EDAnalyzer('EventContentAnalyzer')
 #process.FiltererdTree = cms.Path(process.dump*process.TriggerFilter*process.CFFTree)
 process.FiltererdTree = cms.Path(process.TriggerFilter*process.CFFTree)
 
+#process.raw2digi_custom_step = cms.Path(process.RawToDigi) # L1TRawToDigi*process.castorDigis)
 process.raw2digi_custom_step = cms.Path(process.L1TRawToDigi*process.castorDigis)
 #process.raw2digi_step = cms.Path(process.castorDigis)
 #process.castorreco_step = cms.Path(process.reconstruction)

@@ -28,9 +28,8 @@ class TriggerResultsView: public EventViewBase{
       HLTPrescaleProvider hltprovider_;
       bool isValidHLTConfig_;
       
-      bool isStage1_;
-
       edm::EDGetTokenT<GlobalAlgBlkBxCollection> m_l1tStage2uGtToken; // input tag for L1 uGT DAQ readout record
+      edm::EDGetTokenT<L1GlobalTriggerReadoutRecord> m_l1GtToken; // input tag for L1 uGT DAQ readout record
       edm::EDGetTokenT<edm::TriggerResults> m_HLTtoken;
 
       // To get the number of algorithms
