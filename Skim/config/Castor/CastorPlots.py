@@ -32,6 +32,11 @@ class CastorPlots(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader)
         self.hist["castor_trace_n"] =  ROOT.TH1D("castor_trace_n", "castor_trace_n", 4000, 0, 4000)
         self.hist["castor_trace_high"] =  ROOT.TProfile("castor_trace_high", "castor_trace_high", 4000, 0, 4000)
 
+        self.hist["castor_bits"] =  ROOT.TH1D("castor_bits", "castor_bits", 50, 460, 510)
+        
+        self.hist["castor_bits2D"] =  ROOT.TH2D("castor_bits2D", "castor_bits2D", 4000, 0, 4000, 50, 460, 510)
+
+        
 #        for isec in xrange(0,16):
 #            henergy = 'MuonSignal_sec_{sec}'.format(sec=str(isec+1))
 #            self.hist[henergy] = ROOT.TH1D(henergy, henergy, 200, -50, 6000)
@@ -57,6 +62,12 @@ class CastorPlots(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader)
         #if (self.hist["EventCounter"].GetBinContent(1) % 100 != 0):
         #    return 0
 
+        for iL1 in range(490, 510):
+            if (iL1<self.fChain.trgl1L1GTAlgo.size() and self.fChain.trgl1L1GTAlgo[iL1]):
+                hist["castor_bits"].Fill(1)
+                hist["castor_bits2D"].Fill(self.fChain.bx, 1)
+                
+        
         if self.fChain.CastorRecHitEnergy.size() != 224:
             return 0
 
