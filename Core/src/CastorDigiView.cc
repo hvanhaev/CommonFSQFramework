@@ -67,7 +67,7 @@ void CastorDigiView::fillSpecific(const edm::Event& iEvent, const edm::EventSetu
   
   edm::ESHandle<CastorDbService> conditions;
   iSetup.get<CastorDbRecord>().get(conditions);
-  /*
+  
   const CastorQIEShape* shape = conditions->getCastorShape();
 
    
@@ -92,7 +92,7 @@ void CastorDigiView::fillSpecific(const edm::Event& iEvent, const edm::EventSetu
       addToFVec(ADCallTS.c_str(), adc);
       addToFVec(fCallTS.c_str(), charge);      
     }
-  } */
+  } 
 }
 
 
