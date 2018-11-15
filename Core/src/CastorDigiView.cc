@@ -29,14 +29,7 @@ EventViewBase(iConfig,  tree)
     m_lastTS = iConfig.getParameter<int>("lastTS");
 
     // register consumes
-    iC.consumes<CastorDigiCollection>(m_Digis);
-    
-    EDGetTokenT<CastorDigiCollection> tok_input0;
-    tok_input0 = iC.consumes<CastorDigiCollection>(m_Digis); 
-  
-    TokenTuple myTuple(tok_input0);
-  
-    m_Tokens = myTuple;
+    m_tok_input = iC.consumes<CastorDigiCollection>(m_Digis); 
     
     // register branches 
     for (int ts=m_firstTS;ts<m_lastTS;++ts) {
@@ -61,7 +54,7 @@ void CastorDigiView::fillSpecific(const edm::Event& iEvent, const edm::EventSetu
   using namespace reco;
   
   Handle<CastorDigiCollection> digis;
-  iEvent.getByToken(m_Tokens.get<0>(), digis);
+  iEvent.getByToken(m_tok_input, digis);
   
   edm::ESHandle<CastorDbService> conditions;
   iSetup.get<CastorDbRecord>().get(conditions);
