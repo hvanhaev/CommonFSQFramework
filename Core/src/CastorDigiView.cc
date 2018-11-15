@@ -22,17 +22,6 @@ EventViewBase(iConfig,  tree)
     using namespace edm;
     using namespace reco;
     
-    // register branches    
-    for (int iSector=0;iSector<17;iSector++) {
-	    for (int iModule=0;iModule<15;iModule++) {
-			const string ADCallTS = (boost::format("ADCallTS_Sect%i_Mod%i") % iSector % iModule).str();
-			const string fCallTS = (boost::format("fCallTS_Sect%i_Mod%i") % iSector % iModule).str();
-			
-			registerVecFloat(ADCallTS.c_str(), tree);
-			registerVecFloat(fCallTS.c_str(), tree);
-		}     
-	}
-
     // fetch config data
     m_Digis = iConfig.getParameter<edm::InputTag>("input");
     
@@ -48,6 +37,15 @@ EventViewBase(iConfig,  tree)
     TokenTuple myTuple(tok_input0);
   
     m_Tokens = myTuple;
+    
+    // register branches 
+    for (int ts=m_firstTS;ts<m_lastTS;++ts) {
+    	const string ADCallTS = (boost::format("ADCallSectMod_TS%i") % ts).str();
+	const string fCallTS = (boost::format("fCallSectMod_TS%i") % ts).str();
+
+	registerVecFloat(ADCallTS.c_str(), tree);
+	registerVecFloat(fCallTS.c_str(), tree);
+    }
     
     
 	  
@@ -71,19 +69,16 @@ void CastorDigiView::fillSpecific(const edm::Event& iEvent, const edm::EventSetu
   const CastorQIEShape* shape = conditions->getCastorShape();
 
    
-  for (CastorDigiCollection::const_iterator it = digis->begin(); it != digis->end(); it++) {
+  for (int ts=m_firstTS; ts<m_lastTS; ++ts) { 
+  
+    const string ADCallTS = (boost::format("ADCallSectMod_TS%i") % ts).str();
+    const string fCallTS = (boost::format("fCallSectMod_TS%i") % ts).str();
     
-    const CastorDataFrame digi = (const CastorDataFrame)(*it);
-    
-    const CastorQIECoder* coder = conditions->getCastorCoder(digi.id().rawId());
+    for (CastorDigiCollection::const_iterator it = digis->begin(); it != digis->end(); it++) {
 
-    const int sector = digi.id().sector();     // range 1...16
-    const int module = digi.id().module();     // range 1...14
+      const CastorDataFrame digi = (const CastorDataFrame)(*it);
     
-    const string ADCallTS = (boost::format("ADCallTS_Sect%i_Mod%i") % sector % module).str();
-	const string fCallTS = (boost::format("fCallTS_Sect%i_Mod%i") % sector % module).str();
-    
-    for (int ts=m_firstTS; ts<m_lastTS; ++ts) {
+      const CastorQIECoder* coder = conditions->getCastorCoder(digi.id().rawId());
 
       const int capid = digi.sample(ts).capid(); // range 0..3
       const int adc = digi.sample(ts).adc();
