@@ -53,9 +53,7 @@ class CastorDigiView: public EventViewBase {
       int m_lastTS;
 
       edm::InputTag m_Digis;
-	  
-	  typedef boost::tuple<edm::EDGetTokenT<CastorDigiCollection>> TokenTuple;
-	  TokenTuple m_Tokens;
+      edm::EDGetTokenT<CastorDigiCollection> m_tok_input;
      
       
 };
