@@ -7,7 +7,7 @@ useCustomCond = False
 # this is important to get the right trigger setup
 from Configuration.StandardSequences.Eras import eras
 
-process = cms.Process("Treemaker", eras.Run2_2018)
+process = cms.Process("Treemaker", eras.Run2_2018_pp_on_AA) # eras.Run2_2018)
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.load("Configuration.Geometry.GeometryRecoDB_cff")
@@ -61,10 +61,52 @@ process.source = cms.Source("PoolSource",
         # first stable beams
         #"file:/eos/cms/store/hidata/HIRun2018A/HIMinimumBias0/RAW/v1/000/326/383/00000/A0CCB8F0-C349-0F49-9EF3-335D7889CE5B.root"
         # trigger fixed
-        'file:/eos/cms/store/hidata/HIRun2018A/ZeroBias/RAW/v1/000/326/495/00000/32BC1FB4-963A-6B4E-808F-0E1C5CC78364.root'
+        #'file:/eos/cms/store/hidata/HIRun2018A/ZeroBias/RAW/v1/000/326/495/00000/32BC1FB4-963A-6B4E-808F-0E1C5CC78364.root'
+# epxress test
+ 'file:/eos/cms/store/hidata/HIRun2018A/ZeroBias/RAW/v1/000/326/613/00000/FB0F533A-195C-B34B-96B0-669334A8A734.root'
+
+# first HLT castor muons!!! HLT_L1CastorMuons
+# 'file:/eos/cms/store/hidata/HIRun2018A/MinimumBias/RAW/v1/000/326/683/00000/01E9DF98-E7D7-D44D-AFB3-1FEDA27574F1.root',
+# 'file:/eos/cms/store/hidata/HIRun2018A/MinimumBias/RAW/v1/000/326/683/00000/2977F8B1-E29D-B14D-9994-A06E4BF94428.root',
+# 'file:/eos/cms/store/hidata/HIRun2018A/MinimumBias/RAW/v1/000/326/683/00000/631534FE-CDC9-D84E-BEBD-35782C003398.root',
+# 'file:/eos/cms/store/hidata/HIRun2018A/MinimumBias/RAW/v1/000/326/683/00000/746C8FF2-1F17-2041-8E1C-F54CAA10C016.root',
+# 'file:/eos/cms/store/hidata/HIRun2018A/MinimumBias/RAW/v1/000/326/683/00000/A2FE1625-1090-AF46-B39B-5D0C9465C62B.root',
+# 'file:/eos/cms/store/hidata/HIRun2018A/MinimumBias/RAW/v1/000/326/683/00000/BB6D6A75-014A-6C45-A416-C55499C5023A.root',
+# 'file:/eos/cms/store/hidata/HIRun2018A/MinimumBias/RAW/v1/000/326/683/00000/F296A946-0712-DF4F-B683-3EDACE3C2E40.root',
+
+# first HLT castor muons!!! HLT_Random
+# 'file:/eos/cms/store/hidata/HIRun2018A/ZeroBias/RAW/v1/000/326/683/00000/17F933F7-A94E-F249-8594-A2DB663714BE.root',
+# 'file:/eos/cms/store/hidata/HIRun2018A/ZeroBias/RAW/v1/000/326/683/00000/72B58400-4F77-E846-9203-2E9BB0B59A80.root',
+# 'file:/eos/cms/store/hidata/HIRun2018A/ZeroBias/RAW/v1/000/326/683/00000/9969141F-74EF-A843-BB07-5CE0E27A7543.root',
+# 'file:/eos/cms/store/hidata/HIRun2018A/ZeroBias/RAW/v1/000/326/683/00000/B123B857-148B-4D43-8393-21A2D951FA04.root',
+# 'file:/eos/cms/store/hidata/HIRun2018A/ZeroBias/RAW/v1/000/326/683/00000/C1FF7BAF-66B7-574A-B8A4-2D78BBD2F590.root',
+# 'file:/eos/cms/store/hidata/HIRun2018A/ZeroBias/RAW/v1/000/326/683/00000/CBEE5535-3F43-6A40-B880-CBDD26942879.root',
+# 'file:/eos/cms/store/hidata/HIRun2018A/ZeroBias/RAW/v1/000/326/683/00000/FA114F40-8BDA-5045-A55A-7F191AE86F79.root',
+# 'file:/eos/cms/store/hidata/HIRun2018A/ZeroBias/RAW/v1/000/326/683/00000/FF264181-09C7-CB43-B094-81CD88A4251F.root',
+
+
+#'file:/eos/cms/store/hidata/HIRun2018A/ZeroBias/RAW/v1/000/326/710/00000/A9C7A5A9-11D3-5148-988C-BC0D2ACC0DD2.root',
+#'file:/eos/cms/store/hidata/HIRun2018A/ZeroBias/RAW/v1/000/326/710/00000/C1332E16-0928-DC47-9C71-92F1E4F1024D.root',
+
+#'file:/eos/cms/store/hidata/HIRun2018A/MinimumBias/RAW/v1/000/326/710/00000/35E47230-62E0-4F45-AC30-29FBF6C5328A.root',
+#'file:/eos/cms/store/hidata/HIRun2018A/MinimumBias/RAW/v1/000/326/710/00000/5BEAC802-2AA5-9A4D-91B6-39A45FC89637.root',
+#'file:/eos/cms/store/hidata/HIRun2018A/MinimumBias/RAW/v1/000/326/710/00000/78D6B4A0-3783-454C-B9C5-816C2B96F863.root',
+#'file:/eos/cms/store/hidata/HIRun2018A/MinimumBias/RAW/v1/000/326/710/00000/87203823-6818-E448-9BBA-6F9EF31289A4.root',
+
+
         )
 
-)                            
+)             
+
+#        "file:/eos/cms/store/hidata/HIRun2018A/ZeroBias/RAW/v1/000/326/614/00000/4983FF8A-2894-824A-A9A2-6DD6E4100F9D.root"
+
+# "file:/eos/cms/store/hidata/HIRun2018A/ZeroBias/RAW/v1/000/326/612/00000/9EF7F37B-F33F-954B-93FC-F5C1A10DC527.root",
+# "file:/eos/cms/store/hidata/HIRun2018A/ZeroBias/RAW/v1/000/326/611/00000/A506B97D-9ED7-5445-8AE7-D3FBB7B4C74A.root",
+# "file:/eos/cms/store/hidata/HIRun2018A/ZeroBias/RAW/v1/000/326/610/00000/EF9840FF-55A9-ED41-A95D-88BEB0905528.root",
+# "file:/eos/cms/store/hidata/HIRun2018A/ZeroBias/RAW/v1/000/326/609/00000/77419629-73A1-BC40-AE84-583371BB087D.root",
+
+
+#        'file:/eos/cms/store/hidata/HIRun2018A/ZeroBias/RAW/v1/000/326/613/00000/A385468F-5777-554B-8781-2CC27680859D.root'
 
 # /eos/cms/store/hidata/HIRun2018/ZeroBias/RAW/v1/000/325/860/00000/0A4C73CB-ED9A-4C4E-B145-9EFF69C456E0.root")
 # /eos/cms/store/hidata/HIRun2018/ZeroBias/RAW/v1/000/325/867/00000/29DCC16A-4E7A-6A46-9A0F-D821DD8A2BC7.root")
@@ -86,9 +128,10 @@ process.TriggerFilter = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone
      TriggerResultsTag = cms.InputTag("TriggerResults", "", "HLT"),
      #HLTPaths = ['HLT_L1CastorMuon_v*','HLT_L1Tech59_CASTORHaloMuon_v*'], #  # provide list of HLT paths (or patterns) you want
      #HLTPaths = ['HLT_Random_v*'],
-     HLTPaths = ['*'],
-     #andOr = cms.bool(True),   # how to deal with multiple triggers: True (OR) accept if ANY is true, False (AND) accept if ALL are true
-     throw = True  ## NNED THis FOR 2015 June since the HLT trigger was renamed! 
+     HLTPaths = ['HLT_L1CastorMuon_v*'],
+     #HLTPaths = ['*'],
+     andOr = cms.bool(True),   # how to deal with multiple triggers: True (OR) accept if ANY is true, False (AND) accept if ALL are true
+     throw = cms.bool(True)  ## NNED THis FOR 2015 June since the HLT trigger was renamed! 
 ) 
 
 
@@ -106,7 +149,7 @@ if useCustomCond:
             )
                                     )
 
-    process.es_prefer_castor = cms.ESPrefer('CastorTextCalibrations','es_ascii')
+    process.es_prefer_castor = cms.ESPrefer('CastorTextCalibrations', 'es_ascii')
 
 
 # Here starts the CFF specific part

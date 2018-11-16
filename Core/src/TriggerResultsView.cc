@@ -13,10 +13,12 @@ TriggerResultsView::TriggerResultsView(const edm::ParameterSet& iConfig,
 				       edm::ConsumesCollector && iC,
 				       edm::EDAnalyzer* module):
   EventViewBase(iConfig,  tree), hltprovider_(iConfig, iC, *module),
-  m_l1tStage2uGtToken(iC.consumes<GlobalAlgBlkBxCollection>(edm::InputTag("gtStage2Digis"))),
+  m_l1tStage2uGtToken(iC.consumes<GlobalAlgBlkBxCollection>(edm::InputTag("gtStage2Digis",
+									  "",
+									  "Treemaker"))),
   m_gtUtil(new l1t::L1TGlobalUtil(iConfig, iC, *module,
-				  edm::InputTag("gtStage2Digis"), // 2018
-				  edm::InputTag("gtStage2Digis"))), // 2018
+				  edm::InputTag("gtStage2Digis", "", "Treemaker"), // 2018
+				  edm::InputTag("gtStage2Digis", "", "Treemaker"))), // 2018
   m_numAlgs(0)
 {
     // fetch config data
@@ -78,10 +80,11 @@ TriggerResultsView::TriggerResultsView(const edm::ParameterSet& iConfig,
             }
         }
     }
-    
         
     m_HLTtoken = iC.consumes<edm::TriggerResults>(edm::InputTag("TriggerResults", "", "HLT"));
 }
+
+
 
 void TriggerResultsView::doBeginRun(const edm::Run& r, const edm::EventSetup& es) {
     
@@ -92,82 +95,105 @@ void TriggerResultsView::doBeginRun(const edm::Run& r, const edm::EventSetup& es
     m_gtUtil->retrieveL1Setup(es);
     // Find the number of algos defined
     m_numAlgs = static_cast<int>(m_gtUtil->decisionsInitial().size());
-    edm::LogWarning("TriggerResultsView: number of L1 bits=") << m_numAlgs << std::endl;
+    //edm::LogWarning("TriggerResultsView: number of L1 bits=") << m_numAlgs << std::endl;
 }
 
 
-void TriggerResultsView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-    edm::Handle<edm::TriggerResults> trigres;
-    iEvent.getByToken(m_HLTtoken, trigres);
-    edm::TriggerResultsByName trbn = iEvent.triggerResultsByName(*trigres);
-    if (!trbn.isValid()) {
-        edm::LogWarning(" TriggerResultsByName ") << " Cannot read TriggerResultsByName (HLT) " << std::endl;
-        return; 
-    }
-
-    const std::vector< std::string > names = trbn.triggerNames(); 
+void 
+TriggerResultsView::fillSpecific(const edm::Event& iEvent, 
+				 const edm::EventSetup& iSetup) 
+{
+  edm::Handle<edm::TriggerResults> trigres;
+  iEvent.getByToken(m_HLTtoken, trigres);
+  edm::TriggerResultsByName trbn = iEvent.triggerResultsByName(*trigres);
+  if (!trbn.isValid()) {
+    edm::LogWarning(" TriggerResultsByName ") << " Cannot read TriggerResultsByName (HLT) " << std::endl;
+    return; 
+  }
+  
+  const std::vector< std::string >& names = trbn.triggerNames(); 
+  
+  // this is for stage2 L1 trigger *************************************
+  
+  // auto initial = m_gtUtil->decisionsInitial();
+  
+  // Open uGT readout record
+  edm::Handle<GlobalAlgBlkBxCollection> uGtAlgs;
+  iEvent.getByToken(m_l1tStage2uGtToken, uGtAlgs);
+  
+  if (!uGtAlgs.isValid()) {
+    edm::LogWarning("TriggerResultsView") << "Cannot find uGT readout record.";
+    return;
+  }
+  
+  std::map<std::string, std::vector<std::string> >::const_iterator it, itE;
+  it = m_triggerClasses.begin();
+  itE = m_triggerClasses.end();
+  for(;it != itE; ++it) {
     
-
-    // this is for stage2 L1 trigger *************************************
-      
-    // Open uGT readout record
-    edm::Handle<GlobalAlgBlkBxCollection> uGtAlgs;
-    iEvent.getByToken(m_l1tStage2uGtToken, uGtAlgs);      
-    
-    
-    if (!uGtAlgs.isValid()) {
-      edm::LogWarning("TriggerResultsView") << "Cannot find uGT readout record.";
-      return;
-    }
-    
-    std::map<std::string, std::vector<std::string> >::const_iterator it, itE;
-    it = m_triggerClasses.begin();
-    itE = m_triggerClasses.end();
-    for(;it != itE; ++it) {
-
-      if (it->first == "L1GTAlgo") {
-	const int bxInEvent = 0;
+    if (it->first == "L1GTAlgo") {
+      const int bxInEvent = 0;
+      bool found = false;
+      for (int ibx = uGtAlgs->getFirstBX(); ibx <= uGtAlgs->getLastBX(); ++ibx) {
+       	if (ibx==bxInEvent) {
+       	  if (!uGtAlgs->isEmpty(ibx)) {
+      	    found = true;
+      	    break;
+      	  }
+      	}
+      }
+      if (found) {
+	//for (int ibx = uGtAlgs->getFirstBX(); ibx <= uGtAlgs->getLastBX(); ++ibx) {
 	auto itr = uGtAlgs->begin(bxInEvent);
-
-	for(int algoBit = 0; algoBit < m_numAlgs; ++algoBit) {	    
+	//auto itr = uGtAlgs->begin(ibx);
+	for(int algoBit = 0; algoBit < m_numAlgs; ++algoBit) {
 	  //         prescaleFactorSet_->Fill(lumi, itr->getPreScColumn());
-	  addToIVec(it->first, itr->getAlgoDecisionInitial(algoBit)); // Algorithm bits before AlgoBX mask
-	}
-	continue;
-      }
-      
-      int accept = 0;
-      
-      if (m_storePrescales && it->second.size() == 1) {
-	std::string name = it->second.at(0);
-	if (name.find("*")!= std::string::npos) { // wildcard entry
-	  // do nothing
-	} else {
-	  setI("L1PS_" + it->first, (hltprovider_.prescaleValues(iEvent, iSetup, name)).first );
-	  setI("HLTPS_" + it->first, (hltprovider_.prescaleValues(iEvent, iSetup, name)).second );
-	}
-      }
-      
-      for (unsigned int i=0; i < it->second.size();++i) {
-	std::string name = it->second.at(i);
-	if (name.find("*")!= std::string::npos) { // wildcard entry
-	  for (unsigned iName = 0; iName < names.size(); ++iName) {
-	    std::string nameForSearch = std::string(it->second.at(i), 0, it->second.at(i).size()-1); // strip the star
-	    if (names.at(iName).find(nameForSearch)==0) { // starts with
-	      if (trbn.accept(names.at(iName)))
-		accept = 1;
-	    }
-	  }
-	} else { // normal entry
-	  if (trbn.accept( it->second.at(i)))
-	    accept = 1;
-	  if (m_storePrescales) {
-	    setI("L1PS_" + name, (hltprovider_.prescaleValues(iEvent, iSetup, name)).first );
-	    setI("HLTPS_" + name, (hltprovider_.prescaleValues(iEvent, iSetup, name)).second );
+	  if (algoBit<(int)itr->getAlgoDecisionInitial().size()) {	     
+	    addToIVec(it->first, itr->getAlgoDecisionInitial(algoBit)); // Algorithm bits before AlgoBX mask
+	  } else {
+	    addToIVec(it->first, 0);
 	  }
 	}
-	setI(it->first, accept);
+      } else {
+	for(int algoBit = 0; algoBit < m_numAlgs; ++algoBit) {	    
+	  addToIVec(it->first, 0);
+	}
+      }
+      continue;
+    }
+    
+    int accept = 0;
+    
+    if (m_storePrescales && it->second.size() == 1) {
+      std::string name = it->second.at(0);
+      if (name.find("*")!= std::string::npos) { // wildcard entry
+	// do nothing
+      } else {
+	setI("L1PS_" + it->first, (hltprovider_.prescaleValues(iEvent, iSetup, name)).first );
+	setI("HLTPS_" + it->first, (hltprovider_.prescaleValues(iEvent, iSetup, name)).second );
       }
     }
+    
+    for (unsigned int i=0; i < it->second.size();++i) {
+      std::string name = it->second.at(i);
+      if (name.find("*")!= std::string::npos) { // wildcard entry
+	for (unsigned iName = 0; iName < names.size(); ++iName) {
+	  std::string nameForSearch = std::string(it->second.at(i), 0, it->second.at(i).size()-1); // strip the star
+	  if (names.at(iName).find(nameForSearch)==0) { // starts with
+	    if (trbn.accept(names.at(iName)))
+	      accept = 1;
+	  }
+	}
+      } else { // normal entry
+	if (trbn.accept( it->second.at(i)))
+	  accept = 1;
+	if (m_storePrescales) {
+	  setI("L1PS_" + name, (hltprovider_.prescaleValues(iEvent, iSetup, name)).first );
+	  setI("HLTPS_" + name, (hltprovider_.prescaleValues(iEvent, iSetup, name)).second );
+	}
+      }
+      setI(it->first, accept);
+    }
+  }
 }

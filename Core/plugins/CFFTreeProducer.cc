@@ -28,6 +28,7 @@
 #include <DataFormats/PatCandidates/interface/TriggerEvent.h>
 
 #include "CommonFSQFramework/Core/interface/EventIdData.h"
+#include "CommonFSQFramework/Core/interface/HFRecHitView.h"
 #include "CommonFSQFramework/Core/interface/GenPartView.h"
 #include "CommonFSQFramework/Core/interface/GenJetView.h"
 #include "CommonFSQFramework/Core/interface/RecoTrackView.h"
@@ -41,7 +42,6 @@
 #include "CommonFSQFramework/Core/interface/TrackJetView.h"
 #include "CommonFSQFramework/Core/interface/TriggerResultsView.h"
 #include "CommonFSQFramework/Core/interface/GenericCandidateView.h"
-#include "CommonFSQFramework/Core/interface/HFRecHitView.h"
 #include "CommonFSQFramework/Core/interface/HBHERecHitView.h"
 #include "CommonFSQFramework/Core/interface/EcalRecHitView.h"
 #include "CommonFSQFramework/Core/interface/CaloTowerView.h"

@@ -1,5 +1,9 @@
 #include "CommonFSQFramework/Core/interface/CastorDigiView.h"
 
+#include "CalibFormats/CastorObjects/interface/CastorDbRecord.h"
+#include "CalibFormats/CastorObjects/interface/CastorDbService.h"
+#include "CalibFormats/CastorObjects/interface/CastorCalibrationWidthsSet.h"
+
 #include <boost/format.hpp>
 
 #include <cmath>
