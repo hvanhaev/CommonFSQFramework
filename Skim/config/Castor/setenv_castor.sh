@@ -24,7 +24,7 @@ if [ -f /cvmfs/cms.cern.ch/crab3/crab.sh ]; then
 #    cp -rf data ../..
 fi
 
-export PYTHONPATH=$PYTHONPATH:$DIR:./
+export PYTHONPATH=$PYTHONPATH:$DIR:$PWD/../../../..
 export PATH=$PATH:$DIR/../../../../CommonFSQFramework/Core/scripts/
  
 printTTree.py
