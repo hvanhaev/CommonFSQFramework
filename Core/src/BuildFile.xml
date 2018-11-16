@@ -30,6 +30,7 @@
 <use name="Geometry/CommonDetUnit"/>
 
 <use name="CalibFormats/HcalObjects"/>
+<use name="CalibFormats/CastorObjects"/>
 
 <use name="HLTrigger/HLTcore"/>
 
