@@ -5,9 +5,17 @@ def get(todo):
     
     defs["CastorDigiView"] = cms.PSet(
 		miniView = cms.string("CastorDigiView"),
-		m_firstTS = cms.untracked.int32(0),
-		m_lastTS = cms.untracked.int32(10),
-		m_Digis = cms.InputTag('castorDigis')
+                branchPrefix = cms.untracked.string("CastorDigis"),
+		firstTS = cms.int32(0),
+		lastTS = cms.int32(5), # includes lastTS !
+		inputcoll = cms.InputTag('castorDigis')
 	)
 
 
+    ret = {}
+    for t in todo:
+        if t not in defs:
+            raise Exception("miniView def not known "+t)
+
+        ret[t] = defs[t]
+    return ret
