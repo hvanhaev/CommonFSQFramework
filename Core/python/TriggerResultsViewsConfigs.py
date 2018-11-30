@@ -5,66 +5,54 @@ def get(todo):
 
     # ZeroBias trigger configuration
     defs["ZeroBiasTriggerResultsView"]  = cms.PSet(
-        miniView = cms.string("TriggerResultsView"),
-        branchPrefix = cms.untracked.string("trg"),
-        process = cms.string("HLT"),
-        storePrescales = cms.bool(False),
-        triggers = cms.vstring("ZeroBias"),
-        ZeroBias = cms.vstring("HLT_ZeroBias_part*")
-    )
+         miniView = cms.string("TriggerResultsView"),
+         branchPrefix = cms.untracked.string("trg"),
+         process = cms.string("HLT"),
+         storePrescales = cms.bool(False),
+         triggers = cms.vstring("ZeroBias"),
+         ZeroBias = cms.vstring("HLT_ZeroBias_part*")
+     )
 
-    defs["ZeroBiasTriggerResultsViewWithPS"]  = cms.PSet(
-        miniView = cms.string("TriggerResultsView"),
-        branchPrefix = cms.untracked.string("trg"),
-        process = cms.string("HLT"),
-        storePrescales = cms.bool(True),
-        triggers = cms.vstring("ZeroBias"),
-        ZeroBias = cms.vstring("HLT_ZeroBias_part0_v1","HLT_ZeroBias_part1_v1","HLT_ZeroBias_part2_v1","HLT_ZeroBias_part3_v1","HLT_ZeroBias_part4_v1","HLT_ZeroBias_part5_v1","HLT_ZeroBias_part6_v1","HLT_ZeroBias_part7_v1")
-    )
+     defs["ZeroBiasTriggerResultsViewWithPS"]  = cms.PSet(
+         miniView = cms.string("TriggerResultsView"),
+         branchPrefix = cms.untracked.string("trg"),
+         process = cms.string("HLT"),
+         storePrescales = cms.bool(True),
+         triggers = cms.vstring("ZeroBias"),
+         ZeroBias = cms.vstring("HLT_ZeroBias_part0_v1","HLT_ZeroBias_part1_v1","HLT_ZeroBias_part2_v1","HLT_ZeroBias_part3_v1","HLT_ZeroBias_part4_v1","HLT_ZeroBias_part5_v1","HLT_ZeroBias_part6_v1","HLT_ZeroBias_part7_v1")
+     )
 
-    defs["ZeroBiasWithPSRun2015D"]  = cms.PSet(
-        miniView = cms.string("TriggerResultsView"),
-        branchPrefix = cms.untracked.string("trg"),
-        process = cms.string("HLT"),
-        storePrescales = cms.bool(True),
-        triggers = cms.vstring("ZeroBias"),
-        ZeroBias = cms.vstring("HLT_ZeroBias_v1")
-    )
+     defs["ZeroBiasWithPSRun2015D"]  = cms.PSet(
+         miniView = cms.string("TriggerResultsView"),
+         branchPrefix = cms.untracked.string("trg"),
+         process = cms.string("HLT"),
+         storePrescales = cms.bool(True),
+         triggers = cms.vstring("ZeroBias"),
+         ZeroBias = cms.vstring("HLT_ZeroBias_v1")
+     )
 
-    defs["ZeroBiasWithPSRun2015E"]  = cms.PSet(
-        miniView = cms.string("TriggerResultsView"),
-        branchPrefix = cms.untracked.string("trg"),
-        process = cms.string("HLT"),
-        storePrescales = cms.bool(True),
-        triggers = cms.vstring("ZeroBias","Random"),
-        ZeroBias = cms.vstring("HLT_ZeroBias_v2"),
-        Random = cms.vstring("HLT_Random_v1")
-    )
-
+     defs["ZeroBiasWithPSRun2015E"]  = cms.PSet(
+         miniView = cms.string("TriggerResultsView"),
+         branchPrefix = cms.untracked.string("trg"),
+         process = cms.string("HLT"),
+         storePrescales = cms.bool(True),
+         triggers = cms.vstring("ZeroBias","Random"),
+         ZeroBias = cms.vstring("HLT_ZeroBias_v2"),
+         Random = cms.vstring("HLT_Random_v1")
+     )
+    
     # L1 trigger configuration - please do not edit this
     defs["L1GTriggerResultsView"] = cms.PSet(
         miniView = cms.string("TriggerResultsView"),
         branchPrefix = cms.untracked.string("trgl1"),
-        process = cms.string("HLT"),
-        isStage1 = cms.bool(False),
         storePrescales = cms.bool(False),
-        triggers = cms.vstring("L1GTTech","L1GTAlgo")
-    )
-
-    # L1 trigger configuration - please do not edit this                                                                                                                   
-    defs["L1GTriggerResultsViewStage1"] = cms.PSet(
-        miniView = cms.string("TriggerResultsView"),
-        branchPrefix = cms.untracked.string("trgl1"),
-        process = cms.string("HLT"),
-        isStage1 = cms.bool(True),
-        storePrescales = cms.bool(False),
-        triggers = cms.vstring("L1GTTech","L1GTAlgo")
-    )
+        triggers = cms.vstring("L1GTAlgo")
+        )
 
     defs["AK4CaloJetTriggerResultsView"]  = cms.PSet(
        miniView = cms.string("TriggerResultsView"),
        branchPrefix = cms.untracked.string("trgAK4Calo"),
-       process = cms.string("HLT"),
+       #process = cms.string("HLT"),
        storePrescales = cms.bool(False),
        triggers = cms.vstring("Jet30","Jet40","Jet50"),
        Jet30 = cms.vstring("HLT_AK4CaloJet30ForEndOfFill_v1"),
@@ -75,7 +63,7 @@ def get(todo):
     defs["AK4CaloJetTriggerResultsViewWithPS"]  = cms.PSet(
        miniView = cms.string("TriggerResultsView"),
        branchPrefix = cms.untracked.string("trgAK4Calo"),
-       process = cms.string("HLT"),
+       #process = cms.string("HLT"),
        storePrescales = cms.bool(True),
        triggers = cms.vstring("Jet30","Jet40","Jet50"),
        Jet30 = cms.vstring("HLT_AK4CaloJet30ForEndOfFill_v1"),
@@ -86,7 +74,7 @@ def get(todo):
     defs["FullTrackTriggerResultsView"]  = cms.PSet(
        miniView = cms.string("TriggerResultsView"),
        branchPrefix = cms.untracked.string("trgTracks"),
-       process = cms.string("HLT"),
+       #process = cms.string("HLT"),
        storePrescales = cms.bool(False),
        triggers = cms.vstring("FullTrack12"),
        FullTrack12 = cms.vstring("HLT_FullTrack12ForEndOfFill_v1")
@@ -95,7 +83,7 @@ def get(todo):
     defs["FullTrackTriggerResultsViewWithPS"]  = cms.PSet(
        miniView = cms.string("TriggerResultsView"),
        branchPrefix = cms.untracked.string("trgTracks"),
-       process = cms.string("HLT"),
+       #process = cms.string("HLT"),
        storePrescales = cms.bool(True),
        triggers = cms.vstring("FullTrack12"),
        FullTrack12 = cms.vstring("HLT_FullTrack12ForEndOfFill_v1")
@@ -104,7 +92,7 @@ def get(todo):
     defs["CastorSpecialJetTriggerResultsView"]  = cms.PSet(
         miniView = cms.string("TriggerResultsView"),
         branchPrefix = cms.untracked.string("CasTrg"),
-        process = cms.string("HLT"),
+        #process = cms.string("HLT"),
         storePrescales = cms.bool(False),
         triggers = cms.vstring("ZeroBias","MinBias","Random","CastorMedJet","CastorHighJet","CastorDiJet"),
         ZeroBias = cms.vstring("HLT_ZeroBias*"),
@@ -118,8 +106,7 @@ def get(todo):
     defs["CastorPATriggerResultsView"]  = cms.PSet(
         miniView = cms.string("TriggerResultsView"),
         branchPrefix = cms.untracked.string("CasPATrg"),
-        process = cms.string("HLT"),
-        isStage1 = cms.bool(False),
+        #process = cms.string("HLT"),
         storePrescales = cms.bool(False),
         triggers = cms.vstring("CastorPAMedJet","CastorPAMuon","Random"),
         CastorPAMedJet = cms.vstring("HLT_PAL1CastorMediumJet_BptxAND_v*"),

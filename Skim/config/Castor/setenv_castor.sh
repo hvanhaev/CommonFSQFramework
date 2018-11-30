@@ -18,13 +18,13 @@ export SmallXAnaVersion="Samples_Local"
 # source /afs/cern.ch/cms/ccs/wm/scripts/Crab/crab.csh
 
 # for crab3
-#if [ -f /cvmfs/cms.cern.ch/crab3/crab.sh ]; then
-#    source /cvmfs/cms.cern.ch/crab3/crab.sh
+if [ -f /cvmfs/cms.cern.ch/crab3/crab.sh ]; then
+    source /cvmfs/cms.cern.ch/crab3/crab.sh
 #    cp -rf data ../
 #    cp -rf data ../..
-#fi
+fi
 
-export PYTHONPATH=$PYTHONPATH:$DIR:./
+export PYTHONPATH=$PYTHONPATH:$DIR:$PWD/../../../..
 export PATH=$PATH:$DIR/../../../../CommonFSQFramework/Core/scripts/
  
 printTTree.py

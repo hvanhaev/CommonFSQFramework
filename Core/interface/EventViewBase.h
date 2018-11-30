@@ -42,6 +42,8 @@ class EventViewBase {
       std::vector<reco::Candidate::LorentzVector> & getP4VecStore(const std::string & name) 
             { return m_vectorBranches.at(m_branchPrefix+name); };
 
+
+
    private:
       virtual void fillSpecific(const edm::Event&, const edm::EventSetup&) = 0;
       std::map<std::string, int> m_integerBranches;
@@ -51,7 +53,6 @@ class EventViewBase {
       std::map<std::string, std::vector<float> > m_vecFloatBranches;
 
       std::string m_branchPrefix;  
-
-
 };
+
 #endif
