@@ -14,32 +14,32 @@
 #include "FWCore/Utilities/interface/InputTag.h"
 
 #include "DataFormats/Common/interface/Handle.h"
-#include "DataFormats/HcalDetId/interface/HcalGenericDetId.h"
-#include "DataFormats/HcalDetId/interface/HcalElectronicsId.h"
-#include "DataFormats/HcalDetId/interface/HcalDetId.h"
-#include "DataFormats/HcalDigi/interface/HcalDigiCollections.h"
+//#include "DataFormats/HcalDigi/interface/HcalDigiCollections.h" // for CastorDigiCollection
 #include "DataFormats/DetId/interface/DetId.h"
 
-#include "CondFormats/CastorObjects/interface/CastorPedestals.h"
-#include "CondFormats/CastorObjects/interface/CastorPedestalWidths.h"
+//#include "CondFormats/CastorObjects/interface/CastorPedestals.h"
+//#include "CondFormats/CastorObjects/interface/CastorPedestalWidths.h"
 #include "CondFormats/CastorObjects/interface/CastorQIECoder.h"
 #include "CondFormats/CastorObjects/interface/CastorQIEData.h"
-#include "CondFormats/CastorObjects/interface/CastorQIEShape.h"
+//#include "CondFormats/CastorObjects/interface/CastorQIEShape.h"
 #include "CondFormats/CastorObjects/interface/CastorElectronicsMap.h"
 #include "CondFormats/CastorObjects/interface/AllObjects.h"
 
-#include "CalibFormats/CastorObjects/interface/CastorDbRecord.h"
-#include "CalibFormats/CastorObjects/interface/CastorDbService.h"
+
+#include "DataFormats/HcalDigi/interface/CastorDataFrame.h"
+
 #include "CalibFormats/CastorObjects/interface/CastorCalibrations.h"
 #include "CalibFormats/CastorObjects/interface/CastorCalibrationWidths.h"
 
-#include "CalibCalorimetry/CastorCalib/interface/CastorDbASCIIIO.h"
-#include "TBDataFormats/HcalTBObjects/interface/HcalTBTriggerData.h"
+//#include "CalibCalorimetry/CastorCalib/interface/CastorDbASCIIIO.h"
+
+#include "DataFormats/Common/interface/SortedCollection.h"
 
 #include <map>
 #include <string>
 #include "boost/tuple/tuple.hpp"
 
+typedef edm::SortedCollection<CastorDataFrame> CastorDigiCollection;
 
 
 class CastorDigiView: public EventViewBase {

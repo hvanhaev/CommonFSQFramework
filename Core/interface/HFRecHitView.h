@@ -8,6 +8,7 @@
 #include "DataFormats/HcalRecHit/interface/HcalSourcePositionData.h"
 #include "DataFormats/HcalDetId/interface/HcalSubdetector.h"
 #include "Geometry/CaloGeometry/interface/CaloGeometry.h"
+#include "CalibFormats/HcalObjects/interface/HcalCalibrationWidthsSet.h"
 #include "CalibFormats/HcalObjects/interface/HcalDbRecord.h"
 #include "Geometry/Records/interface/CaloGeometryRecord.h"
 #include "FWCore/Framework/interface/ESHandle.h"
