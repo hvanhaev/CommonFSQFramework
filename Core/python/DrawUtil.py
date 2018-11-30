@@ -6,39 +6,14 @@ import CommonFSQFramework.Core.CMS_lumi
 def getHisto(file,histoname,sample):
     # open the input ROOT file
     theTFile = ROOT.TFile(file, "r")
-    theList = theTFile.GetListOfKeys()
-
-    h = None
-    for l in theList:
-        currentDir = l.ReadObj()
-        
-        if not currentDir:
-            print "Problem reading", l.GetName(), " - skipping"
-            continue
-                
-        if type(currentDir) != ROOT.TDirectoryFile:
-            print "Expected TDirectoryFile,", type(currentDir), "found"
-            continue
-                
-        sampleName = l.GetName()
-        if sampleName != sample: continue
-        
-        dirContents = currentDir.GetListOfKeys()
-        for c in dirContents:
-            if "PROOF_" in c.GetName(): continue
-
-            curObj = c.ReadObj()
-            if not (curObj.InheritsFrom("TH1") or curObj.InheritsFrom("TH2")):
-                #print "Dont know how to load", curObj.GetName(), curObj.ClassName()
-                continue
-	    	
-            if curObj.GetName() != histoname: continue
-	
-	    print " returning", curObj.GetName(), "from", sampleName
-            curObjClone = curObj.Clone()
-            curObjClone.SetDirectory(0)
-            curObjClone.SetTitle(sampleName + "/" + curObjClone.GetName())
-	    h = curObjClone
+		
+    curObj = ROOT.TObject()
+    theTFile.GetObject(sample+"/"+histoname,curObj)	
+    print " returning", curObj.GetName(), "from", sample
+    curObjClone = curObj.Clone()
+    curObjClone.SetDirectory(0)
+    #curObjClone.SetTitle(sampleName + "/" + curObjClone.GetName())
+    h = curObjClone
     
     h.UseCurrentStyle()
     return h
