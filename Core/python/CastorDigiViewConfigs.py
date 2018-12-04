@@ -4,11 +4,11 @@ def get(todo):
     defs = {}
     
     defs["CastorDigiView"] = cms.PSet(
-		    miniView = cms.string("CastorDigiView"),
-		    branchPrefix = cms.untracked.string("CastorDigi"),
-		    firstTS = cms.int32(0),
-		    lastTS = cms.int32(9),
-		    inputcoll = cms.InputTag('castorDigis')
+        miniView = cms.string("CastorDigiView"),
+        branchPrefix = cms.untracked.string("CastorDigi"),
+        firstTS = cms.int32(0),
+        lastTS = cms.int32(9),
+        inputcoll = cms.InputTag('castorDigis')
     )
 
     
