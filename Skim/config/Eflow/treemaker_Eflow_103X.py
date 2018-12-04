@@ -25,7 +25,8 @@ process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 
 # Source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring("root://cms-xrd-global.cern.ch//store/express/HIRun2018/HIExpressPhysics/FEVT/Express-v1/000/326/176/00000/614D3946-4465-3248-853F-9C214A33CFF8.root")
+    #fileNames = cms.untracked.vstring("root://cms-xrd-global.cern.ch//store/express/HIRun2018A/HIExpressPhysics/FEVT/Express-v1/000/326/535/00000/2FB41D5F-542B-3740-B3E6-B8317C2B9E7C.root")
+    fileNames = cms.untracked.vstring("root://cms-xrd-global.cern.ch//store/user/hvanhaev/MinBias/HINPbPb2018-RECO-00003_103X_upgrade2018_realistic_HI_v9/181112_130435/0000/step2_99.root")    
 )
 
 # Geometry and Detector Conditions
@@ -47,8 +48,12 @@ process.EflowTree = cms.EDAnalyzer("CFFTreeProducer")
 
 import CommonFSQFramework.Core.CaloTowerViewsConfigs
 import CommonFSQFramework.Core.CastorViewsConfigs
+import CommonFSQFramework.Core.VerticesViewsConfigs
+import CommonFSQFramework.Core.TriggerResultsViewsConfigs
 
+process.EflowTree._Parameterizable__setParameters(CommonFSQFramework.Core.VerticesViewsConfigs.get(["VerticesView"]))
 process.EflowTree._Parameterizable__setParameters(CommonFSQFramework.Core.CaloTowerViewsConfigs.get(["CaloTowerView"]))
 process.EflowTree._Parameterizable__setParameters(CommonFSQFramework.Core.CastorViewsConfigs.get(["CastorRecHitViewFull","CastorTowerView","ak5CastorJetView"]))
+if isData: process.EflowTree._Parameterizable__setParameters(CommonFSQFramework.Core.TriggerResultsViewsConfigs.get(["HIRun2018ATriggers"]))
 
 process = CommonFSQFramework.Core.customizePAT.addTreeProducer(process, process.EflowTree)
