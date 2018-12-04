@@ -27,7 +27,7 @@ EventViewBase(iConfig,  tree)
     using namespace reco;
     
     // fetch config data
-    m_Digis = iConfig.getParameter<edm::InputTag>("input");
+    m_Digis = iConfig.getParameter<edm::InputTag>("inputcoll");
     
     m_firstTS = iConfig.getParameter<int>("firstTS");
     m_lastTS = iConfig.getParameter<int>("lastTS");
