@@ -294,10 +294,10 @@ def main():
             cntCopy += 1
 
             targetFile = targetDir + "/" + subdir + fname
-            cpCommand = ['gfal-copy', pathSE.rstrip('/') + '/' + srcFile, targetFile]            
-	    #cpCommand = ['lcg-ls', srcFile]
-
-	    #print "would be cpCommand: ", cpCommand
+            if "eos/cms" in targetDir:
+	        cpCommand = ['gfal-copy', pathSE.rstrip('/') + '/' + srcFile, "srm://srm-eoscms.cern.ch/"+targetFile]
+	    else:
+                cpCommand = ['gfal-copy', pathSE.rstrip('/') + '/' + srcFile, targetFile]
             
 	    if "eos/cms" not in targetDir and os.path.isfile(targetFile):
                 print "Allready present", typeString, subdir+fname, " #"+str(cntCopy), "from", s

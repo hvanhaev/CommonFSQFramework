@@ -1,0 +1,5 @@
+/FSQJets/Run2016H-03Feb2017_ver2-v1/MINIAOD
+/L1MinimumBias0/Run2016H-PromptReco-v2/MINIAOD
+/QCD_Pt-10to35_TuneCUETHS1_13TeV-herwigpp/RunIIFall15MiniAODv2-PU25nsData2015v1_castor_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM
+/QCD_Pt-10to35_TuneCUETHS1_13TeV-herwigpp/RunIIFall15MiniAODv2-noPU_castor_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM
+/QCD_Pt-35toInf_TuneCUETHS1_13TeV-herwigpp/RunIIFall15MiniAODv2-noPU_castor_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM

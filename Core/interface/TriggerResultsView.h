@@ -18,7 +18,5 @@ class TriggerResultsView: public EventViewBase{
 
       HLTPrescaleProvider hltprovider_;
       bool isValidHLTConfig_;
-
-      bool isStage1_;
 };
 #endif
