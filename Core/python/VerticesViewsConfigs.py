@@ -25,6 +25,12 @@ def get(todo):
         src = cms.InputTag("siPixelRecHits"),
     )
 
+    defs["PixelView"]  = cms.PSet(
+        miniView = cms.string("PixelView"),
+        branchPrefix = cms.untracked.string("PixelView_"),
+        src = cms.InputTag("siPixelRecHits"),
+    )
+
     defs["ZeroTeslaVertexView_Strips"]  = cms.PSet(
         miniView = cms.string("ZeroTeslaVertexView"),
         branchPrefix = cms.untracked.string("ZeroTeslaTracking_Strip_"),

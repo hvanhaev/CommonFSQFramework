@@ -5,7 +5,7 @@ from optparse import OptionParser
 # TODO: voms-proxy-init --voms cms --valid 168:00
 
 import ROOT
-ROOT.gROOT.SetBatch(True)
+#ROOT.gROOT.SetBatch(True)
 
 # for fileinpath
 from ROOT import *
@@ -27,23 +27,42 @@ def dumpEnvVariable(var):
     return ret+"\n"
 
 
-print "Submitting jobs for", anaVersion
-
+print "Submitting jobs for:", anaVersion
+print "Using black list:", blacklist
 
 parser = OptionParser(usage="usage: %prog [options] filename",
                         version="%prog 1.0")
 
 parser.add_option("-s", "--sample", action="store", type="string", dest="sample" )
+parser.add_option("-c", "--config", action="store", type="string", dest="config" )
 #parser.add_option("-d", "--dataOnly", action="store", type="bool", dest="dataOnly" )
 (options, args) = parser.parse_args()
 
-if options.sample:
+configFile = "crabcfg.py"
+if options.config != None and options.config != "":
+    configFile = options.config
+print "Reading crab config file: ", configFile
+
+
+if options.sample == None or options.sample == "":
+    print "You must specify one or more valid sample(s) from your sample-list, or \"all\": "
+    print "Use the -s or --sample option and comma separation if needed"
+    print "List of valid samples:"
+    for sample in sampleList:
+        print " - ", sample
+    sys.exit()
+
+
+if options.sample == "all":
+    sampleListTodo = sampleList.keys()
+else:
     sampleListTodo = []
     samplesListFromCLI = options.sample.split(",")
     for s in samplesListFromCLI:
         sampleListTodo.append(s)
-else:
-    sampleListTodo = sampleList.keys()
+        if s not in sampleList.keys():
+            print "Invalid sample name ", s
+            sys.exit(1)
 
 for s in sampleListTodo:
 
@@ -55,13 +74,14 @@ for s in sampleListTodo:
 
   targetPath = anaVersion + "/" + "crab_" + name
   if os.path.exists(targetPath):
-    print "Path", name, "allready exists. Doing nothing"
+    print "Path", targetPath, "allready exists. Doing nothing"
     continue    
 
- 
-
+  # crab is creating the directory
+  print "Create working directory: ", targetPath
 
   pycfgextra = []  
+  pycfgextracheck = []
   pycfgextra.append("config.General.workArea='"+anaVersion+"'")
   pycfgextra.append("config.General.requestName='"+name+"'")
   pycfgextra.append("config.Data.outputDatasetTag='"+name+"'")
@@ -73,47 +93,61 @@ for s in sampleListTodo:
 
   
   if isData:
-    print isData, sampleList[s]["json"]
-    pycfgextra.append("config.Data.splitting='LumiBased'")
-    pycfgextra.append("config.Data.unitsPerJob=10")
-    jsonFile=edm.FileInPath(sampleList[s]["json"])
-    pycfgextra.append("config.Data.lumiMask='"+jsonFile.fullPath()+"'")
+    print "Input is \"data\" with lumi file: " + sampleList[s]["json"]
+    pycfgextracheck.append("config.Data.splitting='LumiBased'")
+    pycfgextracheck.append("config.Data.unitsPerJob=10")
+    if os.path.exists(sampleList[s]["json"]):
+        jsonFile = open(sampleList[s]["json"])
+        pycfgextra.append("config.Data.lumiMask='" + os.path.abspath(sampleList[s]["json"]) + "'")
+    else:
+        jsonFile = edm.FileInPath(sampleList[s]["json"])
+        pycfgextra.append("config.Data.lumiMask='"+jsonFile.fullPath()+"'")
     
   else:
-    pycfgextra.append("config.Data.splitting='EventAwareLumiBased'")
-    pycfgextra.append("config.Data.unitsPerJob=100000")
+    print "Input is \"MC\""
+    pycfgextracheck.append("config.Data.splitting='EventAwareLumiBased'")
+    pycfgextracheck.append("config.Data.unitsPerJob=100000")
   
 
   # TODO save old value and set it at exit   
-  os.environ["TMFSampleName"]=s
-
-
-  os.system("cp crabcfg.py  tmp.py")
-  with open("tmp.py", "a") as myfile:
-    for l in pycfgextra:
-        myfile.write(l+"\n")
-
-  #os.system("./crab submit -c tmp.py")
-  os.system("crab submit -c tmp.py")
+  os.environ["TMFSampleName"] = s
 
   cfgName = None
-  with open("crabcfg.py", "r") as cfg:
-    for l in cfg:
-        line = l.strip()
-        #if "pset=" not in line: continue
-        if len(line) > 0 and line[0] == "#": continue
-        if "config.JobType.psetName"  not in line: continue
-        cfgName = line.split("=")[-1].replace("'","").replace('"',"").strip()
-
+  with open("tmp.py", "w") as myfile:
+      checklines = []
+      with open(configFile, "r") as infile:
+          for inline in infile:
+              myfile.write(inline)
+              # search for cmssw job config file while reading
+              line = inline.strip()
+              if len(line) > 0 and line[0] == "#":
+                  continue
+              checklines.append(inline)
+              if "config.JobType.psetName"  not in line:
+                  continue
+              cfgName = line.split("=")[-1].replace("'","").replace('"',"").strip()
+      # append custom config, no-check
+      for l in pycfgextra:
+          myfile.write(l+"\n")
+      # append custom config, WITH-check
+      for extraline in pycfgextracheck:
+          for check in cfglines:
+              if check.strip().find(extraline.split('=').strip()) != 0:
+                  myfile.write(extraline+"\n")
+      myfile.close()
 
   if not cfgName:
-    print "Unable to determine cfg name from crab.cfg!"
+    print "ERROR: Unable to determine cmssw-jobcfg name from crab.cfg!"
+    sys.exit()
   else:
     if not os.path.isfile(cfgName):
-        print "Warning: cannot determine the pset. Tried:", cfgName
-    else:
-        fOut = targetPath + "/" + cfgName
-        shutil.copy(cfgName, fOut)
+        print "ERROR: cannot determine the cmssw-jobcfg name. Tried: ", cfgName
+        sys.exit()
 
-	
-sys.exit()  
+  os.system("crab submit -c tmp.py")
+
+
+  fOut = targetPath + "/" + cfgName
+  shutil.copy(cfgName, fOut)
+
+sys.exit()

@@ -368,7 +368,7 @@ class ExampleProofReader( ROOT.TPySelector ):
             slaveParameters["isData"] = sampleListFullInfo[t]["isData"]
             slaveParameters["normalizationFactor"] =  treeFilesAndNormalizations[t]["normFactor"]
 
-            ROOT.TProof.AddEnvVar("PATH2",ROOT.gSystem.Getenv("PYTHONPATH")+":"+os.getcwd())
+            ROOT.TProof.AddEnvVar("PATH2",ROOT.gSystem.Getenv("PYTHONPATH")+":"+os.getcwd()+":"+os.getcwd()+'../../../../..')
 
             supportedTypes = set(["int", "str", "float", "bool"])
             variablesToFetch = ""
@@ -507,8 +507,6 @@ class ExampleProofReader( ROOT.TPySelector ):
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
-    ROOT.gSystem.Load("libFWCoreFWLite.so")
-    ROOT.FWLiteEnabler.enable()
 
     slaveParams = {}
 
