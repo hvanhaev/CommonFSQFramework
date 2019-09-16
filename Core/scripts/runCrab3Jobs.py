@@ -81,7 +81,7 @@ for s in sampleListTodo:
   print "Create working directory: ", targetPath
 
   pycfgextra = []  
-  pycfgextracheck = []
+  pycfgextracheck = []  
   pycfgextra.append("config.General.workArea='"+anaVersion+"'")
   pycfgextra.append("config.General.requestName='"+name+"'")
   pycfgextra.append("config.Data.outputDatasetTag='"+name+"'")
@@ -112,6 +112,7 @@ for s in sampleListTodo:
   # TODO save old value and set it at exit   
   os.environ["TMFSampleName"] = s
 
+
   cfgName = None
   with open("tmp.py", "w") as myfile:
       checklines = []
@@ -131,9 +132,15 @@ for s in sampleListTodo:
           myfile.write(l+"\n")
       # append custom config, WITH-check
       for extraline in pycfgextracheck:
-          for check in cfglines:
-              if check.strip().find(extraline.split('=').strip()) != 0:
-                  myfile.write(extraline+"\n")
+          found = False
+          for check in checklines:
+              assign = extraline.split('=')
+              if (len(assign)>0):
+                  if check.strip().find(assign[0].strip()) != 0:
+                      found = True
+                      break
+          if not found:
+              myfile.write(extraline+"\n")
       myfile.close()
 
   if not cfgName:
@@ -145,7 +152,6 @@ for s in sampleListTodo:
         sys.exit()
 
   os.system("crab submit -c tmp.py")
-
 
   fOut = targetPath + "/" + cfgName
   shutil.copy(cfgName, fOut)
