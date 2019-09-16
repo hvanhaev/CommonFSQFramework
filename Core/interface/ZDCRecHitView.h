@@ -30,7 +30,7 @@ class ZDCRecHitView: public EventViewBase{
 
     private:
       virtual void fillSpecific(const edm::Event&, const edm::EventSetup&);
-      int getEnergy(ZDCDigiCollection::const_iterator, int, int);
+      float getEnergy(ZDCDigiCollection::const_iterator, int, int);
       const CaloGeometry* fGeo;  //For ETA - PHI info
       edm::ESHandle<HcalDbService> conditions;   //For ETA - PHI info
       const HcalQIECoder* qiecoder;

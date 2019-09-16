@@ -60,7 +60,7 @@ void ZDCRecHitView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup
   }
 }
 
-int ZDCRecHitView::getEnergy(ZDCDigiCollection::const_iterator it, int section, int channel){
+float ZDCRecHitView::getEnergy(ZDCDigiCollection::const_iterator it, int section, int channel){
   const HcalQIECoder* qiecoder = conditions->getHcalCoder(it->id());
   const HcalQIEShape* qieshape = conditions->getHcalShape(qiecoder);
   HcalCoderDb coder(*qiecoder,*qieshape);
