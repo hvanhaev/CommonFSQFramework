@@ -9,7 +9,7 @@ def get(todo):
         branchPrefix = cms.untracked.string("HFRecHit"),
     )
 
-    # HBHERecHits 
+    # HBHERecHits
     defs["HBHERecHitView"]  = cms.PSet(
         miniView = cms.string("HBHERecHitView"),
         branchPrefix = cms.untracked.string("HBHERecHit"),
@@ -20,7 +20,7 @@ def get(todo):
         miniView = cms.string("EcalRecHitView"),
         branchPrefix = cms.untracked.string("EcalRecHit"),
     )
- 
+
     # main function
     ret = {}
     for t in todo:

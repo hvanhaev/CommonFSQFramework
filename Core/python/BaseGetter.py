@@ -18,7 +18,7 @@ class Entry:
         branchName = self.branchPrefix + name + self.variation
         # we could do following, instead of using self.variationToNames:
         #if not hasattr(self.chain, branchName): # what is cost of this call??
-        #    branchName = self.branchPrefix + name 
+        #    branchName = self.branchPrefix + name
         # this seems to be more expensive
         if branchName  not in self.branchStore:
             self.branchStore[branchName] = getattr(self.chain, branchName)

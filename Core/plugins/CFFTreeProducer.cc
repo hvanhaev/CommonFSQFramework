@@ -43,6 +43,7 @@
 #include "CommonFSQFramework/Core/interface/HFRecHitView.h"
 #include "CommonFSQFramework/Core/interface/HBHERecHitView.h"
 #include "CommonFSQFramework/Core/interface/EcalRecHitView.h"
+#include "CommonFSQFramework/Core/interface/ZDCRecHitView.h"
 #include "CommonFSQFramework/Core/interface/CaloTowerView.h"
 #include "CommonFSQFramework/Core/interface/PFCandidateView.h"
 #include "CommonFSQFramework/Core/interface/PFClusterView.h"
@@ -164,6 +165,9 @@ CFFTreeProducer::CFFTreeProducer(const edm::ParameterSet& iConfig)
         }
         else if (miniViewType == "EcalRecHitView") {
             m_views.push_back(new EcalRecHitView(pset, m_tree, this->consumesCollector()));
+        }
+        else if (miniViewType == "ZDCRecHitView") {
+            m_views.push_back(new ZDCRecHitView(pset, m_tree, this->consumesCollector()));
         }
 	else if (miniViewType == "CaloTowerView") {
             m_views.push_back(new CaloTowerView(pset, m_tree, this->consumesCollector()));
