@@ -16,6 +16,9 @@ Or look into the /Core/doc directory for information.
 
 Please note that the code is still developing and improving. 
 
+# Compatibility 
+
+In order to get the code compiled you need to install a CMSSW release CMSSW_8_0_X with X >= 33.
 
 # NOTE (for standalone operations):
 
