@@ -70,7 +70,7 @@ for s in sampleListTodo:
   if "isData" in sampleList[s]:
     isData=sampleList[s]["isData"]
 
-  name=anaVersion+"_"+s
+  name=anaVersion + "_" + s
 
   targetPath = anaVersion + "/" + "crab_" + name
   if os.path.exists(targetPath):

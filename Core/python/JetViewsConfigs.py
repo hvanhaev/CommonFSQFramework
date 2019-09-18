@@ -18,28 +18,28 @@ def get(todo):
         jerFactors = cms.vstring(  # PF10
                 "5.5 1 0.007 0.07 0.072"),
     )
-    
-    
+
+
     defs["JetMET"] = cms.PSet(
         miniView = cms.string("MetView"),
         branchPrefix = cms.untracked.string("MET"),
         input = cms.InputTag("slimmedMETs")
     )
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
     # and so on
     defs["JetViewSisCone5TrackJets"]= cms.PSet(
         miniView = cms.string("TrackJetView"),
 	maxEta = cms.double(2),
         minPt = cms.double(1),
 	branchPrefix = cms.untracked.string("SisCone5CH"),
-        input = cms.InputTag("sisCone5TrackJets"),	
+        input = cms.InputTag("sisCone5TrackJets"),
     )
 
     defs["JetViewak5TrackJets"]= cms.PSet(

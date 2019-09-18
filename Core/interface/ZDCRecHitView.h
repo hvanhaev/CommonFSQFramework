@@ -12,7 +12,7 @@ class ZDCRecHitView: public EventViewBase{
 
     private:
       virtual void fillSpecific(const edm::Event&, const edm::EventSetup&);
-      int getEnergy(ZDCDigiCollection::const_iterator, int, int);
+      float getEnergy(ZDCDigiCollection::const_iterator, int, int);
       edm::InputTag m_inputlabel;
       edm::ESHandle<HcalDbService> fConditions;
 };
