@@ -198,13 +198,9 @@ def main():
     if (options.samples):
         samples = options.samples.split(',')
 
-        print "copy samples: " + str(samples)
-
-
     maxFilesMC = -1
     if options.maxFilesMC:
         maxFilesMC = options.maxFilesMC
-
 
     if options.check:
         remove = False
@@ -227,7 +223,6 @@ def main():
         print "Nothing to do. Run me with '-t' option to copy trees from current skim"
         sys.exit()
         
-    #333
     cntSamples = 0
     cntCopySum = 0
     cntReadSum = 0
@@ -237,6 +232,8 @@ def main():
         if (len(samples) != 0):
             if (s not in samples):
                 continue
+
+        print ("copying sample: " + str(s))
 
         if "pathSE" not in sampleList[s]:
             print "No SE path found for sample", s            

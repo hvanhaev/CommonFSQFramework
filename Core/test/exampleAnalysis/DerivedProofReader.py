@@ -10,7 +10,7 @@ from ROOT import *
 
 from array import *
 
-# please note that python selector class name (here: DerivedProofReader) 
+# please note that python selector class name (here: DerivedProofReader)
 # should be consistent with this file name (DerivedProofReader.py)
 
 # you have to run this file from directory where it is saved
@@ -24,7 +24,7 @@ class DerivedProofReader(CommonFSQFramework.Core.ExampleProofReader.ExampleProof
         self.hist = {}
 
         self.hist["ptLeadHisto"] =  ROOT.TH1F("ptLead",   "ptLead",  100, 0, 100)
-    
+
         # 2d histograms also supported
         self.hist["dummy2d"] =  ROOT.TH2F("dummy2d",   "dummy2d",  100, 0, 100, 100, 0, 100)
 

@@ -19,7 +19,7 @@ def main():
     #parser.add_option("-s", "--sample",   action="store", type="string", dest="sample", help="sample name" )
     #parser.add_option("-l", "--listSamples",   action="store", type="string", dest="list", help="listAllSamples" )
     (options, args) = parser.parse_args()
-    
+
     anaVersion = getVariant()
     print " Current active skim: ", anaVersion
     anaDef = getAnaDefinition("sam")
@@ -50,7 +50,7 @@ def main():
     else:
         filename = args[0]
 
-    
+
     rootfile = ROOT.TFile.Open(filename, "read")
 
     todo = [(rootfile, 0), ]
@@ -82,7 +82,7 @@ def main():
                     print " "*(indent+4), b
             #print l.GetName()
 
-    
+
 
 
 

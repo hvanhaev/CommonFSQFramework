@@ -7,22 +7,22 @@
 RecoTrackView::RecoTrackView(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
 EventViewBase(iConfig,  tree)
 {
-    registerVecP4("p4", tree);
-    registerVecFloat("dz", tree);
-    registerVecFloat("d0", tree);
-    registerVecFloat("dzErr", tree);
-    registerVecFloat("d0Err", tree);
-    registerVecFloat("vx", tree);
-    registerVecFloat("vy", tree);
-    registerVecFloat("vz", tree);
+    registerVecP4("P4", tree);
+    registerVecFloat("Dz", tree);
+    registerVecFloat("D0", tree);
+    registerVecFloat("DzErr", tree);
+    registerVecFloat("D0Err", tree);
+    registerVecFloat("Vx", tree);
+    registerVecFloat("Vy", tree);
+    registerVecFloat("Vz", tree);
 
-    registerVecInt(  "highPurity", tree);
-    registerVecInt(  "algo", tree);
-    registerVecInt(  "nValidHits", tree);
-    registerVecInt(  "nLostHits", tree);
-    registerVecInt(  "charge", tree);
-    registerVecFloat(  "chi2n", tree);
-    registerVecFloat(  "ptErr", tree);
+    registerVecInt(  "HighPurity", tree);
+    registerVecInt(  "Algo", tree);
+    registerVecInt(  "NValidHits", tree);
+    registerVecInt(  "NLostHits", tree);
+    registerVecInt(  "Charge", tree);
+    registerVecFloat(  "Chi2n", tree);
+    registerVecFloat(  "PtErr", tree);
 
     m_maxEta = iConfig.getParameter<double>("maxEta");
     m_minPt = iConfig.getParameter<double>("minPt");
@@ -56,9 +56,9 @@ void RecoTrackView::resetLocal(){
 void RecoTrackView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSetup){
     resetLocal();
 
+    /* not used any more
     edm::Handle<std::vector<reco::Vertex> > hVtx;
     iEvent.getByLabel(edm::InputTag("offlinePrimaryVerticesWithBS"), hVtx); // TODO: take from config
-
 
     float bestSum = 0;
     int bestVtx = -1;
@@ -75,42 +75,52 @@ void RecoTrackView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup
         }
     }
     if (bestVtx < 0) return; // leaves empty tracks collection (filled below)
+    */
 
-    edm::Handle<std::vector<reco::Track> > hIn;
-    iEvent.getByLabel(m_inputCol, hIn);
-    for (unsigned int i = 0; i< hIn->size();++i){
-        if (hIn->at(i).pt() < m_minPt ) continue;
-        if (std::abs(hIn->at(i).eta()) > m_maxEta ) continue;
-        float dz = hIn->at(i).dz( hVtx->at(bestVtx).position() );
-        if (std::abs(dz)  > m_maxDZ) continue;
-        float dxy = hIn->at(i).dxy( hVtx->at(bestVtx).position() );
+    edm::Handle<std::vector<reco::Track> > tracksData;
+    iEvent.getByLabel(m_inputCol, tracksData);
+    for (unsigned int i = 0; i< tracksData->size();++i){
+        if (tracksData->at(i).pt() < m_minPt ) {
+	  continue;
+	}
+	if (std::abs(tracksData->at(i).eta()) > m_maxEta ) {
+	  continue;
+	}
+        // const float dz = tracksData->at(i).dz( hVtx->at(bestVtx).position() );
+        const float dz = tracksData->at(i).dz();
+        /*if (std::abs(dz)  > m_maxDZ) {
+	  std::cout << "skip dz=" << tracksData->at(i).dz() << std::endl;
+	  continue;
+	  }*/
+        // const float dxy = tracksData->at(i).dxy( hVtx->at(bestVtx).position() );
+	const float dxy = tracksData->at(i).dxy();
 
-        double px = hIn->at(i).px();
-        double py = hIn->at(i).py();
-        double pz = hIn->at(i).pz();
-        double E = px*px + py*py + pz*pz;
+        const double px = tracksData->at(i).px();
+        const double py = tracksData->at(i).py();
+        const double pz = tracksData->at(i).pz();
+        const double E = px*px + py*py + pz*pz;
 
         // Note: all fills (below) should be done consistently after all cuts are applied
-        addToP4Vec("p4", reco::Candidate::LorentzVector(px,py,pz,E));
-        //addToFVec("dxy", dxy);
-        //addToFVec("dz", dz);
-        addToFVec("dz", hIn->at(i).dz());
-        addToFVec("dzErr", hIn->at(i).dzError());
-        addToFVec("d0", hIn->at(i).d0());
-        addToFVec("d0Err", hIn->at(i).d0Error());
+        addToP4Vec("P4", reco::Candidate::LorentzVector(px,py,pz,E));
+        //addToFVec("Dxy", dxy);
+        //addToFVec("Dz", dz);
+        addToFVec("Dz", tracksData->at(i).dz());
+        addToFVec("DzErr", tracksData->at(i).dzError());
+        addToFVec("D0", tracksData->at(i).d0());
+        addToFVec("D0Err", tracksData->at(i).d0Error());
 
-        addToFVec("vx", hIn->at(i).vx());
-        addToFVec("vy", hIn->at(i).vy());
-        addToFVec("vz", hIn->at(i).vz());
+        addToFVec("Vx", tracksData->at(i).vx());
+        addToFVec("Vy", tracksData->at(i).vy());
+        addToFVec("Vz", tracksData->at(i).vz());
 
         int highpurity = 1;
-        if (!hIn->at(i).quality(reco::TrackBase::highPurity)) highpurity = 0;
-        addToIVec("highPurity", highpurity);
-        addToIVec("algo", hIn->at(i).algo() );
-        addToIVec("nValidHits", hIn->at(i).numberOfValidHits() );
-        addToIVec("nLostHits", hIn->at(i).numberOfLostHits() );
-        addToFVec("chi2n", hIn->at(i).normalizedChi2() );
-        addToFVec("ptErr", hIn->at(i).ptError() );
+        if (!tracksData->at(i).quality(reco::TrackBase::highPurity)) highpurity = 0;
+        addToIVec("HighPurity", highpurity);
+        addToIVec("Algo", tracksData->at(i).algo() );
+        addToIVec("NValidHits", tracksData->at(i).numberOfValidHits() );
+        addToIVec("NLostHits", tracksData->at(i).numberOfLostHits() );
+        addToFVec("Chi2n", tracksData->at(i).normalizedChi2() );
+        addToFVec("PtErr", tracksData->at(i).ptError() );
         tmf::TestTrackData t;
         t.dxy = dxy;
         t.dz = dz;

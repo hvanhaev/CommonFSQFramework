@@ -35,6 +35,7 @@
 #include "CommonFSQFramework/Core/interface/CastorRecHitView.h"
 #include "CommonFSQFramework/Core/interface/CastorTowerView.h"
 #include "CommonFSQFramework/Core/interface/CastorJetView.h"
+#include "CommonFSQFramework/Core/interface/ZDCRecHitView.h"
 
 #include "CommonFSQFramework/Core/interface/JetView.h"
 #include "CommonFSQFramework/Core/interface/TrackJetView.h"
@@ -165,6 +166,9 @@ CFFTreeProducer::CFFTreeProducer(const edm::ParameterSet& iConfig)
         else if (miniViewType == "EcalRecHitView") {
             m_views.push_back(new EcalRecHitView(pset, m_tree, this->consumesCollector()));
         }
+        else if (miniViewType == "ZDCRecHitView") {
+            m_views.push_back(new ZDCRecHitView(pset, m_tree, this->consumesCollector()));
+        }
 	else if (miniViewType == "CaloTowerView") {
             m_views.push_back(new CaloTowerView(pset, m_tree, this->consumesCollector()));
         }
@@ -184,7 +188,7 @@ CFFTreeProducer::CFFTreeProducer(const edm::ParameterSet& iConfig)
             m_views.push_back(new MetView(pset, m_tree, this->consumesCollector())); // for missing ET
         }
         else {
-            throw "Miniview not known: "+ miniViewType;
+            throw "CFFTreeProduce: Miniview not known: "+ miniViewType;
         }
 
     }
