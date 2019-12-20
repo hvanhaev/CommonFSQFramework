@@ -13,12 +13,10 @@ TriggerResultsView::TriggerResultsView(const edm::ParameterSet& iConfig,
 				       edm::ConsumesCollector && iC,
 				       edm::EDAnalyzer* module):
   EventViewBase(iConfig,  tree), hltprovider_(iConfig, iC, *module),
-  m_l1tStage2uGtToken(iC.consumes<GlobalAlgBlkBxCollection>(edm::InputTag("gtStage2Digis",
-									  "",
-									  "Treemaker"))),
+  m_l1tStage2uGtToken(iC.consumes<GlobalAlgBlkBxCollection>(edm::InputTag("gtStage2Digis"))),
   m_gtUtil(new l1t::L1TGlobalUtil(iConfig, iC, *module,
-				  edm::InputTag("gtStage2Digis", "", "Treemaker"), // 2018
-				  edm::InputTag("gtStage2Digis", "", "Treemaker"))), // 2018
+				  edm::InputTag("gtStage2Digis"), // 2018
+				  edm::InputTag("gtStage2Digis"))), // 2018
   m_numAlgs(0)
 {
     // fetch config data

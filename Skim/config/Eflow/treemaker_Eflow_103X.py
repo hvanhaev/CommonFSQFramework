@@ -18,15 +18,15 @@ process = cms.Process("Treemaker")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1000))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10000))
 
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 
 # Source
 process.source = cms.Source("PoolSource",
-    #fileNames = cms.untracked.vstring("root://cms-xrd-global.cern.ch//store/express/HIRun2018A/HIExpressPhysics/FEVT/Express-v1/000/326/535/00000/2FB41D5F-542B-3740-B3E6-B8317C2B9E7C.root")
-    fileNames = cms.untracked.vstring("root://cms-xrd-global.cern.ch//store/user/hvanhaev/MinBias/HINPbPb2018-RECO-00003_103X_upgrade2018_realistic_HI_v9/181112_130435/0000/step2_99.root")    
+    fileNames = cms.untracked.vstring("root://cms-xrd-global.cern.ch//store/hidata/HIRun2018A/HIForward/AOD/04Apr2019-v1/280000/A0C075F1-F488-4547-8CA5-27034DB0F114.root")
+    #fileNames = cms.untracked.vstring("root://cms-xrd-global.cern.ch//store/user/hvanhaev/MinBias/HINPbPb2018-RECO-00003_103X_upgrade2018_realistic_HI_v9/181112_130435/0000/step2_99.root")    
 )
 
 # Geometry and Detector Conditions

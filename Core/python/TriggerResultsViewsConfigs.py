@@ -124,7 +124,7 @@ def get(todo):
 	NotBptxOR = cms.vstring("HLT_HIL1NotBptxOR_v1"),
 	BptxPlus = cms.vstring("HLT_HIL1UnpairedBunchBptxPlus_v1"),
 	BptxMinus = cms.vstring("HLT_HIL1UnpairedBunchBptxMinus_v1"),
-	MinBiasHFOR = cms.vstring("HLT_HIMinimumBiasHFOR_v1")
+	MinBiasHFOR = cms.vstring("HLT_HIMinimumBias_part1_v1")
     )
 
     defs["HIRun2015Triggers"]  = cms.PSet(
