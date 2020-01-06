@@ -104,6 +104,18 @@ def get(todo):
         CastorDiJet = cms.vstring("HLT_L1CastorMediumJet_PFJet15_v*")
     )
 
+    defs["HIRun2015Triggers"]  = cms.PSet(
+        miniView = cms.string("TriggerResultsView"),
+        branchPrefix = cms.untracked.string("trg"),
+        process = cms.string("HLT"),
+        storePrescales = cms.bool(False),
+        triggers = cms.vstring("ZeroBias","NotBptxOR","BptxPlus","BptxMinus","MinBiasHFOR"),
+        ZeroBias = cms.vstring("HLT_HIZeroBias_v1"),
+        NotBptxOR = cms.vstring("HLT_HIL1Tech7_NoBPTX_v1"),
+        BptxPlus = cms.vstring("HLT_HIL1Tech5_BPTX_PlusOnly_v1"),
+        BptxMinus = cms.vstring("HLT_HIL1Tech6_BPTX_MinusOnly_v1"),
+        MinBiasHFOR = cms.vstring("HLT_HIL1MinimumBiasHF1OR_v1","HLT_HIL1MinimumBiasHF2OR_v1")
+    )
  
     # main function
     ret = {}
