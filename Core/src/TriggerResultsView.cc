@@ -117,7 +117,7 @@ void TriggerResultsView::fillSpecific(const edm::Event& iEvent, const edm::Event
         //it->first  - branch name
         //it->second - list of triggers to check
         //
-        //std::cout << "Trying " << it->first << std::endl;
+        ///std::cout << "Trying " << it->first << std::endl;
 
         if (it->first == "L1GTTech") {
             for (unsigned int i=0; i < TechTrigg.size(); ++i) addToIVec(it->first, TechTrigg.at(i));
@@ -134,8 +134,12 @@ void TriggerResultsView::fillSpecific(const edm::Event& iEvent, const edm::Event
             if (name.find("*")!= std::string::npos) { // wildcard entry
                 // do nothing
             } else {
-                 setI("L1PS_" + it->first, (hltprovider_.prescaleValues(iEvent, iSetup, name)).first );
-                 setI("HLTPS_" + it->first, (hltprovider_.prescaleValues(iEvent, iSetup, name)).second );
+	    	 std::pair<std::vector<std::pair<std::string,int> >,int> hpoutput = hltprovider_.prescaleValuesInDetail(iEvent, iSetup, name);
+		 std::vector<std::pair<std::string,int> > vectorpair = hpoutput.first;
+		 int myL1prescale = -1; // initiate to negative value: if no or more than one L1 seed is found, we can not determine prescale correctly
+		 if (vectorpair.size() == 1) { myL1prescale = vectorpair[0].second; }
+                 setI("L1PS_" + it->first, myL1prescale );
+                 setI("HLTPS_" + it->first, hpoutput.second );
             }
         }
 
@@ -154,8 +158,12 @@ void TriggerResultsView::fillSpecific(const edm::Event& iEvent, const edm::Event
             } else { // normal entry
                 if (trbn.accept( it->second.at(i))) accept = 1;
                 if (m_storePrescales) {
-                     setI("L1PS_" + name, (hltprovider_.prescaleValues(iEvent, iSetup, name)).first );
-                     setI("HLTPS_" + name, (hltprovider_.prescaleValues(iEvent, iSetup, name)).second );
+		     std::pair<std::vector<std::pair<std::string,int> >,int> hpoutput = hltprovider_.prescaleValuesInDetail(iEvent, iSetup, name);
+		     std::vector<std::pair<std::string,int> > vectorpair = hpoutput.first;
+		     int myL1prescale = -1; // initiate to negative value: if no or more than one L1 seed is found, we can not determine prescale correctly
+		     if (vectorpair.size() == 1) { myL1prescale = vectorpair[0].second; }
+                     setI("L1PS_" + name, myL1prescale );
+                     setI("HLTPS_" + name, hpoutput.second );
                 }
             }
             //std::cout << "Accept: " << it->first <<  " "  << accept << std::endl;

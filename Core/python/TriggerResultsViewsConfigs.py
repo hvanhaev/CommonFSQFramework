@@ -108,7 +108,7 @@ def get(todo):
         miniView = cms.string("TriggerResultsView"),
         branchPrefix = cms.untracked.string("trg"),
         process = cms.string("HLT"),
-        storePrescales = cms.bool(False),
+        storePrescales = cms.bool(True),
         triggers = cms.vstring("ZeroBias","NotBptxOR","BptxPlus","BptxMinus","MinBiasHFOR"),
         ZeroBias = cms.vstring("HLT_HIZeroBias_v1"),
         NotBptxOR = cms.vstring("HLT_HIL1Tech7_NoBPTX_v1"),
