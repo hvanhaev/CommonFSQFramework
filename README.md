@@ -3,8 +3,8 @@
 This is the common software analysis package of the Forward and Small-x QCD group in the CMS experiment at CERN to process LHC Run2 data.
 
 For more information regarding this framework, please look at the following pages: <br>
-https://twiki.cern.ch/twiki/bin/viewauth/CMS/FSQCommonFW
-https://twiki.cern.ch/twiki/bin/viewauth/CMS/FSQCommonFWTutorialP2 (currently not up to date)<br>
+https://twiki.cern.ch/twiki/bin/viewauth/CMS/FSQCommonFW (General analysis use)
+https://twiki.cern.ch/twiki/bin/viewauth/CMS/FSQCommonFWTutorialP2 (information on how to create your own skims/code)<br>
 
 Twiki page with existing skims:<br>
 https://twiki.cern.ch/twiki/bin/view/CMS/CFFSkims
@@ -14,5 +14,20 @@ https://twiki.cern.ch/twiki/bin/view/CMS/FSQCommonFW201504Jets
 
 Or look into the /Core/doc directory for information.
 
-Please note that this is still in heavy development...
+# Compatibility and Usage
+
+In order to get the code compiled you need to install a CMSSW release CMSSW_10_1_X with X >= 1. 
+
+<b>This branch version was intended for development inside CMSSW_10_1_X releases.</b> 
+
+For use with CMSSW: clone this repository in your CMSSW/src directory and compile with scram b.
+
+# Note for standalone operations:
+
+In order to run CFF in standalone mode as a python library, just
+execute the script ./makeStandalone.sh Afterwards you are ready to use
+the library on any machine that has just python and PyROOT installed!
+
+Make sure you don't load the libFWCoreFWLite.so anywhere in your code and
+scripts. This will not work on normal computer systems without CMSSW. 
 
