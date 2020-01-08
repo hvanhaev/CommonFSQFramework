@@ -29,13 +29,3 @@ Current branches:<br>
 - CMSSW_103X: use it for Run II 2018 data analysis.
 
 For use with CMSSW: clone this repository in your CMSSW/src directory and compile with scram b.
-
-# Note for standalone operations:
-
-In order to run CFF in standalone mode as a python library, just
-execute the script ./makeStandalone.sh Afterwards you are ready to use
-the library on any machine that has just python and PyROOT installed!
-
-Make sure you don't load the libFWCoreFWLite.so anywhere in your code and
-scripts. This will not work on normal computer systems without CMSSW. 
-
