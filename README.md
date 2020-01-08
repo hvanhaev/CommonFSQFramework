@@ -16,9 +16,9 @@ Or look into the /Core/doc directory for information.
 
 # Compatibility and Usage
 
-In order to get the code compiled you need to install a CMSSW release CMSSW_10_3_X with X >= 1. <br><br>
+In order to get the code compiled you need to install a CMSSW release CMSSW_10_3_X with X >= 1. 
 
-<b>This branch version is intended to analyse Run II 2018 data.</b> <br><br>
+<b>This branch version is intended to analyse Run II 2018 data.</b> 
 
 For use with CMSSW: clone this repository in your CMSSW/src directory and compile with scram b.
 
